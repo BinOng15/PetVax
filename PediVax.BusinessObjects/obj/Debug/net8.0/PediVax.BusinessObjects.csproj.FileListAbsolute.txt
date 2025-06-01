@@ -1,0 +1,15 @@
+E:\Git\pedivax\PediVax.BusinessObjects\bin\Debug\net8.0\PediVax.BusinessObjects.deps.json
+E:\Git\pedivax\PediVax.BusinessObjects\bin\Debug\net8.0\PediVax.BusinessObjects.runtimeconfig.json
+E:\Git\pedivax\PediVax.BusinessObjects\bin\Debug\net8.0\PediVax.BusinessObjects.dll
+E:\Git\pedivax\PediVax.BusinessObjects\bin\Debug\net8.0\PediVax.BusinessObjects.pdb
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\PediVax.BusinessObjects.csproj.AssemblyReference.cache
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\PediVax.BusinessObjects.GeneratedMSBuildEditorConfig.editorconfig
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\PediVax.BusinessObjects.AssemblyInfoInputs.cache
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\PediVax.BusinessObjects.AssemblyInfo.cs
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\PediVax.BusinessObjects.csproj.CoreCompileInputs.cache
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\PediVax.BusinessObjects.sourcelink.json
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\PediVax.BusinessObjects.dll
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\refint\PediVax.BusinessObjects.dll
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\PediVax.BusinessObjects.pdb
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\PediVax.BusinessObjects.genruntimeconfig.cache
+E:\Git\pedivax\PediVax.BusinessObjects\obj\Debug\net8.0\ref\PediVax.BusinessObjects.dll
