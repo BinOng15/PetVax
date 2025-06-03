@@ -24,7 +24,6 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; }
 
         // Navigation properties
-        [ForeignKey("CustomerId")]
         public virtual Customer Customer { get; set; }
 
     }

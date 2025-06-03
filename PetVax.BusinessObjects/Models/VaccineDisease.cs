@@ -21,9 +21,7 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; } // User who last modified the record
 
         // Navigation properties
-        [ForeignKey("VaccineId")]
         public virtual Vaccine Vaccine { get; set; } // Navigation to Vaccine table
-        [ForeignKey("DiseaseId")]
         public virtual Disease Disease { get; set; } // Navigation to Disease table
     }
 }

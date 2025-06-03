@@ -13,7 +13,6 @@ namespace PetVax.BusinessObjects.Models
     {
         [Key]
         public int MembershipId { get; set; }
-        public int CustomerId { get; set; }
         public string MembershipCode { get; set; } // e.g., "MEMB123456", unique identifier for the membership
         public string Name { get; set; }
         public string Description { get; set; }
@@ -25,8 +24,7 @@ namespace PetVax.BusinessObjects.Models
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
 
-        // Navigation properties
-        [ForeignKey("CustomerId")]
         public virtual Customer Customer { get; set; }
+
     }
 }

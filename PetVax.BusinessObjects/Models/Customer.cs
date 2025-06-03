@@ -29,9 +29,7 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; }
 
         // Navigation properties
-        [ForeignKey("AccountId")]
         public virtual Account Account { get; set; }
-        [ForeignKey("MembershipId")]
         public virtual Membership Membership { get; set; }
         public virtual ICollection<Pet> Pets { get; set; }
 

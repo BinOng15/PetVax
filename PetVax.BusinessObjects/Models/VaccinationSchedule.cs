@@ -13,7 +13,9 @@ namespace PetVax.BusinessObjects.Models
     {
         [Key]
         public int VaccinationScheduleId { get; set; } // Unique identifier for the vaccination schedule
+
         public int DiseaseId { get; set; } // Foreign key to Disease table
+
         public string Species { get; set; } // e.g., "Dog", "Cat"
         public int DoseNumber { get; set; }
         public int AgeInterval { get; set; } // Age interval in months for the vaccination schedule
@@ -23,9 +25,8 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; } // User who last modified the record
 
         // Navigation properties
-        [ForeignKey("DiseaseId")]
         public virtual Disease Disease { get; set; } // Navigation to Disease table
-        public virtual ICollection<VaccineProfile> VaccineProfiles { get; set; } // Navigation to VaccineProfile table
 
+        public virtual ICollection<VaccineProfile> VaccineProfiles { get; set; } // Navigation to VaccineProfile table
     }
 }

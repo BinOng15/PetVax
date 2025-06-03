@@ -15,13 +15,15 @@
 *.sln.docstates
 
 # Ignore build output directories
-bin/
-obj/
+*.dll
+*.pdb
+*.cache
 **/bin/
 **/obj/
 **/out/
 **/Debug/
 **/Release/
+
 
 # Ignore user secrets and sensitive configuration files
 appsettings.Development.json
@@ -56,3 +58,4 @@ project.assets.json
 *.swo
 *.DS_Store
 Thumbs.db
+

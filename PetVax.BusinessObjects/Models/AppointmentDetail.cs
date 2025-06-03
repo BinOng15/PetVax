@@ -15,6 +15,7 @@ namespace PetVax.BusinessObjects.Models
         public int AppointmentDetailId { get; set; } // Unique identifier for the appointment detail
         public int AppointmentId { get; set; } // Foreign key to Appointment table
         public int VetId { get; set; } // Foreign key to Vet table
+        public int VaccineProfileId { get; set; } // Foreign key to VaccineProfile table
         public string ServiceType { get; set; } // e.g., "Vaccination", "Microchip", "Passport", "Health Check"
         public int MicrochipItemId { get; set; } // Foreign key to MicrochipItem table
         public int PassportId { get; set; } // Foreign key to PetPassport table
@@ -32,17 +33,12 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; } // User who last modified the record
 
         // Navigation properties
-        [ForeignKey("AppointmentId")]
         public virtual Appointment Appointment { get; set; } // Navigation to Appointment table
-        [ForeignKey("VetId")]
         public virtual Vet Vet { get; set; } // Navigation to Vet table
-        [ForeignKey("MicrochipItemId")]
         public virtual MicrochipItem MicrochipItem { get; set; } // Navigation to MicrochipItem table
-        [ForeignKey("PassportId")]
         public virtual PetPassport PetPassport { get; set; } // Navigation to PetPassport table
-        [ForeignKey("HealthConditionId")]
         public virtual HealthCondition HealthCondition { get; set; } // Navigation to HealthCondition table
-        [ForeignKey("VaccineBatchId")]
         public virtual VaccineBatch VaccineBatch { get; set; } // Navigation to VaccineBatch table
+        public virtual VaccineProfile VaccineProfile { get; set; } // Navigation to VaccineProfile table
     }
 }

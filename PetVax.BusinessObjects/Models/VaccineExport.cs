@@ -22,5 +22,7 @@ namespace PetVax.BusinessObjects.Models
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
 
+        // Navigation properties
+        public virtual ICollection<VaccineExportDetail> VaccineExportDetails { get; set; } // Collection of vaccine export details associated with this export
     }
 }
