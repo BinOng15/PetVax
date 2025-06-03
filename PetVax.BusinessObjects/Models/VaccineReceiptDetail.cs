@@ -13,19 +13,27 @@ namespace PetVax.BusinessObjects.Models
     {
         [Key]
         public int VaccineReceiptDetailId { get; set; } // Unique identifier for the vaccine receipt detail
+
+        [ForeignKey(nameof(VaccineReceipt))]
         public int VaccineReceiptId { get; set; } // Foreign key to VaccineReceipt table
+
+        [ForeignKey(nameof(VaccineBatch))]
         public int VaccineBatchId { get; set; } // Foreign key to VaccineBatch table
+
         public int Quantity { get; set; } // Quantity of vaccines in the receipt detail
+
         public string Notes { get; set; } // Additional notes for the vaccine receipt detail
+
         public DateTime CreatedAt { get; set; } // Date when the record was created
+
         public string CreatedBy { get; set; } // User who created the record
+
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
+
         public string? ModifiedBy { get; set; } // User who last modified the record
 
         // Navigation properties
-        [ForeignKey("VaccineReceiptId")]
-        public virtual VaccineReceipt VaccineReceipt { get; set; } // Navigation to VaccineReceipt table
-        [ForeignKey("VaccineBatchId")]
-        public virtual VaccineBatch VaccineBatch { get; set; } // Navigation to VaccineBatch table
+        public virtual VaccineReceipt VaccineReceipt { get; set; } = null!; // Navigation to VaccineReceipt table
+        public virtual VaccineBatch VaccineBatch { get; set; } = null!; // Navigation to VaccineBatch table
     }
 }

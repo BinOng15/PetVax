@@ -33,10 +33,8 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; }
 
         // Navigation properties
-        public virtual ICollection<Pet> Pets { get; set; }
-        [ForeignKey("MicrochipItemId")]
+        public virtual Pet Pet { get; set; }
         public virtual MicrochipItem MicrochipItem { get; set; }
-        [ForeignKey("HealthConditionId")]
         public virtual HealthCondition HealthCondition { get; set; }
     }
 }

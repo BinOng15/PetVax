@@ -27,9 +27,7 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; } // User who last modified the record
 
         // Navigation properties
-        [ForeignKey("CustomerId")]
         public virtual Customer Customer { get; set; } // Navigation to Customer table
-        [ForeignKey("PetId")]
         public virtual Pet Pet { get; set; } // Navigation to Pet table
 
     }

@@ -25,7 +25,6 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; } // User who last modified the record
 
         // Navigation properties
-        [ForeignKey("MicrochipId")]
         public virtual Microchip Microchip { get; set; } // Navigation to Microchip table
     }
 }
