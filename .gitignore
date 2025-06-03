@@ -1,0 +1,58 @@
+# Ignore environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
+
+# Ignore Visual Studio user-specific files
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore build output directories
+bin/
+obj/
+**/bin/
+**/obj/
+**/out/
+**/Debug/
+**/Release/
+
+# Ignore user secrets and sensitive configuration files
+appsettings.Development.json
+secrets.json
+
+# Ignore logs and generated files
+*.log
+logs/
+coverage/
+TestResults/
+*.cache
+*.pdb
+*.mdb
+
+# Ignore package-related files
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.assets.json
+
+# Ignore Docker build files
+**/Dockerfile
+**/docker-compose.*
+.dockerignore
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db

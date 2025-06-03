@@ -7379,23 +7379,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\hungv\\.nuget\\packages\\": {},
+    "C:\\Users\\VanHieu\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Git\\PetVax\\PetVax.Services\\PetVax.Services.csproj",
+      "projectUniqueName": "C:\\Users\\VanHieu\\Desktop\\PetVax\\PetVax.Services\\PetVax.Services.csproj",
       "projectName": "PetVax.Services",
-      "projectPath": "E:\\Git\\PetVax\\PetVax.Services\\PetVax.Services.csproj",
-      "packagesPath": "C:\\Users\\hungv\\.nuget\\packages\\",
-      "outputPath": "E:\\Git\\PetVax\\PetVax.Services\\obj\\",
+      "projectPath": "C:\\Users\\VanHieu\\Desktop\\PetVax\\PetVax.Services\\PetVax.Services.csproj",
+      "packagesPath": "C:\\Users\\VanHieu\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\VanHieu\\Desktop\\PetVax\\PetVax.Services\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\hungv\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\VanHieu\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -7404,14 +7404,15 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "E:\\Git\\PetVax\\PetVax.Repositories\\PetVax.Repositories.csproj": {
-              "projectPath": "E:\\Git\\PetVax\\PetVax.Repositories\\PetVax.Repositories.csproj"
+            "C:\\Users\\VanHieu\\Desktop\\PetVax\\PetVax.Repositories\\PetVax.Repositories.csproj": {
+              "projectPath": "C:\\Users\\VanHieu\\Desktop\\PetVax\\PetVax.Repositories\\PetVax.Repositories.csproj"
             }
           }
         }
@@ -7420,13 +7421,7 @@
         "warnAsError": [
           "NU1605"
         ]
-      },
-      "restoreAuditProperties": {
-        "enableAudit": "true",
-        "auditLevel": "low",
-        "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "9.0.200"
+      }
     },
     "frameworks": {
       "net8.0": {
@@ -7461,7 +7456,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

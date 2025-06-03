@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PetVax")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+678cb5f7a87ff1c3534e8812fee80f38cd692304")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("PetVax")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PetVax")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
