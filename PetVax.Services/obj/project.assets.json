@@ -63,7 +63,7 @@
           }
         }
       },
-      "CloudinaryDotNet/1.27.4": {
+      "CloudinaryDotNet/1.27.5": {
         "type": "package",
         "dependencies": {
           "Newtonsoft.Json": "13.0.3",
@@ -2595,16 +2595,16 @@
         "lib/netstandard2.0/Azure.Identity.xml"
       ]
     },
-    "CloudinaryDotNet/1.27.4": {
-      "sha512": "yg8ueu70WBJStNGcp+E8kqRCRiFST6LX+Tup8XrXVLjY1Pumas1d6GTjfrsq54hDm42kWc1BtRpaKw6dmm7v5Q==",
+    "CloudinaryDotNet/1.27.5": {
+      "sha512": "wYq4VGuy6o49XMG97jITrXM//4a60Lf5WzuvDcn7tpPrkYJMnaRuAl1xA9CsHlKzxOD1MYRmUYxQGSbcEG1TMQ==",
       "type": "package",
-      "path": "cloudinarydotnet/1.27.4",
+      "path": "cloudinarydotnet/1.27.5",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "CloudinaryIcon.png",
         "README.md",
-        "cloudinarydotnet.1.27.4.nupkg.sha512",
+        "cloudinarydotnet.1.27.5.nupkg.sha512",
         "cloudinarydotnet.nuspec",
         "lib/net452/CloudinaryDotNet.dll",
         "lib/net452/CloudinaryDotNet.xml",
@@ -7373,7 +7373,7 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "AutoMapper >= 14.0.0",
-      "CloudinaryDotNet >= 1.27.4",
+      "CloudinaryDotNet >= 1.27.5",
       "Microsoft.AspNetCore.Http.Abstractions >= 2.3.0",
       "PetVax.Repositories >= 1.0.0"
     ]
@@ -7438,7 +7438,7 @@
           },
           "CloudinaryDotNet": {
             "target": "Package",
-            "version": "[1.27.4, )"
+            "version": "[1.27.5, )"
           },
           "Microsoft.AspNetCore.Http.Abstractions": {
             "target": "Package",

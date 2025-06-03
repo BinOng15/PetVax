@@ -236,7 +236,7 @@
             },
             "CloudinaryDotNet": {
               "target": "Package",
-              "version": "[1.27.4, )"
+              "version": "[1.27.5, )"
             },
             "Microsoft.AspNetCore.Http.Abstractions": {
               "target": "Package",
