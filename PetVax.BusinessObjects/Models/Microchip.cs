@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class Microchip
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MicrochipId { get; set; } // Unique identifier for the microchip
         public string MicrochipCode { get; set; } // Unique code for the microchip, e.g., "MC123456789"
         public string Name { get; set; } // e.g., "Microchip A", "Microchip B"

@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class VaccineBatch
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VaccineBatchId { get; set; } // Unique identifier for the vaccine batch
         public int VaccineId { get; set; } // Foreign key to Vaccine table
         public string BatchNumber { get; set; } // e.g., "BATCH12345"

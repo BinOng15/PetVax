@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class Customer
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CustomerId { get; set; }
         public int AccountId { get; set; }
         public int MembershipId { get; set; }

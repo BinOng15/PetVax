@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class Appointment
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int AppointmentId { get; set; } // Unique identifier for the appointment
         public int CustomerId { get; set; } // Foreign key to Customer table
         public int PetId { get; set; } // Foreign key to Pet table

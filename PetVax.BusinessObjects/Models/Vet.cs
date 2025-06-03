@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class Vet
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VetId { get; set; } // Unique identifier for the vet
         public int AccountId { get; set; } // Foreign key to Account table
         public string VetCode { get; set; } // e.g., "VET12345", unique identifier for the vet

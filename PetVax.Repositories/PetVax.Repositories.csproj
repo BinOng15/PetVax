@@ -13,11 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="IRepository\" />
-      <Folder Include="Repository\BaseResponse\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\PetVax.BusinessObjects\PetVax.BusinessObjects.csproj" />
     </ItemGroup>
 

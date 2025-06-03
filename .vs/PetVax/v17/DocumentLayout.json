@@ -3,24 +3,136 @@
   "WorkspaceRootPath": "E:\\Git\\PetVax\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\Git\\PetVax\\PetVax.BusinessObjects\\Migrations\\20250603152500_SeedData.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:PetVax.BusinessObjects\\Migrations\\20250603152500_SeedData.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{62614540-E536-485E-AFA9-295BA8689F93}|PetVax.Repositories\\PetVax.Repositories.csproj|e:\\git\\petvax\\petvax.repositories\\irepository\\iaccountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{62614540-E536-485E-AFA9-295BA8689F93}|PetVax.Repositories\\PetVax.Repositories.csproj|solutionrelative:petvax.repositories\\irepository\\iaccountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\dbcontext\\seeddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\dbcontext\\seeddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{62614540-E536-485E-AFA9-295BA8689F93}|PetVax.Repositories\\PetVax.Repositories.csproj|e:\\git\\petvax\\petvax.repositories\\repository\\baseresponse\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{62614540-E536-485E-AFA9-295BA8689F93}|PetVax.Repositories\\PetVax.Repositories.csproj|solutionrelative:petvax.repositories\\repository\\baseresponse\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\helpers\\passwordhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\helpers\\passwordhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\dto\\authenticatedto\\authresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\dto\\authenticatedto\\authresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2892078E-C6CB-4BBB-BD85-D04A5F4C74D0}|PetVax.API\\PetVax.csproj|e:\\git\\petvax\\petvax.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{2892078E-C6CB-4BBB-BD85-D04A5F4C74D0}|PetVax.API\\PetVax.csproj|solutionrelative:petvax.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\dto\\authenticatedto\\loginrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\dto\\authenticatedto\\loginrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\dto\\accountdto\\updateaccountdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\dto\\accountdto\\updateaccountdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\dto\\accountdto\\createaccountdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\dto\\accountdto\\createaccountdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\dto\\accountdto\\accountresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\dto\\accountdto\\accountresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\account.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\account.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vetschedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vetschedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vaccinereceiptdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vaccinereceiptdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vaccinereceipt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vaccinereceipt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vaccineprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vaccineprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vaccineexportdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vaccineexportdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vaccineexport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vaccineexport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vaccinedisease.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vaccinedisease.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vaccinebatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vaccinebatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vaccine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vaccine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\vaccinationschedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\vaccinationschedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\servicehistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\servicehistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\pointtransaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\pointtransaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\petpassport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\petpassport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\pet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\pet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\microchipitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\microchipitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\microchip.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\microchip.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\membership.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\membership.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\healthcondition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\healthcondition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\disease.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\disease.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\appointment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\appointment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\appointmentdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\appointmentdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\models\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\models\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|e:\\git\\petvax\\petvax.businessobjects\\dbcontext\\petvaxcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00B7D91A-3D62-4DE0-9A2F-98446A629C8C}|PetVax.BusinessObjects\\PetVax.BusinessObjects.csproj|solutionrelative:petvax.businessobjects\\dbcontext\\petvaxcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -119,66 +231,430 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "20250603152500_SeedData.cs",
-              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Migrations\\20250603152500_SeedData.cs",
-              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Migrations\\20250603152500_SeedData.cs",
-              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Migrations\\20250603152500_SeedData.cs",
-              "RelativeToolTip": "PetVax.BusinessObjects\\Migrations\\20250603152500_SeedData.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "IAccountRepository.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.Repositories\\IRepository\\IAccountRepository.cs",
+              "RelativeDocumentMoniker": "PetVax.Repositories\\IRepository\\IAccountRepository.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.Repositories\\IRepository\\IAccountRepository.cs",
+              "RelativeToolTip": "PetVax.Repositories\\IRepository\\IAccountRepository.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAAAAwAAABZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-03T15:25:01.147Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "PasswordHelper.cs",
-              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Helpers\\PasswordHelper.cs",
-              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Helpers\\PasswordHelper.cs",
-              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Helpers\\PasswordHelper.cs",
-              "RelativeToolTip": "PetVax.BusinessObjects\\Helpers\\PasswordHelper.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAwBoAAAA1AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-03T15:10:40.778Z",
+              "WhenOpened": "2025-06-03T16:32:56.658Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "SeedData.cs",
-              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DBContext\\SeedData.cs",
-              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\DBContext\\SeedData.cs",
-              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DBContext\\SeedData.cs",
-              "RelativeToolTip": "PetVax.BusinessObjects\\DBContext\\SeedData.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAQwCEAAAArAAAAAAAAAA==",
+              "Title": "GenericRepository.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.Repositories\\Repository\\BaseResponse\\GenericRepository.cs",
+              "RelativeDocumentMoniker": "PetVax.Repositories\\Repository\\BaseResponse\\GenericRepository.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.Repositories\\Repository\\BaseResponse\\GenericRepository.cs",
+              "RelativeToolTip": "PetVax.Repositories\\Repository\\BaseResponse\\GenericRepository.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAABIAAAA3AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-03T15:06:27.147Z",
+              "WhenOpened": "2025-06-03T16:30:33.785Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AuthResponse.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AuthenticateDTO\\AuthResponse.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\DTO\\AuthenticateDTO\\AuthResponse.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AuthenticateDTO\\AuthResponse.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\DTO\\AuthenticateDTO\\AuthResponse.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAA0AAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:25:51.05Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.API\\appsettings.json",
-              "RelativeDocumentMoniker": "PetVax.API\\appsettings.json",
-              "ToolTip": "E:\\Git\\PetVax\\PetVax.API\\appsettings.json",
-              "RelativeToolTip": "PetVax.API\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-06-03T15:01:46.7Z",
+              "Title": "LoginRequestDTO.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AuthenticateDTO\\LoginRequestDTO.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\DTO\\AuthenticateDTO\\LoginRequestDTO.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AuthenticateDTO\\LoginRequestDTO.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\DTO\\AuthenticateDTO\\LoginRequestDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:25:11.133Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AccountResponseDTO.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AccountDTO\\AccountResponseDTO.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\DTO\\AccountDTO\\AccountResponseDTO.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AccountDTO\\AccountResponseDTO.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\DTO\\AccountDTO\\AccountResponseDTO.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAcwA0AAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:16:47.163Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "VetSchedule.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VetSchedule.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\VetSchedule.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VetSchedule.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\VetSchedule.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:52.364Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Vet.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Vet.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Vet.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Vet.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Vet.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:48.616Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "VaccineReceiptDetail.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineReceiptDetail.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\VaccineReceiptDetail.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineReceiptDetail.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\VaccineReceiptDetail.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:44.8Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "VaccineReceipt.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineReceipt.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\VaccineReceipt.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineReceipt.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\VaccineReceipt.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:41.195Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "VaccineProfile.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineProfile.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\VaccineProfile.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineProfile.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\VaccineProfile.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:37.525Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "VaccineExport.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineExport.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\VaccineExport.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineExport.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\VaccineExport.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:27.595Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "VaccineDisease.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineDisease.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\VaccineDisease.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineDisease.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\VaccineDisease.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:23.495Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "VaccineBatch.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineBatch.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\VaccineBatch.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineBatch.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\VaccineBatch.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:19.389Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "Vaccine.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Vaccine.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Vaccine.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Vaccine.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Vaccine.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:15.33Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "VaccinationSchedule.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccinationSchedule.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\VaccinationSchedule.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccinationSchedule.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\VaccinationSchedule.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:10:11.983Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "PointTransaction.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\PointTransaction.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\PointTransaction.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\PointTransaction.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\PointTransaction.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:09:59.045Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "PetPassport.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\PetPassport.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\PetPassport.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\PetPassport.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\PetPassport.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:09:54.941Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "Pet.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Pet.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Pet.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Pet.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Pet.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:09:45.968Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "Payment.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Payment.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Payment.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Payment.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Payment.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:09:41.489Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "MicrochipItem.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\MicrochipItem.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\MicrochipItem.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\MicrochipItem.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\MicrochipItem.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:09:37.58Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "Microchip.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Microchip.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Microchip.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Microchip.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Microchip.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:09:30.758Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "Membership.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Membership.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Membership.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Membership.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Membership.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:09:26.661Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "HealthCondition.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\HealthCondition.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\HealthCondition.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\HealthCondition.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\HealthCondition.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:09:21.477Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "ServiceHistory.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\ServiceHistory.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\ServiceHistory.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\ServiceHistory.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\ServiceHistory.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAUwA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:06:13.701Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "Disease.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Disease.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Disease.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Disease.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Disease.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:05:33.485Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "Customer.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Customer.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Customer.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Customer.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Customer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:05:29.829Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "AppointmentDetail.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\AppointmentDetail.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\AppointmentDetail.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\AppointmentDetail.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\AppointmentDetail.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAxwA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:05:24.969Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "Appointment.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Appointment.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Appointment.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Appointment.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Appointment.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAwwA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T16:05:16.738Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "PetVaxContext.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DBContext\\PetVaxContext.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\DBContext\\PetVaxContext.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DBContext\\PetVaxContext.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\DBContext\\PetVaxContext.cs",
+              "ViewState": "AgIAAEEAAAAAAAAAAAA9wEoAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T15:38:07.984Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "VaccineExportDetail.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineExportDetail.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\VaccineExportDetail.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\VaccineExportDetail.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\VaccineExportDetail.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA4AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T15:36:17.5Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\appsettings.json",
-              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\appsettings.json",
-              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\appsettings.json",
-              "RelativeToolTip": "PetVax.BusinessObjects\\appsettings.json",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-06-03T06:07:47.881Z",
+              "Title": "UpdateAccountDTO.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AccountDTO\\UpdateAccountDTO.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\DTO\\AccountDTO\\UpdateAccountDTO.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AccountDTO\\UpdateAccountDTO.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\DTO\\AccountDTO\\UpdateAccountDTO.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAwAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T15:33:08.34Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "CreateAccountDTO.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AccountDTO\\CreateAccountDTO.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\DTO\\AccountDTO\\CreateAccountDTO.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\DTO\\AccountDTO\\CreateAccountDTO.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\DTO\\AccountDTO\\CreateAccountDTO.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABQAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T15:29:19.427Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Account.cs",
+              "DocumentMoniker": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Account.cs",
+              "RelativeDocumentMoniker": "PetVax.BusinessObjects\\Models\\Account.cs",
+              "ToolTip": "E:\\Git\\PetVax\\PetVax.BusinessObjects\\Models\\Account.cs",
+              "RelativeToolTip": "PetVax.BusinessObjects\\Models\\Account.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAAABIAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-03T15:28:52.469Z",
               "EditorCaption": ""
             }
           ]

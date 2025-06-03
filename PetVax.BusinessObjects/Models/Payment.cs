@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class Payment
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PaymentId { get; set; } // Unique identifier for the payment record
         public int AppointmentDetailId { get; set; } // Foreign key to AppointmentDetail table
         public int CustomerId { get; set; } // Foreign key to Customer table

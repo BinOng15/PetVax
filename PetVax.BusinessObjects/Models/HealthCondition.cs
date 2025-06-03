@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class HealthCondition
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int HealthConditionId { get; set; }
         public int PetId { get; set; } // Foreign key to Pet table
         public string ConditionCode { get; set; } // e.g., "HC123456", unique identifier for the health condition

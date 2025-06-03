@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class ServiceHistory
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ServiceHistoryId { get; set; } // Unique identifier for the service history record
         public string ServiceType { get; set; } // Type of service provided, e.g., "Vaccination", "Microchip", "Health Check"
         public DateTime ServiceDate { get; set; } // Date when the service was provided

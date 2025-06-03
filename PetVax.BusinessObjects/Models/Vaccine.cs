@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class Vaccine
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VaccineId { get; set; } // Unique identifier for the vaccine
         public string VaccineCode { get; set; } // e.g., "VAC12345", unique identifier for the vaccine
         public string Name { get; set; } // e.g., "Rabies Vaccine", "Distemper Vaccine"

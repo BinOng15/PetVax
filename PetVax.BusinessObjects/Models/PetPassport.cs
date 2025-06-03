@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class PetPassport
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PassportId { get; set; }
         public int PetId { get; set; }
         public int MicrochipItemId { get; set; } // Foreign key to MicrochipItem table

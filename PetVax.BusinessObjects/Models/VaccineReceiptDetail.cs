@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class VaccineReceiptDetail
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VaccineReceiptDetailId { get; set; } // Unique identifier for the vaccine receipt detail
 
         [ForeignKey(nameof(VaccineReceipt))]

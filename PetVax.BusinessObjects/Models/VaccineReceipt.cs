@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class VaccineReceipt
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VaccineReceiptId { get; set; } // Unique identifier for the vaccine receipt
         public string ReceiptCode { get; set; } // e.g., "REC123456", unique identifier for the receipt
         public DateTime ReceiptDate { get; set; } // Date of the receipt in "yyyy-MM-dd" format

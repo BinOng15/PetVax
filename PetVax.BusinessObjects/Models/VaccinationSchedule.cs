@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class VaccinationSchedule
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VaccinationScheduleId { get; set; } // Unique identifier for the vaccination schedule
 
         public int DiseaseId { get; set; } // Foreign key to Disease table

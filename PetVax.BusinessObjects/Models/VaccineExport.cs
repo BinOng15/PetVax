@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class VaccineExport
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VaccineExportId { get; set; } // Unique identifier for the vaccine export record
         public string ExportCode { get; set; }
         public DateTime ExportDate { get; set; } // Date when the vaccine was exported

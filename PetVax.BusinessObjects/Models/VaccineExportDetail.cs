@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class VaccineExportDetail
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VaccineExportDetailId { get; set; } // Unique identifier for the vaccine export detail
         public int VaccineBatchId { get; set; } // Foreign key to VaccineBatch table
         public int VaccineExportId { get; set; } // Foreign key to VaccineExport table

@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class PointTransaction
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int TransactionId { get; set; }
         public int CustomerId { get; set; }
         public string Change { get; set; }

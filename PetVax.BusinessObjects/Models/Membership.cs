@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class Membership
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MembershipId { get; set; }
         public string MembershipCode { get; set; } // e.g., "MEMB123456", unique identifier for the membership
         public string Name { get; set; }

@@ -12,6 +12,7 @@ namespace PetVax.BusinessObjects.Models
     public class Disease
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int DiseaseId { get; set; } // Unique identifier for the disease
         public string Name { get; set; } // Name of the disease, e.g., "Canine Parvovirus", "Feline Leukemia"
         public string Description { get; set; } // Description of the disease, e.g., "Highly contagious viral disease in dogs"
