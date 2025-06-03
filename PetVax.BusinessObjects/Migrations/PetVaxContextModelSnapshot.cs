@@ -72,13 +72,25 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 3, 5, 54, 10, 322, DateTimeKind.Utc).AddTicks(1892),
+                            CreatedAt = new DateTime(2025, 6, 3, 15, 25, 0, 584, DateTimeKind.Utc).AddTicks(517),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
                             ModifiedBy = "",
-                            Password = "admin123",
+                            Password = "tns+8qNsHzTeEu/NbYni0t43PI5KMl0gXbEEN8qjMoQ=",
                             RefereshToken = "",
                             Role = 1
+                        },
+                        new
+                        {
+                            AccountId = 2,
+                            AccessToken = "",
+                            CreatedAt = new DateTime(2025, 6, 3, 15, 25, 0, 584, DateTimeKind.Utc).AddTicks(522),
+                            CreatedBy = "system",
+                            Email = "staff@petvax.com",
+                            ModifiedBy = "",
+                            Password = "gYMd4KGBD2sEeUuepPrVJ6INHXlkOWjBzvJvU7rRON0=",
+                            RefereshToken = "",
+                            Role = 2
                         });
                 });
 

@@ -1,0 +1,16 @@
+E:\Git\PetVax\PetVax.Repositories\bin\Debug\net8.0\PetVax.Repositories.deps.json
+E:\Git\PetVax\PetVax.Repositories\bin\Debug\net8.0\PetVax.Repositories.dll
+E:\Git\PetVax\PetVax.Repositories\bin\Debug\net8.0\PetVax.Repositories.pdb
+E:\Git\PetVax\PetVax.Repositories\bin\Debug\net8.0\PetVax.BusinessObjects.dll
+E:\Git\PetVax\PetVax.Repositories\bin\Debug\net8.0\PetVax.BusinessObjects.pdb
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\PetVax.Repositories.csproj.AssemblyReference.cache
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\PetVax.Repositories.GeneratedMSBuildEditorConfig.editorconfig
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\PetVax.Repositories.AssemblyInfoInputs.cache
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\PetVax.Repositories.AssemblyInfo.cs
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\PetVax.Repositories.csproj.CoreCompileInputs.cache
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\PetVax.Repositories.sourcelink.json
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\PetVax.R.CAC71E4C.Up2Date
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\PetVax.Repositories.dll
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\refint\PetVax.Repositories.dll
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\PetVax.Repositories.pdb
+E:\Git\PetVax\PetVax.Repositories\obj\Debug\net8.0\ref\PetVax.Repositories.dll
