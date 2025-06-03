@@ -21,6 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\PetVax.BusinessObjects\PetVax.BusinessObjects.csproj" />
 	  <ProjectReference Include="..\PetVax.Services\PetVax.Services.csproj" />
 	</ItemGroup>
 
