@@ -11,7 +11,7 @@ namespace PetVax.BusinessObjects.Helpers
     {
         public static string GenerateSalt()
         {
-            byte[] saltBytes = new byte[16];
+            byte[] saltBytes = new byte[32];
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(saltBytes);
@@ -22,7 +22,7 @@ namespace PetVax.BusinessObjects.Helpers
         public static string HashPassword(string password, string salt)
         {
             var saltBytes = Convert.FromBase64String(salt);
-            var hashBytes = new Rfc2898DeriveBytes(password, saltBytes, 10000, HashAlgorithmName.SHA256).GetBytes(16);
+            var hashBytes = new Rfc2898DeriveBytes(password, saltBytes, 10000, HashAlgorithmName.SHA256).GetBytes(32);
             return Convert.ToBase64String(hashBytes);
         }
     }
