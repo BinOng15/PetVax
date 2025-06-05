@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetVax.BusinessObjects.Migrations
 {
     /// <inheritdoc />
-    public partial class version2 : Migration
+    public partial class postgre_version2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,16 +16,16 @@ namespace PetVax.BusinessObjects.Migrations
                 table: "Account",
                 keyColumn: "AccountId",
                 keyValue: 1,
-                columns: new[] { "CreatedAt", "Password" },
-                values: new object[] { new DateTime(2025, 6, 3, 16, 1, 33, 376, DateTimeKind.Utc).AddTicks(1734), "x1RE/1IQUsTz+mCzesN8aax1DbRPWA4dTqqPlKkyqSY=" });
+                columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
+                values: new object[] { new DateTime(2025, 6, 5, 6, 26, 18, 667, DateTimeKind.Utc).AddTicks(7466), "BP9BYTbpwX75d2UEot006A==", "879YbsTO6kK8QcG1RkHHzQ==" });
 
             migrationBuilder.UpdateData(
                 schema: "dbo",
                 table: "Account",
                 keyColumn: "AccountId",
                 keyValue: 2,
-                columns: new[] { "CreatedAt", "Password" },
-                values: new object[] { new DateTime(2025, 6, 3, 16, 1, 33, 376, DateTimeKind.Utc).AddTicks(1738), "5F0TFOP3iaFynnG3+upjmYD3PKe9oHS0MAVEXKECpuc=" });
+                columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
+                values: new object[] { new DateTime(2025, 6, 5, 6, 26, 18, 667, DateTimeKind.Utc).AddTicks(7471), "bxuFGMUiJjDiAlRexof4CQ==", "R02g4LHg3f6h3zvWpH1Tig==" });
         }
 
         /// <inheritdoc />
@@ -36,16 +36,16 @@ namespace PetVax.BusinessObjects.Migrations
                 table: "Account",
                 keyColumn: "AccountId",
                 keyValue: 1,
-                columns: new[] { "CreatedAt", "Password" },
-                values: new object[] { new DateTime(2025, 6, 3, 15, 25, 0, 584, DateTimeKind.Utc).AddTicks(517), "tns+8qNsHzTeEu/NbYni0t43PI5KMl0gXbEEN8qjMoQ=" });
+                columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
+                values: new object[] { new DateTime(2025, 6, 5, 5, 36, 50, 506, DateTimeKind.Utc).AddTicks(9619), "v5rDRaM7z7JhDE0gWTCyHA==", "AT2esuw7PY7jGu1cK058NQ==" });
 
             migrationBuilder.UpdateData(
                 schema: "dbo",
                 table: "Account",
                 keyColumn: "AccountId",
                 keyValue: 2,
-                columns: new[] { "CreatedAt", "Password" },
-                values: new object[] { new DateTime(2025, 6, 3, 15, 25, 0, 584, DateTimeKind.Utc).AddTicks(522), "gYMd4KGBD2sEeUuepPrVJ6INHXlkOWjBzvJvU7rRON0=" });
+                columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
+                values: new object[] { new DateTime(2025, 6, 5, 5, 36, 50, 506, DateTimeKind.Utc).AddTicks(9623), "iWtdnFsfg1n/5S5RlztyhA==", "AT2esuw7PY7jGu1cK058NQ==" });
         }
     }
 }

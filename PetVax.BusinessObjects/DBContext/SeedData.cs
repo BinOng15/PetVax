@@ -18,27 +18,27 @@ namespace PetVax.BusinessObjects.DBContext
                 {
                     AccountId = 1,
                     Email = "admin@petvax.com",
-                    Password = hashedAdmin,
+                    PasswordHash = hashedAdmin,
+                    PasswordSalt = salt,
                     Role = Enum.EnumList.Role.Admin,
                     AccessToken = "",
                     RefereshToken = "",
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = "system",
-                    ModifiedAt = null,
-                    ModifiedBy = ""
+  
                 },
                 new Account
                 {
                     AccountId = 2,
                     Email = "staff@petvax.com",
-                    Password = hashedStaff,
+                    PasswordHash = hashedStaff,
+                    PasswordSalt = salt,
                     Role = Enum.EnumList.Role.Staff,
                     AccessToken = "",
                     RefereshToken = "",
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = "system",
-                    ModifiedAt = null,
-                    ModifiedBy = ""
+
                 }
             );
         }

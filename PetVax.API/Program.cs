@@ -7,6 +7,7 @@ using System.Text;
 using CloudinaryDotNet;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
+using PediVax.Infrastructure;
 
 namespace PediVax;
 
@@ -17,11 +18,32 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers();
+        builder.Services.AddSwaggerGen();
+        builder.Services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+        });
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                };
+            });
         // Add services to the container.
         builder.Services.AddAuthorization();
-        
+
         // Session Configuration
         builder.Services.AddDistributedMemoryCache();
+
         builder.Services.AddSession(options =>
         {
             options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -39,90 +61,51 @@ public class Program
         });
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        
+        builder.Services.Register();
 
         builder.Services.AddControllers();
-    // .AddJsonOptions(options =>
-    //{
-    //    options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
-    //});
-
-        builder.Services.AddControllers().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
-        });
 
         #region Configre Swagger
-        builder.Services.AddSwaggerGen(options =>
+        builder.Services.AddSwaggerGen(option =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "PediVax API", Version = "v1" });
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            ////JWT Config
+            option.DescribeAllParametersInCamelCase();
+            option.ResolveConflictingActions(conf => conf.First());
+            option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
-                Description = "Please enter a valid JWT token",
+                Description = "Please enter a valid token",
                 Name = "Authorization",
                 Type = SecuritySchemeType.Http,
                 BearerFormat = "JWT",
                 Scheme = "Bearer"
             });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            option.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
                     new OpenApiSecurityScheme
                     {
                         Reference = new OpenApiReference
                         {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
+                            Type=ReferenceType.SecurityScheme,
+                            Id="Bearer"
                         }
                     },
-                    new string[] { }
+                    new string[]{}
                 }
             });
         });
         #endregion
-
-        #region Configure JWT
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-                    ),
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
-        #endregion
-
-        #region Configure Cloudinary
-        //var cloudinarySettings = builder.Configuration.GetSection("Cloudinary");
-        //var cloudinaryAccount = new Account(
-        //    cloudinarySettings["CloudName"],
-        //    cloudinarySettings["ApiKey"],
-        //    cloudinarySettings["ApiSecret"]
-        //);
-        //var cloudinary = new Cloudinary(cloudinaryAccount);
-        //builder.Services.AddSingleton(cloudinary);
-        #endregion
-
         builder.Services.AddHttpContextAccessor();
-        
+
         var app = builder.Build();
 
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "PediVax API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "PetVax API V1");
                 c.RoutePrefix = "swagger";
             });
 
