@@ -93,8 +93,14 @@ namespace PetVax.Services.Service
 
         private bool VerifyPassword(string password, string storedHash, string storedSalt)
         {
+            Console.WriteLine("Input Password: " + password);
+            Console.WriteLine("Stored Hash: " + storedHash);
+            Console.WriteLine("Stored Salt: " + storedSalt);
             var saltBytes = Convert.FromBase64String(storedSalt);
             var hashBytes = new Rfc2898DeriveBytes(password, saltBytes, 10000, HashAlgorithmName.SHA256).GetBytes(32);
+            var computedHash = Convert.ToBase64String(hashBytes);
+
+            Console.WriteLine("Computed Hash: " + computedHash);
             return Convert.ToBase64String(hashBytes) == storedHash;
         }
 

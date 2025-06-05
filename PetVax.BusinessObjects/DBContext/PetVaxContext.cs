@@ -32,7 +32,7 @@ namespace PediVax.BusinessObjects.DBContext
                     throw new InvalidOperationException("Không thể lấy ConnectionString.");
                 }
 
-                optionsBuilder.UseSqlServer(connectionString, options =>
+                optionsBuilder.UseNpgsql(connectionString, options =>
                 {
                     options.EnableRetryOnFailure();
                 });
