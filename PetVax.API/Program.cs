@@ -8,6 +8,8 @@ using CloudinaryDotNet;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using PediVax.Infrastructure;
+using PetVax.Repositories.IRepository;
+using PetVax.Repositories.Repository;
 
 namespace PediVax;
 
@@ -96,6 +98,7 @@ public class Program
 
         builder.Services.Register();
         builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
         var app = builder.Build();
 

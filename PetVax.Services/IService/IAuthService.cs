@@ -1,4 +1,6 @@
-﻿using PetVax.BusinessObjects.DTO.AuthenticateDTO;
+﻿using PetVax.BusinessObjects.DTO;
+using PetVax.BusinessObjects.DTO.AccountDTO;
+using PetVax.BusinessObjects.DTO.AuthenticateDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,8 @@ namespace PetVax.Services.IService
         Task<AuthResponseDTO> LoginAsync(LoginRequestDTO loginRequestDTO, CancellationToken cancellationToken);
         Task<AuthResponseDTO> VerifyOtpAsync(string email, string otp, CancellationToken cancellationToken);
         Task<AuthResponseDTO> LoginSimple(LoginRequestDTO loginRequestDTO, CancellationToken cancellationToken);
+
+        Task<ResponseModel> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken);
 
     }
 }
