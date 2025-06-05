@@ -9,17 +9,19 @@ namespace PetVax.BusinessObjects.DBContext
     {
         public static void Seed(ModelBuilder modelBuilder)
         {
-            string salt = PasswordHelper.GenerateSalt();
-            string hashedAdmin = PasswordHelper.HashPassword("admin123", salt);
-            string hashedStaff = PasswordHelper.HashPassword("staff123", salt);
+            string adminSalt = PasswordHelper.GenerateSalt();
+            string adminHash = PasswordHelper.HashPassword("admin123", adminSalt);
+
+            string staffSalt = PasswordHelper.GenerateSalt();
+            string staffHash = PasswordHelper.HashPassword("staff123", staffSalt);
 
             modelBuilder.Entity<Account>().HasData(
                 new Account
                 {
                     AccountId = 1,
                     Email = "admin@petvax.com",
-                    PasswordHash = hashedAdmin,
-                    PasswordSalt = salt,
+                    PasswordHash = adminHash,
+                    PasswordSalt = adminSalt,
                     Role = Enum.EnumList.Role.Admin,
                     AccessToken = "",
                     RefereshToken = "",
@@ -32,8 +34,8 @@ namespace PetVax.BusinessObjects.DBContext
                 {
                     AccountId = 2,
                     Email = "staff@petvax.com",
-                    PasswordHash = hashedStaff,
-                    PasswordSalt = salt,
+                    PasswordHash = staffHash,
+                    PasswordSalt = staffSalt,
                     Role = Enum.EnumList.Role.Staff,
                     AccessToken = "",
                     RefereshToken = "",

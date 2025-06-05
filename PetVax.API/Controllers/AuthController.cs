@@ -118,6 +118,7 @@ namespace PetVax.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.InnerException?.Message);
                 return Unauthorized(new { message = ex.Message });
             }
         }

@@ -17,59 +17,19 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
-        builder.Services.AddSwaggerGen();
-        builder.Services.AddControllers().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
-        });
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+        // Add services to the container
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
             {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-                };
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
             });
-        // Add services to the container.
-        builder.Services.AddAuthorization();
-
-        // Session Configuration
-        builder.Services.AddDistributedMemoryCache();
-
-        builder.Services.AddSession(options =>
-        {
-            options.IdleTimeout = TimeSpan.FromMinutes(30);
-            options.Cookie.IsEssential = true;
-        });
-
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAllOrigins", policy =>
-            {
-                policy.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
-            });
-        });
 
         builder.Services.AddEndpointsApiExplorer();
-        
-        builder.Services.Register();
 
-        builder.Services.AddControllers();
-
-        #region Configre Swagger
+        // Swagger configuration
         builder.Services.AddSwaggerGen(option =>
         {
-            ////JWT Config
             option.DescribeAllParametersInCamelCase();
             option.ResolveConflictingActions(conf => conf.First());
             option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -96,31 +56,66 @@ public class Program
                 }
             });
         });
-        #endregion
+
+        // Authentication & Authorization
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                };
+            });
+        builder.Services.AddAuthorization();
+
+        // Session Configuration
+        builder.Services.AddDistributedMemoryCache();
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.IsEssential = true;
+        });
+
+        // CORS
+        const string AllowAllOrigins = nameof(AllowAllOrigins);
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(AllowAllOrigins, policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
+
+        builder.Services.Register();
         builder.Services.AddHttpContextAccessor();
 
         var app = builder.Build();
 
-
+        // Enable Swagger only in Development
+        if (app.Environment.IsDevelopment())
+        {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "PetVax API V1");
                 c.RoutePrefix = "swagger";
             });
+        }
 
         app.UseHttpsRedirection();
-
-        app.UseCors("AllowAllOrigins");
-
+        app.UseCors(AllowAllOrigins);
         app.UseSession();
-        
         app.UseAuthentication();
-
         app.UseAuthorization();
-
         app.MapControllers();
-
         app.Run();
     }
 }
