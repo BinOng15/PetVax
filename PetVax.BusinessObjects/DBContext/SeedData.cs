@@ -25,8 +25,7 @@ namespace PetVax.BusinessObjects.DBContext
                     RefereshToken = "",
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = "system",
-                    ModifiedAt = null,
-                    ModifiedBy = ""
+  
                 },
                 new Account
                 {
@@ -39,8 +38,7 @@ namespace PetVax.BusinessObjects.DBContext
                     RefereshToken = "",
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = "system",
-                    ModifiedAt = null,
-                    ModifiedBy = ""
+
                 }
             );
         }
