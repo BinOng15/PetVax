@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using PetVax.BusinessObjects.DTO;
+using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.AuthenticateDTO;
+using PetVax.BusinessObjects.Enum;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
+using PetVax.Repositories.HandleException;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
 using System;
@@ -24,15 +29,18 @@ namespace PetVax.Services.Service
         private readonly IConfiguration _configuration;
         private readonly IAccountRepository _accountRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICustomerRepository _customerRepository;
 
         // In-memory OTP store: Email -> (OTP, Expiration)
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otpStore = new();
 
-        public AuthService(IConfiguration configuration, IAccountRepository accountRepository, IHttpContextAccessor httpContextAccessor)
+        public AuthService(IConfiguration configuration, IAccountRepository accountRepository, IHttpContextAccessor httpContextAccessor, 
+            ICustomerRepository customerRepository)
         {
             _configuration = configuration;
             _accountRepository = accountRepository;
             _httpContextAccessor = httpContextAccessor;
+            _customerRepository = customerRepository;
         }
 
         public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO loginRequest, CancellationToken cancellationToken)
@@ -50,13 +58,15 @@ namespace PetVax.Services.Service
             await SendOtpEmailAsync(loginRequest.Email, otp, cancellationToken);
 
             // Return response indicating OTP is required
+            var accessToken = GenerateJwtToken(account);
+            var refreshToken = GenerateRefreshToken();
             return new AuthResponseDTO
             {
                 AccountId = account.AccountId,
                 Email = account.Email,
                 Role = account.Role,
-                AccessToken = null,
-                RefreshToken = null,
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
                 AccessTokenExpiration = DateTime.MinValue,
                 RefreshTokenExpiration = DateTime.MinValue
             };
@@ -93,14 +103,11 @@ namespace PetVax.Services.Service
 
         private bool VerifyPassword(string password, string storedHash, string storedSalt)
         {
-            Console.WriteLine("Input Password: " + password);
-            Console.WriteLine("Stored Hash: " + storedHash);
-            Console.WriteLine("Stored Salt: " + storedSalt);
+
             var saltBytes = Convert.FromBase64String(storedSalt);
             var hashBytes = new Rfc2898DeriveBytes(password, saltBytes, 10000, HashAlgorithmName.SHA256).GetBytes(32);
             var computedHash = Convert.ToBase64String(hashBytes);
 
-            Console.WriteLine("Computed Hash: " + computedHash);
             return Convert.ToBase64String(hashBytes) == storedHash;
         }
 
@@ -195,7 +202,7 @@ namespace PetVax.Services.Service
             var accessToken = GenerateJwtToken(account);
             var refreshToken = GenerateRefreshToken();
 
-            return new AuthResponseDTO()
+            AuthResponseDTO authResponseDTO =  new AuthResponseDTO()
             {
                 AccountId = account.AccountId,
                 AccessToken = accessToken,
@@ -205,6 +212,48 @@ namespace PetVax.Services.Service
                 AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
                 RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
             };
+            return authResponseDTO;
+        }
+
+        public async Task<ResponseModel> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken)
+        {
+
+            try
+            {
+                var account = await _accountRepository.GetAccountByEmailAsync(regisRequestDTO.Email, cancellationToken);
+                if (account != null)
+                {
+                    throw new ErrorException(409, "The account already exists! ");
+                }
+
+                // passowrd
+                string passwordSalt = PasswordHelper.GenerateSalt();
+                string passwordHash = PasswordHelper.HashPassword(regisRequestDTO.Password, passwordSalt);
+
+                // 3. Tạo đối tượng Account mới
+                Account newAccount = new Account
+                {
+                    Email = regisRequestDTO.Email,
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Role = EnumList.Role.Customer,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                // save to database
+                var newId = await _accountRepository.CreateAccountAsync(newAccount, cancellationToken);
+
+                Customer customer = new Customer
+                {
+                    AccountId = newAccount.AccountId
+                };
+
+                return new ResponseModel(200, "Register successfully", "");
+            }catch(ErrorException ex)
+            {
+                var errorData = new ErrorResponseModel(ex.ErrorCode, ex.Message);
+                return new ResponseModel(404, "Register fail!", errorData);
+            }
         }
     }
 }

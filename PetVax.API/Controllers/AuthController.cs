@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.AuthenticateDTO;
 using PetVax.Services.IService;
 using System.Threading;
@@ -121,6 +122,14 @@ namespace PetVax.Controllers
                 Console.WriteLine(ex.InnerException?.Message);
                 return Unauthorized(new { message = ex.Message });
             }
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisRequestDTO regisRequest, CancellationToken cancellationToken)
+        {
+                var response = await _authService.Register(regisRequest, cancellationToken);
+                return Ok(response);
+   
         }
     }
 }

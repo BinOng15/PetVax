@@ -18,10 +18,10 @@ namespace PetVax.BusinessObjects.Models
         public string PasswordHash { get; set; }
         public string PasswordSalt { get; set; }
         public Enum.EnumList.Role Role { get; set; }
-        public string AccessToken { get; set; }
-        public string RefereshToken { get; set; }
+        public string? AccessToken { get; set; }
+        public string? RefereshToken { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
 
 
         // Navigation properties
