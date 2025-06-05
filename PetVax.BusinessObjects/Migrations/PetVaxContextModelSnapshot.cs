@@ -52,7 +52,11 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordSalt")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -72,11 +76,12 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 3, 16, 1, 33, 376, DateTimeKind.Utc).AddTicks(1734),
+                            CreatedAt = new DateTime(2025, 6, 3, 17, 37, 4, 295, DateTimeKind.Utc).AddTicks(8297),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
                             ModifiedBy = "",
-                            Password = "x1RE/1IQUsTz+mCzesN8aax1DbRPWA4dTqqPlKkyqSY=",
+                            PasswordHash = "DDRb7Hr/iNbgVTlZnkn7lA==",
+                            PasswordSalt = "WS5sT/iN9eoxV0zKcs6cvA==",
                             RefereshToken = "",
                             Role = 1
                         },
@@ -84,11 +89,12 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 3, 16, 1, 33, 376, DateTimeKind.Utc).AddTicks(1738),
+                            CreatedAt = new DateTime(2025, 6, 3, 17, 37, 4, 295, DateTimeKind.Utc).AddTicks(8301),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
                             ModifiedBy = "",
-                            Password = "5F0TFOP3iaFynnG3+upjmYD3PKe9oHS0MAVEXKECpuc=",
+                            PasswordHash = "BT3hbcDQ+WtYlrUOrDp1xw==",
+                            PasswordSalt = "WS5sT/iN9eoxV0zKcs6cvA==",
                             RefereshToken = "",
                             Role = 2
                         });

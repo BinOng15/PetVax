@@ -9,8 +9,11 @@ namespace PetVax.Repositories.IRepository
 {
     public interface IAccountRepository
     {
-        Task<List<Account>> GetAllAccounts(CancellationToken cancellationToken);
-        Task<Account> GetAccountById(int accountId, CancellationToken cancellationToken);
-
+        Task<List<Account>> GetAllAccountsAsync(CancellationToken cancellationToken);
+        Task<Account> GetAccountByIdAsync(int accountId, CancellationToken cancellationToken);
+        Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken);
+        Task<int> CreateAccountAsync(Account account, CancellationToken cancellationToken);
+        Task<int> UpdateAccountAsync(Account account, CancellationToken cancellationToken);
+        Task<bool> DeleteAccountAsync(int accountId, CancellationToken cancellationToken);
     }
 }

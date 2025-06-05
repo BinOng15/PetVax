@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PetVax.BusinessObjects.DTO.AuthenticateDTO
 {
-    public class AuthResponse
+    public class AuthResponseDTO
     {
         public int AccountId { get; set; }
         public string Email { get; set; }

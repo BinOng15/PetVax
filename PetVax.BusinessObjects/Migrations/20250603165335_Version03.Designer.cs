@@ -12,8 +12,8 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    [Migration("20250603160133_version2")]
-    partial class version2
+    [Migration("20250603165335_Version03")]
+    partial class Version03
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,11 +75,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 3, 16, 1, 33, 376, DateTimeKind.Utc).AddTicks(1734),
+                            CreatedAt = new DateTime(2025, 6, 3, 16, 53, 35, 407, DateTimeKind.Utc).AddTicks(4722),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
                             ModifiedBy = "",
-                            Password = "x1RE/1IQUsTz+mCzesN8aax1DbRPWA4dTqqPlKkyqSY=",
+                            Password = "MGQ7oohWqVQBsdRh0UqR+QYd2QCulMP65rt2WHqdusQ=",
                             RefereshToken = "",
                             Role = 1
                         },
@@ -87,11 +87,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 3, 16, 1, 33, 376, DateTimeKind.Utc).AddTicks(1738),
+                            CreatedAt = new DateTime(2025, 6, 3, 16, 53, 35, 407, DateTimeKind.Utc).AddTicks(4731),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
                             ModifiedBy = "",
-                            Password = "5F0TFOP3iaFynnG3+upjmYD3PKe9oHS0MAVEXKECpuc=",
+                            Password = "RqwTQyZQJPzICWex0yhR4d8d20cc7CNarVgVxmpdI9Q=",
                             RefereshToken = "",
                             Role = 2
                         });

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetVax.BusinessObjects.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedData : Migration
+    public partial class Version03 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -895,8 +895,8 @@ namespace PetVax.BusinessObjects.Migrations
                 columns: new[] { "AccountId", "AccessToken", "CreatedAt", "CreatedBy", "Email", "ModifiedAt", "ModifiedBy", "Password", "RefereshToken", "Role" },
                 values: new object[,]
                 {
-                    { 1, "", new DateTime(2025, 6, 3, 15, 25, 0, 584, DateTimeKind.Utc).AddTicks(517), "system", "admin@petvax.com", null, "", "tns+8qNsHzTeEu/NbYni0t43PI5KMl0gXbEEN8qjMoQ=", "", 1 },
-                    { 2, "", new DateTime(2025, 6, 3, 15, 25, 0, 584, DateTimeKind.Utc).AddTicks(522), "system", "staff@petvax.com", null, "", "gYMd4KGBD2sEeUuepPrVJ6INHXlkOWjBzvJvU7rRON0=", "", 2 }
+                    { 1, "", new DateTime(2025, 6, 3, 16, 53, 35, 407, DateTimeKind.Utc).AddTicks(4722), "system", "admin@petvax.com", null, "", "MGQ7oohWqVQBsdRh0UqR+QYd2QCulMP65rt2WHqdusQ=", "", 1 },
+                    { 2, "", new DateTime(2025, 6, 3, 16, 53, 35, 407, DateTimeKind.Utc).AddTicks(4731), "system", "staff@petvax.com", null, "", "RqwTQyZQJPzICWex0yhR4d8d20cc7CNarVgVxmpdI9Q=", "", 2 }
                 });
 
             migrationBuilder.CreateIndex(
