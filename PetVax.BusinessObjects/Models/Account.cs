@@ -15,8 +15,8 @@ namespace PetVax.BusinessObjects.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int AccountId { get; set; }
         public string Email { get; set; }
-        public string PasswordHash { get; set; }
-        public string PasswordSalt { get; set; }
+        public string? PasswordHash { get; set; } //Null when use google account
+        public string? PasswordSalt { get; set; } //Null when use google account
         public Enum.EnumList.Role Role { get; set; }
         public string? AccessToken { get; set; }
         public string? RefereshToken { get; set; }

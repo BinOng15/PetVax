@@ -97,6 +97,10 @@ namespace PetVax.Controllers
                     authResponse.AccountId,
                     authResponse.Email,
                     authResponse.Role,
+                    authResponse.AccessToken, // This will be comment when using HttpOnly cookies
+                    authResponse.RefreshToken,
+                    authResponse.AccessTokenExpiration,
+                    authResponse.RefreshTokenExpiration,
                     Message = "Login successful."
                 });
             }
@@ -109,7 +113,7 @@ namespace PetVax.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        [HttpPost("login-simple")]
+        [HttpPost("system-login")]
         public async Task<IActionResult> LoginSimple([FromBody] LoginRequestDTO loginRequest, CancellationToken cancellationToken)
         {
             try
@@ -131,5 +135,112 @@ namespace PetVax.Controllers
                 return Ok(response);
    
         }
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDTO request, CancellationToken cancellationToken)
+        {
+            if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Name))
+            {
+                return BadRequest("Invalid Google login request.");
+            }
+
+            try
+            {
+                var authResponse = await _authService.LoginWithGoogleAsync(request.Email, request.Name, cancellationToken);
+
+                // Set Access Token as HttpOnly cookie
+                Response.Cookies.Append("AccessToken", authResponse.AccessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    Expires = authResponse.AccessTokenExpiration,
+                    SameSite = SameSiteMode.Strict
+                });
+
+                // Set Refresh Token as HttpOnly cookie
+                Response.Cookies.Append("RefreshToken", authResponse.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    Expires = authResponse.RefreshTokenExpiration,
+                    SameSite = SameSiteMode.Strict
+                });
+
+                // Return user info and tokens in response body
+                return Ok(new
+                {
+                    authResponse.AccountId,
+                    authResponse.Email,
+                    authResponse.Role,
+                    authResponse.AccessToken,
+                    authResponse.RefreshToken,
+                    authResponse.AccessTokenExpiration,
+                    authResponse.RefreshTokenExpiration,
+                    Message = "Google login successful."
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        [HttpPost("google-verify")]
+        public async Task<IActionResult> GoogleVerify([FromBody] GoogleVerifyRequestDTO request, CancellationToken cancellationToken)
+        {
+            if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Token) || string.IsNullOrEmpty(request.Name))
+            {
+                return BadRequest("Invalid Google verification request.");
+            }
+
+            try
+            {
+                var authResponse = await _authService.VerifyGoogleEmailAsync(request.Email, request.Token, request.Name, cancellationToken);
+
+                // Set Access Token as HttpOnly cookie
+                Response.Cookies.Append("AccessToken", authResponse.AccessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    Expires = authResponse.AccessTokenExpiration,
+                    SameSite = SameSiteMode.Strict
+                });
+
+                // Set Refresh Token as HttpOnly cookie
+                Response.Cookies.Append("RefreshToken", authResponse.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    Expires = authResponse.RefreshTokenExpiration,
+                    SameSite = SameSiteMode.Strict
+                });
+
+                // Return user info and tokens in response body
+                return Ok(new
+                {
+                    authResponse.AccountId,
+                    authResponse.Email,
+                    authResponse.Role,
+                    authResponse.AccessToken,
+                    authResponse.RefreshToken,
+                    authResponse.AccessTokenExpiration,
+                    authResponse.RefreshTokenExpiration,
+                    Message = "Google email verification successful."
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        /// <summary>
+
+
     }
 }

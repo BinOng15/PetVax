@@ -262,5 +262,128 @@ namespace PetVax.Services.Service
                 return new ResponseModel(500, "Can not save to database", errorData);
             }
         }
+
+        public async Task<AuthResponseDTO> LoginWithGoogleAsync(string email, string name, CancellationToken cancellationToken)
+        {
+            // Check if account exists
+            var account = await _accountRepository.GetAccountByEmailAsync(email, cancellationToken);
+
+            if (account == null)
+            {
+                // Generate email verification token
+                var verificationToken = Guid.NewGuid().ToString();
+                var tokenExpiration = DateTime.UtcNow.AddMinutes(30);
+
+                // Store token in-memory (for demo; use persistent store in production)
+                _otpStore[email] = (verificationToken, tokenExpiration);
+
+                // Send verification email
+                await SendGoogleVerificationEmailAsync(email, verificationToken, cancellationToken);
+
+                // Return response indicating verification required
+                return new AuthResponseDTO
+                {
+                    AccountId = 0,
+                    Email = email,
+                    Role = EnumList.Role.Customer,
+                    AccessToken = null,
+                    RefreshToken = null,
+                    AccessTokenExpiration = DateTime.MinValue,
+                    RefreshTokenExpiration = DateTime.MinValue
+                };
+            }
+
+            // Generate access token and refresh token
+            var accessToken = GenerateJwtToken(account);
+            var refreshToken = GenerateRefreshToken();
+
+            return new AuthResponseDTO
+            {
+                AccountId = account.AccountId,
+                Email = account.Email,
+                Role = account.Role,
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+            };
+        }
+
+        // Call this method from your controller when user clicks the verification link
+        public async Task<AuthResponseDTO> VerifyGoogleEmailAsync(string email, string token, string name, CancellationToken cancellationToken)
+        {
+            if (!_otpStore.TryGetValue(email, out var tokenInfo) || tokenInfo.Expiration < DateTime.UtcNow || tokenInfo.Otp != token)
+            {
+                throw new UnauthorizedAccessException("Invalid or expired verification link.");
+            }
+
+            var account = await _accountRepository.GetAccountByEmailAsync(email, cancellationToken);
+            if (account == null)
+            {
+                // Create new account after verification
+                account = new Account
+                {
+                    Email = email,
+                    Role = EnumList.Role.Customer,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _accountRepository.CreateAccountAsync(account, cancellationToken);
+            }
+
+            _otpStore.TryRemove(email, out _);
+
+            var accessToken = GenerateJwtToken(account);
+            var refreshToken = GenerateRefreshToken();
+
+            return new AuthResponseDTO
+            {
+                AccountId = account.AccountId,
+                Email = account.Email,
+                Role = account.Role,
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+            };
+        }
+
+        private async Task SendGoogleVerificationEmailAsync(string toEmail, string token, CancellationToken cancellationToken)
+        {
+            var smtpHost = _configuration["Smtp:Host"];
+            var smtpPort = int.Parse(_configuration["Smtp:Port"]);
+            var smtpUser = _configuration["Smtp:User"];
+            var smtpPass = _configuration["Smtp:Pass"];
+            var fromEmail = _configuration["Smtp:From"];
+            var verifyUrl = $"{_configuration["App:BaseUrl"]}/api/auth/verify-google?email={Uri.EscapeDataString(toEmail)}&token={Uri.EscapeDataString(token)}";
+
+            using var client = new SmtpClient(smtpHost, smtpPort)
+            {
+                Credentials = new NetworkCredential(smtpUser, smtpPass),
+                EnableSsl = true
+            };
+
+            var mail = new MailMessage(fromEmail, toEmail)
+            {
+                Subject = "PetVax - Verify your email",
+                Body = $@"
+                <html>
+                <body style='font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 30px;'>
+                <div style='max-width: 500px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 32px;'>
+                <h2 style='color: #2d8cf0; text-align: center;'>PetVax Email Verification</h2>
+                <p style='font-size: 16px; color: #333;'>Dear user,</p>
+                <p style='font-size: 16px; color: #333;'>Please verify your email address to complete your Google login:</p>
+                <div style='text-align: center; margin: 24px 0;'>
+                <a href='{verifyUrl}' style='display: inline-block; font-size: 18px; color: #fff; background: #2d8cf0; padding: 14px 32px; border-radius: 6px; text-decoration: none;'>Verify Email</a>
+                </div>
+                <p style='font-size: 15px; color: #555;'>This link is valid for <b>30 minutes</b>. If you did not request this, please ignore this email.</p>
+                <p style='font-size: 14px; color: #aaa; margin-top: 32px;'>Thank you,<br/>PetVax Team</p>
+                </div>
+                </body>
+                </html>",
+                IsBodyHtml = true
+            };
+
+            await client.SendMailAsync(mail, cancellationToken);
+        }
     }
 }

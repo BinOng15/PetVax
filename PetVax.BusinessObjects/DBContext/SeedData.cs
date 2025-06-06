@@ -10,10 +10,10 @@ namespace PetVax.BusinessObjects.DBContext
         public static void Seed(ModelBuilder modelBuilder)
         {
             string adminSalt = PasswordHelper.GenerateSalt();
-            string adminHash = PasswordHelper.HashPassword("admin123", adminSalt);
+            string adminHash = PasswordHelper.HashPassword("Admin@123", adminSalt);
 
             string staffSalt = PasswordHelper.GenerateSalt();
-            string staffHash = PasswordHelper.HashPassword("staff123", staffSalt);
+            string staffHash = PasswordHelper.HashPassword("Staff@123", staffSalt);
 
             modelBuilder.Entity<Account>().HasData(
                 new Account
