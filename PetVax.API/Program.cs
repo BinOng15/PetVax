@@ -109,15 +109,12 @@ public class Program
         var app = builder.Build();
 
         // Enable Swagger only in Development
-        if (app.Environment.IsDevelopment())
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "PetVax API V1");
-                c.RoutePrefix = "swagger";
-            });
-        }
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "PetVax API V1");
+            c.RoutePrefix = "swagger";
+        });
 
         app.UseHttpsRedirection();
         app.UseCors(AllowAllOrigins);
