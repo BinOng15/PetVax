@@ -230,7 +230,7 @@ namespace PetVax.Services.Service
                 string passwordSalt = PasswordHelper.GenerateSalt();
                 string passwordHash = PasswordHelper.HashPassword(regisRequestDTO.Password, passwordSalt);
 
-                // 3. Tạo đối tượng Account mới
+                // 3. create new Account
                 Account newAccount = new Account
                 {
                     Email = regisRequestDTO.Email,
@@ -245,14 +245,21 @@ namespace PetVax.Services.Service
 
                 Customer customer = new Customer
                 {
-                    AccountId = newAccount.AccountId
+                    AccountId = newAccount.AccountId,
+                    CreatedAt = DateTime.UtcNow,
                 };
+
+                await _customerRepository.CreateCustomerAsync(customer);
 
                 return new ResponseModel(200, "Register successfully", "");
             }catch(ErrorException ex)
             {
                 var errorData = new ErrorResponseModel(ex.ErrorCode, ex.Message);
                 return new ResponseModel(404, "Register fail!", errorData);
+            }catch(Exception ex)
+            {
+                var errorData = new ErrorResponseModel(500, ex.Message);
+                return new ResponseModel(500, "Can not save to database", errorData);
             }
         }
     }
