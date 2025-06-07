@@ -29,13 +29,13 @@ namespace PetVax.Services.Service
         private readonly IConfiguration _configuration;
         private readonly IAccountRepository _accountRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ICustomerRepository _customerRepository;
+        private readonly ICustomerService _customerRepository;
 
         // In-memory OTP store: Email -> (OTP, Expiration)
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otpStore = new();
 
         public AuthService(IConfiguration configuration, IAccountRepository accountRepository, IHttpContextAccessor httpContextAccessor, 
-            ICustomerRepository customerRepository)
+            ICustomerService customerRepository)
         {
             _configuration = configuration;
             _accountRepository = accountRepository;
