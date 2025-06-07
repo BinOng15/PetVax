@@ -38,10 +38,17 @@ namespace PediVax.Controllers
 
         [HttpGet("get-all-accounts")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllAccounts(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllAccounts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = null, CancellationToken cancellationToken = default)
         {
-            var response = await _accountService.GetAllAccountsAsync(cancellationToken);
-            if (!response.Success || response.Data == null || !response.Data.Any())
+            var request = new GetAllAccountRequestDTO
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                KeyWord = keyWord,
+                Status = status
+            };
+            var response = await _accountService.GetAllAccountsAsync(request, cancellationToken);
+            if (!response.Success || response.Data == null)
             {
                 return StatusCode(response.Code, new { Message = response.Message ?? "No accounts found" });
             }

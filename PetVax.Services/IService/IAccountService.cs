@@ -12,7 +12,7 @@ namespace PetVax.Services.IService
     {
         Task<BaseResponse<AccountResponseDTO>> GetAccountByIdAsync(int accountId, CancellationToken cancellationToken);
         Task<BaseResponse<AccountResponseDTO>> GetAccountByEmailAsync(string email, CancellationToken cancellationToken);
-        Task<DynamicResponse<AccountResponseDTO>> GetAllAccountsAsync(CancellationToken cancellationToken);
+        Task<DynamicResponse<AccountResponseDTO>> GetAllAccountsAsync(GetAllAccountRequestDTO getAllAccountRequestDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AccountResponseDTO>> CreateStaffAccountAsync(CreateAccountDTO createAccountDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AccountResponseDTO>> CreateVetAccountAsync(CreateAccountDTO createAccountDTO, CancellationToken cancellationToken);
         Task<BaseResponse<bool>> UpdateAccountAsync(int accountId, UpdateAccountDTO updateAccountDTO, CancellationToken cancellationToken);

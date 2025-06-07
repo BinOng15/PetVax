@@ -28,7 +28,7 @@ namespace PetVax.BusinessObjects.DTO
             public int Code { get; set; }
             public bool Success { get; set; }
             public string? Message { get; set; }
-            public List<T> Data { get; set; }
+            public MegaData<T> Data { get; set; }
         }
 
         public class PagingMetaData
