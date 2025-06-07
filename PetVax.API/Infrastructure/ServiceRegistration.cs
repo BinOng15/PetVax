@@ -20,6 +20,7 @@ namespace PediVax.Infrastructure
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAccountService, AccountService>();
             #endregion
 
             return services;
