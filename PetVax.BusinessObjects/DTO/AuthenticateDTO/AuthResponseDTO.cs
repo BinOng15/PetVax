@@ -16,5 +16,6 @@ namespace PetVax.BusinessObjects.DTO.AuthenticateDTO
         public string RefreshToken { get; set; }
         public DateTime AccessTokenExpiration { get; set; }
         public DateTime RefreshTokenExpiration { get; set; }
+        public bool IsVerify { get; set; }
     }
 }
