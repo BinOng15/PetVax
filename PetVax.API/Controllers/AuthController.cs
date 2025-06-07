@@ -142,6 +142,13 @@ namespace PetVax.Controllers
             }
         }
 
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] OtpVerificationRequestDTO otpRequest, CancellationToken cancellationToken)
+        {
+            var response = await _authService.VerifyEmail(otpRequest.Email, otpRequest.Otp, cancellationToken);
+            return Ok(response);
+
+        }
         [HttpPost("google-login")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDTO request, CancellationToken cancellationToken)
         {
