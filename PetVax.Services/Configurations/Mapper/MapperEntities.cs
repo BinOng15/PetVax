@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PetVax.BusinessObjects.DTO.AccountDTO;
+using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.Models;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,12 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore());
             CreateMap<Account, AccountResponseDTO>();
+
+            //Customer
+            CreateMap<CreateCustomerDTO, Customer>();
+            CreateMap<UpdateCustomerDTO, Customer>();
+            CreateMap<Customer, CustomerResponseDTO>();
+
         }
     }   
 }

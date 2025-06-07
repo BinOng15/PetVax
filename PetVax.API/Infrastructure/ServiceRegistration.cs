@@ -19,11 +19,12 @@ namespace PediVax.Infrastructure
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IVetRepository, VetRepository>();
-
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             #endregion
 
             return services;
