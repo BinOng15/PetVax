@@ -10,5 +10,6 @@ namespace PetVax.Repositories.IRepository
     public interface ICustomerRepository
     {
         Task<int> CreateCustomerAsync(Customer customer);
+        Task<Customer> GetCustomerByAccountId (int accountId, CancellationToken cancellationToken);
     }
 }

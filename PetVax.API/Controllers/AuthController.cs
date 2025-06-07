@@ -146,7 +146,7 @@ namespace PetVax.Controllers
         public async Task<IActionResult> VerifyEmail([FromBody] OtpVerificationRequestDTO otpRequest, CancellationToken cancellationToken)
         {
             var response = await _authService.VerifyEmail(otpRequest.Email, otpRequest.Otp, cancellationToken);
-            return Ok(response);
+            return StatusCode(response.Code, response);
 
         }
         [HttpPost("google-login")]

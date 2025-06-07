@@ -349,7 +349,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Register successfully"
+                    Message = "Register successfully. Please check your email to verify OTP!"
                 };
             }
             catch (ErrorException ex)
@@ -372,7 +372,7 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<ResponseModel> VerifyEmail(string email, string otp, CancellationToken cancellationToken)
+        public async Task<BaseResponse> VerifyEmail(string email, string otp, CancellationToken cancellationToken)
         {
             try
             {
@@ -389,25 +389,39 @@ namespace PetVax.Services.Service
 
                 account.isVerify = true;
                 await _accountRepository.UpdateAccountAsync(account, cancellationToken);
-                Customer customer = new Customer
-                {
-                    AccountId = account.AccountId,
-                    CreatedAt = DateTime.UtcNow,
-                };
 
-                await _customerRepository.CreateCustomerAsync(customer);
+                // Check if customer already exists for this account
+                var existingCustomer = await _customerRepository.GetCustomerByAccountId(account.AccountId, cancellationToken);
+                if (existingCustomer == null)
+                {
+                    Customer customer = new Customer
+                    {
+                        AccountId = account.AccountId,
+                        CreatedAt = DateTime.UtcNow,
+                    };
+                    await _customerRepository.CreateCustomerAsync(customer);
+                }
+
                 _otpStore.TryRemove(email, out _);
 
-                return new ResponseModel(200, "Email verified successfully.", "");
+                return new BaseResponse
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Email verified successfully!"
+                };
             }
             catch (ErrorException ex)
             {
                 var errorData = new ErrorResponseModel(ex.ErrorCode, ex.Message);
-                return new ResponseModel(404, "Verified fail!", errorData);
+                return new BaseResponse
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = errorData.Message
+                };
             }
-
         }
-
         public async Task<BaseResponse<AuthResponseDTO>> LoginWithGoogleAsync(string email, string name, CancellationToken cancellationToken)
         {
             try
