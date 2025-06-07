@@ -18,12 +18,6 @@ namespace PetVax.Controllers
             _authService = authService;
         }
 
-        /// <summary>
-        /// Initiates the login process by verifying credentials and sending an OTP to the user's email.
-        /// </summary>
-        /// <param name="loginRequest">The login request containing email and password.</param>
-        /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
-        /// <returns>Initial response with user info and OTP sent status.</returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest, CancellationToken cancellationToken)
         {
@@ -34,20 +28,13 @@ namespace PetVax.Controllers
 
             try
             {
-                var authResponse = await _authService.LoginAsync(loginRequest, cancellationToken);
-
-                // Since OTP is sent, return user info without tokens
-                return Ok(new
+                var result = await _authService.LoginAsync(loginRequest, cancellationToken);
+                if (!result.Success)
                 {
-                    authResponse.AccountId,
-                    authResponse.Email,
-                    authResponse.Role,
-                    Message = "OTP has been sent to your email. Please verify."
-                });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
+                    return Unauthorized(result.Message);
+                }
+
+                return StatusCode(result.Code, result);
             }
             catch (Exception ex)
             {
@@ -55,12 +42,6 @@ namespace PetVax.Controllers
             }
         }
 
-        /// <summary>
-        /// Verifies the OTP and issues access and refresh tokens upon successful verification.
-        /// </summary>
-        /// <param name="otpRequest">The OTP request containing email and OTP.</param>
-        /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
-        /// <returns>Response with user info, access token, and refresh token.</returns>
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] OtpVerificationRequestDTO otpRequest, CancellationToken cancellationToken)
         {
@@ -71,18 +52,22 @@ namespace PetVax.Controllers
 
             try
             {
-                var authResponse = await _authService.VerifyOtpAsync(otpRequest.Email, otpRequest.Otp, cancellationToken);
+                var result = await _authService.VerifyOtpAsync(otpRequest.Email, otpRequest.Otp, cancellationToken);
+                if (!result.Success)
+                {
+                    return Unauthorized(result.Message);
+                }
 
-                // Set Access Token as HttpOnly cookie
+                var authResponse = result.Data;
+
                 Response.Cookies.Append("AccessToken", authResponse.AccessToken, new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Use true in production (HTTPS)
+                    Secure = true,
                     Expires = authResponse.AccessTokenExpiration,
                     SameSite = SameSiteMode.Strict
                 });
 
-                // Set Refresh Token as HttpOnly cookie
                 Response.Cookies.Append("RefreshToken", authResponse.RefreshToken, new CookieOptions
                 {
                     HttpOnly = true,
@@ -91,50 +76,72 @@ namespace PetVax.Controllers
                     SameSite = SameSiteMode.Strict
                 });
 
-                // Return user info without tokens in response body
-                return Ok(new
-                {
-                    authResponse.AccountId,
-                    authResponse.Email,
-                    authResponse.Role,
-                    authResponse.AccessToken, // This will be comment when using HttpOnly cookies
-                    authResponse.RefreshToken,
-                    authResponse.AccessTokenExpiration,
-                    authResponse.RefreshTokenExpiration,
-                    Message = "Login successful."
-                });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
+                //return StatusCode(StatusCodes.Status200OK, new
+                //{
+                //    authResponse.AccountId,
+                //    authResponse.Email,
+                //    authResponse.Role,
+                //    authResponse.AccessToken,
+                //    authResponse.RefreshToken,
+                //    authResponse.AccessTokenExpiration,
+                //    authResponse.RefreshTokenExpiration,
+                //    Message = "OTP verification successful."
+                //});
+                return StatusCode(result.Code, result);
+
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
         [HttpPost("system-login")]
         public async Task<IActionResult> LoginSimple([FromBody] LoginRequestDTO loginRequest, CancellationToken cancellationToken)
         {
+            if (loginRequest == null)
+            {
+                return BadRequest("Invalid login request.");
+            }
+
             try
             {
-                var response = await _authService.LoginSimple(loginRequest, cancellationToken);
-                return Ok(response);
+                var result = await _authService.LoginSimple(loginRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    return Unauthorized(result.Message);
+                }
+                return StatusCode(result.Code, result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.InnerException?.Message);
-                return Unauthorized(new { message = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisRequestDTO regisRequest, CancellationToken cancellationToken)
         {
-                var response = await _authService.Register(regisRequest, cancellationToken);
-                return Ok(response);
-   
+            if (regisRequest == null)
+            {
+                return BadRequest("Invalid registration request.");
+            }
+
+            try
+            {
+                var result = await _authService.Register(regisRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    return BadRequest(result.Message);
+                }
+                return StatusCode(result.Code, result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
+
         [HttpPost("google-login")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDTO request, CancellationToken cancellationToken)
         {
@@ -145,9 +152,14 @@ namespace PetVax.Controllers
 
             try
             {
-                var authResponse = await _authService.LoginWithGoogleAsync(request.Email, request.Name, cancellationToken);
+                var result = await _authService.LoginWithGoogleAsync(request.Email, request.Name, cancellationToken);
+                if (!result.Success)
+                {
+                    return Unauthorized(result.Message);
+                }
 
-                // Set Access Token as HttpOnly cookie
+                var authResponse = result.Data;
+
                 Response.Cookies.Append("AccessToken", authResponse.AccessToken, new CookieOptions
                 {
                     HttpOnly = true,
@@ -156,7 +168,6 @@ namespace PetVax.Controllers
                     SameSite = SameSiteMode.Strict
                 });
 
-                // Set Refresh Token as HttpOnly cookie
                 Response.Cookies.Append("RefreshToken", authResponse.RefreshToken, new CookieOptions
                 {
                     HttpOnly = true,
@@ -165,28 +176,25 @@ namespace PetVax.Controllers
                     SameSite = SameSiteMode.Strict
                 });
 
-                // Return user info and tokens in response body
-                return Ok(new
-                {
-                    authResponse.AccountId,
-                    authResponse.Email,
-                    authResponse.Role,
-                    authResponse.AccessToken,
-                    authResponse.RefreshToken,
-                    authResponse.AccessTokenExpiration,
-                    authResponse.RefreshTokenExpiration,
-                    Message = "Google login successful."
-                });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
+                //return StatusCode(StatusCodes.Status200OK, new
+                //{
+                //    authResponse.AccountId,
+                //    authResponse.Email,
+                //    authResponse.Role,
+                //    authResponse.AccessToken,
+                //    authResponse.RefreshToken,
+                //    authResponse.AccessTokenExpiration,
+                //    authResponse.RefreshTokenExpiration,
+                //    Message = "Google login successful."
+                //});
+                return StatusCode(result.Code, result);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
         [HttpPost("google-verify")]
         public async Task<IActionResult> GoogleVerify([FromBody] GoogleVerifyRequestDTO request, CancellationToken cancellationToken)
         {
@@ -197,9 +205,14 @@ namespace PetVax.Controllers
 
             try
             {
-                var authResponse = await _authService.VerifyGoogleEmailAsync(request.Email, request.Token, request.Name, cancellationToken);
+                var result = await _authService.VerifyGoogleEmailAsync(request.Email, request.Token, request.Name, cancellationToken);
+                if (!result.Success)
+                {
+                    return Unauthorized(result.Message);
+                }
 
-                // Set Access Token as HttpOnly cookie
+                var authResponse = result.Data;
+
                 Response.Cookies.Append("AccessToken", authResponse.AccessToken, new CookieOptions
                 {
                     HttpOnly = true,
@@ -208,7 +221,6 @@ namespace PetVax.Controllers
                     SameSite = SameSiteMode.Strict
                 });
 
-                // Set Refresh Token as HttpOnly cookie
                 Response.Cookies.Append("RefreshToken", authResponse.RefreshToken, new CookieOptions
                 {
                     HttpOnly = true,
@@ -217,43 +229,18 @@ namespace PetVax.Controllers
                     SameSite = SameSiteMode.Strict
                 });
 
-                // Return user info and tokens in response body
-                return Ok(new
-                {
-                    authResponse.AccountId,
-                    authResponse.Email,
-                    authResponse.Role,
-                    authResponse.AccessToken,
-                    authResponse.RefreshToken,
-                    authResponse.AccessTokenExpiration,
-                    authResponse.RefreshTokenExpiration,
-                    Message = "Google email verification successful."
-                });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ForgetPasswordRequestDTO forgetPasswordRequest, string otp, CancellationToken cancellationToken)
-        {
-            if (forgetPasswordRequest == null || string.IsNullOrEmpty(forgetPasswordRequest.Email) || string.IsNullOrEmpty(forgetPasswordRequest.NewPassword))
-            {
-                return BadRequest("Invalid reset password request.");
-            }
-            try
-            {
-                var response = await _authService.ResetPasswordAsync(forgetPasswordRequest, otp, cancellationToken);
-                return Ok(response);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
+                //return StatusCode(StatusCodes.Status200OK, new
+                //{
+                //    authResponse.AccountId,
+                //    authResponse.Email,
+                //    authResponse.Role,
+                //    authResponse.AccessToken,
+                //    authResponse.RefreshToken,
+                //    authResponse.AccessTokenExpiration,
+                //    authResponse.RefreshTokenExpiration,
+                //    Message = "Google verification successful."
+                //});
+                return StatusCode(result.Code, result);
             }
             catch (Exception ex)
             {
@@ -261,5 +248,26 @@ namespace PetVax.Controllers
             }
         }
 
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ForgetPasswordRequestDTO forgetPasswordRequest, [FromQuery] string otp, CancellationToken cancellationToken)
+        {
+            if (forgetPasswordRequest == null || string.IsNullOrEmpty(forgetPasswordRequest.Email) || string.IsNullOrEmpty(forgetPasswordRequest.NewPassword))
+            {
+                return BadRequest("Invalid reset password request.");
+            }
+            try
+            {
+                var result = await _authService.ResetPasswordAsync(forgetPasswordRequest, otp, cancellationToken);
+                if (!result.Success)
+                {
+                    return Unauthorized(result.Message);
+                }
+                return StatusCode(result.Code, result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }
