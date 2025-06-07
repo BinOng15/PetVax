@@ -21,8 +21,6 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("current-account")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> GetCurrentAccount(CancellationToken cancellationToken)
         {
             var accountId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "AccountId")?.Value;
@@ -30,37 +28,37 @@ namespace PediVax.Controllers
             {
                 return Unauthorized();
             }
-            var account = await _accountService.GetAccountByIdAsync(int.Parse(accountId), cancellationToken);
-            if (account == null)
+            var response = await _accountService.GetAccountByIdAsync(int.Parse(accountId), cancellationToken);
+            if (!response.Success || response.Data == null)
             {
-                return NotFound(new { Message = "Account not found" });
+                return StatusCode(response.Code, new { Message = response.Message ?? "Account not found" });
             }
-            return Ok(account);
+            return StatusCode(response.Code, response);
         }
 
         [HttpGet("get-all-accounts")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllAccounts(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllAccounts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = null, CancellationToken cancellationToken = default)
         {
-            var accounts = await _accountService.GetAllAccountsAsync(cancellationToken);
-            if (accounts == null || !accounts.Any())
+            var request = new GetAllAccountRequestDTO
             {
-                return NotFound(new { Message = "No accounts found" });
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                KeyWord = keyWord,
+                Status = status
+            };
+            var response = await _accountService.GetAllAccountsAsync(request, cancellationToken);
+            if (!response.Success || response.Data == null)
+            {
+                return StatusCode(response.Code, new { Message = response.Message ?? "No accounts found" });
             }
-            return Ok(accounts);
+            return StatusCode(response.Code, response);
         }
 
         [HttpGet("get-account-by-id/{accountId}")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> GetAccountById(int accountId, CancellationToken cancellationToken)
         {
-            if (!User.Identity.IsAuthenticated || !User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated)
             {
                 return Unauthorized("Unauthorized user!!!.");
             }
@@ -70,45 +68,36 @@ namespace PediVax.Controllers
             }
             try
             {
-                var account = await _accountService.GetAccountByIdAsync(accountId, cancellationToken);
-                if (account == null)
+                var response = await _accountService.GetAccountByIdAsync(accountId, cancellationToken);
+                if (!response.Success || response.Data == null)
                 {
-                    return NotFound(new { Message = "Account not found" });
+                    return StatusCode(response.Code, new { Message = response.Message ?? "Account not found" });
                 }
-                return Ok(account);
+                return StatusCode(response.Code, response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching account with ID {id}", accountId);
-                return Problem("An unexpected error occurred.");
+                _logger.LogError(ex, "Error retrieving account by ID: {AccountId}", accountId);
+                return StatusCode((int)HttpStatusCode.InternalServerError, new { Message = "An error occurred while retrieving the account." });
             }
         }
 
         [HttpGet("get-account-by-email/{email}")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> GetAccountByEmail(string email, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(email))
             {
-                return BadRequest(new
-                {
-                    message = "Email cannot be empty!"
-                });
+                return BadRequest(new { Message = "Email cannot be empty!" });
             }
-            var account = await _accountService.GetAccountByEmailAsync(email, cancellationToken);
-            if (account == null)
+            var response = await _accountService.GetAccountByEmailAsync(email, cancellationToken);
+            if (!response.Success || response.Data == null)
             {
-                return NotFound("No account found with the given email!");
+                return StatusCode(response.Code, new { Message = response.Message ?? "Account not found" });
             }
-            return Ok(account);
+            return StatusCode(response.Code, response);
         }
+
         [HttpPost("create-staff-account")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Created)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateStaffAccount([FromBody] CreateAccountDTO createAccountDTO, CancellationToken cancellationToken)
         {
@@ -116,13 +105,15 @@ namespace PediVax.Controllers
             {
                 return BadRequest(new { Message = "Invalid account data" });
             }
-            var account = await _accountService.CreateStaffAccountAsync(createAccountDTO, cancellationToken);
-            return CreatedAtAction(nameof(GetAccountById), new { accountId = account.AccountId }, account);
+            var response = await _accountService.CreateStaffAccountAsync(createAccountDTO, cancellationToken);
+            if (!response.Success || response.Data == null)
+            {
+                return StatusCode(response.Code, new { Message = response.Message ?? "Failed to create staff account" });
+            }
+            return StatusCode(response.Code, response);
         }
+
         [HttpPost("create-vet-account")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Created)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateVetAccount([FromBody] CreateAccountDTO createAccountDTO, CancellationToken cancellationToken)
         {
@@ -130,14 +121,15 @@ namespace PediVax.Controllers
             {
                 return BadRequest(new { Message = "Invalid account data" });
             }
-            var account = await _accountService.CreateVetAccountAsync(createAccountDTO, cancellationToken);
-            return CreatedAtAction(nameof(GetAccountById), new { accountId = account.AccountId }, account);
+            var response = await _accountService.CreateVetAccountAsync(createAccountDTO, cancellationToken);
+            if (!response.Success || response.Data == null)
+            {
+                return StatusCode(response.Code, new { Message = response.Message ?? "Failed to create vet account" });
+            }
+            return StatusCode(response.Code, response);
         }
+
         [HttpPut("update-account/{accountId}")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateAccount(int accountId, [FromBody] UpdateAccountDTO updateAccountDTO, CancellationToken cancellationToken)
         {
@@ -145,18 +137,15 @@ namespace PediVax.Controllers
             {
                 return BadRequest(new { Message = "Invalid account ID or data" });
             }
-            var result = await _accountService.UpdateAccountAsync(accountId, updateAccountDTO, cancellationToken);
-            if (!result)
+            var response = await _accountService.UpdateAccountAsync(accountId, updateAccountDTO, cancellationToken);
+            if (!response.Success || response.Data == false)
             {
-                return NotFound(new { Message = "Account not found" });
+                return StatusCode(response.Code, new { Message = response.Message ?? "Failed to update account" });
             }
-            return Ok(new { Message = "Account updated successfully" });
+            return StatusCode(response.Code, response);
         }
+
         [HttpDelete("delete-account/{accountId}")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAccount(int accountId, CancellationToken cancellationToken)
         {
@@ -164,12 +153,12 @@ namespace PediVax.Controllers
             {
                 return BadRequest(new { Message = "Invalid account ID" });
             }
-            var result = await _accountService.DeleteAccountAsync(accountId, cancellationToken);
-            if (!result)
+            var response = await _accountService.DeleteAccountAsync(accountId, cancellationToken);
+            if (!response.Success || response.Data == false)
             {
-                return NotFound(new { Message = "Account not found" });
+                return StatusCode(response.Code, new { Message = response.Message ?? "Failed to delete account" });
             }
-            return NoContent();
+            return StatusCode(response.Code, new { Message = "Account deleted successfully" });
         }
     }
 }

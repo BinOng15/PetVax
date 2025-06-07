@@ -17,6 +17,9 @@ namespace PediVax.Infrastructure
             #region DependencyInjection
             //Register repositories
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IVetRepository, VetRepository>();
+
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();

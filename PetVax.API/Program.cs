@@ -11,6 +11,7 @@ using PediVax.Infrastructure;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository;
 using PetVax.Services.Service;
+using PetVax.Services.IService;
 
 namespace PediVax;
 
@@ -106,6 +107,10 @@ public class Program
         builder.Services.Register();
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+        builder.Services.AddScoped<IVetRepository, VetRepository>();
+        builder.Services.AddScoped<IVetService, VetService>();
+        builder.Services.AddScoped<IVetScheduleRepository, VetScheduleRepository>();
+        builder.Services.AddScoped<IVetScheduleService, VetScheduleService>();
         var app = builder.Build();
 
         // Enable Swagger only in Development

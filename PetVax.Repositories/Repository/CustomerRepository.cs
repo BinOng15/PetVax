@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
 using System;
@@ -15,6 +16,21 @@ namespace PetVax.Repositories.Repository
         {
             Create(customer);
             return customer.CustomerId;
+        }
+
+        public async Task<Customer> GetCustomerByAccountId(int accountId, CancellationToken cancellationToken)
+        {
+            if (accountId <= 0)
+            {
+                throw new ArgumentException("Invalid account ID", nameof(accountId));
+            }
+            var customer = await _context.Set<Customer>()
+                .FirstOrDefaultAsync(c => c.AccountId == accountId, cancellationToken);
+            if (customer == null)
+            {
+                throw new KeyNotFoundException($"Customer with AccountId {accountId} not found.");
+            }
+            return customer;
         }
     }
 }

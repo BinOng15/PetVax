@@ -29,5 +29,17 @@ namespace PetVax.BusinessObjects.Enum
             Cancelled = 10,
             Rejected = 11,
         }
+
+        public enum Slot
+        {
+            Slot_8h= 1,
+            Slot_9h = 2,
+            Slot_10h = 3,
+            Slot_11h = 4,
+            Slot_13h = 5,
+            Slot_14h = 6,
+            Slot_15h = 7,
+            Slot_16h = 8,
+        }
     }
 }

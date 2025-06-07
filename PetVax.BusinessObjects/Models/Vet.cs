@@ -16,10 +16,10 @@ namespace PetVax.BusinessObjects.Models
         public int VetId { get; set; } // Unique identifier for the vet
         public int AccountId { get; set; } // Foreign key to Account table
         public string VetCode { get; set; } // e.g., "VET12345", unique identifier for the vet
-        public string Name { get; set; } // e.g., "Dr. John Doe"
-        public string Specialization { get; set; } // e.g., "Veterinary Surgeon", "Pet Nutritionist"
-        public DateTime DateOfBirth { get; set; } // Date of birth of the vet
-        public string PhoneNumber { get; set; } 
+        public string? Name { get; set; } // e.g., "Dr. John Doe"
+        public string? Specialization { get; set; } // e.g., "Veterinary Surgeon", "Pet Nutritionist"
+        public DateTime? DateOfBirth { get; set; } // Date of birth of the vet
+        public string? PhoneNumber { get; set; } 
         public DateTime CreateAt { get; set; } // Date when the record was created
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified

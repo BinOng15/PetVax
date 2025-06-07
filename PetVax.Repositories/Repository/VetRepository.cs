@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PediVax.BusinessObjects.DBContext;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
@@ -12,9 +13,11 @@ namespace PetVax.Repositories.Repository
 {
     public class VetRepository : GenericRepository<Vet>, IVetRepository
     {
+ 
         public VetRepository() : base()
         {
         }
+
         public async Task<int> CreateVetAsync(Vet vet, CancellationToken cancellationToken)
         {
             return await CreateAsync(vet, cancellationToken);
@@ -30,16 +33,16 @@ namespace PetVax.Repositories.Repository
             return GetAllAsync(cancellationToken);
         }
 
-
-
-        public Task<Vet> GetVetByIdAsync(int vetId, CancellationToken cancellationToken)
+        public async Task<Vet> GetVetByIdAsync(int vetId, CancellationToken cancellationToken)
         {
-            return _context.Vets.FirstOrDefaultAsync(v => v.VetId == vetId, cancellationToken);
+         
+            return await _context.Vets.FirstOrDefaultAsync(v => v.VetId == vetId, cancellationToken);
         }
 
-        public Task<Vet> GetVetByVetCodeAsync(string vetCode, CancellationToken cancellationToken)
+        public async Task<Vet> GetVetByVetCodeAsync(string vetCode, CancellationToken cancellationToken)
         {
-            return _context.Vets.FirstOrDefaultAsync(v => v.VetCode == vetCode, cancellationToken);
+            
+            return await _context.Vets.FirstOrDefaultAsync(v => v.VetCode == vetCode, cancellationToken);
         }
 
         public Task<int> UpdateVetAsync(Vet vet, CancellationToken cancellationToken)
