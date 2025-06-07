@@ -25,7 +25,7 @@ namespace PediVax.BusinessObjects.DBContext
                     .AddEnvironmentVariables()
                     .Build();
 
-                string connectionString = configuration.GetConnectionString("DefaultConnection");
+                string connectionString = configuration.GetConnectionString("PostgreSQL");
 
                 if (string.IsNullOrEmpty(connectionString))
                 {
