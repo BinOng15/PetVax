@@ -27,7 +27,8 @@ namespace PetVax.BusinessObjects.DBContext
                     RefereshToken = "",
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = "system",
-  
+                    isVerify = true // Admin account is verified by default
+
                 },
                 new Account
                 {
@@ -40,7 +41,7 @@ namespace PetVax.BusinessObjects.DBContext
                     RefereshToken = "",
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = "system",
-
+                    isVerify = true // Staff account is verified by default
                 }
             );
         }

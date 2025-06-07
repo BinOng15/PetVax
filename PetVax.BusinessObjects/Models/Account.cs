@@ -20,6 +20,7 @@ namespace PetVax.BusinessObjects.Models
         public Enum.EnumList.Role Role { get; set; }
         public string? AccessToken { get; set; }
         public string? RefereshToken { get; set; }
+        public bool isVerify { get; set; } = false; // Default to false, indicating the account is not verified
         public DateTime CreatedAt { get; set; }
         public string? CreatedBy { get; set; }
 

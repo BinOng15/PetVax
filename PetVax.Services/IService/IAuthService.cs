@@ -17,6 +17,6 @@ namespace PetVax.Services.IService
         Task<ResponseModel> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken);
         Task<AuthResponseDTO> LoginWithGoogleAsync(string email, string name, CancellationToken cancellationToken);
         Task<AuthResponseDTO> VerifyGoogleEmailAsync(string email, string token, string name, CancellationToken cancellationToken);
-
+        Task<AuthResponseDTO> 
     }
 }
