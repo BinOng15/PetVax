@@ -19,6 +19,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,13 +30,13 @@ namespace PetVax.Services.Service
         private readonly IConfiguration _configuration;
         private readonly IAccountRepository _accountRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ICustomerService _customerRepository;
+        private readonly ICustomerRepository _customerRepository;
 
         // In-memory OTP store: Email -> (OTP, Expiration)
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otpStore = new();
 
         public AuthService(IConfiguration configuration, IAccountRepository accountRepository, IHttpContextAccessor httpContextAccessor, 
-            ICustomerService customerRepository)
+            ICustomerRepository customerRepository)
         {
             _configuration = configuration;
             _accountRepository = accountRepository;
@@ -226,6 +227,12 @@ namespace PetVax.Services.Service
                     throw new ErrorException(409, "The account already exists! ");
                 }
 
+                // Generate OTP and send email
+                var otp = GenerateOtp();
+                var expiration = DateTime.UtcNow.AddMinutes(5);
+                _otpStore[regisRequestDTO.Email] = (otp, expiration);
+                await SendOtpEmailAsync(regisRequestDTO.Email, otp, cancellationToken);
+
                 // passowrd
                 string passwordSalt = PasswordHelper.GenerateSalt();
                 string passwordHash = PasswordHelper.HashPassword(regisRequestDTO.Password, passwordSalt);
@@ -237,21 +244,15 @@ namespace PetVax.Services.Service
                     PasswordHash = passwordHash,
                     PasswordSalt = passwordSalt,
                     Role = EnumList.Role.Customer,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    isVerify = false
                 };
 
                 // save to database
                 var newId = await _accountRepository.CreateAccountAsync(newAccount, cancellationToken);
+                
 
-                Customer customer = new Customer
-                {
-                    AccountId = newAccount.AccountId,
-                    CreatedAt = DateTime.UtcNow,
-                };
-
-                await _customerRepository.CreateCustomerAsync(customer);
-
-                return new ResponseModel(200, "Register successfully", "");
+                return new ResponseModel(200, "Please check your email!", "");
             }catch(ErrorException ex)
             {
                 var errorData = new ErrorResponseModel(ex.ErrorCode, ex.Message);
@@ -263,6 +264,41 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<ResponseModel> VerifyEmail(string email, string otp, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTime.UtcNow || otpInfo.Otp != otp)
+                {
+                    throw new ErrorException(409,"Invalid or expired OTP.");
+                }
+
+                var account = await _accountRepository.GetAccountByEmailAsync(email, cancellationToken);
+                if (account == null)
+                {
+                    throw new ErrorException(404,"Account not found.");
+                }
+
+                account.isVerify = true;
+                await _accountRepository.UpdateAccountAsync(account, cancellationToken);
+                Customer customer = new Customer
+                {
+                    AccountId = account.AccountId,
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                await _customerRepository.CreateCustomerAsync(customer);
+                _otpStore.TryRemove(email, out _);
+
+                return new ResponseModel(200, "Email verified successfully.", "");
+            }
+            catch (ErrorException ex)
+            {
+                var errorData = new ErrorResponseModel(ex.ErrorCode, ex.Message);
+                return new ResponseModel(404, "Verified fail!", errorData);
+            }
+
+        }
         public async Task<AuthResponseDTO> LoginWithGoogleAsync(string email, string name, CancellationToken cancellationToken)
         {
             // Check if account exists

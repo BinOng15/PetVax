@@ -106,7 +106,6 @@ public class Program
         builder.Services.Register();
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-        builder.Services.AddScoped<ICustomerService, CustomerService>();
         var app = builder.Build();
 
         // Enable Swagger only in Development

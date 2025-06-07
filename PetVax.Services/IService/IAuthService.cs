@@ -1,11 +1,7 @@
 ﻿using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.AuthenticateDTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.Design.Serialization;
 
 namespace PetVax.Services.IService
 {
@@ -17,6 +13,6 @@ namespace PetVax.Services.IService
         Task<ResponseModel> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken);
         Task<AuthResponseDTO> LoginWithGoogleAsync(string email, string name, CancellationToken cancellationToken);
         Task<AuthResponseDTO> VerifyGoogleEmailAsync(string email, string token, string name, CancellationToken cancellationToken);
-        Task<AuthResponseDTO> 
+        Task<ResponseModel> VerifyEmail(string email, string otp, CancellationToken cancellationToken);
     }
 }
