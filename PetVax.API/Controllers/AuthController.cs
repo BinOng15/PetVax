@@ -247,8 +247,27 @@ namespace PetVax.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        /// <summary>
-
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ForgetPasswordRequestDTO forgetPasswordRequest, string otp, CancellationToken cancellationToken)
+        {
+            if (forgetPasswordRequest == null || string.IsNullOrEmpty(forgetPasswordRequest.Email) || string.IsNullOrEmpty(forgetPasswordRequest.NewPassword))
+            {
+                return BadRequest("Invalid reset password request.");
+            }
+            try
+            {
+                var response = await _authService.ResetPasswordAsync(forgetPasswordRequest, otp, cancellationToken);
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
     }
 }

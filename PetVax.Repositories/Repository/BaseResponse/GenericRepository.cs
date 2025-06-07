@@ -28,16 +28,14 @@ namespace PetVax.Repositories.Repository.BaseResponse
         public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await _context.Set<T>()
-                .Where(e => EF.Property<int>(e, "IsActive") == 1)
                 .ToListAsync(cancellationToken);
         }
         public async Task<(List<T> Data, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             if (pageNumber < 1) pageNumber = 1;
             if (pageSize < 1) pageSize = 10;
-            var query = _context.Set<T>().Where(e => EF.Property<int>(e, "IsActive") == 1);
+            var query = _context.Set<T>();
 
-            // Lấy tổng số bản ghi thoả mãn điều kiện IsActive = 1
             var totalRecords = await query.CountAsync();
             var data = await query
                 .Skip((pageNumber - 1) * pageSize)
@@ -132,7 +130,6 @@ namespace PetVax.Repositories.Repository.BaseResponse
 
             // Truy vấn dữ liệu từ entity dựa trên tên khóa chính
             var entity = await _context.Set<T>()
-                .Where(e => EF.Property<int>(e, "IsActive") == 1)  // Lọc theo IsActive = 1
                 .FirstOrDefaultAsync(e => EF.Property<int>(e, keyProperty.Name) == id, cancellationToken);  // Tìm theo khóa chính tự động xác định
 
             if (entity != null)
@@ -194,13 +191,9 @@ namespace PetVax.Repositories.Repository.BaseResponse
             var entity = await GetByIdAsync(id);
             if (entity != null)
             {
-                var property = entity.GetType().GetProperty("IsActive");
-                if (property != null)
-                {
-                    property.SetValue(entity, 0);
-                    await UpdateAsync(entity, cancellationToken);
-                    return true;
-                }
+                _context.Remove(entity);
+                await _context.SaveChangesAsync(cancellationToken);
+                return true;
             }
             return false;
         }
@@ -216,7 +209,6 @@ namespace PetVax.Repositories.Repository.BaseResponse
             }
 
             return await _context.Set<T>()
-                .Where(e => EF.Property<int>(e, "IsActive") == 1)
                 .Where(e => EF.Property<string>(e, propertyName).Contains(keyword))
                 .ToListAsync(cancellationToken);
         }

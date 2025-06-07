@@ -421,5 +421,33 @@ namespace PetVax.Services.Service
 
             await client.SendMailAsync(mail, cancellationToken);
         }
+
+        public async Task<ForgetPasswordResponseDTO> ResetPasswordAsync(ForgetPasswordRequestDTO forgetPasswordRequestDTO, string otp, CancellationToken cancellationToken)
+        {
+            // Check if account exists
+            var account = await _accountRepository.GetAccountByEmailAsync(forgetPasswordRequestDTO.Email, cancellationToken);
+            if (account == null)
+            {
+                throw new UnauthorizedAccessException("Account not found.");
+            }
+            // Verify OTP
+            if (!_otpStore.TryGetValue(forgetPasswordRequestDTO.Email, out var otpInfo) || otpInfo.Expiration < DateTime.UtcNow || otpInfo.Otp != otp)
+            {
+                throw new UnauthorizedAccessException("Invalid or expired OTP.");
+            }
+            // Generate new password hash and salt
+            string newPasswordSalt = PasswordHelper.GenerateSalt();
+            string newPasswordHash = PasswordHelper.HashPassword(forgetPasswordRequestDTO.NewPassword, newPasswordSalt);
+            // Update account password
+            account.PasswordHash = newPasswordHash;
+            account.PasswordSalt = newPasswordSalt;
+            await _accountRepository.UpdateAccountAsync(account, cancellationToken);
+            // Remove OTP from store
+            _otpStore.TryRemove(forgetPasswordRequestDTO.Email, out _);
+            return new ForgetPasswordResponseDTO
+            {
+                Message = "Password reset successfully."
+            };
+        }
     }
 }
