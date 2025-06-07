@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using PediVax.Infrastructure;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository;
+using PetVax.Services.Service;
 
 namespace PediVax;
 
@@ -105,7 +106,6 @@ public class Program
         builder.Services.Register();
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-
         var app = builder.Build();
 
         // Enable Swagger only in Development
@@ -125,3 +125,4 @@ public class Program
         app.Run();
     }
 }
+
