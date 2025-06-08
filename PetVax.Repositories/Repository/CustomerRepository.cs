@@ -18,6 +18,16 @@ namespace PetVax.Repositories.Repository
             return customer.CustomerId;
         }
 
+        public async Task<bool> DeleteCustomerAsync(int customerId, CancellationToken cancellationToken)
+        {
+            return await DeleteAsync(customerId, cancellationToken);
+        }
+
+        public async Task<List<Customer>> GetAllCustomersAsync(CancellationToken cancellationToken)
+        {
+            return await GetAllAsync(cancellationToken);
+        }
+
         public async Task<Customer> GetCustomerByAccountId(int accountId, CancellationToken cancellationToken)
         {
             if (accountId <= 0)
@@ -31,6 +41,17 @@ namespace PetVax.Repositories.Repository
                 throw new KeyNotFoundException($"Customer with AccountId {accountId} not found.");
             }
             return customer;
+        }
+
+        public async Task<Customer> GetCustomerByIdAsync(int customerId, CancellationToken cancellationToken)
+        {
+            return await _context.Customers
+                .FirstOrDefaultAsync(c => c.CustomerId == customerId, cancellationToken);
+        }
+
+        public async Task<int> UpdateCustomerAsync(Customer customer, CancellationToken cancellationToken)
+        {
+            return await UpdateAsync(customer, cancellationToken);
         }
     }
 }

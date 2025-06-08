@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PetVax.BusinessObjects.DTO.AccountDTO
+namespace PetVax.BusinessObjects.DTO.CustomerDTO
 {
-    public class GetAllAccountRequestDTO
+    public class GetAllCustomerRequestDTO
     {
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
