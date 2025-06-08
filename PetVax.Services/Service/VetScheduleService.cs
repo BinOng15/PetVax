@@ -15,9 +15,11 @@ namespace PetVax.Services.Service
     public class VetScheduleService : IVetScheduleService
     {
         private readonly IVetScheduleRepository _vetScheduleRepository;
-        public VetScheduleService(IVetScheduleRepository vetScheduleRepository)
+        private readonly IVetRepository _vetRepository;
+        public VetScheduleService(IVetScheduleRepository vetScheduleRepository, IVetRepository vetRepository)
         {
             _vetScheduleRepository = vetScheduleRepository;
+            _vetRepository = vetRepository;
         }
 
         public async Task<List<BaseResponse<VetScheduleDTO>>> GetAllVetSchedulesAsync(CancellationToken cancellationToken)
@@ -28,15 +30,15 @@ namespace PetVax.Services.Service
                 if (vetSchedules == null || !vetSchedules.Any())
                 {
                     return new List<BaseResponse<VetScheduleDTO>>()
-                {
-                    new BaseResponse<VetScheduleDTO>
                     {
-                        Success = false,
-                        Message = "No vet schedules found",
-                        Code = 404,
-                        Data = null
-                    }
-                };
+                        new BaseResponse<VetScheduleDTO>
+                        {
+                            Success = false,
+                            Message = "No vet schedules found",
+                            Code = 404,
+                            Data = default! // Use default! to explicitly indicate a nullable value
+                        }
+                    };
                 }
                 return vetSchedules.Select(vs => new BaseResponse<VetScheduleDTO>
                 {
@@ -117,6 +119,17 @@ namespace PetVax.Services.Service
         {
             try
             {
+                var vet = await _vetRepository.GetVetByIdAsync(request.VetId, cancellationToken);
+                if (vet == null)
+                {
+                    return new BaseResponse<VetScheduleDTO>
+                    {
+                        Success = false,
+                        Message = "Vet not found",
+                        Code = 404,
+                        Data = null
+                    };
+                }
                 var vetSchedule = new VetSchedule
                 {
                     VetId = request.VetId,
@@ -124,7 +137,7 @@ namespace PetVax.Services.Service
                     SlotNumber = request.SlotNumber,
                     Status = request.Status,
                     CreatedAt = DateTime.UtcNow,
-                    CreatedBy = request.CreatedBy
+                    CreatedBy = "admin"
                 };
                 var createdVetScheduleId = await _vetScheduleRepository.CreateVetScheduleAsync(vetSchedule, cancellationToken);
                 if (createdVetScheduleId <= 0)
@@ -235,15 +248,15 @@ namespace PetVax.Services.Service
                 if (vetSchedules == null || !vetSchedules.Any())
                 {
                     return new List<BaseResponse<VetScheduleDTO>>()
-                {
-                    new BaseResponse<VetScheduleDTO>
                     {
-                        Success = false,
-                        Message = "No vet schedules found",
-                        Code = 404,
-                        Data = null
-                    }
-                };
+                        new BaseResponse<VetScheduleDTO>
+                        {
+                            Success = false,
+                            Message = "No vet schedules found",
+                            Code = 404,
+                            Data = null
+                        }
+                    };
                 }
                 return vetSchedules.Select(vs => new BaseResponse<VetScheduleDTO>
                 {
@@ -274,6 +287,56 @@ namespace PetVax.Services.Service
                         Data = null
                     }
                 };
+            }
+        }
+
+        public async Task<BaseResponse<VetScheduleDTO>> DeleteVetScheduleAsync(int vetScheduleId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var vetSchedule = await _vetScheduleRepository.GetVetScheduleByIdAsync(vetScheduleId, cancellationToken);
+                if (vetSchedule == null)
+                {
+                    return new BaseResponse<VetScheduleDTO>
+                    {
+                        Success = false,
+                        Message = "Failed to delete vet schedule",
+                        Code = 500,
+                        Data = null
+                    };
+                }
+                
+                var isDeleted = await _vetScheduleRepository.DeleteVetScheduleAsync(vetScheduleId, cancellationToken);
+                if (!isDeleted)
+                {
+                    return new BaseResponse<VetScheduleDTO>
+                    {
+                        Success = false,
+                        Message = "Failed to delete vet schedule",
+                        Code = 500,
+                        Data = null
+                    };
+                }
+                return new BaseResponse<VetScheduleDTO>
+                {
+                    Success = true,
+                    Message = "Vet schedule deleted successfully",
+                    Code = 200,
+                    Data = new VetScheduleDTO
+                    {
+                        VetScheduleId = vetSchedule.VetScheduleId,
+                        VetId = vetSchedule.VetId,
+                        ScheduleDate = vetSchedule.ScheduleDate,
+                        SlotNumber = vetSchedule.SlotNumber,
+                        Status = vetSchedule.Status,
+                        CreatedAt = vetSchedule.CreatedAt,
+                        CreatedBy = vetSchedule.CreatedBy
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while deleting the vet schedule: {ex.Message}", ex);
             }
         }
     }
