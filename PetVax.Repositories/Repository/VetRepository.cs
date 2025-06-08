@@ -1,4 +1,6 @@
-﻿using PetVax.BusinessObjects.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PediVax.BusinessObjects.DBContext;
+using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
 using System;
@@ -11,22 +13,41 @@ namespace PetVax.Repositories.Repository
 {
     public class VetRepository : GenericRepository<Vet>, IVetRepository
     {
-        public VetRepository() : base() 
+ 
+        public VetRepository() : base()
         {
         }
 
         public async Task<int> CreateVetAsync(Vet vet, CancellationToken cancellationToken)
         {
-            if (vet == null)
-            {
-                throw new ArgumentNullException(nameof(vet), "Vet cannot be null");
-            }
-            // Ensure the vet has a valid AccountId
-            if (vet.AccountId <= 0)
-            {
-                throw new ArgumentException("Invalid AccountId for Vet", nameof(vet.AccountId));
-            }
             return await CreateAsync(vet, cancellationToken);
+        }
+
+        public Task<bool> DeleteVetAsync(int vetId, CancellationToken cancellationToken)
+        {
+            return DeleteAsync(vetId, cancellationToken);
+        }
+
+        public Task<List<Vet>> GetAllVetsAsync(CancellationToken cancellationToken)
+        {
+            return GetAllAsync(cancellationToken);
+        }
+
+        public async Task<Vet> GetVetByIdAsync(int vetId, CancellationToken cancellationToken)
+        {
+         
+            return await _context.Vets.FirstOrDefaultAsync(v => v.VetId == vetId, cancellationToken);
+        }
+
+        public async Task<Vet> GetVetByVetCodeAsync(string vetCode, CancellationToken cancellationToken)
+        {
+            
+            return await _context.Vets.FirstOrDefaultAsync(v => v.VetCode == vetCode, cancellationToken);
+        }
+
+        public Task<int> UpdateVetAsync(Vet vet, CancellationToken cancellationToken)
+        {
+            return UpdateAsync(vet, cancellationToken);
         }
     }
 }

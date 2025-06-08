@@ -389,19 +389,14 @@ namespace PetVax.Services.Service
 
                 account.isVerify = true;
                 await _accountRepository.UpdateAccountAsync(account, cancellationToken);
-
-                // Check if customer already exists for this account
-                var existingCustomer = await _customerRepository.GetCustomerByAccountId(account.AccountId, cancellationToken);
-                if (existingCustomer == null)
-                {
+              
                     Customer customer = new Customer
                     {
                         AccountId = account.AccountId,
                         CreatedAt = DateTime.UtcNow,
                     };
                     await _customerRepository.CreateCustomerAsync(customer);
-                }
-
+               
                 _otpStore.TryRemove(email, out _);
 
                 return new BaseResponse
