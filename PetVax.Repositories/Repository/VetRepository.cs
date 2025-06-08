@@ -36,7 +36,7 @@ namespace PetVax.Repositories.Repository
         public async Task<Vet> GetVetByIdAsync(int vetId, CancellationToken cancellationToken)
         {
          
-            return await _context.Vets.FirstOrDefaultAsync(v => v.VetId == vetId, cancellationToken);
+            return await GetByIdAsync(vetId, cancellationToken);
         }
 
         public async Task<Vet> GetVetByVetCodeAsync(string vetCode, CancellationToken cancellationToken)
