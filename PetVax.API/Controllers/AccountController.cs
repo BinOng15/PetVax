@@ -130,7 +130,6 @@ namespace PediVax.Controllers
         }
 
         [HttpPut("update-account/{accountId}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateAccount(int accountId, [FromBody] UpdateAccountDTO updateAccountDTO, CancellationToken cancellationToken)
         {
             if (accountId <= 0 || updateAccountDTO == null)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-all-vets")]
+        [Authorize(Roles = "Admin, Vet")]
         public async Task<IActionResult> GetAllVets([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, CancellationToken cancellationToken = default)
         {
             var request = new GetAllVetRequestDTO
@@ -41,6 +43,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPut("update-vet")]
+        [Authorize(Roles = "Admin, Vet")]
         public async Task<IActionResult> UpdateVet([FromBody] UpdateVetRequest updateVetRequest, CancellationToken cancellationToken = default)
         {
 
@@ -54,6 +57,7 @@ namespace PediVax.Controllers
 
 
         [HttpGet("get-vet-by-id/{vetId}")]
+        [Authorize(Roles = "Admin, Vet, Staff")]
         public async Task<IActionResult> GetVetById(int vetId, CancellationToken cancellationToken = default)
         {
             var response = await _vetService.GetVetByIdAsync(vetId, cancellationToken);
@@ -65,6 +69,7 @@ namespace PediVax.Controllers
         }
 
         [HttpDelete("delete-vet/{vetId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteVet(int vetId, CancellationToken cancellationToken = default)
         {
             var response = await _vetService.DeleteVetAsync(vetId, cancellationToken);

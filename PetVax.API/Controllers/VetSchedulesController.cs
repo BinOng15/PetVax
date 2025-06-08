@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("Get-all-schedules")]
+        [Authorize(Roles = "Admin, Vet, Staff")]
         public async Task<ActionResult> GetVetSchedules(CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.GetAllVetSchedulesAsync(cancellationToken);
@@ -35,6 +37,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("Get-schedule-by-id/{vetScheduleId}")]
+        [Authorize(Roles = "Admin, Vet, Staff")]
         public async Task<ActionResult> GetVetScheduleById(int vetScheduleId, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.GetVetScheduleByIdAsync(vetScheduleId, cancellationToken);
@@ -46,6 +49,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPost("Create-schedule")]
+        [Authorize(Roles = "Admin, Vet")]
         public async Task<ActionResult> CreateVetSchedule([FromBody] CreateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
             if (request == null)
@@ -61,6 +65,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPut("Update-schedule")]
+        [Authorize(Roles = "Admin, Vet")]
         public async Task<ActionResult> UpdateVetSchedule([FromBody] UpdateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
             if (request == null)
@@ -76,6 +81,7 @@ namespace PediVax.Controllers
 
         }
         [HttpGet("Get-schedules-by-vet-id/{vetId}")]
+        [Authorize(Roles = "Admin, Vet, Staff")]
         public async Task<ActionResult> GetVetSchedulesByVetId(int vetId, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.GetAllVetSchedulesByVetIdAsync(vetId, cancellationToken);
@@ -87,7 +93,8 @@ namespace PediVax.Controllers
         }
 
         [HttpDelete("Delete-schedule/{vetScheduleId}")]
-       public async Task<ActionResult> DeleteVetSchedule(int vetScheduleId, CancellationToken cancellationToken)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteVetSchedule(int vetScheduleId, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.DeleteVetScheduleAsync(vetScheduleId, cancellationToken);
             if (response == null || response.Data == null)
