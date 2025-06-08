@@ -30,6 +30,7 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpGet("get-customer-by-account-id/{accountId}")]
+        [Authorize(Roles = "Admin, Customer")]
         public async Task<IActionResult> GetCustomerByAccountId(int accountId, CancellationToken cancellationToken)
         {
             var response = await _customerService.GetCustomerByAccountIdAsync(accountId, cancellationToken);
