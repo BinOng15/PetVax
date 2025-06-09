@@ -29,10 +29,7 @@ namespace PediVax.Controllers
         public async Task<ActionResult> GetVetSchedules(CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.GetAllVetSchedulesAsync(cancellationToken);
-            if (response == null || !response.Any())
-            {
-                return NotFound("No vet schedules found.");
-            }
+
             return Ok(response);
         }
 
@@ -49,15 +46,9 @@ namespace PediVax.Controllers
         [Authorize(Roles = "Admin, Vet")]
         public async Task<ActionResult> CreateVetSchedule([FromBody] CreateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
-            if (request == null)
-            {
-                return BadRequest("Invalid request data.");
-            }
+
             var response = await _vetScheduleService.CreateVetScheduleAsync(request, cancellationToken);
-            if (response == null || response.Data == null)
-            {
-                return BadRequest("Failed to create vet schedule.");
-            }
+  
             return CreatedAtAction(nameof(GetVetScheduleById), new { vetScheduleId = response.Data.VetScheduleId }, response);
         }
 
@@ -65,15 +56,9 @@ namespace PediVax.Controllers
         [Authorize(Roles = "Admin, Vet")]
         public async Task<ActionResult> UpdateVetSchedule([FromBody] UpdateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
-            if (request == null)
-            {
-                return BadRequest("Invalid request data.");
-            }
+
             var response = await _vetScheduleService.UpdateVetScheduleAsync(request, cancellationToken);
-            if (response == null || response.Data == null)
-            {
-                return BadRequest("Failed to update vet schedule.");
-            }
+  
             return Ok(response);
 
         }
@@ -82,10 +67,7 @@ namespace PediVax.Controllers
         public async Task<ActionResult> GetVetSchedulesByVetId(int vetId, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.GetAllVetSchedulesByVetIdAsync(vetId, cancellationToken);
-            if (response == null || !response.Any())
-            {
-                return NotFound($"No schedules found for vet with ID {vetId}.");
-            }
+  
             return Ok(response);
         }
 
@@ -94,10 +76,7 @@ namespace PediVax.Controllers
         public async Task<ActionResult> DeleteVetSchedule(int vetScheduleId, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.DeleteVetScheduleAsync(vetScheduleId, cancellationToken);
-            if (response == null || response.Data == null)
-            {
-                return NotFound($"Vet schedule with ID {vetScheduleId} not found.");
-            }
+
             return Ok(response);
         }
     }
