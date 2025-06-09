@@ -388,14 +388,17 @@ namespace PetVax.Services.Service
                 }
 
                 account.isVerify = true;
-                await _accountRepository.UpdateAccountAsync(account, cancellationToken);
+                int update = await _accountRepository.UpdateAccountAsync(account, cancellationToken);
               
+                if(update > 0)
+                {
                     Customer customer = new Customer
                     {
                         AccountId = account.AccountId,
                         CreatedAt = DateTime.UtcNow,
                     };
                     await _customerRepository.CreateCustomerAsync(customer);
+                }
                
                 _otpStore.TryRemove(email, out _);
 
