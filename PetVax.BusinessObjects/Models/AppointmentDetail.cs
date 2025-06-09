@@ -16,16 +16,16 @@ namespace PetVax.BusinessObjects.Models
         public int AppointmentDetailId { get; set; } // Unique identifier for the appointment detail
         public int AppointmentId { get; set; } // Foreign key to Appointment table
         public int VetId { get; set; } // Foreign key to Vet table
-        public int VaccineProfileId { get; set; } // Foreign key to VaccineProfile table
-        public string ServiceType { get; set; } // e.g., "Vaccination", "Microchip", "Passport", "Health Check"
-        public int MicrochipItemId { get; set; } // Foreign key to MicrochipItem table
-        public int PassportId { get; set; } // Foreign key to PetPassport table
-        public int HealthConditionId { get; set; } // Foreign key to HealthCondition table
-        public int VaccineBatchId { get; set; } // Foreign key to VaccineBatch table
+        public int? VaccineProfileId { get; set; } // Foreign key to VaccineProfile table
+        public string? ServiceType { get; set; } // e.g., "Vaccination", "Microchip", "Passport", "Health Check"
+        public int? MicrochipItemId { get; set; } // Foreign key to MicrochipItem table
+        public int? PassportId { get; set; } // Foreign key to PetPassport table
+        public int? HealthConditionId { get; set; } // Foreign key to HealthCondition table
+        public int? VaccineBatchId { get; set; } // Foreign key to VaccineBatch table
         public string AppointmentDetailCode { get; set; } // e.g., "AD123456", unique identifier for the appointment detail
-        public string Dose { get; set; } // e.g., "1st Dose", "2nd Dose"
-        public string Reaction { get; set; } // e.g., "None", "Mild", "Severe"
-        public string NextVaccinationInfo { get; set; } // e.g., "Next vaccination due on 2023-12-01"
+        public string? Dose { get; set; } // e.g., "1st Dose", "2nd Dose"
+        public string? Reaction { get; set; } // e.g., "None", "Mild", "Severe"
+        public string? NextVaccinationInfo { get; set; } // e.g., "Next vaccination due on 2023-12-01"
         public DateTime AppointmentDate { get; set; } // Date of the appointment
         public Enum.EnumList.AppointmentStatus AppointmentStatus { get; set; }
         public DateTime CreatedAt { get; set; } // Date when the record was created
