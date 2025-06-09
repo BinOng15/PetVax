@@ -41,10 +41,7 @@ namespace PediVax.Controllers
         public async Task<ActionResult> GetVetScheduleById(int vetScheduleId, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.GetVetScheduleByIdAsync(vetScheduleId, cancellationToken);
-            if (response == null || response.Data == null)
-            {
-                return NotFound($"Vet schedule with ID {vetScheduleId} not found.");
-            }
+            
             return Ok(response);
         }
 

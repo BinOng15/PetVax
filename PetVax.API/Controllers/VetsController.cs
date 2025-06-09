@@ -35,10 +35,6 @@ namespace PediVax.Controllers
                 KeyWord = keyWord
             };
             var response = await _vetService.GetAllVetsAsync(request, cancellationToken);
-            if (!response.Success || response.Data == null)
-            {
-                return StatusCode(response.Code, new { Message = response.Message ?? "No vets found" });
-            }
             return StatusCode(response.Code, response);
         }
 
@@ -48,10 +44,7 @@ namespace PediVax.Controllers
         {
 
             var response = await _vetService.UpdateVetsAsync(updateVetRequest, cancellationToken);
-            if (!response.Success || response.Data == null)
-            {
-                return StatusCode(response.Code, new { Message = response.Message ?? "Failed to update vet" });
-            }
+
             return StatusCode(response.Code, response);
         }
 
@@ -61,10 +54,7 @@ namespace PediVax.Controllers
         public async Task<IActionResult> GetVetById(int vetId, CancellationToken cancellationToken = default)
         {
             var response = await _vetService.GetVetByIdAsync(vetId, cancellationToken);
-            if (!response.Success || response.Data == null)
-            {
-                return StatusCode(response.Code, new { Message = response.Message ?? "Vet not found" });
-            }
+   
             return StatusCode(response.Code, response);
         }
 
@@ -73,10 +63,7 @@ namespace PediVax.Controllers
         public async Task<IActionResult> DeleteVet(int vetId, CancellationToken cancellationToken = default)
         {
             var response = await _vetService.DeleteVetAsync(vetId, cancellationToken);
-            if (!response.Success)
-            {
-                return StatusCode(response.Code, new { Message = response.Message ?? "Failed to delete vet" });
-            }
+
             return StatusCode(response.Code, response);
         }
     }
