@@ -173,10 +173,11 @@ namespace PetVax.Services.Service
                     };
                 }
 
+                var random = new Random();
                 var vet = new Vet
                 {
                     AccountId = createdAccount.AccountId,
-                    VetCode = "V" + Guid.NewGuid().ToString("N").Substring(0, 7).ToUpper(),
+                    VetCode = "V" + random.Next(0, 1000000).ToString("D6"),
                     CreateAt = DateTime.UtcNow,
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system",
                 };

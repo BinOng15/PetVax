@@ -22,8 +22,4 @@
       <ProjectReference Include="..\PetVax.Repositories\PetVax.Repositories.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="ExternalService\" />
-    </ItemGroup>
-
 </Project>

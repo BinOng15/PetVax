@@ -21,7 +21,7 @@ namespace PetVax.Services.Service
         private readonly IMapper _mapper;
         private readonly ILogger<CustomerService> _logger;
 
-        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<CustomerService> logger)
+        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger)
         {
             _customerRepository = customerRepository;
             _mapper = mapper;
@@ -224,19 +224,19 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<CustomerResponseDTO>> UpdateCustomerAsync(int customerId, UpdateCustomerDTO updateCustomerDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<bool>> UpdateCustomerAsync(int customerId, UpdateCustomerDTO updateCustomerDTO, CancellationToken cancellationToken)
         {
             try
             {
                 var customer = await _customerRepository.GetCustomerByIdAsync(customerId, cancellationToken);
                 if (customer == null)
                 {
-                    return new BaseResponse<CustomerResponseDTO>
+                    return new BaseResponse<bool>
                     {
                         Code = 404,
                         Success = false,
                         Message = "Customer not found.",
-                        Data = null
+                        Data = false
                     };
                 }
                 // Map the update DTO to the customer entity
@@ -245,32 +245,31 @@ namespace PetVax.Services.Service
                 int updatedCustomerId = await _customerRepository.UpdateCustomerAsync(customer, cancellationToken);
                 if (updatedCustomerId <= 0)
                 {
-                    return new BaseResponse<CustomerResponseDTO>
+                    return new BaseResponse<bool>
                     {
                         Code = 500,
                         Success = false,
                         Message = "Failed to update customer.",
-                        Data = null
+                        Data = false
                     };
                 }
-                var updatedCustomerResponse = _mapper.Map<CustomerResponseDTO>(customer);
-                return new BaseResponse<CustomerResponseDTO>
+                return new BaseResponse<bool>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Customer updated successfully.",
-                    Data = updatedCustomerResponse
+                    Data = true
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while updating customer.");
-                return new BaseResponse<CustomerResponseDTO>
+                return new BaseResponse<bool>
                 {
                     Code = 500,
                     Success = false,
                     Message = "An error occurred while updating the customer.",
-                    Data = null
+                    Data = false
                 };
             }
         }

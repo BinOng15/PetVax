@@ -1,6 +1,12 @@
 ﻿using AutoMapper;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
+using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
+using PetVax.BusinessObjects.DTO.VaccineDTO;
+using PetVax.BusinessObjects.DTO.VetDTO;
+using PetVax.BusinessObjects.DTO.VetScheduleDTO;
 using PetVax.BusinessObjects.Models;
 using System;
 using System.Collections.Generic;
@@ -27,6 +33,36 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreateCustomerDTO, Customer>();
             CreateMap<UpdateCustomerDTO, Customer>();
             CreateMap<Customer, CustomerResponseDTO>();
+
+            //Vet
+            CreateMap<Vet, VetResponseDTO>();
+
+            //VetSchedule
+            CreateMap<CreateVetScheduleRequestDTO, VetSchedule>();
+            CreateMap<UpdateVetScheduleRequestDTO, VetSchedule>();
+            CreateMap<VetSchedule, VetScheduleDTO>();
+
+            //Vaccine
+            CreateMap<CreateVaccineDTO, Vaccine>();
+            CreateMap<UpdateVaccineDTO, Vaccine>();
+            CreateMap<Vaccine, VaccineResponseDTO>()
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image));
+
+            //VaccineDisease
+            CreateMap<CreateVaccineDiseaseDTO, VaccineDisease>();
+            CreateMap<UpdateVaccineDiseaseDTO, VaccineDisease>();
+            CreateMap<VaccineDisease, VaccineDiseaseResponseDTO>();
+
+            // VaccineBatch
+            CreateMap<CreateVaccineBatchDTO, VaccineBatch>();
+            CreateMap<UpdateVaccineBatchDTO, VaccineBatch>();
+            CreateMap<VaccineBatch, VaccineBatchResponseDTO>();
+
+            //Disease
+            CreateMap<CreateDiseaseDTO, Disease>();
+            CreateMap<UpdateDiseaseDTO, Disease>();
+            CreateMap<Disease, DiseaseResponseDTO>();
+
 
         }
     }   
