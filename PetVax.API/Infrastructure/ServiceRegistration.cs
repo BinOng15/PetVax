@@ -25,6 +25,9 @@ namespace PediVax.Infrastructure
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IPetPassportRepository, PetPassportRepository>();
+            services.AddScoped<IPetRepository, PetRepository>();
+            services.AddScoped<IPetService, PetService>();
             #endregion
 
             return services;
