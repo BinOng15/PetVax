@@ -37,6 +37,13 @@ namespace PetVax.Repositories.Repository
             return await GetPetByNameAsync(petName, cancellationToken);
         }
 
+        public async Task<List<Pet>> GetPetsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
+        {
+            return await _context.Pets
+                .Where(p => p.CustomerId == customerId)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<int> UpdatePetAsync(Pet pet, CancellationToken cancellationToken)
         {
             return await UpdateAsync(pet, cancellationToken);
