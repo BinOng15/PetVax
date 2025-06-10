@@ -32,6 +32,9 @@ namespace PetVax.Infrastructure
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IVaccineService, VaccineService>();
             services.AddScoped<ICloudinariService, CloudinaryService>();
+            services.AddScoped<IPetPassportRepository, PetPassportRepository>();
+            services.AddScoped<IPetRepository, PetRepository>();
+            services.AddScoped<IPetService, PetService>();
             #endregion
 
             return services;

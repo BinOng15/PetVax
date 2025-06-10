@@ -9,6 +9,7 @@ namespace PetVax.Repositories.IRepository
 {
     public interface IDiseaseRepository
     {
+
         Task<List<Disease>> GetAllDiseaseAsync(CancellationToken cancellationToken);
         Task<Disease> GetDiseaseByIdAsync(int diseaseId, CancellationToken cancellationToken);
         Task<int> CreateDiseaseAsync(Disease disease, CancellationToken cancellationToken);

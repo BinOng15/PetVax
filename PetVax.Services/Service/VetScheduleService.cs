@@ -35,7 +35,7 @@ namespace PetVax.Services.Service
                         {
                             Success = false,
                             Message = "No vet schedules found",
-                            Code = 404,
+                            Code = 200,
                             Data = default! // Use default! to explicitly indicate a nullable value
                         }
                     };
@@ -83,7 +83,7 @@ namespace PetVax.Services.Service
                     {
                         Success = false,
                         Message = "Vet schedule not found",
-                        Code = 404,
+                        Code = 200,
                         Data = null
                     };
                 }
@@ -126,7 +126,7 @@ namespace PetVax.Services.Service
                     {
                         Success = false,
                         Message = "Vet not found",
-                        Code = 404,
+                        Code = 200,
                         Data = null
                     };
                 }
@@ -190,7 +190,7 @@ namespace PetVax.Services.Service
                     {
                         Success = false,
                         Message = "Vet schedule not found",
-                        Code = 404,
+                        Code = 200,
                         Data = null
                     };
                 }
@@ -253,7 +253,7 @@ namespace PetVax.Services.Service
                         {
                             Success = false,
                             Message = "No vet schedules found",
-                            Code = 404,
+                            Code = 200,
                             Data = null
                         }
                     };
@@ -301,7 +301,7 @@ namespace PetVax.Services.Service
                     {
                         Success = false,
                         Message = "Failed to delete vet schedule",
-                        Code = 500,
+                        Code = 200,
                         Data = null
                     };
                 }
