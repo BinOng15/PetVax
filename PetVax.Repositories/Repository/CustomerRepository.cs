@@ -30,16 +30,9 @@ namespace PetVax.Repositories.Repository
 
         public async Task<Customer> GetCustomerByAccountId(int accountId, CancellationToken cancellationToken)
         {
-            if (accountId <= 0)
-            {
-                throw new ArgumentException("Invalid account ID", nameof(accountId));
-            }
-            var customer = await _context.Set<Customer>()
-                .FirstOrDefaultAsync(c => c.AccountId == accountId, cancellationToken);
-            if (customer == null)
-            {
-                throw new KeyNotFoundException($"Customer with AccountId {accountId} not found.");
-            }
+            
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.AccountId == accountId, cancellationToken);           
             return customer;
         }
 

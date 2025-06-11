@@ -56,5 +56,12 @@ namespace PediVax.Controllers
             var response = await _petService.CreatePetAsync(accountId, createPetRequest, cancellationToken);
             return StatusCode(response.Code, response);
         }
+
+        [HttpGet("get-pets-by-account-id/{accountId}")]
+        public async Task<IActionResult> GetPetsByAccountId(int accountId, CancellationToken cancellationToken = default)
+        {
+            var response = await _petService.GetPetsByCustomerIdAsync(accountId, cancellationToken);
+            return StatusCode(response.FirstOrDefault()?.Code ?? 200, response);
+        }
     }
  }

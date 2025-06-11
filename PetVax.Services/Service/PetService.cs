@@ -134,7 +134,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Pet with ID {PetId} not found", updatePetRequest.PetId);
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 200,
+                        Code = 404,
                         Success = false,
                         Message = "Pet not found",
                         Data = null
@@ -221,7 +221,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Pet with ID {PetId} not found", petId);
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 200,
+                        Code = 404,
                         Success = false,
                         Message = "Pet not found",
                         Data = null
@@ -278,7 +278,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Customer with ID {CustomerId} not found", accountId);
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 200,
+                        Code = 404,
                         Success = false,
                         Message = "Customer not found",
                         Data = null
@@ -311,7 +311,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Failed to create pet for customer ID {CustomerId}", customer.CustomerId);
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 200,
+                        Code = 400,
                         Success = false,
                         Message = "Failed to create pet",
                         Data = null
@@ -352,6 +352,83 @@ namespace PetVax.Services.Service
                     Success = false,
                     Message = "Error while creating pet: " + (ex.InnerException?.Message ?? ex.Message),
                     Data = null
+                };
+            }
+        }
+
+        public async Task<List<BaseResponse<PetResponseDTO>>> GetPetsByCustomerIdAsync(int accountId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var customer = await _customerRepository.GetCustomerByAccountId(accountId, cancellationToken);
+                if(customer == null)
+                {
+                    return new List<BaseResponse<PetResponseDTO>>
+                    {
+                        new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 404,
+                            Success = false,
+                            Message = "Customer not found",
+                            Data = null
+                        }
+                    };
+                }
+
+                var pets = await _petRepository.GetPetsByCustomerIdAsync(customer.CustomerId, cancellationToken);
+                if (pets == null || !pets.Any())
+                {
+                    return new List<BaseResponse<PetResponseDTO>>
+                    {
+                        new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 404,
+                            Success = false,
+                            Message = "No pets found for this customer",
+                            Data = null
+                        }
+                    };
+                }
+                var petResponses = pets.Select(p => new PetResponseDTO
+                {
+                    PetId = p.PetId,
+                    PetCode = p.PetCode,
+                    CustomerId = p.CustomerId,
+                    Name = p.Name,
+                    Species = p.Species,
+                    Breed = p.Breed,
+                    Age = p.Age,
+                    Gender = p.Gender,
+                    DateOfBirth = p.DateOfBirth,
+                    PlaceToLive = p.PlaceToLive,
+                    PlaceOfBirth = p.PlaceOfBirth,
+                    Image = p.Image,
+                    Weight = p.Weight,
+                    Color = p.Color,
+                    Nationality = p.Nationality,
+                    isSterilized = p.isSterilized
+                }).ToList();
+
+                return petResponses.Select(p => new BaseResponse<PetResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Pets retrieved successfully",
+                    Data = p
+                }).ToList();
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Error retrieving pets for customer");
+                return new List<BaseResponse<PetResponseDTO>>
+                {
+                    new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Error while retrieving pets: " + (ex.InnerException?.Message ?? ex.Message),
+                        Data = null
+                    }
                 };
             }
         }
