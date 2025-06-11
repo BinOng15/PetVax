@@ -23,9 +23,11 @@ namespace PetVax.Repositories.Repository
         {
             return await DeleteAsync(diseaseId, cancellationToken);
         }
-        public async Task<List<Disease>> GetAllDiseasesAsync(CancellationToken cancellationToken)
+
+        public async Task<List<Disease>> GetAllDiseaseAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.Diseases
+                .ToListAsync(cancellationToken);
         }
         public async Task<Disease> GetDiseaseByIdAsync(int diseaseId, CancellationToken cancellationToken)
         {
