@@ -268,14 +268,14 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<PetResponseDTO>> CreatePetAsync(int customerId, CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken)
+        public async Task<BaseResponse<PetResponseDTO>> CreatePetAsync(int accountId, CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken)
         {
             try
             {
-                var customer = await _customerRepository.GetCustomerByIdAsync(customerId, cancellationToken);
+                var customer = await _customerRepository.GetCustomerByAccountId(accountId, cancellationToken);
                 if (customer == null)
                 {
-                    _logger.LogWarning("Customer with ID {CustomerId} not found", customerId);
+                    _logger.LogWarning("Customer with ID {CustomerId} not found", accountId);
                     return new BaseResponse<PetResponseDTO>
                     {
                         Code = 200,
@@ -287,7 +287,7 @@ namespace PetVax.Services.Service
                 var pet = new Pet
                 {
                     PetCode = "PET" + Guid.NewGuid().ToString("N").Substring(0, 7).ToUpper(),
-                    CustomerId = customerId,
+                    CustomerId = customer.CustomerId,
                     Name = createPetRequest.Name,
                     Species = createPetRequest.Species,
                     Breed = createPetRequest.Breed,
@@ -308,7 +308,7 @@ namespace PetVax.Services.Service
                 int createdPetId = await _petRepository.CreatePetAsync(pet, cancellationToken);
                 if (createdPetId <= 0)
                 {
-                    _logger.LogWarning("Failed to create pet for customer ID {CustomerId}", customerId);
+                    _logger.LogWarning("Failed to create pet for customer ID {CustomerId}", customer.CustomerId);
                     return new BaseResponse<PetResponseDTO>
                     {
                         Code = 200,
@@ -317,7 +317,7 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                _logger.LogInformation("Pet created successfully for customer ID {CustomerId}", customerId);
+                _logger.LogInformation("Pet created successfully for customer ID {CustomerId}", customer.CustomerId);
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 200,
@@ -345,7 +345,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating pet for customer ID {CustomerId}", customerId);
+                _logger.LogError(ex, "Error creating pet for customer ID");
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 500,
