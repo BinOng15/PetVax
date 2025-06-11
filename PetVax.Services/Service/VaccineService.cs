@@ -21,14 +21,16 @@ namespace PetVax.Services.Service
     public class VaccineService : IVaccineService
     {
         private readonly IVaccineRepository _vaccineRepository;
+        private readonly IVaccineDiseaseRepository _vaccineDiseaseRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<VaccineService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICloudinariService _cloudinariService;
 
-        public VaccineService(IVaccineRepository vaccineRepository, IMapper mapper, ILogger<VaccineService> logger, IHttpContextAccessor httpContextAccessor, ICloudinariService cloudinariService)
+        public VaccineService(IVaccineRepository vaccineRepository, IVaccineDiseaseRepository vaccineDiseaseRepository, IMapper mapper, ILogger<VaccineService> logger, IHttpContextAccessor httpContextAccessor, ICloudinariService cloudinariService)
         {
             _vaccineRepository = vaccineRepository;
+            _vaccineDiseaseRepository = vaccineDiseaseRepository;
             _mapper = mapper;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
@@ -210,6 +212,63 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse<VaccineResponseDTO>> GetVaccineByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
+        {
+            if (diseaseId <= 0)
+            {
+                return new BaseResponse<VaccineResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Invalid disease ID provided."
+                };
+            }
+            try
+            {
+                // Get VaccineDisease by diseaseId
+                var vaccineDisease = await _vaccineDiseaseRepository.GetVaccineDiseaseByDiseaseIdAsync(diseaseId, cancellationToken);
+                if (vaccineDisease == null)
+                {
+                    return new BaseResponse<VaccineResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "No vaccine found for the specified disease."
+                    };
+                }
+
+                // Get Vaccine by VaccineId from VaccineDisease
+                var vaccine = await _vaccineRepository.GetVaccineByIdAsync(vaccineDisease.VaccineId, cancellationToken);
+                if (vaccine == null)
+                {
+                    return new BaseResponse<VaccineResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Vaccine not found for the specified disease."
+                    };
+                }
+                var responseDTO = _mapper.Map<VaccineResponseDTO>(vaccine);
+                return new BaseResponse<VaccineResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Vaccine retrieved successfully.",
+                    Data = responseDTO
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving vaccine by disease ID");
+                return new BaseResponse<VaccineResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "An error occurred while retrieving the vaccine."
+                };
+            }
+        }
+
         public async Task<BaseResponse<VaccineResponseDTO>> GetVaccineByIdAsync(int vaccineId, CancellationToken cancellationToken)
         {
             if (vaccineId <= 0)
@@ -342,11 +401,11 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<bool>> UpdateVaccineAsync(int vaccineId, UpdateVaccineDTO updateVaccineDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<VaccineResponseDTO>> UpdateVaccineAsync(int vaccineId, UpdateVaccineDTO updateVaccineDTO, CancellationToken cancellationToken)
         {
             if (updateVaccineDTO == null)
             {
-                return new BaseResponse<bool>
+                return new BaseResponse<VaccineResponseDTO>
                 {
                     Code = 400,
                     Success = false,
@@ -358,36 +417,52 @@ namespace PetVax.Services.Service
                 var existingVaccine = await _vaccineRepository.GetVaccineByIdAsync(vaccineId, cancellationToken);
                 if (existingVaccine == null)
                 {
-                    return new BaseResponse<bool>
+                    return new BaseResponse<VaccineResponseDTO>
                     {
                         Code = 404,
                         Success = false,
                         Message = "Vaccine not found."
                     };
                 }
-                var vaccineToUpdate = _mapper.Map<Vaccine>(updateVaccineDTO);
-                var updatedVaccine = await _vaccineRepository.UpdateVaccineAsync(vaccineToUpdate, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(updateVaccineDTO.Name))
+                    existingVaccine.Name = updateVaccineDTO.Name;
+                if (!string.IsNullOrWhiteSpace(updateVaccineDTO.Description))
+                    existingVaccine.Description = updateVaccineDTO.Description;
+                if (updateVaccineDTO.Price.HasValue)
+                    existingVaccine.Price = updateVaccineDTO.Price.Value;
+                if (!string.IsNullOrWhiteSpace(updateVaccineDTO.Notes))
+                    existingVaccine.Notes = updateVaccineDTO.Notes;
+                if (updateVaccineDTO.Image != null)
+                    existingVaccine.Image = await _cloudinariService.UploadImage(updateVaccineDTO.Image);
+
+                existingVaccine.ModifiedAt = DateTime.UtcNow;
+                existingVaccine.ModifiedBy = GetCurrentUserName();
+
+                var updatedVaccine = await _vaccineRepository.UpdateVaccineAsync(existingVaccine, cancellationToken);
                 if (updatedVaccine <= 0)
                 {
-                    return new BaseResponse<bool>
+                    return new BaseResponse<VaccineResponseDTO>
                     {
                         Code = 500,
                         Success = false,
                         Message = "Failed to update vaccine."
                     };
                 }
-                return new BaseResponse<bool>
+                // Get the updated vaccine from DB to ensure all fields (like VaccineId) are set
+                var vaccine = await _vaccineRepository.GetVaccineByIdAsync(vaccineId, cancellationToken);
+                var responseDTO = _mapper.Map<VaccineResponseDTO>(vaccine ?? existingVaccine);
+                return new BaseResponse<VaccineResponseDTO>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Vaccine updated successfully.",
-                    Data = true
+                    Data = responseDTO
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating vaccine");
-                return new BaseResponse<bool>
+                return new BaseResponse<VaccineResponseDTO>
                 {
                     Code = 500,
                     Success = false,

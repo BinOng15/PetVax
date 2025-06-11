@@ -160,9 +160,9 @@ namespace PetVax.Controllers
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ForgetPasswordRequestDTO forgetPasswordRequest, [FromQuery] string otp, CancellationToken cancellationToken)
+        public async Task<IActionResult> ResetPassword([FromForm] ForgetPasswordRequestDTO forgetPasswordRequest, CancellationToken cancellationToken)
         {
-            var result = await _authService.ResetPasswordAsync(forgetPasswordRequest, otp, cancellationToken);
+            var result = await _authService.ResetPasswordAsync(forgetPasswordRequest, cancellationToken);
             return StatusCode(result.Code, result);
         }
     }

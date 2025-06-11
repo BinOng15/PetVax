@@ -20,7 +20,5 @@ namespace PetVax.BusinessObjects.DTO.VaccineDTO
         public string CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
-        public object VaccineDiseases { get; set; }
-        public object VaccineBatches { get; set; }
     }
 }

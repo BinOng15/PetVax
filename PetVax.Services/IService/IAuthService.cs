@@ -19,7 +19,7 @@ namespace PetVax.Services.IService
         Task<BaseResponse> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AuthResponseDTO>> LoginWithGoogleAsync(string email, string name, CancellationToken cancellationToken);
         Task<BaseResponse<AuthResponseDTO>> VerifyGoogleEmailAsync(string email, string token, string name, CancellationToken cancellationToken);
-        Task<BaseResponse<ForgetPasswordResponseDTO>> ResetPasswordAsync(ForgetPasswordRequestDTO forgetPasswordRequestDTO, string otp, CancellationToken cancellationToken);
+        Task<BaseResponse<ForgetPasswordResponseDTO>> ResetPasswordAsync(ForgetPasswordRequestDTO forgetPasswordRequestDTO, CancellationToken cancellationToken);
         Task<BaseResponse> VerifyEmail(string email, string otp, CancellationToken cancellationToken);
     }
 }

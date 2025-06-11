@@ -67,5 +67,11 @@ namespace PediVax.Controllers
             var response = await _vaccineService.DeleteVaccineAsync(vaccineId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpGet("get-vaccine-by-disease-id/{diseaseId}")]
+        public async Task<IActionResult> GetVaccineByDiseaseId(int diseaseId, CancellationToken cancellationToken)
+        {
+            var response = await _vaccineService.GetVaccineByDiseaseIdAsync(diseaseId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

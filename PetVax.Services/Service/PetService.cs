@@ -1,13 +1,17 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
+using PetVax.Services.ExternalService;
 using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using static PetVax.BusinessObjects.DTO.ResponseModel;
@@ -18,13 +22,19 @@ namespace PetVax.Services.Service
     {
         private readonly IPetRepository _petRepository;
         private readonly ICustomerRepository _customerRepository;
-        private ILogger<PetService> _logger;
-
-        public PetService(IPetRepository petRepository, ICustomerRepository customerRepository, ILogger<PetService> logger)
+        private readonly ILogger<PetService> _logger;
+        private readonly IMapper _mapper;
+        private readonly ICloudinariService _cloudinariService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+            
+        public PetService(IPetRepository petRepository, ICustomerRepository customerRepository, ILogger<PetService> logger, IMapper mapper, ICloudinariService cloudinariService, IHttpContextAccessor httpContextAccessor)
         {
             _petRepository = petRepository;
             _customerRepository = customerRepository;
             _logger = logger;
+            _mapper = mapper;
+            _cloudinariService = cloudinariService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<DynamicResponse<PetResponseDTO>> GetAllPetsAsync(GetAllPetsRequestDTO getAllPetsRequest, CancellationToken cancellationToken)
@@ -268,84 +278,93 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<PetResponseDTO>> CreatePetAsync(int accountId, CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken)
+        public async Task<BaseResponse<PetResponseDTO>> CreatePetAsync(CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken)
         {
+            if (createPetRequest == null)
+            {
+                _logger.LogError("CreatePetRequestDTO is null");
+                return new BaseResponse<PetResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Invalid request data",
+                    Data = null
+                };
+            }
             try
             {
-                var customer = await _customerRepository.GetCustomerByAccountId(accountId, cancellationToken);
-                if (customer == null)
+                var pet = _mapper.Map<Pet>(createPetRequest);
+                if (createPetRequest.Image != null)
                 {
-                    _logger.LogWarning("Customer with ID {CustomerId} not found", accountId);
-                    return new BaseResponse<PetResponseDTO>
-                    {
-                        Code = 404,
-                        Success = false,
-                        Message = "Customer not found",
-                        Data = null
-                    };
+                    pet.Image = await _cloudinariService.UploadImage(createPetRequest.Image);
                 }
-                var pet = new Pet
-                {
-                    PetCode = "PET" + Guid.NewGuid().ToString("N").Substring(0, 7).ToUpper(),
-                    CustomerId = customer.CustomerId,
-                    Name = createPetRequest.Name,
-                    Species = createPetRequest.Species,
-                    Breed = createPetRequest.Breed,
-                    Age = createPetRequest.Age,
-                    Gender = createPetRequest.Gender,
-                    DateOfBirth = createPetRequest.DateOfBirth,
-                    PlaceToLive = createPetRequest.PlaceToLive,
-                    PlaceOfBirth = createPetRequest.PlaceOfBirth,
-                    Image = createPetRequest.Image,
-                    Weight = createPetRequest.Weight,
-                    Color = createPetRequest.Color,
-                    Nationality = createPetRequest.Nationality,
-                    isSterilized = createPetRequest.isSterilized,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = customer.FullName
-                };
+                var random = new Random();
 
-                int createdPetId = await _petRepository.CreatePetAsync(pet, cancellationToken);
-                if (createdPetId <= 0)
+                pet.CustomerId = createPetRequest.CustomerId;
+                pet.PetCode = "PET" + random.Next(0, 1000000).ToString("D6");
+                pet.Name = createPetRequest.Name;
+                pet.Species = createPetRequest.Species;
+                pet.Breed = createPetRequest.Breed;
+                pet.Age = createPetRequest.Age;
+                pet.Gender = createPetRequest.Gender;
+                pet.DateOfBirth = createPetRequest.DateOfBirth;
+                pet.PlaceToLive = createPetRequest.PlaceToLive;
+                pet.PlaceOfBirth = createPetRequest.PlaceOfBirth;
+                pet.Weight = createPetRequest.Weight;
+                pet.Image = await _cloudinariService.UploadImage(createPetRequest.Image);
+                pet.Color = createPetRequest.Color;
+                pet.Nationality = createPetRequest.Nationality;
+                pet.isSterilized = createPetRequest.isSterilized;
+                pet.CreatedAt = DateTime.UtcNow;
+                pet.CreatedBy = GetCurrentUserName();
+                
+                if (createPetRequest == null)
                 {
-                    _logger.LogWarning("Failed to create pet for customer ID {CustomerId}", customer.CustomerId);
                     return new BaseResponse<PetResponseDTO>
                     {
                         Code = 400,
+                        Success = false,
+                        Message = "Request cannot be null.",
+                        Data = null
+                    };
+                }
+
+                if (createPetRequest.Image == null)
+                {
+                    return new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Image is required.",
+                        Data = null
+                    };
+                }
+                var createdPetId = await _petRepository.CreatePetAsync(pet, cancellationToken);
+                if (createdPetId <= 0)
+                {
+                    return new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 500,
                         Success = false,
                         Message = "Failed to create pet",
                         Data = null
                     };
                 }
-                _logger.LogInformation("Pet created successfully for customer ID {CustomerId}", customer.CustomerId);
+
+                var createdPet = await _petRepository.GetPetByIdAsync(pet.PetId, cancellationToken);
+                var responseDTO = _mapper.Map<PetResponseDTO>(createdPet);
+
                 return new BaseResponse<PetResponseDTO>
                 {
-                    Code = 200,
+                    Code = 201,
                     Success = true,
                     Message = "Pet created successfully",
-                    Data = new PetResponseDTO
-                    {
-                        PetId = pet.PetId,
-                        Name = createPetRequest.Name,
-                        PetCode = pet.PetCode,
-                        Species = createPetRequest.Species,
-                        Breed = createPetRequest.Breed,
-                        Age = createPetRequest.Age,
-                        Gender = createPetRequest.Gender,
-                        DateOfBirth = createPetRequest.DateOfBirth,
-                        PlaceToLive = createPetRequest.PlaceToLive,
-                        PlaceOfBirth = createPetRequest.PlaceOfBirth,
-                        Image = createPetRequest.Image,
-                        Weight = createPetRequest.Weight,
-                        Color = createPetRequest.Color,
-                        Nationality = createPetRequest.Nationality,
-                        isSterilized = createPetRequest.isSterilized,
-                    }
+                    Data = responseDTO
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating pet for customer ID");
+                _logger.LogError(ex, "Error creating pet");
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 500,
@@ -431,6 +450,10 @@ namespace PetVax.Services.Service
                     }
                 };
             }
+        }
+        private string GetCurrentUserName()
+        {
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value ?? "System";
         }
     }
 }

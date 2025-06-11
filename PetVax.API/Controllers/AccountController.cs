@@ -5,6 +5,7 @@ using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.Enum;
 using PetVax.Services.IService;
 using System.Net;
+using System.Security.Claims;
 
 namespace PediVax.Controllers
 {
@@ -21,19 +22,20 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("current-account")]
-        public async Task<IActionResult> GetCurrentAccount(CancellationToken cancellationToken)
+        [Authorize]
+        public IActionResult GetCurrentAccount(CancellationToken cancellationToken)
         {
-            var accountId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "AccountId")?.Value;
-            if (string.IsNullOrEmpty(accountId))
+            var accountIdClaim = User.Claims.Where(a => a.Type == ClaimTypes.NameIdentifier && int.TryParse(a.Value, out _)).FirstOrDefault()?.Value;
+
+            var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "Unknown";
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
+
+            return Ok(new
             {
-                return Unauthorized();
-            }
-            var response = await _accountService.GetAccountByIdAsync(int.Parse(accountId), cancellationToken);
-            if (!response.Success || response.Data == null)
-            {
-                return StatusCode(response.Code, new { Message = response.Message ?? "Account not found" });
-            }
-            return StatusCode(response.Code, response);
+                AccountId = accountIdClaim,
+                Email = email,
+                Role = role
+            });
         }
 
         [HttpGet("get-all-accounts")]

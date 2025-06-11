@@ -2,6 +2,7 @@
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineDTO;
@@ -62,6 +63,12 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreateDiseaseDTO, Disease>();
             CreateMap<UpdateDiseaseDTO, Disease>();
             CreateMap<Disease, DiseaseResponseDTO>();
+
+            //Pet
+            CreateMap<CreatePetRequestDTO, Pet>();
+            CreateMap<UpdatePetRequestDTO, Pet>();
+            CreateMap<Pet, PetResponseDTO>()
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image));
 
 
         }
