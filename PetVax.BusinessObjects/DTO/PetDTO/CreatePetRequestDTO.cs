@@ -29,7 +29,6 @@ namespace PetVax.BusinessObjects.DTO.PetDTO
         public string PlaceToLive { get; set; }
         [Required(ErrorMessage = "Place of Birth is required.")]
         public string PlaceOfBirth { get; set; }
-        [Required(ErrorMessage = "Image is required.")]
         public IFormFile Image { get; set; }
         [Required(ErrorMessage = "Weight is required.")]
         public string Weight { get; set; } // e.g., "10 kg", "5 lbs"

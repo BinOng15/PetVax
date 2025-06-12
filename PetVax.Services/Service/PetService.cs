@@ -298,6 +298,10 @@ namespace PetVax.Services.Service
                 {
                     pet.Image = await _cloudinariService.UploadImage(createPetRequest.Image);
                 }
+                else
+                {
+                    pet.Image = null;
+                }
                 var random = new Random();
 
                 pet.CustomerId = createPetRequest.CustomerId;
@@ -311,34 +315,12 @@ namespace PetVax.Services.Service
                 pet.PlaceToLive = createPetRequest.PlaceToLive;
                 pet.PlaceOfBirth = createPetRequest.PlaceOfBirth;
                 pet.Weight = createPetRequest.Weight;
-                pet.Image = await _cloudinariService.UploadImage(createPetRequest.Image);
                 pet.Color = createPetRequest.Color;
                 pet.Nationality = createPetRequest.Nationality;
                 pet.isSterilized = createPetRequest.isSterilized;
                 pet.CreatedAt = DateTime.UtcNow;
                 pet.CreatedBy = GetCurrentUserName();
-                
-                if (createPetRequest == null)
-                {
-                    return new BaseResponse<PetResponseDTO>
-                    {
-                        Code = 400,
-                        Success = false,
-                        Message = "Request cannot be null.",
-                        Data = null
-                    };
-                }
 
-                if (createPetRequest.Image == null)
-                {
-                    return new BaseResponse<PetResponseDTO>
-                    {
-                        Code = 400,
-                        Success = false,
-                        Message = "Image is required.",
-                        Data = null
-                    };
-                }
                 var createdPetId = await _petRepository.CreatePetAsync(pet, cancellationToken);
                 if (createdPetId <= 0)
                 {
