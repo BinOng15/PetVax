@@ -12,6 +12,9 @@ namespace PetVax.Repositories.Repository
 {
     public class PaymentRepository : GenericRepository<Payment>, IPaymentRepository
     {
+        public PaymentRepository() : base()
+        {
+        }
         public async Task<int> AddPaymentAsync(Payment payment, CancellationToken cancellationToken)
         {
             return await CreateAsync(payment, cancellationToken);

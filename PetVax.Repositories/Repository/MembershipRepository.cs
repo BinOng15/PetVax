@@ -12,6 +12,9 @@ namespace PetVax.Repositories.Repository
 {
     public class MembershipRepository : GenericRepository<Membership>, IMembershipRepository
     {
+        public MembershipRepository() : base()
+        {
+        }
         public async Task<int> AddMembershipAsync(Membership membership, CancellationToken cancellationToken)
         {
             return await CreateAsync(membership, cancellationToken);

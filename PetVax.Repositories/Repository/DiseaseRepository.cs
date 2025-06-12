@@ -12,6 +12,9 @@ namespace PetVax.Repositories.Repository
 {
     public class DiseaseRepository : GenericRepository<Disease>, IDiseaseRepository
     {
+        public DiseaseRepository() : base()
+        {
+        }
         public async Task<int> AddDiseaseAsync(Disease disease, CancellationToken cancellationToken)
         {
             return await CreateAsync(disease, cancellationToken);
