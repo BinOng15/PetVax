@@ -302,6 +302,15 @@ namespace PetVax.Services.Service
                 {
                     pet.Image = null;
                 }
+
+                var dob = DateTime.Parse(createPetRequest.DateOfBirth); 
+                var today = DateTime.Today;
+                int age = today.Year - dob.Year;
+
+                if (dob.Date > today.AddYears(-age))
+                {
+                    age--; 
+                }
                 var random = new Random();
 
                 pet.CustomerId = createPetRequest.CustomerId;
@@ -309,7 +318,7 @@ namespace PetVax.Services.Service
                 pet.Name = createPetRequest.Name;
                 pet.Species = createPetRequest.Species;
                 pet.Breed = createPetRequest.Breed;
-                pet.Age = createPetRequest.Age;
+                pet.Age = age.ToString();
                 pet.Gender = createPetRequest.Gender;
                 pet.DateOfBirth = createPetRequest.DateOfBirth;
                 pet.PlaceToLive = createPetRequest.PlaceToLive;

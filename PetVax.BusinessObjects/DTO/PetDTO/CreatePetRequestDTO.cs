@@ -20,8 +20,6 @@ namespace PetVax.BusinessObjects.DTO.PetDTO
         [Required(ErrorMessage = "Breed is required.")]
         public string Breed { get; set; }
         [Required(ErrorMessage = "Age is required.")]
-        public string Age { get; set; } // e.g., "2 years", "6 months"
-        [Required(ErrorMessage = "Gender is required.")]
         public string Gender { get; set; }
         [Required(ErrorMessage = "Date of Birth is required.")]
         public string DateOfBirth { get; set; }
@@ -29,7 +27,7 @@ namespace PetVax.BusinessObjects.DTO.PetDTO
         public string PlaceToLive { get; set; }
         [Required(ErrorMessage = "Place of Birth is required.")]
         public string PlaceOfBirth { get; set; }
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
         [Required(ErrorMessage = "Weight is required.")]
         public string Weight { get; set; } // e.g., "10 kg", "5 lbs"
         [Required(ErrorMessage = "Color is required.")]
