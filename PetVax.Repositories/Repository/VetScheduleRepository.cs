@@ -12,6 +12,9 @@ namespace PetVax.Repositories.Repository
 {
     public class VetScheduleRepository : GenericRepository<VetSchedule>, IVetScheduleRepository
     {
+        public VetScheduleRepository() : base()
+        {
+        }
         public async Task<int> CreateVetScheduleAsync(VetSchedule vetSchedule, CancellationToken cancellationToken)
         {
             return await CreateAsync(vetSchedule, cancellationToken);

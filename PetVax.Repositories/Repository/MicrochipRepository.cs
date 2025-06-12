@@ -12,6 +12,9 @@ namespace PetVax.Repositories.Repository
 {
     public class MicrochipRepository : GenericRepository<Microchip>, IMicrochipRepository
     {
+        public MicrochipRepository() : base()
+        {
+        }
         public async Task<int> CreateMicrochipAsync(Microchip microchip, CancellationToken cancellationToken)
         {
             return await CreateAsync(microchip, cancellationToken);

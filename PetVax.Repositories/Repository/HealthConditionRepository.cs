@@ -12,6 +12,9 @@ namespace PetVax.Repositories.Repository
 {
     public class HealthConditionRepository : GenericRepository<HealthCondition>, IHealthConditionRepository
     {
+        public HealthConditionRepository() : base()
+        {
+        }
         public async Task<int> AddHealthConditionAsync(HealthCondition healthCondition, CancellationToken cancellationToken)
         {
             return await CreateAsync(healthCondition, cancellationToken);

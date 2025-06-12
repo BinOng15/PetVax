@@ -15,6 +15,8 @@ namespace PetVax.Repositories.Repository
         public DiseaseRepository() : base()
         {
         }
+
+       
         public async Task<int> CreateDiseaseAsync(Disease disease, CancellationToken cancellationToken)
         {
             return await CreateAsync(disease, cancellationToken);

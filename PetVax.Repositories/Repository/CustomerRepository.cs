@@ -15,7 +15,6 @@ namespace PetVax.Repositories.Repository
         public CustomerRepository() : base()
         {
         }
-
         public async Task<int> CreateCustomerAsync(Customer customer)
         {
             Create(customer);

@@ -25,6 +25,9 @@ namespace PetVax.Infrastructure
             services.AddScoped<IDiseaseRepository, DiseaseRepository>();
             services.AddScoped<IVaccineBatchRepository, VaccineBatchRepository>();
             services.AddScoped<IVaccineDiseaseRepository, VaccineDiseaseRepository>();
+            services.AddScoped<IPetPassportRepository, PetPassportRepository>();
+            services.AddScoped<IPetRepository, PetRepository>();
+            services.AddScoped<IVaccineProfileRepository, VaccineProfileRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -32,13 +35,15 @@ namespace PetVax.Infrastructure
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IVaccineService, VaccineService>();
             services.AddScoped<ICloudinariService, CloudinaryService>();
-            services.AddScoped<IPetPassportRepository, PetPassportRepository>();
-            services.AddScoped<IPetRepository, PetRepository>();
+            
             services.AddScoped<IPetService, PetService>();
             services.AddScoped<IVetService, VetService>();
             services.AddScoped<IVetScheduleService, VetScheduleService>();
             services.AddScoped<IDiseaseService, DiseaseService>();
             services.AddScoped<IVaccineDiseaseService, VaccineDiseaseService>();
+            services.AddScoped<IVaccineProfileService, VaccineProfileService>();
+            
+
             #endregion
 
             return services;
