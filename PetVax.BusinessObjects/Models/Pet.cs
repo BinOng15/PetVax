@@ -24,7 +24,7 @@ namespace PetVax.BusinessObjects.Models
         public string DateOfBirth { get; set; }
         public string PlaceToLive { get; set; }
         public string PlaceOfBirth { get; set; }
-        public string Image { get; set; } 
+        public string? Image { get; set; } 
         public string Weight { get; set; } // e.g., "10 kg", "5 lbs"
         public string Color { get; set; } // e.g., "Brown", "Black"
         public string Nationality { get; set; } // e.g., "American", "British"
