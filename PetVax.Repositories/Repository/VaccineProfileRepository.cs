@@ -13,7 +13,7 @@ namespace PetVax.Repositories.Repository
 {
     public class VaccineProfileRepository : GenericRepository<VaccineProfile>, IVaccineProfileRepository
     {
-        public VaccineProfileRepository(PetVaxContext context) : base(context)
+        public VaccineProfileRepository() : base()
         {
         }
 
@@ -29,7 +29,9 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<VaccineProfile>> GetAllVaccineProfilesAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.VaccineProfiles
+                .Include(vp => vp.Disease) 
+    .           ToListAsync(cancellationToken);
         }
 
         public async Task<VaccineProfile> GetVaccineProfileByIdAsync(int vaccineProfileId, CancellationToken cancellationToken)
@@ -41,10 +43,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VaccineProfiles
                 .Where(vp => vp.PetId == petId)
-                .Include(vp => vp.Disease.DiseaseId)
-                .Include(vp => vp.Disease.Name)
-                .Include(vp => vp.Disease.Description)
-                .Include(vp => vp.Disease.Treatment)
+                .Include(vp => vp.Disease)
                 .FirstOrDefaultAsync(cancellationToken);
         }
 

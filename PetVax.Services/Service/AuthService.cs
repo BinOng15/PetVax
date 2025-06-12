@@ -593,7 +593,7 @@ namespace PetVax.Services.Service
             await client.SendMailAsync(mail, cancellationToken);
         }
 
-        public async Task<BaseResponse<ForgetPasswordResponseDTO>> ResetPasswordAsync(ForgetPasswordRequestDTO forgetPasswordRequestDTO, string otp, CancellationToken cancellationToken)
+        public async Task<BaseResponse<ForgetPasswordResponseDTO>> ResetPasswordAsync(ForgetPasswordRequestDTO forgetPasswordRequestDTO, CancellationToken cancellationToken)
         {
             try
             {
@@ -609,26 +609,28 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                // Verify OTP
-                if (!_otpStore.TryGetValue(forgetPasswordRequestDTO.Email, out var otpInfo) || otpInfo.Expiration < DateTime.UtcNow || otpInfo.Otp != otp)
+
+                // Verify old password
+                if (!VerifyPassword(forgetPasswordRequestDTO.OldPassword, account.PasswordHash, account.PasswordSalt))
                 {
                     return new BaseResponse<ForgetPasswordResponseDTO>
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid or expired OTP.",
+                        Message = "Old password is incorrect.",
                         Data = null
                     };
                 }
+
                 // Generate new password hash and salt
                 string newPasswordSalt = PasswordHelper.GenerateSalt();
                 string newPasswordHash = PasswordHelper.HashPassword(forgetPasswordRequestDTO.NewPassword, newPasswordSalt);
+
                 // Update account password
                 account.PasswordHash = newPasswordHash;
                 account.PasswordSalt = newPasswordSalt;
                 await _accountRepository.UpdateAccountAsync(account, cancellationToken);
-                // Remove OTP from store
-                _otpStore.TryRemove(forgetPasswordRequestDTO.Email, out _);
+
                 return new BaseResponse<ForgetPasswordResponseDTO>
                 {
                     Code = 200,
@@ -652,5 +654,6 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
     }
 }

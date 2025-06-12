@@ -50,10 +50,10 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
 
-        [HttpPost("create-pet/{customerId}")]
-        public async Task<IActionResult> CreatePet(int accountId, [FromBody] CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken = default)
+        [HttpPost("create-pet")]
+        public async Task<IActionResult> CreatePet([FromForm] CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken = default)
         {
-            var response = await _petService.CreatePetAsync(accountId, createPetRequest, cancellationToken);
+            var response = await _petService.CreatePetAsync(createPetRequest, cancellationToken);
             return StatusCode(response.Code, response);
         }
 

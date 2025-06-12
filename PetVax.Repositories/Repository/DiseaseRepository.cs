@@ -15,33 +15,32 @@ namespace PetVax.Repositories.Repository
         public DiseaseRepository() : base()
         {
         }
-        public async Task<int> AddDiseaseAsync(Disease disease, CancellationToken cancellationToken)
+
+       
+        public async Task<int> CreateDiseaseAsync(Disease disease, CancellationToken cancellationToken)
         {
             return await CreateAsync(disease, cancellationToken);
         }
-
-        public async Task<bool> DeleteDiseaseAsync(int id, CancellationToken cancellationToken)
+        public async Task<bool> DeleteDiseaseAsync(int diseaseId, CancellationToken cancellationToken)
         {
-            return await DeleteAsync(id, cancellationToken);
+            return await DeleteAsync(diseaseId, cancellationToken);
         }
 
-        public async Task<List<Disease>> GetAllDiseasesAsync(CancellationToken cancellationToken)
-        {
-            return await GetAllAsync(cancellationToken);
-        }
-
-        public async Task<Disease?> GetDiseaseByIdAsync(int id, CancellationToken cancellationToken)
-        {
-            return await GetByIdAsync(id, cancellationToken);
-        }
-
-        public async Task<List<Disease>> GetDiseasesByNameAsync(string name, CancellationToken cancellationToken)
+        public async Task<List<Disease>> GetAllDiseaseAsync(CancellationToken cancellationToken)
         {
             return await _context.Diseases
-                .Where(d => d.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
                 .ToListAsync(cancellationToken);
         }
-
+        public async Task<Disease> GetDiseaseByIdAsync(int diseaseId, CancellationToken cancellationToken)
+        {
+            return await _context.Diseases
+                .FirstOrDefaultAsync(d => d.DiseaseId == diseaseId, cancellationToken);
+        }
+        public async Task<Disease> GetDiseaseByName(string name, CancellationToken cancellationToken)
+        {
+            return await _context.Diseases
+                .FirstOrDefaultAsync(d => d.Name == name, cancellationToken);
+        }
         public async Task<int> UpdateDiseaseAsync(Disease disease, CancellationToken cancellationToken)
         {
             return await UpdateAsync(disease, cancellationToken);
