@@ -52,5 +52,37 @@ namespace PediVax.Controllers
             return Ok(response);
         }
 
+        [HttpGet("GetVaccineProfileById/{id}")]
+        public async Task<IActionResult> GetVaccineProfileById(int id, CancellationToken cancellationToken)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid vaccine profile ID.");
+            }
+            var response = await _vaccineProfileService.GetVaccineProfileByIdAsync(id, cancellationToken);
+            return Ok(response);
+        }
+        [HttpPut("UpdateVaccineProfile/{id}")]
+        public async Task<IActionResult> UpdateVaccineProfile(int id, [FromBody] VaccineProfileRequestDTO vaccineProfileRequest, CancellationToken cancellationToken)
+        {
+            if (id <= 0 || vaccineProfileRequest == null)
+            {
+                return BadRequest("Invalid vaccine profile ID or request data.");
+            }
+            // Assuming the service has an update method
+            var response = await _vaccineProfileService.UpdateVaccineProfileAsync(id, vaccineProfileRequest, cancellationToken);
+            return Ok(response);
+
+        }
+        [HttpDelete("DeleteVaccineProfile/{vaccineProfileId}")]
+        public async Task<IActionResult> DeleteVaccineProfile(int vaccineProfileId, CancellationToken cancellationToken)
+        {
+            if (vaccineProfileId <= 0)
+            {
+                return BadRequest("Invalid vaccine profile ID.");
+            }
+            var response = await _vaccineProfileService.DeleteVaccineProfileAsync(vaccineProfileId, cancellationToken);
+            return Ok(response);
+        }
     }
 }

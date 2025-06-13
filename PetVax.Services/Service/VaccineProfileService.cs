@@ -300,5 +300,141 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<BaseResponse<VaccineProfileResponseDTO>> UpdateVaccineProfileAsync(int vaccineProfileId, VaccineProfileRequestDTO vaccineProfileRequest, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var existingVaccineProfile = await _vaccineProfileRepository.GetVaccineProfileByIdAsync(vaccineProfileId, cancellationToken);
+
+                var pet = await _petRepository.GetPetByIdAsync(vaccineProfileRequest.PetId, cancellationToken);
+                if (pet == null)
+                {
+                    return new BaseResponse<VaccineProfileResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Pet not found."
+                    };
+                }
+                var disease = await _diseaseRepo.GetDiseaseByIdAsync(vaccineProfileRequest.DiseaseId, cancellationToken);
+                if (disease == null)
+                {
+                    return new BaseResponse<VaccineProfileResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Disease not found."
+                    };
+                }
+                if (existingVaccineProfile == null)
+                {
+                    return new BaseResponse<VaccineProfileResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Vaccine profile not found."
+                    };
+                }
+                existingVaccineProfile.PetId = vaccineProfileRequest.PetId;
+                existingVaccineProfile.DiseaseId = vaccineProfileRequest.DiseaseId;
+                existingVaccineProfile.PreferedDate = vaccineProfileRequest.PreferedDate;
+                existingVaccineProfile.VaccinationDate = vaccineProfileRequest.VaccinationDate;
+                existingVaccineProfile.Dose = vaccineProfileRequest.Dose;
+                existingVaccineProfile.Reaction = vaccineProfileRequest.Reaction;
+                existingVaccineProfile.NextVaccinationInfo = vaccineProfileRequest.NextVaccinationInfo;
+                existingVaccineProfile.ModifiedAt = DateTime.UtcNow;
+                var updateResult = await _vaccineProfileRepository.UpdateVaccineProfileAsync(existingVaccineProfile, cancellationToken);
+                if (updateResult <= 0)
+                {
+                    return new BaseResponse<VaccineProfileResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Failed to update vaccine profile."
+                    };
+                }
+                return new BaseResponse<VaccineProfileResponseDTO>
+                {
+                    Code = 200,
+                    Data = new VaccineProfileResponseDTO
+                    {
+                        VaccineProfileId = existingVaccineProfile.VaccineProfileId,
+                        PetId = existingVaccineProfile.PetId,
+                        PreferedDate = existingVaccineProfile.PreferedDate,
+                        VaccinationDate = existingVaccineProfile.VaccinationDate,
+                        Dose = existingVaccineProfile.Dose,
+                        Reaction = existingVaccineProfile.Reaction,
+                        NextVaccinationInfo = existingVaccineProfile.NextVaccinationInfo,
+                        IsActive = existingVaccineProfile.IsActive,
+                        IsCompleted = existingVaccineProfile.IsCompleted,
+                        CreatedAt = existingVaccineProfile.CreatedAt, // Assuming CreatedAt is not changed during update
+                        Disease = new DiseaseResponseDTO
+                        {
+                            DiseaseId = existingVaccineProfile.Disease?.DiseaseId ?? 0, // Assuming Disease is optional
+                            Name = existingVaccineProfile.Disease?.Name ?? string.Empty,
+                            Description = existingVaccineProfile.Disease?.Description ?? string.Empty,
+                            Species = existingVaccineProfile.Disease?.Species ?? string.Empty,
+                            Symptoms = existingVaccineProfile.Disease?.Symptoms ?? string.Empty,
+                            Treatment = existingVaccineProfile.Disease?.Treatment ?? string.Empty
+                        }
+                    },
+                    Success = true,
+                    Message = "Vaccine profile updated successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<VaccineProfileResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = $"An error occurred while updating the vaccine profile: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<BaseResponse<VaccineProfileResponseDTO>> DeleteVaccineProfileAsync(int vaccineProfileId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var existingVaccineProfile = await _vaccineProfileRepository.GetVaccineProfileByIdAsync(vaccineProfileId, cancellationToken);
+                if (existingVaccineProfile == null)
+                {
+                    return new BaseResponse<VaccineProfileResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Vaccine profile not found."
+                    };
+                }
+                var deleteResult = await _vaccineProfileRepository.DeleteVaccineProfileAsync(vaccineProfileId, cancellationToken);
+                if (!deleteResult)
+                {
+                    return new BaseResponse<VaccineProfileResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Failed to delete vaccine profile."
+                    };
+                }
+                return new BaseResponse<VaccineProfileResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Vaccine profile deleted successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<VaccineProfileResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = $"An error occurred while deleting the vaccine profile: {ex.Message}"
+                };
+            }
+        }
     }
 }
+                
