@@ -16,6 +16,8 @@ namespace PetVax.BusinessObjects.Models
         public int VaccineProfileId { get; set; } // Unique identifier for the vaccine profile
         public int PetId { get; set; } // Foreign key to Pet table
         public int? DiseaseId { get; set; }
+        public int? AppointmentDetailId { get; set; }
+        public int? VaccinationScheduleId { get; set; } // Foreign key to VaccineProfile table, if applicable (for follow-up vaccinations)
         public DateTime? PreferedDate { get; set; } // Preferred date for the vaccination in "yyyy-MM-dd" format
         public DateTime? VaccinationDate { get; set; } // Actual date of vaccination in "yyyy-MM-dd" format
         public string? Dose { get; set; } // e.g., "1st Dose", "2nd Dose"
@@ -31,6 +33,6 @@ namespace PetVax.BusinessObjects.Models
         // Navigation properties
         public virtual Pet Pet { get; set; } // Navigation to Pet table
         public virtual Disease Disease { get; set; } // Navigation to Disease table
-        public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; } // Collection of appointment details associated with this vaccine profile
+        public virtual AppointmentDetail AppointmentDetail { get; set; } // Navigation to AppointmentDetail table
     }
 }

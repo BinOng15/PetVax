@@ -67,11 +67,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 12, 13, 56, 58, 895, DateTimeKind.Utc).AddTicks(7601),
+                            CreatedAt = new DateTime(2025, 6, 16, 6, 21, 29, 807, DateTimeKind.Utc).AddTicks(1281),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "9Qbsyb1V7/w7XI4UlQDmWHAVr+/GJ/X0Q8oYsbhC2Bs=",
-                            PasswordSalt = "ZJ95VL6xis8Ln4rOtXnPQ/Ns0rpXwSOdPzYqiRSwqtI=",
+                            PasswordHash = "L36KsF0QL8NQeMxFAbjiBOgtfalpmADeLOZtGhApWnU=",
+                            PasswordSalt = "Wov2mD98Pxdh3SkY4uq4kaMggPlEwfe8NXVStNricnU=",
                             RefereshToken = "",
                             Role = 1,
                             isVerify = true
@@ -80,11 +80,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 12, 13, 56, 58, 895, DateTimeKind.Utc).AddTicks(7606),
+                            CreatedAt = new DateTime(2025, 6, 16, 6, 21, 29, 807, DateTimeKind.Utc).AddTicks(1287),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "9+F37WRPGyFNSaLMUfKXLh7IG2DQkYzNfQuxkZuy9wg=",
-                            PasswordSalt = "/3Ja7vzphpOujeZhz+uJlOU9OpdeLMaOQyZVb0UbY+w=",
+                            PasswordHash = "nqZ4Yk2BF1WU3XlDdRInOd93kMZwdzKcdQH5Vchcrhw=",
+                            PasswordSalt = "lC3PIvhNKnqdpDG6DSHKs9AlLfu/tYEGO127ZY2hqgw=",
                             RefereshToken = "",
                             Role = 2,
                             isVerify = true
@@ -210,9 +210,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int?>("VaccineBatchId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("VaccineProfileId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("VetId")
                         .HasColumnType("integer");
 
@@ -234,8 +231,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VaccineBatchId")
                         .IsUnique();
-
-                    b.HasIndex("VaccineProfileId");
 
                     b.HasIndex("VetId");
 
@@ -1177,6 +1172,9 @@ namespace PetVax.BusinessObjects.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("VaccineProfileId"));
 
+                    b.Property<int?>("AppointmentDetailId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1220,6 +1218,8 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("VaccineProfileId");
+
+                    b.HasIndex("AppointmentDetailId");
 
                     b.HasIndex("DiseaseId");
 
@@ -1461,11 +1461,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasForeignKey("PetVax.BusinessObjects.Models.AppointmentDetail", "VaccineBatchId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("PetVax.BusinessObjects.Models.VaccineProfile", "VaccineProfile")
-                        .WithMany("AppointmentDetails")
-                        .HasForeignKey("VaccineProfileId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("PetVax.BusinessObjects.Models.Vet", "Vet")
                         .WithMany("AppointmentDetails")
                         .HasForeignKey("VetId")
@@ -1481,8 +1476,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Navigation("PetPassport");
 
                     b.Navigation("VaccineBatch");
-
-                    b.Navigation("VaccineProfile");
 
                     b.Navigation("Vet");
                 });
@@ -1686,6 +1679,11 @@ namespace PetVax.BusinessObjects.Migrations
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineProfile", b =>
                 {
+                    b.HasOne("PetVax.BusinessObjects.Models.AppointmentDetail", "AppointmentDetail")
+                        .WithMany("VaccineProfiles")
+                        .HasForeignKey("AppointmentDetailId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PetVax.BusinessObjects.Models.Disease", "Disease")
                         .WithMany("VaccineProfiles")
                         .HasForeignKey("DiseaseId")
@@ -1701,6 +1699,8 @@ namespace PetVax.BusinessObjects.Migrations
                         .WithMany("VaccineProfiles")
                         .HasForeignKey("VaccinationScheduleId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AppointmentDetail");
 
                     b.Navigation("Disease");
 
@@ -1753,6 +1753,11 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired();
 
                     b.Navigation("Vet");
+                });
+
+            modelBuilder.Entity("PetVax.BusinessObjects.Models.AppointmentDetail", b =>
+                {
+                    b.Navigation("VaccineProfiles");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Customer", b =>
@@ -1815,11 +1820,6 @@ namespace PetVax.BusinessObjects.Migrations
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineExport", b =>
                 {
                     b.Navigation("VaccineExportDetails");
-                });
-
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineProfile", b =>
-                {
-                    b.Navigation("AppointmentDetails");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineReceipt", b =>

@@ -25,7 +25,7 @@ namespace PediVax.BusinessObjects.DBContext
                     .AddEnvironmentVariables()
                     .Build();
 
-                string connectionString = configuration.GetConnectionString("PostgreSQL");
+                string connectionString = configuration.GetConnectionString("DefaultConnection");
 
                 if (string.IsNullOrEmpty(connectionString))
                 {
@@ -297,11 +297,10 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey<VaccineProfile>(vp => vp.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // VaccineProfile - AppointmentDetail (N-1, optional)
-            modelBuilder.Entity<AppointmentDetail>()
-                .HasOne(a => a.VaccineProfile)
-                .WithMany(vp => vp.AppointmentDetails)
-                .HasForeignKey(a => a.VaccineProfileId)
+            modelBuilder.Entity<VaccineProfile>()
+                .HasOne(vp => vp.AppointmentDetail)
+                .WithMany(a => a.VaccineProfiles)
+                .HasForeignKey(vp => vp.AppointmentDetailId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Vet - Account (1-1)
