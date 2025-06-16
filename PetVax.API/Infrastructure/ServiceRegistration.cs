@@ -28,6 +28,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IPetPassportRepository, PetPassportRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IVaccineProfileRepository, VaccineProfileRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -42,6 +43,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IDiseaseService, DiseaseService>();
             services.AddScoped<IVaccineDiseaseService, VaccineDiseaseService>();
             services.AddScoped<IVaccineProfileService, VaccineProfileService>();
+            services.AddScoped<IAppointmentService, AppointmentService>();
             
 
             #endregion

@@ -67,11 +67,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 16, 6, 21, 29, 807, DateTimeKind.Utc).AddTicks(1281),
+                            CreatedAt = new DateTime(2025, 6, 16, 18, 51, 19, 55, DateTimeKind.Utc).AddTicks(4674),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "L36KsF0QL8NQeMxFAbjiBOgtfalpmADeLOZtGhApWnU=",
-                            PasswordSalt = "Wov2mD98Pxdh3SkY4uq4kaMggPlEwfe8NXVStNricnU=",
+                            PasswordHash = "w7Ra1tCj9UxLyET5XzKuv5cZIxa8w8i3ROp27TJ0fUA=",
+                            PasswordSalt = "faFYBY+5opVGslGPeG1OGRWPSHL5N012f40bZCqdU0I=",
                             RefereshToken = "",
                             Role = 1,
                             isVerify = true
@@ -80,11 +80,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 16, 6, 21, 29, 807, DateTimeKind.Utc).AddTicks(1287),
+                            CreatedAt = new DateTime(2025, 6, 16, 18, 51, 19, 55, DateTimeKind.Utc).AddTicks(4679),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "nqZ4Yk2BF1WU3XlDdRInOd93kMZwdzKcdQH5Vchcrhw=",
-                            PasswordSalt = "lC3PIvhNKnqdpDG6DSHKs9AlLfu/tYEGO127ZY2hqgw=",
+                            PasswordHash = "VIQua3oc50FIo3M7P0lRliEvD9k1g0wihdbfzZRIOWE=",
+                            PasswordSalt = "x1agWK+EyRnaM0Yk4dFpyGELQr3y6mPGqTNqqrs3lzw=",
                             RefereshToken = "",
                             Role = 2,
                             isVerify = true
@@ -654,10 +654,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PetId"));
-
-                    b.Property<string>("Age")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Breed")
                         .IsRequired()

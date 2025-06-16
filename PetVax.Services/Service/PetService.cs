@@ -87,7 +87,6 @@ namespace PetVax.Services.Service
                         Name = p.Name,
                         Species = p.Species,
                         Breed = p.Breed,
-                        Age = p.Age,
                         Gender = p.Gender,
                         DateOfBirth = p.DateOfBirth,
                         PlaceToLive = p.PlaceToLive,
@@ -155,7 +154,6 @@ namespace PetVax.Services.Service
                 pet.Name = updatePetRequest.Name ?? pet.Name;
                 pet.Species = updatePetRequest.Species ?? pet.Species;
                 pet.Breed = updatePetRequest.Breed ?? pet.Breed;
-                pet.Age = updatePetRequest.Age ?? pet.Age;
                 pet.Gender = updatePetRequest?.Gender ?? pet.Gender;
                 pet.DateOfBirth = updatePetRequest?.DateOfBirth ?? pet.DateOfBirth;
                 pet.PlaceToLive = updatePetRequest?.PlaceToLive ?? pet.PlaceToLive;
@@ -194,7 +192,6 @@ namespace PetVax.Services.Service
                         Name = pet.Name,
                         Species = pet.Species,
                         Breed = pet.Breed,
-                        Age = pet.Age,
                         Gender = pet.Gender,
                         DateOfBirth = pet.DateOfBirth,
                         PlaceToLive = pet.PlaceToLive,
@@ -251,7 +248,6 @@ namespace PetVax.Services.Service
                         Name = pet.Name,
                         Species = pet.Species,
                         Breed = pet.Breed,
-                        Age = pet.Age,
                         Gender = pet.Gender,
                         DateOfBirth = pet.DateOfBirth,
                         PlaceToLive = pet.PlaceToLive,
@@ -318,7 +314,6 @@ namespace PetVax.Services.Service
                 pet.Name = createPetRequest.Name;
                 pet.Species = createPetRequest.Species;
                 pet.Breed = createPetRequest.Breed;
-                pet.Age = age.ToString();
                 pet.Gender = createPetRequest.Gender;
                 pet.DateOfBirth = createPetRequest.DateOfBirth;
                 pet.PlaceToLive = createPetRequest.PlaceToLive;
@@ -407,7 +402,6 @@ namespace PetVax.Services.Service
                     Name = p.Name,
                     Species = p.Species,
                     Breed = p.Breed,
-                    Age = p.Age,
                     Gender = p.Gender,
                     DateOfBirth = p.DateOfBirth,
                     PlaceToLive = p.PlaceToLive,

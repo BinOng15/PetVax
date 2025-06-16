@@ -12,7 +12,6 @@ namespace PetVax.BusinessObjects.DTO.PetDTO
         public string Name { get; set; }
         public string Species { get; set; } // e.g., Dog, Cat
         public string Breed { get; set; }
-        public string Age { get; set; } // e.g., "2 years", "6 months"
         public string Gender { get; set; }
         public string DateOfBirth { get; set; }
         public string PlaceToLive { get; set; }
