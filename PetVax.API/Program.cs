@@ -2,11 +2,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PediVax.BusinessObjects.DBContext;
 using System.Text;
 using CloudinaryDotNet;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
+using PetVax.Repositories.IRepository;
+using PetVax.Repositories.Repository;
+using PetVax.Services.Service;
+using PetVax.Services.IService;
+using PetVax.Infrastructure;
 
 namespace PediVax;
 
@@ -16,75 +20,47 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
-        // Add services to the container.
-        builder.Services.AddAuthorization();
-        
-        // Session Configuration
-        builder.Services.AddDistributedMemoryCache();
-        builder.Services.AddSession(options =>
-        {
-            options.IdleTimeout = TimeSpan.FromMinutes(30);
-            options.Cookie.IsEssential = true;
-        });
-
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAllOrigins", policy =>
+        // Add services to the container
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
             {
-                policy.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
             });
-        });
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
 
-        builder.Services.AddControllers();
-    // .AddJsonOptions(options =>
-    //{
-    //    options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
-    //});
-
-        builder.Services.AddControllers().AddJsonOptions(options =>
+        // Swagger configuration
+        builder.Services.AddSwaggerGen(option =>
         {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
-        });
-
-        #region Configre Swagger
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "PediVax API", Version = "v1" });
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            option.DescribeAllParametersInCamelCase();
+            option.ResolveConflictingActions(conf => conf.First());
+            option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
-                Description = "Please enter a valid JWT token",
+                Description = "Please enter a valid token",
                 Name = "Authorization",
                 Type = SecuritySchemeType.Http,
                 BearerFormat = "JWT",
                 Scheme = "Bearer"
             });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            option.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
                     new OpenApiSecurityScheme
                     {
                         Reference = new OpenApiReference
                         {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
+                            Type=ReferenceType.SecurityScheme,
+                            Id="Bearer"
                         }
                     },
-                    new string[] { }
+                    new string[]{}
                 }
             });
         });
-        #endregion
 
-        #region Configure JWT
+        // Authentication & Authorization
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -93,51 +69,63 @@ public class Program
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-                    ),
-                    ClockSkew = TimeSpan.Zero
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                 };
+            })
+            .AddGoogle(options =>
+             {
+                 options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                 options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                 options.CallbackPath = "/signin-google";
+             });
+        builder.Services.AddAuthorization();
+
+        // Session Configuration
+        builder.Services.AddDistributedMemoryCache();
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.IsEssential = true;
+        });
+
+        // CORS
+        const string AllowAllOrigins = nameof(AllowAllOrigins);
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(AllowAllOrigins, policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
             });
-        #endregion
+        });
 
-        #region Configure Cloudinary
-        //var cloudinarySettings = builder.Configuration.GetSection("Cloudinary");
-        //var cloudinaryAccount = new Account(
-        //    cloudinarySettings["CloudName"],
-        //    cloudinarySettings["ApiKey"],
-        //    cloudinarySettings["ApiSecret"]
-        //);
-        //var cloudinary = new Cloudinary(cloudinaryAccount);
-        //builder.Services.AddSingleton(cloudinary);
-        #endregion
-
+        builder.Services.Register();
         builder.Services.AddHttpContextAccessor();
-        
+        builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+        builder.Services.AddScoped<IVetRepository, VetRepository>();
+        builder.Services.AddScoped<IVetService, VetService>();
+        builder.Services.AddScoped<IVetScheduleRepository, VetScheduleRepository>();
+        builder.Services.AddScoped<IVetScheduleService, VetScheduleService>();
         var app = builder.Build();
 
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "PediVax API V1");
-                c.RoutePrefix = "swagger";
-            });
+        // Enable Swagger only in Development
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "PetVax API V1");
+            c.RoutePrefix = "swagger";
+        });
 
         app.UseHttpsRedirection();
-
-        app.UseCors("AllowAllOrigins");
-
+        app.UseCors(AllowAllOrigins);
         app.UseSession();
-        
         app.UseAuthentication();
-
         app.UseAuthorization();
-
         app.MapControllers();
-
         app.Run();
     }
 }

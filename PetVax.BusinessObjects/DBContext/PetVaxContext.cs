@@ -25,14 +25,18 @@ namespace PediVax.BusinessObjects.DBContext
                     .AddEnvironmentVariables()
                     .Build();
 
-                string connectionString = configuration.GetConnectionString("DefaultConnection");
+                string connectionString = configuration.GetConnectionString("PostgreSQL");
 
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     throw new InvalidOperationException("Không thể lấy ConnectionString.");
                 }
 
-                optionsBuilder.UseSqlServer(connectionString);
+                optionsBuilder.UseNpgsql(connectionString, options =>
+                {
+                    options.EnableRetryOnFailure();
+                });
+
             }
         }
 
@@ -172,6 +176,13 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey<AppointmentDetail>(ad => ad.VaccineBatchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //AppointmentDetail - Disease (1-N, optional)
+            modelBuilder.Entity<AppointmentDetail>()
+                .HasOne(ad => ad.Disease)
+                .WithMany()
+                .HasForeignKey(ad => ad.DiseaseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // ServiceHistory - AppointmentDetail (1-N)
             modelBuilder.Entity<ServiceHistory>()
                 .HasMany(sh => sh.AppointmentDetails)
@@ -293,11 +304,10 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey<VaccineProfile>(vp => vp.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // VaccineProfile - AppointmentDetail (N-1, optional)
-            modelBuilder.Entity<AppointmentDetail>()
-                .HasOne(a => a.VaccineProfile)
-                .WithMany(vp => vp.AppointmentDetails)
-                .HasForeignKey(a => a.VaccineProfileId)
+            modelBuilder.Entity<VaccineProfile>()
+                .HasOne(vp => vp.AppointmentDetail)
+                .WithMany(a => a.VaccineProfiles)
+                .HasForeignKey(vp => vp.AppointmentDetailId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Vet - Account (1-1)

@@ -15,14 +15,15 @@ namespace PetVax.BusinessObjects.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int AccountId { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; }
+        public string? PasswordHash { get; set; } //Null when use google account
+        public string? PasswordSalt { get; set; } //Null when use google account
         public Enum.EnumList.Role Role { get; set; }
-        public string AccessToken { get; set; }
-        public string RefereshToken { get; set; }
+        public string? AccessToken { get; set; }
+        public string? RefereshToken { get; set; }
+        public bool isVerify { get; set; } = false; // Default to false, indicating the account is not verified
         public DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime? ModifiedAt { get; set; }
-        public string ModifiedBy { get; set; }
+        public string? CreatedBy { get; set; }
+
 
         // Navigation properties
 
