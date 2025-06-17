@@ -41,5 +41,18 @@ namespace PetVax.BusinessObjects.Enum
             Slot_15h = 7,
             Slot_16h = 8,
         }
+
+        public enum ServiceType
+        {
+            Vaccination = 1,
+            Microchip = 2,
+            HealthCertificate = 3,
+        }
+
+        public enum Location
+        {
+            Clinic = 1,
+            HomeVisit = 2,
+        }
     }
 }

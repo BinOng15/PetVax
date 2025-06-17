@@ -54,7 +54,7 @@ namespace PediVax.Controllers
         public async Task<IActionResult> GetVetById(int vetId, CancellationToken cancellationToken = default)
         {
             var response = await _vetService.GetVetByIdAsync(vetId, cancellationToken);
-   
+
             return StatusCode(response.Code, response);
         }
 
@@ -64,6 +64,12 @@ namespace PediVax.Controllers
         {
             var response = await _vetService.DeleteVetAsync(vetId, cancellationToken);
 
+            return StatusCode(response.Code, response);
+        }
+        [HttpPost("create-vet")]
+        public async Task<IActionResult> CreateVet([FromBody] CreateVetDTO createVetDTO, CancellationToken cancellationToken = default)
+        {
+            var response = await _vetService.CreateVetAsync(createVetDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }

@@ -19,6 +19,7 @@ namespace PetVax.BusinessObjects.Models
         public string? CustomerCode { get; set; } // e.g., "CUST123456", unique identifier for the customer
         public string? FullName { get; set; }
         public string? UserName { get; set; }
+        public string? Image { get; set; } // URL or path to the customer's image
         public string? PhoneNumber { get; set; }
         public string? DateOfBirth { get; set; }
         public string? Gender { get; set; }

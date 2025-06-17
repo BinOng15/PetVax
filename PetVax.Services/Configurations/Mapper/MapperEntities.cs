@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PetVax.BusinessObjects.DTO.AccountDTO;
+using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
@@ -35,10 +36,13 @@ namespace PetVax.Services.Configurations.Mapper
             //Customer
             CreateMap<CreateCustomerDTO, Customer>();
             CreateMap<UpdateCustomerDTO, Customer>();
-            CreateMap<Customer, CustomerResponseDTO>();
+            CreateMap<Customer, CustomerResponseDTO>()
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image)); ;
 
             //Vet
             CreateMap<Vet, VetResponseDTO>();
+            CreateMap<CreateVetDTO, Vet>();
+            CreateMap<UpdateVetRequest, Vet>();
 
             //VetSchedule
             CreateMap<CreateVetScheduleRequestDTO, VetSchedule>();
@@ -76,6 +80,11 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreateAppointmentDTO, Appointment>();
             CreateMap<UpdateAppointmentDTO, Appointment>();
             CreateMap<Appointment, AppointmentResponseDTO>();
+
+            //AppointmentDetail
+            CreateMap<CreateAppointmentDetailDTO, AppointmentDetail>();
+            CreateMap<UpdateAppointmentDetailDTO, AppointmentDetail>();
+            CreateMap<AppointmentDetail, AppointmentDetailResponseDTO>();
 
         }
     }   

@@ -320,7 +320,7 @@ namespace PetVax.Services.Service
                 _otpStore[regisRequestDTO.Email] = (otp, expiration);
                 await SendOtpEmailAsync(regisRequestDTO.Email, otp, cancellationToken);
 
-                // passowrd
+                // password
                 string passwordSalt = PasswordHelper.GenerateSalt();
                 string passwordHash = PasswordHelper.HashPassword(regisRequestDTO.Password, passwordSalt);
 
@@ -334,16 +334,7 @@ namespace PetVax.Services.Service
                     isVerify = false
                 };
 
-                var newId = await _accountRepository.CreateAccountAsync(newAccount, cancellationToken);
-                
-
-                Customer customer = new Customer
-                {
-                    AccountId = newAccount.AccountId,
-                    CreatedAt = DateTime.UtcNow,
-                };
-
-                await _customerRepository.CreateCustomerAsync(customer);
+                await _accountRepository.CreateAccountAsync(newAccount, cancellationToken);
 
                 return new BaseResponse
                 {
@@ -378,28 +369,41 @@ namespace PetVax.Services.Service
             {
                 if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTime.UtcNow || otpInfo.Otp != otp)
                 {
-                    throw new ErrorException(409, "Invalid or expired OTP.");
+                    return new BaseResponse
+                    {
+                        Code = 401,
+                        Success = false,
+                        Message = "Invalid or expired OTP."
+                    };
                 }
 
                 var account = await _accountRepository.GetAccountByEmailAsync(email, cancellationToken);
                 if (account == null)
                 {
-                    throw new ErrorException(404, "Account not found.");
+                    return new BaseResponse
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Account not found."
+                    };
                 }
 
                 account.isVerify = true;
                 int update = await _accountRepository.UpdateAccountAsync(account, cancellationToken);
-              
-                if(update > 0)
+
+                if (update > 0)
                 {
+                    // Generate random customer code: C + 6 digits
+                    string customerCode = "C" + new Random().Next(100000, 1000000).ToString();
                     Customer customer = new Customer
                     {
                         AccountId = account.AccountId,
                         CreatedAt = DateTime.UtcNow,
+                        CustomerCode = customerCode
                     };
                     await _customerRepository.CreateCustomerAsync(customer);
                 }
-               
+
                 _otpStore.TryRemove(email, out _);
 
                 return new BaseResponse

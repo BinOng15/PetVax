@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PediVax.BusinessObjects.DBContext;
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250617090902_UpdateVer12")]
+    partial class UpdateVer12
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,11 +70,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 17, 15, 36, 45, 985, DateTimeKind.Utc).AddTicks(2732),
+                            CreatedAt = new DateTime(2025, 6, 17, 9, 9, 2, 265, DateTimeKind.Utc).AddTicks(9611),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "pT7nTY1B1sTK9uG6hFk0GSyGAx7zpY1GD5qEMZSg2h0=",
-                            PasswordSalt = "a+6nfn79B7Bns0rqmQ7JJQBTYa5Lyk+nBV3UcUXsDH4=",
+                            PasswordHash = "aYoOFGIrwzJur8jU2/g956N+eByL0PtPrNs8ZqFWNmo=",
+                            PasswordSalt = "wTYlwBtruLSWXs/GY9KLiOso+qjMv2W/OfUZwmwv0xM=",
                             RefereshToken = "",
                             Role = 1,
                             isVerify = true
@@ -80,11 +83,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 17, 15, 36, 45, 985, DateTimeKind.Utc).AddTicks(2737),
+                            CreatedAt = new DateTime(2025, 6, 17, 9, 9, 2, 265, DateTimeKind.Utc).AddTicks(9619),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "OAbDfIckamF/Ew7wpD42k0y7cUnsVE9iRtXX9DGqXo8=",
-                            PasswordSalt = "EfHo6C1rrYubJxyx6h+1TesIbramCp1qyAFQSsPynGY=",
+                            PasswordHash = "ja8Pm6QEzLZCN7dKOUqDKJJ/5IRZQqs5zqSzHy2J9Gs=",
+                            PasswordSalt = "eJUmbYh4vvy1ZJmnpyG1I1B8J6ySojHONPejN9MNfYQ=",
                             RefereshToken = "",
                             Role = 2,
                             isVerify = true
@@ -210,7 +213,7 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int?>("VaccineBatchId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("VetId")
+                    b.Property<int>("VetId")
                         .HasColumnType("integer");
 
                     b.HasKey("AppointmentDetailId");
@@ -272,9 +275,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Gender")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Image")
                         .HasColumnType("text");
 
                     b.Property<int?>("MembershipId")
@@ -1470,7 +1470,8 @@ namespace PetVax.BusinessObjects.Migrations
                     b.HasOne("PetVax.BusinessObjects.Models.Vet", "Vet")
                         .WithMany("AppointmentDetails")
                         .HasForeignKey("VetId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Appointment");
 

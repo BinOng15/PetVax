@@ -5,6 +5,7 @@ using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.Repositories.IRepository;
+using PetVax.Services.ExternalService;
 using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
@@ -20,12 +21,15 @@ namespace PetVax.Services.Service
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<CustomerService> _logger;
+        private readonly ICloudinariService _cloudinariService;
 
-        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger)
+
+        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger, ICloudinariService cloudinariService)
         {
             _customerRepository = customerRepository;
             _mapper = mapper;
             _logger = logger;
+            _cloudinariService = cloudinariService;
         }
 
         public async Task<BaseResponse<bool>> DeleteCustomerAsync(int customerId, CancellationToken cancellationToken)
@@ -239,9 +243,35 @@ namespace PetVax.Services.Service
                         Data = false
                     };
                 }
-                // Map the update DTO to the customer entity
-                _mapper.Map(updateCustomerDTO, customer);
-                // Update the customer in the repository
+
+                // Handle image upload if a new image is provided
+                if (updateCustomerDTO.Image != null)
+                {
+                    var imageUrl = await _cloudinariService.UploadImage(updateCustomerDTO.Image);
+                    customer.Image = imageUrl;
+                }
+
+                // Update other fields if provided
+                if (!string.IsNullOrWhiteSpace(updateCustomerDTO.FullName))
+                    customer.FullName = updateCustomerDTO.FullName;
+
+                if (!string.IsNullOrWhiteSpace(updateCustomerDTO.UserName))
+                    customer.UserName = updateCustomerDTO.UserName;
+
+                if (!string.IsNullOrWhiteSpace(updateCustomerDTO.PhoneNumber))
+                    customer.PhoneNumber = updateCustomerDTO.PhoneNumber;
+
+                if (!string.IsNullOrWhiteSpace(updateCustomerDTO.DateOfBirth))
+                    customer.DateOfBirth = updateCustomerDTO.DateOfBirth;
+
+                if (!string.IsNullOrWhiteSpace(updateCustomerDTO.Gender))
+                    customer.Gender = updateCustomerDTO.Gender;
+
+                if (!string.IsNullOrWhiteSpace(updateCustomerDTO.Address))
+                    customer.Address = updateCustomerDTO.Address;
+
+                customer.ModifiedAt = DateTime.UtcNow;
+
                 int updatedCustomerId = await _customerRepository.UpdateCustomerAsync(customer, cancellationToken);
                 if (updatedCustomerId <= 0)
                 {

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
+using PetVax.BusinessObjects.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -16,11 +18,23 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
         [Required(ErrorMessage = "Vui lòng chọn ngày đăng ký dịch vụ")]
         public DateTime AppointmentDate { get; set; }
         [Required(ErrorMessage = "Vui lòng chọn loại dịch vụ")]
-        public string ServiceType { get; set; }
+        public EnumList.ServiceType ServiceType { get; set; }
         [Required(ErrorMessage = "Vui lòng chọn nơi thực hiện dịch vụ (Tại trung tâm hoặc tại nhà)")]
-        public string Location { get; set; }
-        [Required(ErrorMessage = "Địa chỉ nhà không được để trống")]
+        public EnumList.Location Location { get; set; }
         public string Address { get; set; }
 
+        public DateTime GetAppointmentDateInVietnamTime()
+        {
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            return TimeZoneInfo.ConvertTimeFromUtc(AppointmentDate.ToUniversalTime(), vietnamTimeZone);
+        }
+
+
+
+    }
+    public class CreateFullAppointmentDTO
+    {
+        public CreateAppointmentDTO Appointment { get; set; }
+        public CreateAppointmentDetailDTO AppointmentDetail { get; set; }
     }
 }

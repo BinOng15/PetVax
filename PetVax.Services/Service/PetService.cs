@@ -158,12 +158,24 @@ namespace PetVax.Services.Service
                 pet.DateOfBirth = updatePetRequest?.DateOfBirth ?? pet.DateOfBirth;
                 pet.PlaceToLive = updatePetRequest?.PlaceToLive ?? pet.PlaceToLive;
                 pet.PlaceOfBirth = updatePetRequest?.PlaceOfBirth ?? pet.PlaceOfBirth;
-                pet.Image = updatePetRequest?.Image ?? pet.Image;
+
+                // Handle image update (support IFormFile like CreatePetAsync)
+                if (updatePetRequest.Image != null)
+                {
+                    pet.Image = await _cloudinariService.UploadImage(updatePetRequest.Image);
+                }
+                else
+                {
+                    pet.Image = null;
+                }
+                // else keep existing image
+
                 pet.Weight = updatePetRequest?.Weight ?? pet.Weight;
                 pet.Color = updatePetRequest?.Color ?? pet.Color;
                 pet.Nationality = updatePetRequest.Nationality ?? pet.Nationality;
                 pet.isSterilized = updatePetRequest.isSterilized;
                 pet.ModifiedAt = DateTime.UtcNow;
+                pet.ModifiedBy = GetCurrentUserName();
 
                 int update = await _petRepository.UpdatePetAsync(pet, cancellationToken);
                 if (update <= 0)
