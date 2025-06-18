@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using PetVax.BusinessObjects.DTO.AccountDTO;
+using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
+using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
@@ -8,6 +10,7 @@ using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
+using PetVax.BusinessObjects.Enum;
 using PetVax.BusinessObjects.Models;
 using System;
 using System.Collections.Generic;
@@ -33,10 +36,13 @@ namespace PetVax.Services.Configurations.Mapper
             //Customer
             CreateMap<CreateCustomerDTO, Customer>();
             CreateMap<UpdateCustomerDTO, Customer>();
-            CreateMap<Customer, CustomerResponseDTO>();
+            CreateMap<Customer, CustomerResponseDTO>()
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image)); ;
 
             //Vet
             CreateMap<Vet, VetResponseDTO>();
+            CreateMap<CreateVetDTO, Vet>();
+            CreateMap<UpdateVetRequest, Vet>();
 
             //VetSchedule
             CreateMap<CreateVetScheduleRequestDTO, VetSchedule>();
@@ -70,6 +76,15 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<Pet, PetResponseDTO>()
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image));
 
+            //Appointment
+            CreateMap<CreateAppointmentDTO, Appointment>();
+            CreateMap<UpdateAppointmentDTO, Appointment>();
+            CreateMap<Appointment, AppointmentResponseDTO>();
+
+            //AppointmentDetail
+            CreateMap<CreateAppointmentDetailDTO, AppointmentDetail>();
+            CreateMap<UpdateAppointmentDetailDTO, AppointmentDetail>();
+            CreateMap<AppointmentDetail, AppointmentDetailResponseDTO>();
 
         }
     }   

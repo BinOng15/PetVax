@@ -17,7 +17,10 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<int> CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken)
         {
-            return await CreateAsync(appointment, cancellationToken);
+            _context.Add(appointment);
+            await _context.SaveChangesAsync(cancellationToken);
+            return appointment.AppointmentId;
+
         }
 
         public async Task<bool> DeleteAppointmentAsync(int appointmentId, CancellationToken cancellationToken)

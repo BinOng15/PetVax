@@ -18,16 +18,22 @@ namespace PetVax.Infrastructure
             #region DependencyInjection
             //Register repositories
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<IAppointmentDetailRepository, AppointmentDetailRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<IVetRepository, VetRepository>();
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<IVaccineRepository, VaccineRepository>();
             services.AddScoped<IDiseaseRepository, DiseaseRepository>();
-            services.AddScoped<IVaccineBatchRepository, VaccineBatchRepository>();
-            services.AddScoped<IVaccineDiseaseRepository, VaccineDiseaseRepository>();
+            services.AddScoped<IHealthConditionRepository, HealthConditionRepository>();
+            services.AddScoped<IMembershipRepository, MembershipRepository>();
+            services.AddScoped<IMicrochipItemRepository, MicrochipItemRepository>();
+            services.AddScoped<IMicrochipRepository, MicrochipRepository>();
             services.AddScoped<IPetPassportRepository, PetPassportRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
+            services.AddScoped<IVetRepository, VetRepository>();
+            services.AddScoped<IVaccineRepository, VaccineRepository>();
+            services.AddScoped<IVaccineBatchRepository, VaccineBatchRepository>();
+            services.AddScoped<IVaccineDiseaseRepository, VaccineDiseaseRepository>();
             services.AddScoped<IVaccineProfileRepository, VaccineProfileRepository>();
+            
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -42,7 +48,9 @@ namespace PetVax.Infrastructure
             services.AddScoped<IDiseaseService, DiseaseService>();
             services.AddScoped<IVaccineDiseaseService, VaccineDiseaseService>();
             services.AddScoped<IVaccineProfileService, VaccineProfileService>();
-            
+            services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IAppointmentDetailService, AppointmentDetailService>();
+
 
             #endregion
 

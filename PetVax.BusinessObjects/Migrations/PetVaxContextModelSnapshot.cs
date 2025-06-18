@@ -67,11 +67,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 16, 6, 21, 29, 807, DateTimeKind.Utc).AddTicks(1281),
+                            CreatedAt = new DateTime(2025, 6, 17, 15, 36, 45, 985, DateTimeKind.Utc).AddTicks(2732),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "L36KsF0QL8NQeMxFAbjiBOgtfalpmADeLOZtGhApWnU=",
-                            PasswordSalt = "Wov2mD98Pxdh3SkY4uq4kaMggPlEwfe8NXVStNricnU=",
+                            PasswordHash = "pT7nTY1B1sTK9uG6hFk0GSyGAx7zpY1GD5qEMZSg2h0=",
+                            PasswordSalt = "a+6nfn79B7Bns0rqmQ7JJQBTYa5Lyk+nBV3UcUXsDH4=",
                             RefereshToken = "",
                             Role = 1,
                             isVerify = true
@@ -80,11 +80,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 16, 6, 21, 29, 807, DateTimeKind.Utc).AddTicks(1287),
+                            CreatedAt = new DateTime(2025, 6, 17, 15, 36, 45, 985, DateTimeKind.Utc).AddTicks(2737),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "nqZ4Yk2BF1WU3XlDdRInOd93kMZwdzKcdQH5Vchcrhw=",
-                            PasswordSalt = "lC3PIvhNKnqdpDG6DSHKs9AlLfu/tYEGO127ZY2hqgw=",
+                            PasswordHash = "OAbDfIckamF/Ew7wpD42k0y7cUnsVE9iRtXX9DGqXo8=",
+                            PasswordSalt = "EfHo6C1rrYubJxyx6h+1TesIbramCp1qyAFQSsPynGY=",
                             RefereshToken = "",
                             Role = 2,
                             isVerify = true
@@ -100,7 +100,6 @@ namespace PetVax.BusinessObjects.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AppointmentId"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("AppointmentCode")
@@ -123,9 +122,8 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Location")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
@@ -136,9 +134,8 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int>("PetId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("ServiceType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("ServiceType")
+                        .HasColumnType("integer");
 
                     b.HasKey("AppointmentId");
 
@@ -177,6 +174,9 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("DiseaseId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Dose")
                         .HasColumnType("text");
 
@@ -204,19 +204,21 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int?>("ServiceHistoryId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("ServiceType")
-                        .HasColumnType("text");
+                    b.Property<int>("ServiceType")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("VaccineBatchId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("VetId")
+                    b.Property<int?>("VetId")
                         .HasColumnType("integer");
 
                     b.HasKey("AppointmentDetailId");
 
                     b.HasIndex("AppointmentId")
                         .IsUnique();
+
+                    b.HasIndex("DiseaseId");
 
                     b.HasIndex("HealthConditionId")
                         .IsUnique();
@@ -270,6 +272,9 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Gender")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Image")
                         .HasColumnType("text");
 
                     b.Property<int?>("MembershipId")
@@ -654,10 +659,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PetId"));
-
-                    b.Property<string>("Age")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Breed")
                         .IsRequired()
@@ -1436,6 +1437,11 @@ namespace PetVax.BusinessObjects.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PetVax.BusinessObjects.Models.Disease", "Disease")
+                        .WithMany()
+                        .HasForeignKey("DiseaseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PetVax.BusinessObjects.Models.HealthCondition", "HealthCondition")
                         .WithOne()
                         .HasForeignKey("PetVax.BusinessObjects.Models.AppointmentDetail", "HealthConditionId")
@@ -1464,10 +1470,11 @@ namespace PetVax.BusinessObjects.Migrations
                     b.HasOne("PetVax.BusinessObjects.Models.Vet", "Vet")
                         .WithMany("AppointmentDetails")
                         .HasForeignKey("VetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Appointment");
+
+                    b.Navigation("Disease");
 
                     b.Navigation("HealthCondition");
 

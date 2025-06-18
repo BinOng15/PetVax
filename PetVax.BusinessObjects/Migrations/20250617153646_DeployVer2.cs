@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetVax.BusinessObjects.Migrations
 {
     /// <inheritdoc />
-    public partial class week6 : Migration
+    public partial class DeployVer2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,7 @@ namespace PetVax.BusinessObjects.Migrations
                 keyColumn: "AccountId",
                 keyValue: 1,
                 columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
-                values: new object[] { new DateTime(2025, 6, 16, 6, 16, 18, 606, DateTimeKind.Utc).AddTicks(3545), "OnIX6H8p7nN7drJqocSchPH+JtXtOtK0/tqhR5c3dJs=", "emWZCN7wwu/4WgIyeukUthmG3UxeeiHRpFZFZKPG8Lc=" });
+                values: new object[] { new DateTime(2025, 6, 17, 15, 36, 45, 985, DateTimeKind.Utc).AddTicks(2732), "pT7nTY1B1sTK9uG6hFk0GSyGAx7zpY1GD5qEMZSg2h0=", "a+6nfn79B7Bns0rqmQ7JJQBTYa5Lyk+nBV3UcUXsDH4=" });
 
             migrationBuilder.UpdateData(
                 schema: "dbo",
@@ -25,7 +25,7 @@ namespace PetVax.BusinessObjects.Migrations
                 keyColumn: "AccountId",
                 keyValue: 2,
                 columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
-                values: new object[] { new DateTime(2025, 6, 16, 6, 16, 18, 606, DateTimeKind.Utc).AddTicks(3548), "98Vh5C6MQmqql3am4ckvyvZu7Di1Nb0GLqUiH05EL1E=", "MOmRz5rb2a4dVCN6P7mTLp3aVxTJMyRczrOallIlGl8=" });
+                values: new object[] { new DateTime(2025, 6, 17, 15, 36, 45, 985, DateTimeKind.Utc).AddTicks(2737), "OAbDfIckamF/Ew7wpD42k0y7cUnsVE9iRtXX9DGqXo8=", "EfHo6C1rrYubJxyx6h+1TesIbramCp1qyAFQSsPynGY=" });
         }
 
         /// <inheritdoc />
@@ -37,7 +37,7 @@ namespace PetVax.BusinessObjects.Migrations
                 keyColumn: "AccountId",
                 keyValue: 1,
                 columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
-                values: new object[] { new DateTime(2025, 6, 16, 5, 37, 57, 883, DateTimeKind.Utc).AddTicks(5137), "Rb6g//sujEa8Zl5uYOZEqVuNKN3YKZLd20kHbErM4Pg=", "IC8cazfkiRRH+BsAj6YKKCTla9LKfQ7t0PIsqu03tN8=" });
+                values: new object[] { new DateTime(2025, 6, 17, 11, 2, 16, 854, DateTimeKind.Utc).AddTicks(1977), "UNVWxAtt+E1QI04q+XTUBxJBSpiwyfkbud78z5g2BXQ=", "BqiyeMxTP7aIgdSVoHZHqWtIq5SKRlWTaDk4j1f2JtQ=" });
 
             migrationBuilder.UpdateData(
                 schema: "dbo",
@@ -45,7 +45,7 @@ namespace PetVax.BusinessObjects.Migrations
                 keyColumn: "AccountId",
                 keyValue: 2,
                 columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
-                values: new object[] { new DateTime(2025, 6, 16, 5, 37, 57, 883, DateTimeKind.Utc).AddTicks(5142), "xNuy3n4I9++9xBjPKvk+vA+BBVeAv4ZHfR6/v/WJVAs=", "AGb7Ag0tiNCNoHzqe/XumDbxxbiXcVXyEZ1TCM8F7EQ=" });
+                values: new object[] { new DateTime(2025, 6, 17, 11, 2, 16, 854, DateTimeKind.Utc).AddTicks(1982), "qc2xxr93Kos1zyQ0cZuwXwhu5E+VQLwypeqkQdBsonQ=", "exvfw/X+lxFkrK16DAaqeKtvRtWw4i6kwDjoZ2ATY5M=" });
         }
     }
 }

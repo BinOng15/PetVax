@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
@@ -20,12 +21,14 @@ namespace PetVax.Services.Service
         private readonly IVetRepository _vetRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<VetService> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public VetService(IVetRepository vetRepository, IMapper mapper, ILogger<VetService> logger)
+        public VetService(IVetRepository vetRepository, IMapper mapper, ILogger<VetService> logger, IHttpContextAccessor httpContextAccessor)
         {
             _vetRepository = vetRepository;
             _mapper = mapper;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<DynamicResponse<VetResponseDTO>> GetAllVetsAsync(GetAllVetRequestDTO getAllVetRequest, CancellationToken cancellationToken)
@@ -307,6 +310,68 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Error while deleting veterinarian: " + (ex.InnerException?.Message ?? ex.Message),
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<VetResponseDTO>> CreateVetAsync(CreateVetDTO createVetDTO, CancellationToken cancellationToken)
+        {
+            if (createVetDTO == null)
+            {
+                _logger.LogWarning("CreateVetAsync called with null request");
+                return new BaseResponse<VetResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Dữ liệu tạo bác sĩ thú y không được để trống",
+                    Data = null
+                };
+            }
+            try
+            {
+                var vets = _mapper.Map<Vet>(createVetDTO);
+                var random = new Random();
+
+                vets.VetCode = "V" + random.Next(0, 1000000).ToString("D6");
+                vets.Name = createVetDTO.Name?.Trim();
+                vets.Specialization = createVetDTO.Specialization?.Trim();
+                vets.PhoneNumber = createVetDTO.PhoneNumber?.Trim();
+                vets.DateOfBirth = createVetDTO.DateOfBirth;
+                vets.CreateAt = DateTime.UtcNow;
+                vets.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                var result = await _vetRepository.CreateVetAsync(vets, cancellationToken);
+                if (result <= 0)
+                {
+                    _logger.LogWarning("Failed to create Vet with data: {@VetData}", createVetDTO);
+                    return new BaseResponse<VetResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không thể tạo Vet",
+                        Data = null
+                    };
+                }
+
+                var response = _mapper.Map<VetResponseDTO>(vets);
+                _logger.LogInformation("Created Vet with ID {VetId} successfully", response.VetId);
+                return new BaseResponse<VetResponseDTO>
+                {
+                    Code = 201,
+                    Success = true,
+                    Message = "Tạo bác sĩ thú y thành công",
+                    Data = response
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating Vet");
+                return new BaseResponse<VetResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Lỗi khi tạo bác sĩ thú y: " + (ex.InnerException?.Message ?? ex.Message),
                     Data = null
                 };
             }
