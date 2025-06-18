@@ -288,17 +288,7 @@ namespace PetVax.Services.Service
 
         public async Task<BaseResponse<PetResponseDTO>> CreatePetAsync(CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken)
         {
-            if (createPetRequest == null)
-            {
-                _logger.LogError("CreatePetRequestDTO is null");
-                return new BaseResponse<PetResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Invalid request data",
-                    Data = null
-                };
-            }
+        
             try
             {
                 var pet = _mapper.Map<Pet>(createPetRequest);

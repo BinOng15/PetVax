@@ -1,0 +1,19 @@
+﻿using PetVax.BusinessObjects.DTO.MicrochipDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static PetVax.BusinessObjects.DTO.ResponseModel;
+
+namespace PetVax.Services.IService
+{
+    public interface IMicrochipService
+    {
+        Task<BaseResponse<bool>> DeleteMicrochipAsync(int microchipId, CancellationToken cancellationToken);
+        Task<BaseResponse<MicrochipResponseDTO>> GetMicrochipByIdAsync(int microchipId, CancellationToken cancellationToken);
+        Task<BaseResponse<List<MicrochipResponseDTO>>> GetAllMicrochipsAsync(CancellationToken cancellationToken);
+        Task<BaseResponse<MicrochipResponseDTO>> CreateMicrochipAsync(MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<MicrochipResponseDTO>> UpdateMicrochipAsync(int microchipId, MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken);
+    }
+}

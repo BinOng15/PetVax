@@ -12,8 +12,8 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    [Migration("20250617110217_UpdateVer13")]
-    partial class UpdateVer13
+    [Migration("20250618114054_deploy_ver4")]
+    partial class deploy_ver4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,11 +70,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 17, 11, 2, 16, 854, DateTimeKind.Utc).AddTicks(1977),
+                            CreatedAt = new DateTime(2025, 6, 18, 11, 40, 53, 634, DateTimeKind.Utc).AddTicks(6463),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "UNVWxAtt+E1QI04q+XTUBxJBSpiwyfkbud78z5g2BXQ=",
-                            PasswordSalt = "BqiyeMxTP7aIgdSVoHZHqWtIq5SKRlWTaDk4j1f2JtQ=",
+                            PasswordHash = "LVyozTYbEuH9IYVS9gC2yycLh+JseNyIWGtgbphAvLo=",
+                            PasswordSalt = "t4YR5OuZAlBwzR0mgnbKJG0SYFh60OU3o/Zg0WEDHMI=",
                             RefereshToken = "",
                             Role = 1,
                             isVerify = true
@@ -83,11 +83,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 17, 11, 2, 16, 854, DateTimeKind.Utc).AddTicks(1982),
+                            CreatedAt = new DateTime(2025, 6, 18, 11, 40, 53, 634, DateTimeKind.Utc).AddTicks(6466),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "qc2xxr93Kos1zyQ0cZuwXwhu5E+VQLwypeqkQdBsonQ=",
-                            PasswordSalt = "exvfw/X+lxFkrK16DAaqeKtvRtWw4i6kwDjoZ2ATY5M=",
+                            PasswordHash = "ijVGXvGUF9IFOitB/dxTU+0GtxkEpQ+FrcOFU1CBN9E=",
+                            PasswordSalt = "b77JRlooNvvuq67b8U1EN0No9DgHlvU4TUmg2wHaip4=",
                             RefereshToken = "",
                             Role = 2,
                             isVerify = true
@@ -512,11 +512,9 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("MicrochipCode")
@@ -528,7 +526,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<decimal>("Price")
@@ -555,7 +552,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
@@ -581,6 +577,9 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int>("PetId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("PetId1")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -591,6 +590,8 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsUnique();
 
                     b.HasIndex("PetId");
+
+                    b.HasIndex("PetId1");
 
                     b.ToTable("MicrochipItem", "dbo");
                 });
@@ -1533,7 +1534,15 @@ namespace PetVax.BusinessObjects.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PetVax.BusinessObjects.Models.Pet", "Pet")
+                        .WithMany()
+                        .HasForeignKey("PetId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Microchip");
+
+                    b.Navigation("Pet");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Payment", b =>
