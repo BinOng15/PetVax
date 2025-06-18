@@ -9,7 +9,7 @@ using PetVax.BusinessObjects.Enum;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("AppointmentDetail", Schema = "dbo")]
+    [Table("AppointmentDetail")]
     public class AppointmentDetail
     {
         [Key]

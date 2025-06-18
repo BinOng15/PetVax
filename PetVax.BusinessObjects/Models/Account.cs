@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("Account", Schema = "dbo")]
+    [Table("Account")]
     public class Account
     {
         [Key]

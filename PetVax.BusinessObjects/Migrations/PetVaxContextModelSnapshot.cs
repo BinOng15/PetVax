@@ -60,18 +60,18 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasKey("AccountId");
 
-                    b.ToTable("Account", "dbo");
+                    b.ToTable("Account");
 
                     b.HasData(
                         new
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 18, 11, 40, 53, 634, DateTimeKind.Utc).AddTicks(6463),
+                            CreatedAt = new DateTime(2025, 6, 18, 6, 16, 39, 916, DateTimeKind.Utc).AddTicks(7380),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "LVyozTYbEuH9IYVS9gC2yycLh+JseNyIWGtgbphAvLo=",
-                            PasswordSalt = "t4YR5OuZAlBwzR0mgnbKJG0SYFh60OU3o/Zg0WEDHMI=",
+                            PasswordHash = "BktpIzbXmzXznq5GvOlQBwQ0avGv8EGhjQQbbv44LCg=",
+                            PasswordSalt = "UpASQjK1TDKYtlYskR9mR6WS7M8Gk5PIliHAtIHnt6o=",
                             RefereshToken = "",
                             Role = 1,
                             isVerify = true
@@ -80,11 +80,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 18, 11, 40, 53, 634, DateTimeKind.Utc).AddTicks(6466),
+                            CreatedAt = new DateTime(2025, 6, 18, 6, 16, 39, 916, DateTimeKind.Utc).AddTicks(7389),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "ijVGXvGUF9IFOitB/dxTU+0GtxkEpQ+FrcOFU1CBN9E=",
-                            PasswordSalt = "b77JRlooNvvuq67b8U1EN0No9DgHlvU4TUmg2wHaip4=",
+                            PasswordHash = "Gl+MY/texaFJijNVSoRMJhPvDRix+ynsMeOOEaLtB3g=",
+                            PasswordSalt = "w98iEHWiC3MjkfCBTccj6m65TLZiWAeBKrokVtNlFZc=",
                             RefereshToken = "",
                             Role = 2,
                             isVerify = true
@@ -143,7 +143,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("PetId");
 
-                    b.ToTable("Appointment", "dbo");
+                    b.ToTable("Appointment");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.AppointmentDetail", b =>
@@ -236,7 +236,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VetId");
 
-                    b.ToTable("AppointmentDetail", "dbo");
+                    b.ToTable("AppointmentDetail");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Customer", b =>
@@ -300,7 +300,7 @@ namespace PetVax.BusinessObjects.Migrations
                     b.HasIndex("MembershipId")
                         .IsUnique();
 
-                    b.ToTable("Customer", "dbo");
+                    b.ToTable("Customer");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Disease", b =>
@@ -350,7 +350,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasKey("DiseaseId");
 
-                    b.ToTable("Disease", "dbo");
+                    b.ToTable("Disease");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.HealthCondition", b =>
@@ -444,7 +444,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("PetId");
 
-                    b.ToTable("HealthCondition", "dbo");
+                    b.ToTable("HealthCondition");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Membership", b =>
@@ -494,7 +494,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasKey("MembershipId");
 
-                    b.ToTable("Membership", "dbo");
+                    b.ToTable("Membership");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Microchip", b =>
@@ -534,7 +534,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasKey("MicrochipId");
 
-                    b.ToTable("Microchip", "dbo");
+                    b.ToTable("Microchip");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.MicrochipItem", b =>
@@ -588,9 +588,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("PetId");
 
-                    b.HasIndex("PetId1");
-
-                    b.ToTable("MicrochipItem", "dbo");
+                    b.ToTable("MicrochipItem");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Payment", b =>
@@ -650,7 +648,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VaccineId");
 
-                    b.ToTable("Payment", "dbo");
+                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Pet", b =>
@@ -731,7 +729,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Pet", "dbo");
+                    b.ToTable("Pet");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.PetPassport", b =>
@@ -811,7 +809,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("PetId");
 
-                    b.ToTable("PetPassport", "dbo");
+                    b.ToTable("PetPassport");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.PointTransaction", b =>
@@ -857,7 +855,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("PointTransaction", "dbo");
+                    b.ToTable("PointTransaction");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.ServiceHistory", b =>
@@ -894,7 +892,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasKey("ServiceHistoryId");
 
-                    b.ToTable("ServiceHistory", "dbo");
+                    b.ToTable("ServiceHistory");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccinationSchedule", b =>
@@ -935,7 +933,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("DiseaseId");
 
-                    b.ToTable("VaccinationSchedule", "dbo");
+                    b.ToTable("VaccinationSchedule");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Vaccine", b =>
@@ -988,7 +986,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasKey("VaccineId");
 
-                    b.ToTable("Vaccine", "dbo");
+                    b.ToTable("Vaccine");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineBatch", b =>
@@ -1032,7 +1030,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VaccineId");
 
-                    b.ToTable("VaccineBatch", "dbo");
+                    b.ToTable("VaccineBatch");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineDisease", b =>
@@ -1068,7 +1066,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VaccineId");
 
-                    b.ToTable("VaccineDisease", "dbo");
+                    b.ToTable("VaccineDisease");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineExport", b =>
@@ -1114,7 +1112,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VaccineBatchId");
 
-                    b.ToTable("VaccineExport", "dbo");
+                    b.ToTable("VaccineExport");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineExportDetail", b =>
@@ -1163,7 +1161,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VaccineExportId");
 
-                    b.ToTable("VaccineExportDetail", "dbo");
+                    b.ToTable("VaccineExportDetail");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineProfile", b =>
@@ -1230,7 +1228,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VaccinationScheduleId");
 
-                    b.ToTable("VaccineProfile", "dbo");
+                    b.ToTable("VaccineProfile");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineReceipt", b =>
@@ -1276,7 +1274,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VaccineBatchId");
 
-                    b.ToTable("VaccineReceipt", "dbo");
+                    b.ToTable("VaccineReceipt");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineReceiptDetail", b =>
@@ -1319,7 +1317,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VaccineReceiptId");
 
-                    b.ToTable("VaccineReceiptDetail", "dbo");
+                    b.ToTable("VaccineReceiptDetail");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Vet", b =>
@@ -1367,7 +1365,7 @@ namespace PetVax.BusinessObjects.Migrations
                     b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.ToTable("Vet", "dbo");
+                    b.ToTable("Vet");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VetSchedule", b =>
@@ -1408,7 +1406,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("VetId");
 
-                    b.ToTable("VetSchedule", "dbo");
+                    b.ToTable("VetSchedule");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Appointment", b =>
