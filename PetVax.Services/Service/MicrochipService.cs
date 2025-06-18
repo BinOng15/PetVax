@@ -60,8 +60,7 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                var microchipResponse = _mapper.Map<MicrochipResponseDTO>(microchip);
-                microchipResponse.MicrochipId = created;
+                var microchipResponse = _mapper.Map<MicrochipResponseDTO>(microchip);                
                 return new BaseResponse<MicrochipResponseDTO>
                 {
                     Code = 201,
@@ -129,12 +128,11 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                var microchipResponses = _mapper.Map<List<MicrochipResponseDTO>>(microchips);
                 return new BaseResponse<List<MicrochipResponseDTO>>
                 {
                     Code = 200,
                     Message = "Lấy danh sách microchip thành công",
-                    Data = microchipResponses
+                    Data = _mapper.Map<List<MicrochipResponseDTO>>(microchips)
                 };
             }
             catch (Exception ex)

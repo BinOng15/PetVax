@@ -13,6 +13,7 @@ namespace PetVax.BusinessObjects.DTO.MicrochipDTO
         public string Name { get; set; } // e.g., "Microchip A", "Microchip B"
         public string Description { get; set; } // e.g., "Microchip for pet identification"
         public decimal Price { get; set; } // Price of the microchip
+        public string Status { get; set; }
         public string Notes { get; set; }
 
     }

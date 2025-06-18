@@ -27,6 +27,5 @@ namespace PetVax.BusinessObjects.Models
 
         // Navigation properties
         public virtual Microchip Microchip { get; set; } // Navigation to Microchip table
-        public virtual Pet Pet { get; set; } // Navigation to Pet table
     }
 }

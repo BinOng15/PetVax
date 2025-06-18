@@ -45,7 +45,6 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.MicrochipItems
                 .Include(mc => mc.Microchip)
-                .Include(mc => mc.Pet)
                 .FirstOrDefaultAsync(mc => mc.Microchip.MicrochipCode == microchipCode, cancellationToken);
         }
 

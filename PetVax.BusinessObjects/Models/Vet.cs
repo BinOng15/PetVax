@@ -17,6 +17,7 @@ namespace PetVax.BusinessObjects.Models
         public int AccountId { get; set; } // Foreign key to Account table
         public string VetCode { get; set; } // e.g., "VET12345", unique identifier for the vet
         public string? Name { get; set; } // e.g., "Dr. John Doe"
+        public string? image { get; set; } // URL or path to the vet's image
         public string? Specialization { get; set; } // e.g., "Veterinary Surgeon", "Pet Nutritionist"
         public DateTime? DateOfBirth { get; set; } // Date of birth of the vet
         public string? PhoneNumber { get; set; } 

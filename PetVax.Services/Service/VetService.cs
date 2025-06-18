@@ -6,6 +6,7 @@ using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository;
+using PetVax.Services.ExternalService;
 using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
@@ -22,15 +23,16 @@ namespace PetVax.Services.Service
         private readonly IMapper _mapper;
         private readonly ILogger<VetService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICloudinariService _cloudinariService;
 
-        public VetService(IVetRepository vetRepository, IMapper mapper, ILogger<VetService> logger, IHttpContextAccessor httpContextAccessor)
+        public VetService(IVetRepository vetRepository, IMapper mapper, ILogger<VetService> logger, IHttpContextAccessor httpContextAccessor, ICloudinariService cloudinariService)
         {
             _vetRepository = vetRepository;
             _mapper = mapper;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
+            _cloudinariService = cloudinariService;
         }
-
         public async Task<DynamicResponse<VetResponseDTO>> GetAllVetsAsync(GetAllVetRequestDTO getAllVetRequest, CancellationToken cancellationToken)
         {
             try
@@ -146,8 +148,16 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
+
+                if(updateVetRequest.Image != null)
+                {
+                    existingVet.image = await _cloudinariService.UploadImage(updateVetRequest.Image);
+                }
+                else
+                {
+                    existingVet.image = existingVet.image;
+                }
                 // Map updated properties
-                existingVet.VetCode = updateVetRequest.VetCode ?? existingVet.VetCode;
                 existingVet.Name = updateVetRequest.Name ?? existingVet.Name;
                 existingVet.PhoneNumber = updateVetRequest.PhoneNumber ?? existingVet.PhoneNumber;
                 existingVet.Specialization = updateVetRequest.Specialization ?? existingVet.Specialization;
@@ -332,6 +342,16 @@ namespace PetVax.Services.Service
             {
                 var vets = _mapper.Map<Vet>(createVetDTO);
                 var random = new Random();
+
+                if(createVetDTO.Image != null)
+                {
+                    
+                    vets.image = await _cloudinariService.UploadImage(createVetDTO.Image);
+                }
+                else
+                {
+                    vets.image = null;
+                }
 
                 vets.VetCode = "V" + random.Next(0, 1000000).ToString("D6");
                 vets.Name = createVetDTO.Name?.Trim();
