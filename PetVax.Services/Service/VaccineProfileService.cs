@@ -217,6 +217,7 @@ namespace PetVax.Services.Service
 
                 vaccineProfile.PetId = vaccineProfileRequest.PetId;
                 vaccineProfile.DiseaseId = vaccineProfileRequest.DiseaseId;
+                vaccineProfile.AppointmentDetailId = vaccineProfileRequest.AppointmentDetailId;
                 vaccineProfile.PreferedDate = vaccineProfileRequest.PreferedDate;
                 vaccineProfile.VaccinationDate = vaccineProfileRequest.VaccinationDate;
                 vaccineProfile.NextVaccinationInfo = vaccineProfileRequest.NextVaccinationInfo;
