@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("Microchip", Schema = "dbo")]
+    [Table("Microchip")]
     public class Microchip
     {
         [Key]

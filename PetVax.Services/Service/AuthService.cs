@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AccountDTO;
@@ -32,17 +33,19 @@ namespace PetVax.Services.Service
         private readonly IAccountRepository _accountRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICustomerRepository _customerRepository;
+        private readonly ILogger<AuthService> _logger;
 
         // In-memory OTP store: Email -> (OTP, Expiration)
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otpStore = new();
 
         public AuthService(IConfiguration configuration, IAccountRepository accountRepository, IHttpContextAccessor httpContextAccessor,
-            ICustomerRepository customerRepository)
+            ICustomerRepository customerRepository, ILogger<AuthService> logger)
         {
             _configuration = configuration;
             _accountRepository = accountRepository;
             _httpContextAccessor = httpContextAccessor;
             _customerRepository = customerRepository;
+            _logger = logger;
         }
 
         public async Task<BaseResponse<AuthResponseDTO>> LoginAsync(LoginRequestDTO loginRequest, CancellationToken cancellationToken)
@@ -289,6 +292,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error login!");
                 return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 500,
