@@ -69,6 +69,7 @@ namespace PediVax.BusinessObjects.DBContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("public");
             base.OnModelCreating(modelBuilder);
 
             // Customer - Account (1-1)

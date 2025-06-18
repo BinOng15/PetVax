@@ -32,4 +32,10 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
         public AppointmentResponseDTO Appointment { get; set; }
         public AppointmentDetailResponseDTO AppointmentDetail { get; set; }
     }
+
+    public class AppointmentWithVaccinationResponseDTO
+    {
+        public AppointmentResponseDTO Appointment { get; set; }
+        public AppointmentVaccinationDetailResponseDTO Vaccinations { get; set; }
+    }
 }

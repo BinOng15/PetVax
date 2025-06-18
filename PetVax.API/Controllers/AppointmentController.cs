@@ -46,23 +46,35 @@ namespace PetVax.Controllers
             var response = await _appointmentService.GetAppointmentByPetIdAsync(petId, cancellationToken);
             return StatusCode(response.Code, response);
         }
-        [HttpPost("create-appointment")]
-        public async Task<IActionResult> CreateAppointment(CreateFullAppointmentDTO createFullAppointmentDTO,
-            CancellationToken cancellationToken = default)
-        {
-            var response = await _appointmentService.CreateFullAppointmentAsync(createFullAppointmentDTO, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
-        [HttpPut("update-appointment/{appointmentId}")]
-        public async Task<IActionResult> UpdateAppointment(int appointmentId, [FromBody] UpdateAppointmentDTO updateAppointmentDTO, CancellationToken cancellationToken = default)
-        {
-            var response = await _appointmentService.UpdateAppointmentAsync(appointmentId, updateAppointmentDTO, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
+        //[HttpPost("create-appointment")]
+        //public async Task<IActionResult> CreateAppointment(CreateFullAppointmentDTO createFullAppointmentDTO,
+        //    CancellationToken cancellationToken = default)
+        //{
+        //    var response = await _appointmentService.CreateFullAppointmentAsync(createFullAppointmentDTO, cancellationToken);
+        //    return StatusCode(response.Code, response);
+        //}
+        //[HttpPut("update-appointment/{appointmentId}")]
+        //public async Task<IActionResult> UpdateAppointment(int appointmentId, [FromBody] UpdateAppointmentDTO updateAppointmentDTO, CancellationToken cancellationToken = default)
+        //{
+        //    var response = await _appointmentService.UpdateAppointmentAsync(appointmentId, updateAppointmentDTO, cancellationToken);
+        //    return StatusCode(response.Code, response);
+        //}
         [HttpDelete("delete-appointment/{appointmentId}")]
         public async Task<IActionResult> DeleteAppointment(int appointmentId, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentService.DeleteAppointmentAsync(appointmentId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+        [HttpPost("create-appointment-vaccination")]
+        public async Task<IActionResult> CreateAppointmentVaccination([FromBody] CreateAppointmentVaccinationDTO createAppointmentVaccinationDTO, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentService.CreateAppointmentVaccinationAsync(createAppointmentVaccinationDTO, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+        [HttpPut("update-appointment-vaccination/{appointmentId}")]
+        public async Task<IActionResult> UpdateAppointmentVaccination(int appointmentId, [FromForm] UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentService.UpdateAppointmentVaccination(appointmentId, updateAppointmentVaccinationDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }

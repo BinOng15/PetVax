@@ -58,7 +58,7 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpPut("update-customer/{customerId}")]
-        public async Task<IActionResult> UpdateCustomer(int customerId, [FromBody] UpdateCustomerDTO updateCustomerDTO, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateCustomer(int customerId, [FromForm] UpdateCustomerDTO updateCustomerDTO, CancellationToken cancellationToken)
         {
             if (updateCustomerDTO == null || customerId <= 0)
             {

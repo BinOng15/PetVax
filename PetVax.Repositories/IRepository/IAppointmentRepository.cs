@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.Models;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using PetVax.BusinessObjects.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace PetVax.Repositories.IRepository
         Task<List<Appointment>> GetAllAppointmentsAsync(CancellationToken cancellationToken);
         Task<Appointment> GetAppointmentByIdAsync(int appointmentId, CancellationToken cancellationToken);
         Task<int> UpdateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken);
-        Task<List<Appointment>> GetAppointmentsByPetIdAsync(int petId, CancellationToken cancellationToken);
+        Task<Appointment> GetAppointmentsByPetIdAsync(int petId, CancellationToken cancellationToken);
+        Task<IDbContextTransaction> BeginTransactionAsync();
+
     }
 }

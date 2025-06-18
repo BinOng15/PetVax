@@ -80,11 +80,16 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreateAppointmentDTO, Appointment>();
             CreateMap<UpdateAppointmentDTO, Appointment>();
             CreateMap<Appointment, AppointmentResponseDTO>();
+            CreateMap<Appointment, AppointmentWithDetailResponseDTO>();
+            CreateMap<CreateAppointmentVaccinationDTO, Appointment>();
+            CreateMap<UpdateAppointmentVaccinationDTO, Appointment>();
+            CreateMap<Appointment, AppointmentWithVaccinationResponseDTO>();
 
             //AppointmentDetail
             CreateMap<CreateAppointmentDetailDTO, AppointmentDetail>();
             CreateMap<UpdateAppointmentDetailDTO, AppointmentDetail>();
             CreateMap<AppointmentDetail, AppointmentDetailResponseDTO>();
+            CreateMap<AppointmentDetail, AppointmentVaccinationDetailResponseDTO>();
 
         }
     }   

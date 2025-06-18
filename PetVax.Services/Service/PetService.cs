@@ -6,6 +6,7 @@ using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
+using PetVax.Repositories.Repository;
 using PetVax.Services.ExternalService;
 using PetVax.Services.IService;
 using System;
@@ -22,12 +23,13 @@ namespace PetVax.Services.Service
     {
         private readonly IPetRepository _petRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IVaccineProfileRepository _vaccineProfileRepository;
         private readonly ILogger<PetService> _logger;
         private readonly IMapper _mapper;
         private readonly ICloudinariService _cloudinariService;
         private readonly IHttpContextAccessor _httpContextAccessor;
             
-        public PetService(IPetRepository petRepository, ICustomerRepository customerRepository, ILogger<PetService> logger, IMapper mapper, ICloudinariService cloudinariService, IHttpContextAccessor httpContextAccessor)
+        public PetService(IPetRepository petRepository, ICustomerRepository customerRepository, ILogger<PetService> logger, IMapper mapper, ICloudinariService cloudinariService, IHttpContextAccessor httpContextAccessor, IVaccineProfileRepository vaccineProfileRepository)
         {
             _petRepository = petRepository;
             _customerRepository = customerRepository;
@@ -35,6 +37,7 @@ namespace PetVax.Services.Service
             _mapper = mapper;
             _cloudinariService = cloudinariService;
             _httpContextAccessor = httpContextAccessor;
+            _vaccineProfileRepository = vaccineProfileRepository;
         }
 
         public async Task<DynamicResponse<PetResponseDTO>> GetAllPetsAsync(GetAllPetsRequestDTO getAllPetsRequest, CancellationToken cancellationToken)
@@ -347,6 +350,31 @@ namespace PetVax.Services.Service
                         Message = "Failed to create pet",
                         Data = null
                     };
+                }
+
+                var vaccineProfile = new VaccineProfile
+                {
+                    PetId = pet.PetId,
+                    IsCompleted = false, // Mặc định chưa tiêm đủ
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = GetCurrentUserName()
+                };
+
+                var vaccineProfileCreated = await _vaccineProfileRepository.CreateVaccineProfileAsync(vaccineProfile, cancellationToken);
+                if (vaccineProfileCreated <= 0)
+                {
+                    _logger.LogWarning("Failed to create vaccine profile for pet with ID {PetId}", pet.PetId);
+                    return new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Lỗi khi tạo hồ sơ tiêm chủng cho thú cưng",
+                        Data = null
+                    };
+                }
+                else
+                {
+                    _logger.LogInformation("Vaccine profile created successfully for pet with ID {PetId}", pet.PetId);
                 }
 
                 var createdPet = await _petRepository.GetPetByIdAsync(pet.PetId, cancellationToken);
