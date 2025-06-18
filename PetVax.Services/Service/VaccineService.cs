@@ -236,9 +236,9 @@ namespace PetVax.Services.Service
                         Message = "No vaccine found for the specified disease."
                     };
                 }
-
+                var vaccineId = vaccineDisease.Select(vd => vd.VaccineId).FirstOrDefault();
                 // Get Vaccine by VaccineId from VaccineDisease
-                var vaccine = await _vaccineRepository.GetVaccineByIdAsync(vaccineDisease.VaccineId, cancellationToken);
+                var vaccine = await _vaccineRepository.GetVaccineByIdAsync(vaccineId, cancellationToken);
                 if (vaccine == null)
                 {
                     return new BaseResponse<VaccineResponseDTO>

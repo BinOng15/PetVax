@@ -487,5 +487,10 @@ namespace PetVax.Services.Service
         {
             throw new NotImplementedException();
         }
+
+        public Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentDetailId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

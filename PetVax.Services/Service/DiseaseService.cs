@@ -295,11 +295,12 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
+                var diseaseId = vaccineDisease.Select(vd => vd.DiseaseId).FirstOrDefault();
 
-                var disease = await _diseaseRepository.GetDiseaseByIdAsync(vaccineDisease.DiseaseId, cancellationToken);
+                var disease = await _diseaseRepository.GetDiseaseByIdAsync(diseaseId, cancellationToken);
                 if (disease == null)
                 {
-                    _logger.LogError($"GetDiseaseByVaccineIdAsync: Disease with ID {vaccineDisease.DiseaseId} not found");
+                    _logger.LogError($"GetDiseaseByVaccineIdAsync: Disease with ID {diseaseId} not found");
                     return new BaseResponse<DiseaseResponseDTO>
                     {
                         Code = 404,

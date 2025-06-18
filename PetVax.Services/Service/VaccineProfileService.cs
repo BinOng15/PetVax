@@ -171,28 +171,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<VaccineProfileResponseDTO>
                 {
                     Code = 200,
-                    Data = new VaccineProfileResponseDTO
-                    {
-                        VaccineProfileId = vaccineProfile.VaccineProfileId,
-                        PetId = vaccineProfile.PetId,
-                        PreferedDate = vaccineProfile.PreferedDate,
-                        VaccinationDate = vaccineProfile.VaccinationDate,
-                        Dose = vaccineProfile.Dose,
-                        Reaction = vaccineProfile.Reaction,
-                        NextVaccinationInfo = vaccineProfile.NextVaccinationInfo,
-                        IsActive = vaccineProfile.IsActive,
-                        IsCompleted = vaccineProfile.IsCompleted,
-                        CreatedAt = vaccineProfile.CreatedAt,
-                        Disease = new DiseaseResponseDTO
-                        {
-                            DiseaseId = vaccineProfile.Disease.DiseaseId,
-                            Name = vaccineProfile.Disease.Name,
-                            Description = vaccineProfile.Disease.Description,
-                            Species = vaccineProfile.Disease.Species,
-                            Symptoms = vaccineProfile.Disease.Symptoms,
-                            Treatment = vaccineProfile.Disease.Treatment
-                        }
-                    },
+                    Data = _mapper.Map<VaccineProfileResponseDTO>(vaccineProfile),
                     Success = true,
                     Message = "Vaccine profile for the specified pet retrieved successfully."
                 };

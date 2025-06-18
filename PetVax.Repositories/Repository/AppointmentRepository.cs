@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
@@ -15,12 +16,21 @@ namespace PetVax.Repositories.Repository
         public AppointmentRepository() : base()
         {
         }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            if (_context.Database.CurrentTransaction != null)
+            {
+                return _context.Database.CurrentTransaction;
+            }
+            return await _context.Database.BeginTransactionAsync();
+        }
+
         public async Task<int> CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken)
         {
             _context.Add(appointment);
             await _context.SaveChangesAsync(cancellationToken);
             return appointment.AppointmentId;
-
         }
 
         public async Task<bool> DeleteAppointmentAsync(int appointmentId, CancellationToken cancellationToken)
@@ -38,11 +48,11 @@ namespace PetVax.Repositories.Repository
             return await GetByIdAsync(appointmentId, cancellationToken);
         }
 
-        public async Task<List<Appointment>> GetAppointmentsByPetIdAsync(int petId, CancellationToken cancellationToken)
+        public async Task<Appointment> GetAppointmentsByPetIdAsync(int petId, CancellationToken cancellationToken)
         {
-            return await _context.Appointments
+            return await _context.Set<Appointment>()
                 .Where(a => a.PetId == petId)
-                .ToListAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<int> UpdateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken)

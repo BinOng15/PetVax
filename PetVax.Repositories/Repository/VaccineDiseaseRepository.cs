@@ -30,22 +30,25 @@ namespace PetVax.Repositories.Repository
             return await GetAllAsync(cancellationToken);
         }
 
-        public async Task<VaccineDisease> GetVaccineDiseaseByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
+        public async Task<List<VaccineDisease>> GetVaccineDiseaseByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
         {
             return await _context.VaccineDiseases
-                .FirstOrDefaultAsync(vd => vd.DiseaseId == diseaseId, cancellationToken);
+                .Where(vd => vd.DiseaseId == diseaseId)
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<VaccineDisease> GetVaccineDiseaseByIdAsync(int vaccineDiseaseId, CancellationToken cancellationToken)
+
+        public async Task<VaccineDisease> GetVaccineDiseaseByIdAsync(int diseaseId, CancellationToken cancellationToken)
         {
             return await _context.VaccineDiseases
-                .FirstOrDefaultAsync(vd => vd.VaccineDiseaseId == vaccineDiseaseId, cancellationToken);
+                .FirstOrDefaultAsync(vd => vd.VaccineDiseaseId == diseaseId, cancellationToken);
         }
 
-        public async Task<VaccineDisease> GetVaccineDiseaseByVaccineIdAsync(int vaccineId, CancellationToken cancellationToken)
+        public async Task<List<VaccineDisease>> GetVaccineDiseaseByVaccineIdAsync(int vaccineId, CancellationToken cancellationToken)
         {
             return await _context.VaccineDiseases
-                .FirstOrDefaultAsync(vd => vd.VaccineId == vaccineId, cancellationToken);
+                .Where(vd => vd.VaccineId == vaccineId)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<int> UpdateVaccineDiseaseAsync(VaccineDisease vaccineDisease, CancellationToken cancellationToken)
