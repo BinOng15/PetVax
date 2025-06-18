@@ -67,11 +67,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 18, 5, 53, 21, 796, DateTimeKind.Utc).AddTicks(8827),
+                            CreatedAt = new DateTime(2025, 6, 18, 6, 16, 39, 916, DateTimeKind.Utc).AddTicks(7380),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "rsZKs8WTjtwHp+An+kpb456BEQEPWt+V14TQ8+SHibA=",
-                            PasswordSalt = "jb1FcTjzi3Wd/UFWdQ34TxNfeWojaClP20HNn39Jzrs=",
+                            PasswordHash = "BktpIzbXmzXznq5GvOlQBwQ0avGv8EGhjQQbbv44LCg=",
+                            PasswordSalt = "UpASQjK1TDKYtlYskR9mR6WS7M8Gk5PIliHAtIHnt6o=",
                             RefereshToken = "",
                             Role = 1,
                             isVerify = true
@@ -80,11 +80,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 18, 5, 53, 21, 796, DateTimeKind.Utc).AddTicks(8832),
+                            CreatedAt = new DateTime(2025, 6, 18, 6, 16, 39, 916, DateTimeKind.Utc).AddTicks(7389),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "udbwvdytYcWtVhimmtOrHNjIvLpPV2u1K38/awh/UM4=",
-                            PasswordSalt = "/pV2xnlk/VRCK9R7oQaSBMqVU09bBDWA7/flwy8+PBI=",
+                            PasswordHash = "Gl+MY/texaFJijNVSoRMJhPvDRix+ynsMeOOEaLtB3g=",
+                            PasswordSalt = "w98iEHWiC3MjkfCBTccj6m65TLZiWAeBKrokVtNlFZc=",
                             RefereshToken = "",
                             Role = 2,
                             isVerify = true

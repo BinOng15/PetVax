@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace PetVax.BusinessObjects.Migrations
 {
     /// <inheritdoc />
-    public partial class Database : Migration
+    public partial class Database123 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -837,8 +837,8 @@ namespace PetVax.BusinessObjects.Migrations
                 columns: new[] { "AccountId", "AccessToken", "CreatedAt", "CreatedBy", "Email", "PasswordHash", "PasswordSalt", "RefereshToken", "Role", "isVerify" },
                 values: new object[,]
                 {
-                    { 1, "", new DateTime(2025, 6, 18, 5, 53, 21, 796, DateTimeKind.Utc).AddTicks(8827), "system", "admin@petvax.com", "rsZKs8WTjtwHp+An+kpb456BEQEPWt+V14TQ8+SHibA=", "jb1FcTjzi3Wd/UFWdQ34TxNfeWojaClP20HNn39Jzrs=", "", 1, true },
-                    { 2, "", new DateTime(2025, 6, 18, 5, 53, 21, 796, DateTimeKind.Utc).AddTicks(8832), "system", "staff@petvax.com", "udbwvdytYcWtVhimmtOrHNjIvLpPV2u1K38/awh/UM4=", "/pV2xnlk/VRCK9R7oQaSBMqVU09bBDWA7/flwy8+PBI=", "", 2, true }
+                    { 1, "", new DateTime(2025, 6, 18, 6, 16, 39, 916, DateTimeKind.Utc).AddTicks(7380), "system", "admin@petvax.com", "BktpIzbXmzXznq5GvOlQBwQ0avGv8EGhjQQbbv44LCg=", "UpASQjK1TDKYtlYskR9mR6WS7M8Gk5PIliHAtIHnt6o=", "", 1, true },
+                    { 2, "", new DateTime(2025, 6, 18, 6, 16, 39, 916, DateTimeKind.Utc).AddTicks(7389), "system", "staff@petvax.com", "Gl+MY/texaFJijNVSoRMJhPvDRix+ynsMeOOEaLtB3g=", "w98iEHWiC3MjkfCBTccj6m65TLZiWAeBKrokVtNlFZc=", "", 2, true }
                 });
 
             migrationBuilder.CreateIndex(
