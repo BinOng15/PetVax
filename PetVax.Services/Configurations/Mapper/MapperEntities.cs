@@ -95,6 +95,7 @@ namespace PetVax.Services.Configurations.Mapper
             //Microchip
             CreateMap<Microchip, MicrochipResponseDTO>();
             CreateMap<MicrochipRequestDTO, Microchip>();
+            CreateMap<MicrochipItem, MicrochipItemResponseDTO>();
         }
     }   
 }
