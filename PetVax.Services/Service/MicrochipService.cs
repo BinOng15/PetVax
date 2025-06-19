@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
@@ -44,7 +45,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<MicrochipResponseDTO>
                     {
-                        Code = 400,
+                        Code = 200,
                         Message = "Giá microchip phải lớn hơn 0",
                         Data = null
                     };
@@ -54,7 +55,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<MicrochipResponseDTO>
                     {
-                        Code = 500,
+                        Code = 200,
                         Message = "Không thể tạo microchip",
                         Data = null
                     };
@@ -90,7 +91,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<MicrochipResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Message = "Microchip không tồn tại",
                         Data = null
                     };
@@ -114,33 +115,72 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<List<MicrochipResponseDTO>>> GetAllMicrochipsAsync(CancellationToken cancellationToken)
+        public async Task<DynamicResponse<MicrochipResponseDTO>> GetAllMicrochipsDynamicAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
         {
             try
             {
                 var microchips = await _microchipRepository.GetAllMicrochipsAsync(cancellationToken);
-                if (microchips == null || !microchips.Any())
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
-                    return new BaseResponse<List<MicrochipResponseDTO>>
+                    microchips = microchips
+                        .Where(m => m.MicrochipCode.Contains(getAllItemsDTO.KeyWord, StringComparison.OrdinalIgnoreCase) ||
+                                    m.Name.Contains(getAllItemsDTO.KeyWord, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
+
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = microchips.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+
+                var pagedMicrochips = microchips
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+
+                var responseData = new MegaData<MicrochipResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                    },
+                    PageData = _mapper.Map<List<MicrochipResponseDTO>>(pagedMicrochips)
+                };
+
+                if (!pagedMicrochips.Any())
+                {
+                    return new DynamicResponse<MicrochipResponseDTO>
                     {
                         Code = 404,
-                        Message = "Không có microchip nào",
-                        Data = null
+                        Success = false,
+                        Message = "Không tìm thấy microchip nào.",
+                        Data = responseData
                     };
                 }
-                return new BaseResponse<List<MicrochipResponseDTO>>
+                return new DynamicResponse<MicrochipResponseDTO>
                 {
                     Code = 200,
-                    Message = "Lấy danh sách microchip thành công",
-                    Data = _mapper.Map<List<MicrochipResponseDTO>>(microchips)
+                    Success = true,
+                    Message = "Lấy tất cả microchip thành công.",
+                    Data = responseData
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<MicrochipResponseDTO>>
+                // _logger.LogError(ex, "Error occurred while getting all microchips.");
+                return new DynamicResponse<MicrochipResponseDTO>
                 {
                     Code = 500,
-                    Message = $"Lỗi khi lấy danh sách microchip: {ex.Message}",
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả microchip.",
                     Data = null
                 };
             }
@@ -155,7 +195,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<MicrochipResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Message = "Microchip không tồn tại",
                         Data = null
                     };
@@ -167,7 +207,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<MicrochipResponseDTO>
                     {
-                        Code = 500,
+                        Code = 200,
                         Message = "Không thể cập nhật microchip",
                         Data = null
                     };
@@ -176,6 +216,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<MicrochipResponseDTO>
                 {
                     Code = 200,
+                    Success = true,
                     Message = "Cập nhật microchip thành công",
                     Data = microchipResponse
                 };
@@ -200,7 +241,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<bool>
                     {
-                        Code = 404,
+                        Code = 200,
                         Message = "Microchip không tồn tại",
                         Data = false
                     };
@@ -210,7 +251,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<bool>
                     {
-                        Code = 500,
+                        Code = 200,
                         Message = "Không thể xóa microchip",
                         Data = false
                     };

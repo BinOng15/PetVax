@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
 using PetVax.BusinessObjects.Models;
@@ -25,30 +26,44 @@ namespace PetVax.Services.Service
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<List<BaseResponse<VetScheduleDTO>>> GetAllVetSchedulesAsync(CancellationToken cancellationToken)
+        public async Task<DynamicResponse<VetScheduleDTO>> GetAllVetSchedulesAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
         {
             try
             {
                 var vetSchedules = await _vetScheduleRepository.GetAllVetSchedulesAsync(cancellationToken);
-                if (vetSchedules == null || !vetSchedules.Any())
+
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
-                    return new List<BaseResponse<VetScheduleDTO>>()
-                    {
-                        new BaseResponse<VetScheduleDTO>
-                        {
-                            Success = false,
-                            Message = "No vet schedules found",
-                            Code = 200,
-                            Data = default! // Use default! to explicitly indicate a nullable value
-                        }
-                    };
+                    vetSchedules = vetSchedules
+                        .Where(vs => vs.VetId.ToString().Contains(getAllItemsDTO.KeyWord, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                 }
-                return vetSchedules.Select(vs => new BaseResponse<VetScheduleDTO>
+
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = vetSchedules.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+
+                var pagedSchedules = vetSchedules
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+
+                var responseData = new MegaData<VetScheduleDTO>
                 {
-                    Success = true,
-                    Message = "Vet schedules retrieved successfully",
-                    Code = 200,
-                    Data = new VetScheduleDTO
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                    },
+                    PageData = pagedSchedules.Select(vs => new VetScheduleDTO
                     {
                         VetScheduleId = vs.VetScheduleId,
                         VetId = vs.VetId,
@@ -57,20 +72,35 @@ namespace PetVax.Services.Service
                         Status = vs.Status,
                         CreatedAt = vs.CreatedAt,
                         CreatedBy = vs.CreatedBy
-                    }
-                }).ToList();
+                    }).ToList()
+                };
+
+                if (!pagedSchedules.Any())
+                {
+                    return new DynamicResponse<VetScheduleDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "No vet schedules found.",
+                        Data = responseData
+                    };
+                }
+                return new DynamicResponse<VetScheduleDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Vet schedules retrieved successfully.",
+                    Data = responseData
+                };
             }
             catch (Exception ex)
             {
-                return new List<BaseResponse<VetScheduleDTO>>()
+                return new DynamicResponse<VetScheduleDTO>
                 {
-                    new BaseResponse<VetScheduleDTO>
-                    {
-                        Success = false,
-                        Message = $"An error occurred while retrieving vet schedules: {ex.Message}",
-                        Code = 500,
-                        Data = null
-                    }
+                    Code = 500,
+                    Success = false,
+                    Message = $"An error occurred while retrieving vet schedules: {ex.Message}",
+                    Data = null
                 };
             }
         }

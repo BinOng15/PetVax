@@ -92,7 +92,7 @@ namespace PetVax.Services.Service
                     _logger.LogInformation("No vets found for the given criteria");
                     return new DynamicResponse<VetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "No vets found",
                         Data = responseData
@@ -130,7 +130,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Invalid update request for Vet with ID {VetId}", updateVetRequest?.VetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 400,
+                        Code = 200,
                         Success = false,
                         Message = "Invalid request data",
                         Data = null
@@ -142,7 +142,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Vet with ID {VetId} not found", updateVetRequest.VetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Vet not found",
                         Data = null
@@ -216,7 +216,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Invalid Vet ID: {VetId}", vetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 400,
+                        Code = 200,
                         Success = false,
                         Message = "Invalid Vet ID",
                         Data = null
@@ -228,7 +228,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Vet with ID {VetId} not found", vetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Vet not found",
                         Data = null
@@ -273,7 +273,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Invalid Vet ID: {VetId}", vetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 400,
+                        Code = 200,
                         Success = false,
                         Message = "Invalid Vet ID",
                         Data = null
@@ -285,7 +285,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Vet with ID {VetId} not found", vetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Vet not found",
                         Data = null
@@ -306,7 +306,7 @@ namespace PetVax.Services.Service
                 _logger.LogWarning("Failed to delete Vet with ID {VetId}", vetId);
                 return new BaseResponse<VetResponseDTO>
                 {
-                    Code = 500,
+                    Code = 200,
                     Success = false,
                     Message = "Failed to delete veterinarian",
                     Data = null
@@ -332,7 +332,7 @@ namespace PetVax.Services.Service
                 _logger.LogWarning("CreateVetAsync called with null request");
                 return new BaseResponse<VetResponseDTO>
                 {
-                    Code = 400,
+                    Code = 200,
                     Success = false,
                     Message = "Dữ liệu tạo bác sĩ thú y không được để trống",
                     Data = null
@@ -367,7 +367,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Failed to create Vet with data: {@VetData}", createVetDTO);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 500,
+                        Code = 200,
                         Success = false,
                         Message = "Không thể tạo Vet",
                         Data = null
