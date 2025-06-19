@@ -15,6 +15,31 @@ namespace PediVax.BusinessObjects.DBContext
         public PetVaxContext() { }
         public PetVaxContext(DbContextOptions<PetVaxContext> options) : base(options) { }
 
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
+        //        var configuration = new ConfigurationBuilder()
+        //            .SetBasePath(Directory.GetCurrentDirectory())
+        //            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        //            .AddEnvironmentVariables()
+        //            .Build();
+
+        //        string connectionString = configuration.GetConnectionString("PostgreSQL");
+
+        //        if (string.IsNullOrEmpty(connectionString))
+        //        {
+        //            throw new InvalidOperationException("Không thể lấy ConnectionString.");
+        //        }
+
+        //        optionsBuilder.UseNpgsql(connectionString, options =>
+        //        {
+        //            options.EnableRetryOnFailure();
+        //        });
+
+        //    }
+        //}
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -25,18 +50,14 @@ namespace PediVax.BusinessObjects.DBContext
                     .AddEnvironmentVariables()
                     .Build();
 
-                string connectionString = configuration.GetConnectionString("PostgreSQL");
+                string connectionString = configuration.GetConnectionString("DefaultConnection");
 
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     throw new InvalidOperationException("Không thể lấy ConnectionString.");
                 }
 
-                optionsBuilder.UseNpgsql(connectionString, options =>
-                {
-                    options.EnableRetryOnFailure();
-                });
-
+                optionsBuilder.UseSqlServer(connectionString);
             }
         }
 
@@ -69,7 +90,7 @@ namespace PediVax.BusinessObjects.DBContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema("public");
+            //modelBuilder.HasDefaultSchema("public");
             base.OnModelCreating(modelBuilder);
 
             // Customer - Account (1-1)
