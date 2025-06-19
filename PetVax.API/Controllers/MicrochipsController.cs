@@ -1,14 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Azure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PediVax.BusinessObjects.DBContext;
+using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
 using PetVax.BusinessObjects.Models;
 using PetVax.Services.IService;
+using PetVax.Services.Service;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PediVax.Controllers
 {
@@ -24,13 +28,19 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("GetAllMicrochips")]
-        public async Task<IActionResult> GetAllMicrochips(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllMicrochips([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, CancellationToken cancellationToken = default)
         {
-
-            var response = await _microchipService.GetAllMicrochipsAsync(cancellationToken);
-            return Ok(response);
-
+            var request = new GetAllItemsDTO
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                KeyWord = keyWord
+            };
+            var response = await _microchipService.GetAllMicrochipsDynamicAsync(request, cancellationToken);
+            return StatusCode(response.Code, response);
         }
+
+
 
         [HttpGet("GetMicrochipById/{microchipId}")]
         public async Task<IActionResult> GetMicrochipById(int microchipId, CancellationToken cancellationToken)

@@ -417,7 +417,7 @@ namespace PetVax.Services.Service
                     {
                         new BaseResponse<PetResponseDTO>
                         {
-                            Code = 404,
+                            Code = 200,
                             Success = false,
                             Message = "No pets found for this customer",
                             Data = null
