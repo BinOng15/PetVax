@@ -424,7 +424,7 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<AppointmentResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy cuộc hẹn nào.",
                         Data = null
@@ -460,7 +460,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Cuộc hẹn không tồn tại.",
                         Data = null
@@ -497,7 +497,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentResponseDTO>
                     {
-                        Code = 404,
+                        Code = 202,
                         Success = false,
                         Message = "Không tìm thấy cuộc hẹn cho thú cưng này.",
                         Data = null
@@ -680,7 +680,7 @@ namespace PetVax.Services.Service
                     var isValidSchedule = vetSchedules.Any(s =>
                         s.ScheduleDate.Date == appointmentDate.Date &&
                         s.SlotNumber == slotNumber &&
-                        s.Status == "Active");
+                        s.Status == EnumList.VetScheduleStatus.Available);
 
                     if (!isValidSchedule)
                     {
@@ -1050,7 +1050,6 @@ namespace PetVax.Services.Service
             }
             if (createAppointmentVaccinationDTO.Appointment.Location == EnumList.Location.Clinic)
             {
-                // If Clinic, ignore address (set to null or empty)
                 createAppointmentVaccinationDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
             }
             var pet = await _petRepository.GetPetByIdAsync(createAppointmentVaccinationDTO.Appointment.PetId, cancellationToken);
@@ -1064,7 +1063,6 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
-            // Kiểm tra xem DiseaseId có tồn tại không
             if (createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId == null || createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId <= 0)
             {
                 return new BaseResponse<AppointmentWithVaccinationResponseDTO>
@@ -1112,26 +1110,14 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                // Lấy lại bản ghi Appointment vừa tạo để đảm bảo có đầy đủ thông tin (ID, ...)
                 var createdAppointment = await _appointmentRepository.GetAppointmentByIdAsync(createdAppointmentId, cancellationToken);
-                if (createdAppointment == null)
-                {
-                    return new BaseResponse<AppointmentWithVaccinationResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Không thể lấy thông tin cuộc hẹn tiêm phòng vừa tạo.",
-                        Data = null
-                    };
-                }
 
-                var appointmentResponse = _mapper.Map<AppointmentResponseDTO>(createdAppointment);
                 var appointmentDetail = new AppointmentDetail
                 {
-                    AppointmentId = appointmentResponse.AppointmentId,
-                    AppointmentDate = appointmentResponse.AppointmentDate,
-                    ServiceType = appointmentResponse.ServiceType,
-                    AppointmentStatus = appointmentResponse.AppointmentStatus,
+                    AppointmentId = createdAppointment.AppointmentId,
+                    AppointmentDate = createdAppointment.AppointmentDate,
+                    ServiceType = createdAppointment.ServiceType,
+                    AppointmentStatus = createdAppointment.AppointmentStatus,
                     AppointmentDetailCode = "AD" + random.Next(0, 1000000).ToString("D6"),
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
@@ -1140,6 +1126,7 @@ namespace PetVax.Services.Service
                 var createdAppointmentDetailId = await _appointmentDetailRepository.AddAppointmentDetailAsync(appointmentDetail, cancellationToken);
                 if (createdAppointmentDetailId <= 0)
                 {
+                    await _appointmentRepository.DeleteAppointmentAsync(createdAppointmentId, cancellationToken);
                     return new BaseResponse<AppointmentWithVaccinationResponseDTO>
                     {
                         Code = 500,
@@ -1148,31 +1135,27 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                // Lấy lại bản ghi AppointmentDetail vừa tạo
-                var createdAppointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(createdAppointmentDetailId, cancellationToken);
-                if (createdAppointmentDetail == null)
+                var fullDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(createdAppointmentDetailId, cancellationToken);
+                if (createdAppointment == null || fullDetail == null)
                 {
                     return new BaseResponse<AppointmentWithVaccinationResponseDTO>
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Không thể lấy thông tin chi tiết cuộc hẹn tiêm phòng vừa tạo.",
+                        Message = "Lỗi khi lấy thông tin cuộc hẹn đã tạo.",
                         Data = null
                     };
                 }
-                var appointmentVaccinationDetailResponse = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(createdAppointmentDetail);
-                
-                var appointmentVaccinationWithDetailResponse = new AppointmentWithVaccinationResponseDTO
-                {
-                    Appointment = appointmentResponse,
-                    Vaccinations = appointmentVaccinationDetailResponse
-                };
                 return new BaseResponse<AppointmentWithVaccinationResponseDTO>
                 {
                     Code = 201,
                     Success = true,
                     Message = "Tạo cuộc hẹn tiêm phòng thành công.",
-                    Data = appointmentVaccinationWithDetailResponse
+                    Data = new AppointmentWithVaccinationResponseDTO
+                    {
+                        Appointment = _mapper.Map<AppointmentResponseDTO>(createdAppointment),
+                        Vaccinations = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(fullDetail)
+                    }
                 };
             }
             catch (Exception ex)

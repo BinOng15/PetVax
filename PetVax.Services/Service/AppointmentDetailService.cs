@@ -234,10 +234,10 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<AppointmentDetailResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn nào.",
-                        Data = responseData
+                        Data = null
                     };
                 }
                 return new DynamicResponse<AppointmentDetailResponseDTO>
@@ -270,7 +270,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentDetailResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn cho ID đã cung cấp.",
                         Data = null
@@ -307,7 +307,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentDetailResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn cho ID đã cung cấp.",
                         Data = null
@@ -344,7 +344,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentDetailResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn cho Pet ID đã cung cấp.",
                         Data = null
@@ -381,7 +381,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentDetailResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn cho loại dịch vụ đã cung cấp.",
                         Data = null
@@ -418,7 +418,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentDetailResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn cho trạng thái đã cung cấp.",
                         Data = null
@@ -455,7 +455,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentDetailResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn cho Vet ID đã cung cấp.",
                         Data = null

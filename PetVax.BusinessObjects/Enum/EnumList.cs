@@ -54,5 +54,11 @@ namespace PetVax.BusinessObjects.Enum
             Clinic = 1,
             HomeVisit = 2,
         }
+
+        public enum VetScheduleStatus
+        {
+            Available = 1,
+            Unavailable = 2,
+        }
     }
 }

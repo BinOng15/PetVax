@@ -43,7 +43,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Customer not found.",
+                        Message = "Không tìm thấy khách hàng với ID đã cho.",
                         Data = false
                     };
                 }
@@ -54,7 +54,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 200,
                         Success = true,
-                        Message = "Customer deleted successfully.",
+                        Message = "Xóa khách hàng thành công.",
                         Data = true
                     };
                 }
@@ -64,7 +64,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Failed to delete customer.",
+                        Message = "Không thể xóa khách hàng. Vui lòng thử lại sau.",
                         Data = false
                     };
                 }
@@ -76,7 +76,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while deleting the customer.",
+                    Message = "Lỗi xảy ra khi xóa khách hàng.",
                     Data = false
                 };
             }
@@ -127,9 +127,9 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<CustomerResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "No customers found.",
+                        Message = "Không tìm thấy khách hàng nào phù hợp với tiêu chí tìm kiếm.",
                         Data = null
                     };
                 }
@@ -137,7 +137,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Customers retrieved successfully.",
+                    Message = "Danh sách khách hàng đã được lấy thành công.",
                     Data = responseData
                 };
             }
@@ -148,7 +148,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while retrieving customers.",
+                    Message = "Lỗi xảy ra khi lấy danh sách khách hàng.",
                     Data = null
                 };
             }
@@ -163,9 +163,9 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<CustomerResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "Customer not found.",
+                        Message = "Không tìm thấy khách hàng với ID tài khoản đã cho.",
                         Data = null
                     };
                 }
@@ -174,7 +174,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Customer retrieved successfully.",
+                    Message = "Khách hàng đã được lấy thành công.",
                     Data = customerResponse
                 };
             }
@@ -185,7 +185,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while retrieving the customer.",
+                    Message = "Lỗi xảy ra khi lấy khách hàng.",
                     Data = null
                 };
             }
@@ -200,9 +200,9 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<CustomerResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "Customer not found.",
+                        Message = "Không tìm thấy khách hàng với ID đã cho.",
                         Data = null
                     };
                 }
@@ -211,7 +211,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Customer retrieved successfully.",
+                    Message = "Khách hàng đã được lấy thành công.",
                     Data = customerResponse
                 };
             }
@@ -222,7 +222,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while retrieving the customer.",
+                    Message = "Lỗi xảy ra khi lấy khách hàng.",
                     Data = null
                 };
             }
@@ -239,7 +239,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Customer not found.",
+                        Message = "Không tìm thấy khách hàng với ID đã cho.",
                         Data = false
                     };
                 }
@@ -279,7 +279,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Failed to update customer.",
+                        Message = "Không thể cập nhật khách hàng. Vui lòng thử lại sau.",
                         Data = false
                     };
                 }
@@ -287,7 +287,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Customer updated successfully.",
+                    Message = "Cập nhật khách hàng thành công.",
                     Data = true
                 };
             }
@@ -298,7 +298,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while updating the customer.",
+                    Message = "Lỗi xảy ra khi cập nhật khách hàng.",
                     Data = false
                 };
             }
