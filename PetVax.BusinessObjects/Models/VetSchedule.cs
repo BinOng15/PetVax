@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using PetVax.BusinessObjects.Enum;
 
 namespace PetVax.BusinessObjects.Models
 {
@@ -17,7 +18,7 @@ namespace PetVax.BusinessObjects.Models
         public int VetId { get; set; } // Foreign key to Vet table
         public DateTime ScheduleDate { get; set; } // Date of the schedule
         public int SlotNumber { get; set; } // e.g., 1 for first slot, 2 for second slot, etc.
-        public string Status { get; set; } // e.g., "Active", "Cancelled", "Completed"
+        public EnumList.VetScheduleStatus Status { get; set; } // e.g., "Active", "Cancelled", "Completed"
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified

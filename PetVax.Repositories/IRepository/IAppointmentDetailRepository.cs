@@ -11,7 +11,7 @@ namespace PetVax.Repositories.IRepository
     public interface IAppointmentDetailRepository
     {
         Task<List<AppointmentDetail>> GetAllAppointmentDetailsAsync(CancellationToken cancellationToken);
-        Task<AppointmentDetail?> GetAppointmentDetailByIdAsync(int id, CancellationToken cancellationToken);
+        Task<AppointmentDetail> GetAppointmentDetailByIdAsync(int id, CancellationToken cancellationToken);
         Task<int> AddAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken);
         Task<int> UpdateAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken);
         Task<bool> DeleteAppointmentDetailAsync(int id, CancellationToken cancellationToken);
@@ -25,5 +25,6 @@ namespace PetVax.Repositories.IRepository
         Task<AppointmentDetail> GetAppointmentDetailByPetIdAsync(int petId, CancellationToken cancellationToken);
         Task<List<AppointmentDetail>> GetAppointmentDetailsByServiceTypeAsync(EnumList.ServiceType serviceType, CancellationToken cancellationToken);
         Task<List<AppointmentDetail>> GetAppointmentDetailsByStatusAsync(EnumList.AppointmentStatus status, CancellationToken cancellationToken);
+        Task<AppointmentDetail> GetAppointmentDetailWithRelationsAsync(int id, CancellationToken cancellationToken);
     }
 }

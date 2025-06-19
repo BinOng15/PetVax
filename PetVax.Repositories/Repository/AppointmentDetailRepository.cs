@@ -18,7 +18,9 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<int> AddAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)
         {
-            return await CreateAsync(appointmentDetail, cancellationToken);
+            _context.Add(appointmentDetail);
+            await _context.SaveChangesAsync(cancellationToken);
+            return appointmentDetail.AppointmentDetailId;
         }
 
         public async Task<bool> DeleteAppointmentDetailAsync(int id, CancellationToken cancellationToken)
@@ -31,7 +33,7 @@ namespace PetVax.Repositories.Repository
             return await GetAllAsync(cancellationToken);
         }
 
-        public async Task<AppointmentDetail?> GetAppointmentDetailByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<AppointmentDetail> GetAppointmentDetailByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await GetByIdAsync(id, cancellationToken);
         }
@@ -96,6 +98,15 @@ namespace PetVax.Repositories.Repository
         {
             return _context.AppointmentDetails
                 .FirstOrDefaultAsync(ad => ad.VetId == vetId, cancellationToken);
+        }
+
+        public async Task<AppointmentDetail> GetAppointmentDetailWithRelationsAsync(int id, CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(ad => ad.Vet)
+                .Include(ad => ad.VaccineBatch)
+                .Include(ad => ad.Disease)
+                .FirstOrDefaultAsync(ad => ad.AppointmentDetailId == id, cancellationToken);
         }
 
         public async Task<int> UpdateAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)

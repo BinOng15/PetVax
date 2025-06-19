@@ -59,7 +59,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid email or password.",
+                        Message = "Email và mật khẩu không hợp lệ.",
                         Data = null
                     };
                 }
@@ -87,7 +87,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "OTP sent to email.",
+                    Message = "Đăng nhập thành công. Vui lòng kiểm tra email để nhận mã OTP.",
                     Data = response
                 };
             }
@@ -113,7 +113,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid or expired OTP.",
+                        Message = "OTP không hợp lệ hoặc đã hết hạn.",
                         Data = null
                     };
                 }
@@ -125,7 +125,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Account not found.",
+                        Message = "Tài khoản không tồn tại.",
                         Data = null
                     };
                 }
@@ -148,7 +148,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "OTP verified successfully.",
+                    Message = "Xác thực OTP thành công.",
                     Data = response
                 };
             }
@@ -264,7 +264,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid email or password.",
+                        Message = "Email và mật khẩu không hợp lệ.",
                         Data = null
                     };
                 }
@@ -314,7 +314,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 409,
                         Success = false,
-                        Message = "The account already exists!"
+                        Message = "Email dã được sử dụng. Vui lòng sử dụng email khác."
                     };
                 }
 
@@ -344,7 +344,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Register successfully. Please check your email to verify OTP!"
+                    Message = "Đăng ký thành công. Vui lòng kiểm tra email để nhận mã OTP xác thực.",
                 };
             }
             catch (ErrorException ex)
@@ -362,7 +362,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Can not save to database: " + ex.Message
+                    Message = "Không thể đăng ký tài khoản. Vui lòng thử lại sau.",
                 };
             }
         }
@@ -377,7 +377,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid or expired OTP."
+                        Message = "Mã OTP không hợp lệ hoặc đã hết hạn."
                     };
                 }
 
@@ -388,7 +388,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Account not found."
+                        Message = "Tài khoản không tồn tại."
                     };
                 }
 
@@ -414,7 +414,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Email verified successfully!"
+                    Message = "Xác thực email thành công. Bạn có thể đăng nhập ngay bây giờ."
                 };
             }
             catch (ErrorException ex)
@@ -452,7 +452,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 202,
                         Success = true,
-                        Message = "Verification email sent.",
+                        Message = "Đã xác thực",
                         Data = new AuthResponseDTO
                         {
                             AccountId = 0,
@@ -474,7 +474,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Login with Google successful.",
+                    Message = "Đăng nhập thành công.",
                     Data = new AuthResponseDTO
                     {
                         AccountId = account.AccountId,
@@ -510,7 +510,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid or expired verification link.",
+                        Message = "Mã xác thực không hợp lệ hoặc đã hết hạn.",
                         Data = null
                     };
                 }
@@ -537,7 +537,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Email verified and account created.",
+                    Message = "Xác thực email thành công.",
                     Data = new AuthResponseDTO
                     {
                         AccountId = account.AccountId,
@@ -613,7 +613,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Account not found.",
+                        Message = "Tài khoản không tồn tại.",
                         Data = null
                     };
                 }
@@ -625,7 +625,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Old password is incorrect.",
+                        Message = "Mật khẩu cũ không đúng.",
                         Data = null
                     };
                 }
@@ -643,10 +643,10 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Password reset successfully.",
+                    Message = "Đặt lại mật khẩu thành công.",
                     Data = new ForgetPasswordResponseDTO
                     {
-                        Message = "Password reset successfully.",
+                        Message = "Mật khẩu đã được đặt lại thành công.",
                         IsSuccess = true
                     }
                 };

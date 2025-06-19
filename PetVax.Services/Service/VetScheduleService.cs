@@ -2,6 +2,7 @@
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
+using PetVax.BusinessObjects.Enum;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -69,7 +70,7 @@ namespace PetVax.Services.Service
                         VetId = vs.VetId,
                         ScheduleDate = vs.ScheduleDate,
                         SlotNumber = vs.SlotNumber,
-                        Status = vs.Status,
+                        Status = EnumList.VetScheduleStatus.Available,
                         CreatedAt = vs.CreatedAt,
                         CreatedBy = vs.CreatedBy
                     }).ToList()
@@ -131,7 +132,7 @@ namespace PetVax.Services.Service
                         VetId = vetSchedule.VetId,
                         ScheduleDate = vetSchedule.ScheduleDate,
                         SlotNumber = vetSchedule.SlotNumber,
-                        Status = vetSchedule.Status,
+                        Status = EnumList.VetScheduleStatus.Available,
                         CreatedAt = vetSchedule.CreatedAt,
                         CreatedBy = vetSchedule.CreatedBy
                     }
@@ -187,7 +188,7 @@ namespace PetVax.Services.Service
                             VetId = request.VetId,
                             ScheduleDate = date,
                             SlotNumber = slot,
-                            Status = request.Status,
+                            Status = EnumList.VetScheduleStatus.Available,
                             CreatedAt = DateTime.UtcNow,
                             CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system"
                         };
@@ -201,7 +202,7 @@ namespace PetVax.Services.Service
                                 VetId = vetSchedule.VetId,
                                 ScheduleDate = vetSchedule.ScheduleDate,
                                 SlotNumber = vetSchedule.SlotNumber,
-                                Status = vetSchedule.Status,
+                                Status = EnumList.VetScheduleStatus.Available,
                                 CreatedAt = vetSchedule.CreatedAt,
                                 CreatedBy = vetSchedule.CreatedBy
                             });
@@ -260,7 +261,7 @@ namespace PetVax.Services.Service
                 vetSchedule.VetId = request.VetId;
                 vetSchedule.ScheduleDate = request.ScheduleDate;
                 vetSchedule.SlotNumber = request.SlotNumber;
-                vetSchedule.Status = request.Status;
+                vetSchedule.Status = EnumList.VetScheduleStatus.Available;
                 vetSchedule.ModifiedAt = DateTime.UtcNow;
                 var updatedVetScheduleId = await _vetScheduleRepository.UpdateVetScheduleAsync(vetSchedule, cancellationToken);
                 if (updatedVetScheduleId <= 0)

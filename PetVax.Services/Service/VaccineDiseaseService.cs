@@ -40,7 +40,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "CreateVaccineDiseaseDTO cannot be null"
+                    Message = "Không có dữ liệu để tạo vaccine disease"
                 };
             }
             try
@@ -59,7 +59,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Failed to create vaccine disease"
+                        Message = "Lỗi khi tạo vaccine disease"
                     };
                 }
 
@@ -68,7 +68,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 201,
                     Success = true,
-                    Message = "Vaccine disease created successfully",
+                    Message = "Tạo vaccine disease thành công",
                     Data = responseDTO
                 };
             }
@@ -79,7 +79,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while creating the vaccine disease"
+                    Message = "Lỗi khi tạo vaccine disease"
                 };
             }
         }
@@ -92,7 +92,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Invalid vaccine disease ID"
+                    Message = "Lỗi ID vaccine disease không hợp lệ"
                 };
             }
             try
@@ -104,14 +104,14 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Vaccine disease not found"
+                        Message = "Vaccine disease không tồn tại hoặc đã bị xóa trước đó"
                     };
                 }
                 return new BaseResponse<bool>
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Vaccine disease deleted successfully",
+                    Message = "Xóa vaccine disease thành công",
                     Data = true
                 };
             }
@@ -122,7 +122,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while deleting the vaccine disease"
+                    Message = "Lỗi khi xóa vaccine disease"
                 };
             }
         }
@@ -160,9 +160,9 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<VaccineDiseaseResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "No vaccine diseases found",
+                        Message = "Không có vaccine diseases nào được tìm thấy",
                         Data = responseData
                     };
                 }
@@ -170,7 +170,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Vaccine diseases retrieved successfully",
+                    Message = "Lấy danh sách vaccine diseases thành công",
                     Data = responseData
                 };
             }
@@ -181,7 +181,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while retrieving vaccine diseases"
+                    Message = "Lỗi khi lấy danh sách vaccine diseases",
                 };
             }
         }
@@ -194,7 +194,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Invalid disease ID"
+                    Message = "Không có ID bệnh hợp lệ"
                 };
             }
             try
@@ -204,9 +204,9 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<VaccineDiseaseResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "Vaccine disease not found"
+                        Message = "Vaccine disease không tồn tại cho bệnh này"
                     };
                 }
                 var responseDTO = _mapper.Map<VaccineDiseaseResponseDTO>(vaccineDisease);
@@ -214,7 +214,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Vaccine disease retrieved successfully",
+                    Message = "Lấy vaccine disease thành công",
                     Data = responseDTO
                 };
             }
@@ -225,7 +225,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while retrieving the vaccine disease"
+                    Message = "Lỗi khi lấy vaccine disease cho bệnh này"
                 };
             }
         }
@@ -238,7 +238,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Invalid vaccine disease ID"
+                    Message = "Không có ID vaccine disease hợp lệ"
                 };
             }
             try
@@ -248,9 +248,9 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<VaccineDiseaseResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "Vaccine disease not found"
+                        Message = "Vaccine disease không tồn tại"
                     };
                 }
                 var responseDTO = _mapper.Map<VaccineDiseaseResponseDTO>(vaccineDisease);
@@ -258,7 +258,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Vaccine disease retrieved successfully",
+                    Message = "Lấy vaccine disease thành công",
                     Data = responseDTO
                 };
             }
@@ -269,7 +269,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while retrieving the vaccine disease"
+                    Message = "Lỗi khi lấy vaccine disease"
                 };
             }
         }
@@ -282,7 +282,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Invalid vaccine ID"
+                    Message = "Không có ID vaccine hợp lệ"
                 };
             }
             try
@@ -292,9 +292,9 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<VaccineDiseaseResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "Vaccine disease not found"
+                        Message = "Vaccine disease không tồn tại cho vaccine này"
                     };
                 }
                 var responseDTO = _mapper.Map<VaccineDiseaseResponseDTO>(vaccineDisease);
@@ -302,7 +302,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Vaccine disease retrieved successfully",
+                    Message = "Lấy vaccine disease thành công",
                     Data = responseDTO
                 };
             }
@@ -313,7 +313,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while retrieving the vaccine disease"
+                    Message = "Lỗi khi lấy vaccine disease cho vaccine này"
                 };
             }
         }
@@ -326,7 +326,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Invalid vaccine disease ID or update data"
+                    Message = "Không có ID vaccine disease hợp lệ hoặc dữ liệu cập nhật không hợp lệ"
                 };
             }
             try
@@ -338,7 +338,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Vaccine disease not found"
+                        Message = "Vaccine disease không tồn tại"
                     };
                 }
                 var updatedVaccineDisease = _mapper.Map(updateVaccineDiseaseDTO, existingVaccineDisease);
@@ -351,7 +351,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Failed to update vaccine disease"
+                        Message = "Lỗi khi cập nhật vaccine disease"
                     };
                 }
                 var responseDTO = _mapper.Map<VaccineDiseaseResponseDTO>(updatedVaccineDisease);
@@ -359,7 +359,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Vaccine disease updated successfully",
+                    Message = "Cập nhật vaccine disease thành công",
                     Data = responseDTO
                 };
             }
@@ -370,7 +370,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while updating the vaccine disease"
+                    Message = "Lỗi khi cập nhật vaccine disease"
                 };
             }
         }
