@@ -107,7 +107,7 @@ namespace PetVax.Services.Service
                     _logger.LogInformation("No pets found for the given criteria");
                     return new DynamicResponse<PetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "No vets found",
                         Data = responseData
@@ -146,7 +146,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Pet with ID {PetId} not found", updatePetRequest.PetId);
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Pet not found",
                         Data = null
@@ -243,7 +243,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Pet with ID {PetId} not found", petId);
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Pet not found",
                         Data = null
@@ -291,17 +291,7 @@ namespace PetVax.Services.Service
 
         public async Task<BaseResponse<PetResponseDTO>> CreatePetAsync(CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken)
         {
-            if (createPetRequest == null)
-            {
-                _logger.LogError("CreatePetRequestDTO is null");
-                return new BaseResponse<PetResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Invalid request data",
-                    Data = null
-                };
-            }
+        
             try
             {
                 var pet = _mapper.Map<Pet>(createPetRequest);
@@ -345,7 +335,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 500,
+                        Code = 200,
                         Success = false,
                         Message = "Failed to create pet",
                         Data = null
@@ -366,7 +356,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Failed to create vaccine profile for pet with ID {PetId}", pet.PetId);
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 500,
+                        Code = 200,
                         Success = false,
                         Message = "Lỗi khi tạo hồ sơ tiêm chủng cho thú cưng",
                         Data = null
@@ -412,7 +402,7 @@ namespace PetVax.Services.Service
                     {
                         new BaseResponse<PetResponseDTO>
                         {
-                            Code = 404,
+                            Code = 200,
                             Success = false,
                             Message = "Customer not found",
                             Data = null

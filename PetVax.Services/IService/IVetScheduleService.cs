@@ -12,7 +12,7 @@ namespace PetVax.Services.IService
     {
         Task<List<BaseResponse<VetScheduleDTO>>> GetAllVetSchedulesAsync(CancellationToken cancellationToken);
         Task<BaseResponse<VetScheduleDTO>> GetVetScheduleByIdAsync(int vetScheduleId, CancellationToken cancellationToken);
-        Task<BaseResponse<VetScheduleDTO>> CreateVetScheduleAsync(CreateVetScheduleRequestDTO request, CancellationToken cancellationToken);
+        Task<BaseResponse<List<VetScheduleDTO>>> CreateVetScheduleAsync(CreateVetScheduleRequestDTO request, CancellationToken cancellationToken);
         Task<BaseResponse<VetScheduleDTO>> UpdateVetScheduleAsync(UpdateVetScheduleRequestDTO request, CancellationToken cancellationToken);
         Task<List<BaseResponse<VetScheduleDTO>>> GetAllVetSchedulesByVetIdAsync(int vetId, CancellationToken cancellationToken);
         Task<BaseResponse<VetScheduleDTO>> DeleteVetScheduleAsync(int vetScheduleId, CancellationToken cancellationToken);

@@ -21,7 +21,7 @@ namespace PetVax.BusinessObjects.Models
         public DateTime InstallationDate { get; set; } // Date when the microchip was installed
         public string Status { get; set; } // e.g., "Active", "Inactive", "Lost"
         public DateTime CreatedAt { get; set; } // Date when the record was created
-        public string CreatedBy { get; set; } // User who created the record
+        public string? CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
 

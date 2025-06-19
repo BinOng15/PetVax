@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PediVax.BusinessObjects.DBContext;
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250618160159_deploy_ver4")]
+    partial class deploy_ver4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,11 +71,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 18, 16, 2, 53, 180, DateTimeKind.Utc).AddTicks(8126),
+                            CreatedAt = new DateTime(2025, 6, 18, 16, 1, 59, 212, DateTimeKind.Utc).AddTicks(2039),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "Mjno4B507f+5gyc9kXFwMd3xhgiBeo/ENKTcRz1x1Co=",
-                            PasswordSalt = "jmv+HwVVg5kNNq6svnp2qGml17CaH56FertfPMDxHmI=",
+                            PasswordHash = "o4CEClMUlDktFO+7P5yim8DuaAan2ykfVoQcYB1f9V8=",
+                            PasswordSalt = "JcB/CpaEdUAWMDS1Cpe8R+ZOQhb1Hutw6h7o5lenR+Y=",
                             RefereshToken = "",
                             Role = 1,
                             isVerify = true
@@ -81,11 +84,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 18, 16, 2, 53, 180, DateTimeKind.Utc).AddTicks(8131),
+                            CreatedAt = new DateTime(2025, 6, 18, 16, 1, 59, 212, DateTimeKind.Utc).AddTicks(2046),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "jABiHgaGfhVnAqe2d0AtpZeYDbklUbasHmkVZ5hE3+A=",
-                            PasswordSalt = "4yVipqODBS0hScnZLFUfnQUFHm4UANVxcnaQF1BYmj8=",
+                            PasswordHash = "QjqF33sw8CJ5U7GSAVRqO40yUpBtr1WOCKE7Db/TZXY=",
+                            PasswordSalt = "bg4WDf06M3pXYit/fqsTsRYn1ZlPNoapMkkxKW7EKKE=",
                             RefereshToken = "",
                             Role = 2,
                             isVerify = true

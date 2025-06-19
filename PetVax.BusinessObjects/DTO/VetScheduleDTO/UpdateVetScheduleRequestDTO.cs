@@ -13,6 +13,5 @@ namespace PetVax.BusinessObjects.DTO.VetScheduleDTO
         public DateTime ScheduleDate { get; set; } 
         public int SlotNumber { get; set; } 
         public string Status { get; set; } 
-        public string CreatedBy { get; set; } 
     }
 }

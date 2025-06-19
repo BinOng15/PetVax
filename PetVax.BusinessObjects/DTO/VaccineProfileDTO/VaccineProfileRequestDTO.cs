@@ -10,6 +10,7 @@ namespace PetVax.BusinessObjects.DTO.VaccineProfileDTO
     {
         public int PetId { get; set; } // Foreign key to Pet table
         public int DiseaseId { get; set; }
+        public int? AppointmentDetailId { get; set; } // Foreign key to AppointmentDetail table, if applicable
         public DateTime? PreferedDate { get; set; } // Preferred date for the vaccination in "yyyy-MM-dd" format
         public DateTime? VaccinationDate { get; set; } // Actual date of vaccination in "yyyy-MM-dd" format
         public string? Dose { get; set; } // e.g., "1st Dose", "2nd Dose"

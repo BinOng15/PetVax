@@ -4,6 +4,7 @@ using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.MicrochipDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
@@ -91,6 +92,8 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<AppointmentDetail, AppointmentDetailResponseDTO>();
             CreateMap<AppointmentDetail, AppointmentVaccinationDetailResponseDTO>();
 
+            //Microchip
+            CreateMap<Microchip, MicrochipResponseDTO>();   
         }
     }   
 }
