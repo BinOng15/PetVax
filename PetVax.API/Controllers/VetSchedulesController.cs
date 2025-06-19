@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PediVax.BusinessObjects.DBContext;
+using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
 using PetVax.BusinessObjects.Models;
 using PetVax.Services.IService;
+using PetVax.Services.Service;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PediVax.Controllers
 {
@@ -26,12 +28,18 @@ namespace PediVax.Controllers
 
         [HttpGet("Get-all-schedules")]
         [Authorize(Roles = "Admin, Vet, Staff")]
-        public async Task<ActionResult> GetVetSchedules(CancellationToken cancellationToken)
+        public async Task<ActionResult> GetVetSchedules([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, CancellationToken cancellationToken = default)
         {
-            var response = await _vetScheduleService.GetAllVetSchedulesAsync(cancellationToken);
-
-            return Ok(response);
+            var request = new GetAllItemsDTO
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                KeyWord = keyWord
+            };
+            var response = await _vetScheduleService.GetAllVetSchedulesAsync(request, cancellationToken);
+            return StatusCode(response.Code, response);
         }
+        
 
         [HttpGet("Get-schedule-by-id/{vetScheduleId}")]
         [Authorize(Roles = "Admin, Vet, Staff")]
