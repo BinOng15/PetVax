@@ -26,7 +26,7 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; } // User who last modified the record
 
         // Navigation properties
-        public virtual ICollection<VaccineProfile> VaccineProfiles { get; set; } // Navigation to VaccineProfile table
+        public virtual ICollection<VaccineProfileDisease> VaccineProfileDiseases { get; set; }
         public virtual ICollection<VaccineDisease> VaccineDiseases { get; set; }
         public virtual ICollection<VaccinationSchedule> VaccinationSchedules { get; set; } // Navigation to VaccinationSchedule table
 

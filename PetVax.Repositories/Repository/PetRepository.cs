@@ -30,7 +30,7 @@ namespace PetVax.Repositories.Repository
             return await GetAllAsync(cancellationToken);
         }
 
-        public Task<Pet> GetPetAndAppointmentByIdAsync(int petId, CancellationToken cancellationToken)
+        public Task<Pet> GetPetAndAppointmentByIdAsync(int? petId, CancellationToken cancellationToken)
         {
             return _context.Pets
                 .Include(p => p.Appointments)
@@ -59,5 +59,6 @@ namespace PetVax.Repositories.Repository
         {
             return await UpdateAsync(pet, cancellationToken);
         }
+
     }
 }

@@ -25,8 +25,13 @@ namespace PediVax.Controllers
         [Authorize]
         public IActionResult GetCurrentAccount(CancellationToken cancellationToken)
         {
-            var accountIdClaim = User.Claims
-                .FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier && int.TryParse(a.Value, out _))?.Value;
+            // Lấy claim AccountId và chuyển sang int, mặc định là 0 nếu không có
+            int accountId = 0;
+            var accountIdClaim = User.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier);
+            if (accountIdClaim != null)
+            {
+                int.TryParse(accountIdClaim.Value, out accountId);
+            }
 
             var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "Unknown";
             var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value ?? "Customer";
@@ -34,14 +39,14 @@ namespace PediVax.Controllers
             // Chuyển đổi chuỗi role sang enum Role
             if (!Enum.TryParse<EnumList.Role>(roleClaim, true, out var role))
             {
-                role = EnumList.Role.Customer; // Giá trị mặc định nếu không parse được
+                role = EnumList.Role.Customer;
             }
 
             return Ok(new
             {
-                AccountId = accountIdClaim,
+                AccountId = accountId, // Trả về int
                 Email = email,
-                Role = role // Trả về enum Role
+                Role = role
             });
         }
 

@@ -83,6 +83,7 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<VaccineExport> VaccineExports { get; set; }
         public DbSet<VaccineExportDetail> VaccineExportDetails { get; set; }
         public DbSet<VaccineProfile> VaccineProfiles { get; set; }
+        public DbSet<VaccineProfileDisease> VaccineProfileDiseases { get; set; }
         public DbSet<VaccineReceipt> VaccineReceipts { get; set; }
         public DbSet<VaccineReceiptDetail> VaccineReceiptDetails { get; set; }
         public DbSet<Vet> Vets { get; set; }
@@ -266,11 +267,16 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey(vd => vd.DiseaseId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // VaccineProfile - Disease (N-1)
-            modelBuilder.Entity<VaccineProfile>()
-                .HasOne(vp => vp.Disease)
-                .WithMany(d => d.VaccineProfiles)
-                .HasForeignKey(vp => vp.DiseaseId)
+            modelBuilder.Entity<VaccineProfileDisease>()
+                .HasOne(vpd => vpd.Disease)
+                .WithMany(vpd => vpd.VaccineProfileDiseases)
+                .HasForeignKey(vpd => vpd.DiseaseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VaccineProfileDisease>()
+                .HasOne(vpd => vpd.VaccineProfile)
+                .WithMany(vpd => vpd.VaccineProfileDiseases)
+                .HasForeignKey(vpd => vpd.VaccineProfileId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<VaccinationSchedule>()

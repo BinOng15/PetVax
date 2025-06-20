@@ -20,8 +20,10 @@ namespace PetVax.Services.IService
         Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByAppointmentId(int appointmentId, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByPetId(int petId, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByVetId(int vetId, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByServiceType(EnumList.ServiceType serviceType, CancellationToken cancellationToken);
+        Task<BaseResponse<List<AppointmentDetailResponseDTO>>> GetAppointmentDetailByServiceType(EnumList.ServiceType serviceType, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByStatus(EnumList.AppointmentStatus status, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentDetailId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>> GetAppointmentVaccinationByPetId(int petId, CancellationToken cancellationToken);
+        Task<BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>> GetAppointmentVaccinationByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken);
     }
 }

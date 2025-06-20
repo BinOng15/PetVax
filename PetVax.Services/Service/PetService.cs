@@ -24,12 +24,13 @@ namespace PetVax.Services.Service
         private readonly IPetRepository _petRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IVaccineProfileRepository _vaccineProfileRepository;
+        private readonly IVaccineProfileDiseaseRepository _vaccineProfileDiseaseRepository;
         private readonly ILogger<PetService> _logger;
         private readonly IMapper _mapper;
         private readonly ICloudinariService _cloudinariService;
         private readonly IHttpContextAccessor _httpContextAccessor;
             
-        public PetService(IPetRepository petRepository, ICustomerRepository customerRepository, ILogger<PetService> logger, IMapper mapper, ICloudinariService cloudinariService, IHttpContextAccessor httpContextAccessor, IVaccineProfileRepository vaccineProfileRepository)
+        public PetService(IPetRepository petRepository, ICustomerRepository customerRepository, ILogger<PetService> logger, IMapper mapper, ICloudinariService cloudinariService, IHttpContextAccessor httpContextAccessor, IVaccineProfileRepository vaccineProfileRepository, IVaccineProfileDiseaseRepository vaccineProfileDiseaseRepository)
         {
             _petRepository = petRepository;
             _customerRepository = customerRepository;
@@ -38,6 +39,8 @@ namespace PetVax.Services.Service
             _cloudinariService = cloudinariService;
             _httpContextAccessor = httpContextAccessor;
             _vaccineProfileRepository = vaccineProfileRepository;
+            _vaccineProfileDiseaseRepository = vaccineProfileDiseaseRepository;
+            _vaccineProfileDiseaseRepository = vaccineProfileDiseaseRepository;
         }
 
         public async Task<DynamicResponse<PetResponseDTO>> GetAllPetsAsync(GetAllPetsRequestDTO getAllPetsRequest, CancellationToken cancellationToken)
@@ -366,6 +369,13 @@ namespace PetVax.Services.Service
                 {
                     _logger.LogInformation("Vaccine profile created successfully for pet with ID {PetId}", pet.PetId);
                 }
+
+                var vaccineProfileDisease = new VaccineProfileDisease
+                {
+                    DiseaseId = null,
+                    VaccineProfileId = vaccineProfile.VaccineProfileId,
+                };
+                await _vaccineProfileDiseaseRepository.CreateVaccineProfileDiseaseAsync(vaccineProfileDisease, cancellationToken);
 
                 var createdPet = await _petRepository.GetPetByIdAsync(pet.PetId, cancellationToken);
                 var responseDTO = _mapper.Map<PetResponseDTO>(createdPet);

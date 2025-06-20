@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.DTO.DiseaseDTO;
+﻿using PetVax.BusinessObjects.DTO.AppointmentDTO;
+using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.Enum;
@@ -62,6 +63,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public VetResponseDTO Vet { get; set; } // Navigation to Vet table
         public VaccineBatchResponseDTO VaccineBatch { get; set; } // Navigation to VaccineBatch table
         public DiseaseResponseDTO Disease { get; set; } // Navigation to Disease table, if applicable (for vaccinations)
+        public AppointmentResponseDTO Appointment { get; set; } // Navigation to Appointment table
     }
 
     public class AppointmentMicrochipResponseDTO

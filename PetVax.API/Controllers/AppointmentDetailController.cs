@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.Enum;
 using PetVax.Services.IService;
+using PetVax.Services.Service;
 
 namespace PediVax.Controllers
 {
@@ -32,42 +34,6 @@ namespace PediVax.Controllers
             var response = await _appointmentDetailService.GetAllAppointmentDetail(request, cancellationToken);
             return StatusCode(response.Code, response);
         }
-        [HttpGet("get-appointment-detail-by-id/{appointmentDetailId}")]
-        public async Task<IActionResult> GetAppointmentDetailById(int appointmentDetailId, CancellationToken cancellationToken)
-        {
-            var response = await _appointmentDetailService.GetAppointmentDetailById(appointmentDetailId, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
-        [HttpGet("get-appointment-detail-by-appointment-id/{appointmentId}")]
-        public async Task<IActionResult> GetAppointmentDetailByAppointmentId(int appointmentId, CancellationToken cancellationToken)
-        {
-            var response = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(appointmentId, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
-        [HttpGet("get-appointment-detail-by-pet-id/{petId}")]
-        public async Task<IActionResult> GetAppointmentDetailByPetId(int petId, CancellationToken cancellationToken)
-        {
-            var response = await _appointmentDetailService.GetAppointmentDetailByPetId(petId, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
-        [HttpGet("get-appointment-detail-by-vet-id/{vetId}")]
-        public async Task<IActionResult> GetAppointmentDetailByVetId(int vetId, CancellationToken cancellationToken)
-        {
-            var response = await _appointmentDetailService.GetAppointmentDetailByVetId(vetId, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
-        [HttpGet("get-appointment-detail-by-service-type/{serviceType}")]
-        public async Task<IActionResult> GetAppointmentDetailByServiceType(EnumList.ServiceType serviceType, CancellationToken cancellationToken)
-        {
-            var response = await _appointmentDetailService.GetAppointmentDetailByServiceType(serviceType, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
-        [HttpGet("get-appointment-detail-by-status/{status}")]
-        public async Task<IActionResult> GetAppointmentDetailByStatus(EnumList.AppointmentStatus status, CancellationToken cancellationToken)
-        {
-            var response = await _appointmentDetailService.GetAppointmentDetailByStatus(status, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
         //[HttpPost("create-appointment-detail")]
         //public async Task<IActionResult> CreateAppointmentDetail([FromBody] CreateAppointmentDetailDTO createAppointmentDetailDTO, CancellationToken cancellationToken)
         //{
@@ -80,10 +46,29 @@ namespace PediVax.Controllers
         //    var response = await _appointmentDetailService.UpdateAppointmentDetail(appointmentDetailId, updateAppointmentDetailDTO, cancellationToken);
         //    return StatusCode(response.Code, response);
         //}
+        [HttpGet("get-appointment-detail-by-service-type/{serviceType}")]
+        public async Task<IActionResult> GetAppointmentByServiceType (EnumList.ServiceType serviceType, CancellationToken cancellationToken)
+        {
+            var response = await _appointmentDetailService.GetAppointmentDetailByServiceType(serviceType, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
         [HttpDelete("delete-appointment-detail/{appointmentDetailId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteAppointmentDetail(int appointmentDetailId, CancellationToken cancellationToken)
         {
             var response = await _appointmentDetailService.DeleteAppointmentDetail(appointmentDetailId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+        [HttpGet("get-appointment-vaccination-by-pet-id/{petId}")]
+        public async Task<IActionResult> GetAppointmentVaccinationByPetId(int petId, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentDetailService.GetAppointmentVaccinationByPetId(petId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+        [HttpGet("get-appointment-vaccination-by-pet-id-and-status/{petId}/{status}")]
+        public async Task<IActionResult> GetAppointmentVaccinationByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentDetailService.GetAppointmentVaccinationByPetIdAndStatus(petId, status, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }

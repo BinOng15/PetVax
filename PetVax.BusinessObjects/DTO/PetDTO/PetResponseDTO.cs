@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PetVax.BusinessObjects.DTO.CustomerDTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,5 +24,7 @@ namespace PetVax.BusinessObjects.DTO.PetDTO
         public string Color { get; set; } 
         public string Nationality { get; set; }
         public bool isSterilized { get; set; }
+
+        public CustomerResponseDTO CustomerResponseDTO { get; set; }
     }
 }

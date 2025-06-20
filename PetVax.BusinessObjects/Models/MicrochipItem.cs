@@ -15,7 +15,7 @@ namespace PetVax.BusinessObjects.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MicrochipItemId { get; set; }
         public int MicrochipId { get; set; } // Foreign key to Microchip table
-        public int PetId { get; set; } // Foreign key to Pet table
+        public int? PetId { get; set; } // Foreign key to Pet table
         public string Name { get; set; } // e.g., "Microchip A", "Microchip B"
         public string Description { get; set; } // e.g., "Microchip for pet identification"
         public DateTime InstallationDate { get; set; } // Date when the microchip was installed

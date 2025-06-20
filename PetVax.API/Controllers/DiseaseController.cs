@@ -67,5 +67,11 @@ namespace PediVax.Controllers
             var response = await _diseaseService.GetDiseaseByVaccineIdAsync(vaccineId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpGet("get-disease-by-species/{species}")]
+        public async Task<IActionResult> GetDiseaseBySpecies(string species, CancellationToken cancellationToken)
+        {
+            var response = await _diseaseService.GetDiseaseBySpeciesAsync(species, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

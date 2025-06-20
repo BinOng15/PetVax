@@ -16,7 +16,6 @@ namespace PetVax.Repositories.Repository
         {
         }
 
-       
         public async Task<int> CreateDiseaseAsync(Disease disease, CancellationToken cancellationToken)
         {
             return await CreateAsync(disease, cancellationToken);
@@ -41,6 +40,23 @@ namespace PetVax.Repositories.Repository
             return await _context.Diseases
                 .FirstOrDefaultAsync(d => d.Name == name, cancellationToken);
         }
+
+        public async Task<List<Disease>> GetDiseaseBySpecies(string species, CancellationToken cancellationToken)
+        {
+            return await _context.Diseases
+                .Where(d => d.Species == species)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Disease>> GetDiseaseByVaccineId(int vaccineId, CancellationToken cancellationToken)
+        {
+            return await _context.VaccineDiseases
+                .Where(vd => vd.VaccineId == vaccineId)
+                .Include(vd => vd.Disease)
+                .Select(vd => vd.Disease)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<int> UpdateDiseaseAsync(Disease disease, CancellationToken cancellationToken)
         {
             return await UpdateAsync(disease, cancellationToken);

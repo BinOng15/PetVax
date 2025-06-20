@@ -1,4 +1,5 @@
 ﻿using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.VaccineProfileDiseaseDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,6 @@ namespace PetVax.BusinessObjects.DTO.VaccineProfileDTO
     {
         public int VaccineProfileId { get; set; } 
         public int PetId { get; set; } 
-
         public DateTime? PreferedDate { get; set; } 
         public DateTime? VaccinationDate { get; set; }
         public string? Dose { get; set; } 
@@ -21,6 +21,6 @@ namespace PetVax.BusinessObjects.DTO.VaccineProfileDTO
         public bool? IsCompleted { get; set; } 
         public DateTime CreatedAt { get; set; } 
 
-        public DiseaseResponseDTO Disease { get; set; }
+        public List<VaccineProfileDiseaseResponse> VaccineProfileDiseaseResponse { get; set; }
     }
 }
