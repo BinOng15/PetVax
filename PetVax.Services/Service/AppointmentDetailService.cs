@@ -200,9 +200,35 @@ namespace PetVax.Services.Service
                 var details = await _appointmentDetailRepository.GetAllAppointmentDetailsAsync(cancellationToken);
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
-                    details = details.Where(d => d.AppointmentDetailCode.Contains(getAllItemsDTO.KeyWord.ToLower(), StringComparison.OrdinalIgnoreCase)).ToList();
-                }
+                    var keyword = getAllItemsDTO.KeyWord.ToLower();
+                    details = details
+                        .Where(d =>
+                            // Search by AppointmentDetailCode
+                            (d.AppointmentDetailCode != null && d.AppointmentDetailCode.ToLower().Contains(keyword)) ||
 
+                            // Search by Vet name
+                            (d.Vet != null && d.Vet.Name != null && d.Vet.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Vaccine batch code
+                            (d.VaccineBatch != null && d.VaccineBatch.Vaccine.Name != null && d.VaccineBatch.Vaccine.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Disease name
+                            (d.Disease != null && d.Disease.Name != null && d.Disease.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Microchip code
+                            (d.MicrochipItem != null && d.MicrochipItem.Name != null && d.MicrochipItem.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by ServiceType (enum)
+                            (d.ServiceType.ToString().ToLower().Contains(keyword)) ||
+
+                            // Search by Appointment status (enum)
+                            (d.AppointmentStatus.ToString().ToLower().Contains(keyword)) ||
+
+                            // Search by Dose information
+                            (d.Dose != null && d.Dose.ToLower().Contains(keyword))
+                        )
+                        .ToList();
+                }
                 int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
                 int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
                 int skip = (pageNumber - 1) * pageSize;

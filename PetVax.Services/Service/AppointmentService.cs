@@ -392,8 +392,30 @@ namespace PetVax.Services.Service
                 {
                     var keyword = getAllItemsDTO.KeyWord.ToLower();
                     appointments = appointments
-                        .Where(a => a.AppointmentCode.ToLower().Contains(keyword) ||
-                        a.Pet.Name.ToLower().Contains(keyword)).ToList();
+                        .Where(a =>
+                            // Search by AppointmentCode (case-insensitive)
+                            (a.AppointmentCode != null && a.AppointmentCode.ToLower().Contains(keyword)) ||
+
+                            // Search by Pet Name (case-insensitive, check null)
+                            (a.Pet != null &&
+                             a.Pet.Name != null &&
+                             a.Pet.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Customer FullName (case-insensitive, check null)
+                            (a.Customer != null &&
+                             a.Customer.FullName != null &&
+                             a.Customer.FullName.ToLower().Contains(keyword)) ||
+
+                            // Search by Location (convert enum to string)
+                            (a.Location.ToString().ToLower().Contains(keyword)) ||
+
+                            // Search by ServiceType (convert enum to string)
+                            (a.ServiceType.ToString().ToLower().Contains(keyword)) ||
+
+                            // Search by Address (case-insensitive, check null)
+                            (a.Address != null && a.Address.ToLower().Contains(keyword))
+                        )
+                        .ToList();
                 }
 
                 int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
