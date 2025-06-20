@@ -61,16 +61,6 @@ namespace PetVax.Services.Service
                         IsActive = vp.IsActive,
                         IsCompleted = vp.IsCompleted,
                         CreatedAt = vp.CreatedAt,
-
-                        Disease = new DiseaseResponseDTO
-                        {
-                            DiseaseId = vp.Disease.DiseaseId,
-                            Name = vp.Disease.Name,
-                            Description = vp.Disease.Description,
-                            Species = vp.Disease.Species,
-                            Symptoms = vp.Disease.Symptoms,
-                            Treatment = vp.Disease.Treatment
-                        }
                     },
                     Success = true,
                     Message = "Vaccine profiles retrieved successfully."
@@ -119,15 +109,7 @@ namespace PetVax.Services.Service
                         IsActive = vaccineProfile.IsActive,
                         IsCompleted = vaccineProfile.IsCompleted,
                         CreatedAt = vaccineProfile.CreatedAt,
-                        Disease = new DiseaseResponseDTO
-                        {
-                            DiseaseId = vaccineProfile.Disease.DiseaseId,
-                            Name = vaccineProfile.Disease.Name,
-                            Description = vaccineProfile.Disease.Description,
-                            Species = vaccineProfile.Disease.Species,
-                            Symptoms = vaccineProfile.Disease.Symptoms,
-                            Treatment = vaccineProfile.Disease.Treatment
-                        }
+
                     },
                     Success = true,
                     Message = "Vaccine profile retrieved successfully."
@@ -195,7 +177,6 @@ namespace PetVax.Services.Service
                 VaccineProfile vaccineProfile = new VaccineProfile();
 
                 vaccineProfile.PetId = vaccineProfileRequest.PetId;
-                vaccineProfile.DiseaseId = vaccineProfileRequest.DiseaseId;
                 vaccineProfile.AppointmentDetailId = vaccineProfileRequest.AppointmentDetailId;
                 vaccineProfile.PreferedDate = vaccineProfileRequest.PreferedDate;
                 vaccineProfile.VaccinationDate = vaccineProfileRequest.VaccinationDate;
@@ -256,15 +237,6 @@ namespace PetVax.Services.Service
                         IsActive = vaccineProfile.IsActive,
                         IsCompleted = vaccineProfile.IsCompleted,
                         CreatedAt = DateTime.UtcNow, // Assuming CreatedAt is set to current time
-                        Disease = new DiseaseResponseDTO
-                        {
-                            DiseaseId = vaccineProfile.Disease?.DiseaseId ?? 0, // Assuming Disease is optional
-                            Name = vaccineProfile.Disease?.Name ?? string.Empty,
-                            Description = vaccineProfile.Disease?.Description ?? string.Empty,
-                            Species = vaccineProfile.Disease?.Species ?? string.Empty,
-                            Symptoms = vaccineProfile.Disease?.Symptoms ?? string.Empty,
-                            Treatment = vaccineProfile.Disease?.Treatment ?? string.Empty
-                        }
                     },
                     Success = true,
                     Message = "Vaccine profile created successfully."
@@ -317,7 +289,6 @@ namespace PetVax.Services.Service
                     };
                 }
                 existingVaccineProfile.PetId = vaccineProfileRequest.PetId;
-                existingVaccineProfile.DiseaseId = vaccineProfileRequest.DiseaseId;
                 existingVaccineProfile.PreferedDate = vaccineProfileRequest.PreferedDate;
                 existingVaccineProfile.VaccinationDate = vaccineProfileRequest.VaccinationDate;
                 existingVaccineProfile.Dose = vaccineProfileRequest.Dose;
@@ -349,15 +320,6 @@ namespace PetVax.Services.Service
                         IsActive = existingVaccineProfile.IsActive,
                         IsCompleted = existingVaccineProfile.IsCompleted,
                         CreatedAt = existingVaccineProfile.CreatedAt, // Assuming CreatedAt is not changed during update
-                        Disease = new DiseaseResponseDTO
-                        {
-                            DiseaseId = existingVaccineProfile.Disease?.DiseaseId ?? 0, // Assuming Disease is optional
-                            Name = existingVaccineProfile.Disease?.Name ?? string.Empty,
-                            Description = existingVaccineProfile.Disease?.Description ?? string.Empty,
-                            Species = existingVaccineProfile.Disease?.Species ?? string.Empty,
-                            Symptoms = existingVaccineProfile.Disease?.Symptoms ?? string.Empty,
-                            Treatment = existingVaccineProfile.Disease?.Treatment ?? string.Empty
-                        }
                     },
                     Success = true,
                     Message = "Vaccine profile updated successfully."

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PediVax.BusinessObjects.DBContext;
 
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250620041828_updateVaccineProfile")]
+    partial class updateVaccineProfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,11 +70,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 20, 4, 54, 27, 810, DateTimeKind.Utc).AddTicks(8406),
+                            CreatedAt = new DateTime(2025, 6, 20, 4, 18, 27, 909, DateTimeKind.Utc).AddTicks(4115),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "8VzVC8ZkIKucKf3PLFSWELantOpEDs13PZuntFtTh+E=",
-                            PasswordSalt = "bRAeKdzBVyMwe5HEEL7ZHXcvFy4ZP34parKCeM5zzeI=",
+                            PasswordHash = "Dgfh2wQOJnNC/frYzubEQ4tolWjTSknB5QbU/g/DwVI=",
+                            PasswordSalt = "S/B15Dte8OS1ebk+LejlI1mxntSTwmdBiCFOwmXlOtI=",
                             RefereshToken = "",
                             Role = 1,
                             isVerify = true
@@ -80,11 +83,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 20, 4, 54, 27, 810, DateTimeKind.Utc).AddTicks(8411),
+                            CreatedAt = new DateTime(2025, 6, 20, 4, 18, 27, 909, DateTimeKind.Utc).AddTicks(4123),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "+Dt2sQ5ZEIwA393R0hDJKrhlAYPiPutwrA2ISA5tveE=",
-                            PasswordSalt = "PaxPOQo1d3lG18iW3dwXsoNM5fOMujAfVJkVrEgQj3Y=",
+                            PasswordHash = "CscrmXOnndGByCni+eD80fnPGq0fqmvjTghwEx7udQM=",
+                            PasswordSalt = "sgcrtpJdOEYZwcV7oJIJ586gAECI7oGFvKlsFeqH9/8=",
                             RefereshToken = "",
                             Role = 2,
                             isVerify = true
@@ -1236,10 +1239,10 @@ namespace PetVax.BusinessObjects.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VaccineProfileDiseasesId"));
 
-                    b.Property<int?>("DiseaseId")
+                    b.Property<int>("DiseaseId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("VaccineProfileId")
+                    b.Property<int>("VaccineProfileId")
                         .HasColumnType("int");
 
                     b.HasKey("VaccineProfileDiseasesId");
@@ -1733,12 +1736,14 @@ namespace PetVax.BusinessObjects.Migrations
                     b.HasOne("PetVax.BusinessObjects.Models.Disease", "Disease")
                         .WithMany("VaccineProfileDiseases")
                         .HasForeignKey("DiseaseId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("PetVax.BusinessObjects.Models.VaccineProfile", "VaccineProfile")
                         .WithMany("VaccineProfileDiseases")
                         .HasForeignKey("VaccineProfileId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Disease");
 

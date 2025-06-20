@@ -37,6 +37,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVetRepository, VetRepository>();          
             services.AddScoped<IVetScheduleRepository, VetScheduleRepository>();
             services.AddScoped<IMicrochipRepository, MicrochipRepository>();
+            services.AddScoped<IVaccineProfileDiseaseRepository, VaccineProfileDiseaseRepository>();
 
 
             //Register services

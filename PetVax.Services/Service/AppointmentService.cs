@@ -32,6 +32,7 @@ namespace PetVax.Services.Service
         private readonly IVaccineBatchRepository _vaccineBatchRepository;
         private readonly IVaccineProfileRepository _vaccineProfileRepository;
         private readonly IVetScheduleRepository _vetScheduleRepository;
+        private readonly IVaccineProfileDiseaseRepository _vaccineProfileDiseaseRepository;
         private readonly ILogger<AppointmentService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -44,6 +45,7 @@ namespace PetVax.Services.Service
             IAppointmentDetailRepository appointmentDetailRepository,
             IVaccineBatchRepository vaccineBatchRepository,
             IVaccineProfileRepository vaccineProfileRepository,
+            IVaccineProfileDiseaseRepository vaccineProfileDiseaseRepository,
             IVetScheduleRepository vetScheduleRepository,
             ILogger<AppointmentService> logger,
             IMapper mapper,
@@ -56,6 +58,7 @@ namespace PetVax.Services.Service
             _appointmentDetailRepository = appointmentDetailRepository;
             _vaccineBatchRepository = vaccineBatchRepository;
             _vaccineProfileRepository = vaccineProfileRepository;
+            _vaccineProfileDiseaseRepository = vaccineProfileDiseaseRepository;
             _vetScheduleRepository = vetScheduleRepository;
             _logger = logger;
             _mapper = mapper;
@@ -755,7 +758,7 @@ namespace PetVax.Services.Service
                             var vaccineProfile = new VaccineProfile
                             {
                                 PetId = appointment.PetId,
-                                DiseaseId = appointmentDetail.DiseaseId,
+                                VaccineProfileDiseases = new List<VaccineProfileDisease>(),
                                 AppointmentDetailId = appointmentDetail.AppointmentDetailId,
                                 VaccinationDate = appointmentDetail.AppointmentDate,
                                 Dose = appointmentDetail.Dose,
@@ -768,25 +771,40 @@ namespace PetVax.Services.Service
                             };
                             if (existingProfiles != null)
                             {
-                                // Cập nhật VaccineProfile nếu đã tồn tại
                                 existingProfiles.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
                                 existingProfiles.VaccinationDate = appointmentDetail.AppointmentDate;
                                 existingProfiles.Dose = appointmentDetail.Dose ?? existingProfiles.Dose;
-                                existingProfiles.DiseaseId = appointmentDetail.DiseaseId ?? existingProfiles.DiseaseId;
                                 existingProfiles.Reaction = appointmentDetail.Reaction ?? existingProfiles.Reaction;
                                 existingProfiles.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? existingProfiles.NextVaccinationInfo;
                                 existingProfiles.IsActive = true;
+                                existingProfiles.VaccineProfileDiseases = _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken).Result ?? new List<VaccineProfileDisease>();
                                 existingProfiles.IsCompleted = true; // Đánh dấu là đã hoàn thành
                                 existingProfiles.ModifiedAt = DateTime.UtcNow;
                                 existingProfiles.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                                int vaccineProfileid = existingProfiles.VaccineProfileId;
+                                var existingProfileDisease = await _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByVaccineProfileIdAsync(vaccineProfileid, cancellationToken);
+
+                                var existingDisease = existingProfileDisease.FirstOrDefault(d => d.DiseaseId == appointmentDetail.DiseaseId);
+
+                                if (existingDisease == null && appointmentDetail.DiseaseId.HasValue)
+                                {
+                                    var newVaccineProfileDisease = new VaccineProfileDisease
+                                    {
+                                        DiseaseId = appointmentDetail.DiseaseId,
+                                        VaccineProfileId = existingProfiles.VaccineProfileId,
+                                    };
+
+                                    await _vaccineProfileDiseaseRepository.CreateVaccineProfileDiseaseAsync(newVaccineProfileDisease, cancellationToken);
+                                }
+                                else if (existingDisease != null)
+                                {
+                                    existingDisease.DiseaseId = appointmentDetail.DiseaseId;
+                                    await _vaccineProfileDiseaseRepository.UpdateVaccineProfileDiseaseAsync(existingDisease, cancellationToken);
+                                }
+
                                 await _vaccineProfileRepository.UpdateVaccineProfileAsync(existingProfiles, cancellationToken);
                             }
-                            else
-                            {
-                                // Thêm mới VaccineProfile nếu chưa tồn tại
-                                await _vaccineProfileRepository.CreateVaccineProfileAsync(vaccineProfile, cancellationToken);
-                            }
-
                         }
 
                         await transaction.CommitAsync();
