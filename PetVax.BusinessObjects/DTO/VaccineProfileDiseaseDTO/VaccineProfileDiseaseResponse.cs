@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.VaccineProfileDTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +12,8 @@ namespace PetVax.BusinessObjects.DTO.VaccineProfileDiseaseDTO
     {
         public int VaccineProfileID { get; set; }
         public int DiseaseID { get; set; }
+
+        public VaccineProfileResponseDTO VaccineProfile { get; set; }
+        public DiseaseResponseDTO Disease { get; set; }
     }
 }

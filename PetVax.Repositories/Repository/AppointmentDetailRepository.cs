@@ -158,8 +158,6 @@ namespace PetVax.Repositories.Repository
         public async Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetId(int petId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-                .Include(ad => ad.VaccineBatch)
-                .Include(ad => ad.Disease)
                 .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == EnumList.ServiceType.Vaccination)
                 .ToListAsync(cancellationToken);
         }
@@ -167,8 +165,6 @@ namespace PetVax.Repositories.Repository
         public async Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-                .Include(ad => ad.VaccineBatch)
-                .Include(ad => ad.Disease)
                 .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == EnumList.ServiceType.Vaccination && ad.AppointmentStatus == status)
                 .ToListAsync(cancellationToken);
         }

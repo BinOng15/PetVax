@@ -130,41 +130,42 @@ namespace PetVax.Services.Service
         {
             try
             {
-                var pet = await _petRepository.GetPetByIdAsync(petId, cancellationToken);
-                if (pet == null)
-                {
-                    return new BaseResponse<VaccineProfileResponseDTO>
-                    {
-                        Code = 404,
-                        Success = false,
-                        Message = "Pet not found."
-                    };
-                }
                 var vaccineProfile = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(petId, cancellationToken);
+
                 if (vaccineProfile == null)
                 {
                     return new BaseResponse<VaccineProfileResponseDTO>
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Vaccine profile for the specified pet not found."
+                        Message = "Vaccine profile not found"
                     };
                 }
+
+                // Kiểm tra null cho VaccineProfileDiseases
+                if (vaccineProfile.VaccineProfileDiseases == null)
+                {
+                    vaccineProfile.VaccineProfileDiseases = new List<VaccineProfileDisease>();
+                }
+
+                var result = _mapper.Map<VaccineProfileResponseDTO>(vaccineProfile);
+
                 return new BaseResponse<VaccineProfileResponseDTO>
                 {
                     Code = 200,
-                    Data = _mapper.Map<VaccineProfileResponseDTO>(vaccineProfile),
                     Success = true,
-                    Message = "Vaccine profile for the specified pet retrieved successfully."
+                    Data = result,
+                    Message = "Vaccine profile retrieved successfully"
                 };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error retrieving vaccine profile for pet {PetId}", petId);
                 return new BaseResponse<VaccineProfileResponseDTO>
                 {
                     Code = 500,
                     Success = false,
-                    Message = $"An error occurred while retrieving the vaccine profile for the specified pet: {ex.Message}"
+                    Message = $"Error: {ex.Message}"
                 };
             }
         }

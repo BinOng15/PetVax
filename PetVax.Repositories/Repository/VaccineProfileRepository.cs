@@ -38,18 +38,17 @@ namespace PetVax.Repositories.Repository
         public async Task<VaccineProfile> GetVaccineProfileByIdAsync(int vaccineProfileId, CancellationToken cancellationToken)
         {
             return await _context.VaccineProfiles
-                .Include(vp => vp.VaccineProfileDiseases)
-                .ThenInclude(vpd => vpd.Disease)
                 .FirstOrDefaultAsync(vp => vp.VaccineProfileId == vaccineProfileId, cancellationToken);
         }
 
-        public async Task<List<VaccineProfile>> GetVaccineProfileByPetIdAsync(int petId, CancellationToken cancellationToken)
+        public async Task<VaccineProfile> GetVaccineProfileByPetIdAsync(int petId, CancellationToken cancellationToken)
         {
             return await _context.VaccineProfiles
-                .Include(vp => vp.VaccineProfileDiseases)
-                .ThenInclude(vpd => vpd.Disease)
                 .Where(vp => vp.PetId == petId)
-                .ToListAsync(cancellationToken);
+                .Include(vp => vp.VaccineProfileDiseases)
+                    .ThenInclude(vpd => vpd.Disease)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<List<VaccineProfile>> GetVaccineProfilesByDiseaseId(int diseaseId, CancellationToken cancellationToken)

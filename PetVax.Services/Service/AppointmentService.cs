@@ -753,7 +753,6 @@ namespace PetVax.Services.Service
                         if (isStatusChangeToProcessed)
                         {
                             var existingProfile = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(appointment.PetId, cancellationToken);
-                            var existingProfiles = existingProfile.FirstOrDefault(p => p.PetId == appointment.PetId);
 
                             var vaccineProfile = new VaccineProfile
                             {
@@ -769,20 +768,20 @@ namespace PetVax.Services.Service
                                 ModifiedAt = DateTime.UtcNow,
                                 ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
                             };
-                            if (existingProfiles != null)
+                            if (existingProfile != null)
                             {
-                                existingProfiles.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
-                                existingProfiles.VaccinationDate = appointmentDetail.AppointmentDate;
-                                existingProfiles.Dose = appointmentDetail.Dose ?? existingProfiles.Dose;
-                                existingProfiles.Reaction = appointmentDetail.Reaction ?? existingProfiles.Reaction;
-                                existingProfiles.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? existingProfiles.NextVaccinationInfo;
-                                existingProfiles.IsActive = true;
-                                existingProfiles.VaccineProfileDiseases = _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken).Result ?? new List<VaccineProfileDisease>();
-                                existingProfiles.IsCompleted = true; // Đánh dấu là đã hoàn thành
-                                existingProfiles.ModifiedAt = DateTime.UtcNow;
-                                existingProfiles.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-
-                                int vaccineProfileid = existingProfiles.VaccineProfileId;
+                                existingProfile.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
+                                existingProfile.VaccinationDate = appointmentDetail.AppointmentDate;
+                                existingProfile.Dose = appointmentDetail.Dose ?? existingProfile.Dose;
+                                existingProfile.Reaction = appointmentDetail.Reaction ?? existingProfile.Reaction;
+                                existingProfile.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? existingProfile.NextVaccinationInfo;
+                                existingProfile.IsActive = true;
+                                existingProfile.VaccineProfileDiseases = _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken).Result ?? new List<VaccineProfileDisease>();
+                                existingProfile.IsCompleted = true; // Đánh dấu là đã hoàn thành
+                                existingProfile.ModifiedAt = DateTime.UtcNow;
+                                existingProfile.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                                        
+                                int vaccineProfileid = existingProfile.VaccineProfileId;
                                 var existingProfileDisease = await _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByVaccineProfileIdAsync(vaccineProfileid, cancellationToken);
 
                                 var existingDisease = existingProfileDisease.FirstOrDefault(d => d.DiseaseId == appointmentDetail.DiseaseId);
@@ -792,7 +791,7 @@ namespace PetVax.Services.Service
                                     var newVaccineProfileDisease = new VaccineProfileDisease
                                     {
                                         DiseaseId = appointmentDetail.DiseaseId,
-                                        VaccineProfileId = existingProfiles.VaccineProfileId,
+                                        VaccineProfileId = existingProfile.VaccineProfileId,
                                     };
 
                                     await _vaccineProfileDiseaseRepository.CreateVaccineProfileDiseaseAsync(newVaccineProfileDisease, cancellationToken);
@@ -803,7 +802,7 @@ namespace PetVax.Services.Service
                                     await _vaccineProfileDiseaseRepository.UpdateVaccineProfileDiseaseAsync(existingDisease, cancellationToken);
                                 }
 
-                                await _vaccineProfileRepository.UpdateVaccineProfileAsync(existingProfiles, cancellationToken);
+                                await _vaccineProfileRepository.UpdateVaccineProfileAsync(existingProfile, cancellationToken);
                             }
                         }
 

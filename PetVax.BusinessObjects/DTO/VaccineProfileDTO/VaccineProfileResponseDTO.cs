@@ -21,7 +21,6 @@ namespace PetVax.BusinessObjects.DTO.VaccineProfileDTO
         public bool? IsCompleted { get; set; } 
         public DateTime CreatedAt { get; set; } 
 
-        public DiseaseResponseDTO Disease { get; set; }
-        public VaccineProfileDiseaseResponse VaccineProfileDiseaseResponse { get; set; }
+        public List<VaccineProfileDiseaseResponse> VaccineProfileDiseaseResponse { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace PetVax.Repositories.IRepository
     {
         Task<List<VaccineProfile>> GetAllVaccineProfilesAsync(CancellationToken cancellationToken);
         Task<VaccineProfile> GetVaccineProfileByIdAsync(int vaccineProfileId, CancellationToken cancellationToken);
-        Task<List<VaccineProfile>> GetVaccineProfileByPetIdAsync(int petId, CancellationToken cancellationToken);
+        Task<VaccineProfile> GetVaccineProfileByPetIdAsync(int petId, CancellationToken cancellationToken);
         Task<int> CreateVaccineProfileAsync(VaccineProfile vaccineProfile, CancellationToken cancellationToken);
         Task<int> UpdateVaccineProfileAsync(VaccineProfile vaccineProfile, CancellationToken cancellationToken);
         Task<bool> DeleteVaccineProfileAsync(int vaccineProfileId, CancellationToken cancellationToken);
