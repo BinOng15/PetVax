@@ -488,14 +488,14 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmentResponseDTO>> GetAppointmentByPetIdAsync(int petId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<AppointmentResponseDTO>>> GetAppointmentByPetIdAsync(int petId, CancellationToken cancellationToken)
         {
             try
             {
                 var appointments = await _appointmentRepository.GetAppointmentsByPetIdAsync(petId, cancellationToken);
                 if (appointments == null)
                 {
-                    return new BaseResponse<AppointmentResponseDTO>
+                    return new BaseResponse<List<AppointmentResponseDTO>>
                     {
                         Code = 202,
                         Success = false,
@@ -504,18 +504,18 @@ namespace PetVax.Services.Service
                     };
                 }
                 var appointmentResponses = _mapper.Map<List<AppointmentResponseDTO>>(appointments);
-                return new BaseResponse<AppointmentResponseDTO>
+                return new BaseResponse<List<AppointmentResponseDTO>>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Lấy cuộc hẹn theo thú cưng thành công.",
-                    Data = appointmentResponses.FirstOrDefault() // Assuming you want the first appointment
+                    Data = appointmentResponses
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Đã xảy ra lỗi khi lấy cuộc hẹn theo ID thú cưng.");
-                return new BaseResponse<AppointmentResponseDTO>
+                return new BaseResponse<List<AppointmentResponseDTO>>
                 {
                     Code = 500,
                     Success = false,
@@ -820,90 +820,90 @@ namespace PetVax.Services.Service
             }
         }
 
-    //    private async Task UpdateVaccineProfilesForInjectedVaccinationAppointment(
-    //AppointmentDetail appointmentDetail,
-    //CancellationToken cancellationToken)
-    //    {
-    //        try
-    //        {
-    //            // 1. Kiểm tra null chặt chẽ
-    //            if (appointmentDetail == null)
-    //            {
-    //                _logger.LogError("AppointmentDetail is null");
-    //                throw new ArgumentNullException(nameof(appointmentDetail));
-    //            }
+        //    private async Task UpdateVaccineProfilesForInjectedVaccinationAppointment(
+        //AppointmentDetail appointmentDetail,
+        //CancellationToken cancellationToken)
+        //    {
+        //        try
+        //        {
+        //            // 1. Kiểm tra null chặt chẽ
+        //            if (appointmentDetail == null)
+        //            {
+        //                _logger.LogError("AppointmentDetail is null");
+        //                throw new ArgumentNullException(nameof(appointmentDetail));
+        //            }
 
-    //            if (appointmentDetail.Appointment == null)
-    //            {
-    //                _logger.LogError("Appointment is null for AppointmentDetailId: {AppointmentDetailId}",
-    //                    appointmentDetail.AppointmentDetailId);
-    //                return;
-    //            }
+        //            if (appointmentDetail.Appointment == null)
+        //            {
+        //                _logger.LogError("Appointment is null for AppointmentDetailId: {AppointmentDetailId}",
+        //                    appointmentDetail.AppointmentDetailId);
+        //                return;
+        //            }
 
-    //            if (!appointmentDetail.DiseaseId.HasValue)
-    //            {
-    //                _logger.LogInformation("No DiseaseId, skipping update");
-    //                return;
-    //            }
+        //            if (!appointmentDetail.DiseaseId.HasValue)
+        //            {
+        //                _logger.LogInformation("No DiseaseId, skipping update");
+        //                return;
+        //            }
 
-    //            // 2. Lấy danh sách vaccine liên quan đến disease
-    //            var vaccineDiseases = await _vaccineDiseaseRepository.GetVaccineDiseaseByDiseaseIdAsync(
-    //                appointmentDetail.DiseaseId.Value,
-    //                cancellationToken);
+        //            // 2. Lấy danh sách vaccine liên quan đến disease
+        //            var vaccineDiseases = await _vaccineDiseaseRepository.GetVaccineDiseaseByDiseaseIdAsync(
+        //                appointmentDetail.DiseaseId.Value,
+        //                cancellationToken);
 
-    //            if (vaccineDiseases == null || !vaccineDiseases.Any())
-    //            {
-    //                _logger.LogWarning("No vaccine diseases found for DiseaseId: {DiseaseId}",
-    //                    appointmentDetail.DiseaseId);
-    //                return;
-    //            }
+        //            if (vaccineDiseases == null || !vaccineDiseases.Any())
+        //            {
+        //                _logger.LogWarning("No vaccine diseases found for DiseaseId: {DiseaseId}",
+        //                    appointmentDetail.DiseaseId);
+        //                return;
+        //            }
 
-    //            var vaccineIds = vaccineDiseases.Select(vd => vd.VaccineId).ToList();
+        //            var vaccineIds = vaccineDiseases.Select(vd => vd.VaccineId).ToList();
 
-    //            // 3. Lấy vaccine profiles của pet
-    //            var petProfiles = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(
-    //                appointmentDetail.Appointment.PetId,
-    //                cancellationToken);
+        //            // 3. Lấy vaccine profiles của pet
+        //            var petProfiles = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(
+        //                appointmentDetail.Appointment.PetId,
+        //                cancellationToken);
 
-    //            if (petProfiles == null || !petProfiles.Any())
-    //            {
-    //                _logger.LogInformation("No vaccine profiles found for PetId: {PetId}",
-    //                    appointmentDetail.Appointment.PetId);
-    //                return;
-    //            }
+        //            if (petProfiles == null || !petProfiles.Any())
+        //            {
+        //                _logger.LogInformation("No vaccine profiles found for PetId: {PetId}",
+        //                    appointmentDetail.Appointment.PetId);
+        //                return;
+        //            }
 
-    //            // 4. Cập nhật từng profile
-    //            foreach (var vaccineId in vaccineIds)
-    //            {
-    //                var profileToUpdate = petProfiles
-    //                    .FirstOrDefault(vp => vp.DiseaseId == appointmentDetail.DiseaseId &&
-    //                                        vp.IsCompleted == false);
+        //            // 4. Cập nhật từng profile
+        //            foreach (var vaccineId in vaccineIds)
+        //            {
+        //                var profileToUpdate = petProfiles
+        //                    .FirstOrDefault(vp => vp.DiseaseId == appointmentDetail.DiseaseId &&
+        //                                        vp.IsCompleted == false);
 
-    //                if (profileToUpdate != null)
-    //                {
-    //                    profileToUpdate.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
-    //                    profileToUpdate.VaccinationDate = appointmentDetail.AppointmentDate;
-    //                    profileToUpdate.Dose = appointmentDetail.Dose ?? profileToUpdate.Dose;
-    //                    profileToUpdate.Reaction = appointmentDetail.Reaction ?? profileToUpdate.Reaction;
-    //                    profileToUpdate.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? profileToUpdate.NextVaccinationInfo;
-    //                    profileToUpdate.IsCompleted = true;
-    //                    profileToUpdate.ModifiedAt = DateTime.UtcNow;
-    //                    profileToUpdate.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+        //                if (profileToUpdate != null)
+        //                {
+        //                    profileToUpdate.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
+        //                    profileToUpdate.VaccinationDate = appointmentDetail.AppointmentDate;
+        //                    profileToUpdate.Dose = appointmentDetail.Dose ?? profileToUpdate.Dose;
+        //                    profileToUpdate.Reaction = appointmentDetail.Reaction ?? profileToUpdate.Reaction;
+        //                    profileToUpdate.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? profileToUpdate.NextVaccinationInfo;
+        //                    profileToUpdate.IsCompleted = true;
+        //                    profileToUpdate.ModifiedAt = DateTime.UtcNow;
+        //                    profileToUpdate.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
-    //                    await _vaccineProfileRepository.UpdateVaccineProfileAsync(profileToUpdate, cancellationToken);
+        //                    await _vaccineProfileRepository.UpdateVaccineProfileAsync(profileToUpdate, cancellationToken);
 
-    //                    _logger.LogInformation("Updated VaccineProfile {VaccineProfileId} for Pet {PetId}",
-    //                        profileToUpdate.VaccineProfileId, appointmentDetail.Appointment.PetId);
-    //                }
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            _logger.LogError(ex, "Error updating VaccineProfile for AppointmentDetailId: {AppointmentDetailId}",
-    //                appointmentDetail?.AppointmentDetailId);
-    //            throw new Exception("Failed to update vaccine profiles for injected vaccination appointment", ex);
-    //        }
-    //    }
+        //                    _logger.LogInformation("Updated VaccineProfile {VaccineProfileId} for Pet {PetId}",
+        //                        profileToUpdate.VaccineProfileId, appointmentDetail.Appointment.PetId);
+        //                }
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            _logger.LogError(ex, "Error updating VaccineProfile for AppointmentDetailId: {AppointmentDetailId}",
+        //                appointmentDetail?.AppointmentDetailId);
+        //            throw new Exception("Failed to update vaccine profiles for injected vaccination appointment", ex);
+        //        }
+        //    }
 
         //private async Task UpdateVaccineProfilesForInjectedVaccinationAppointment(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)
         //{
@@ -991,40 +991,6 @@ namespace PetVax.Services.Service
         //        throw new Exception("Failed to update vaccine profile", ex);
         //    }
         //}
-
-        private DateTime? ExtractDateFromVaccinationInfo(string vaccinationInfo)
-        {
-            if (string.IsNullOrWhiteSpace(vaccinationInfo))
-                return null;
-
-            // Tìm ngày theo định dạng yyyy-MM-dd trong chuỗi
-            var regex = new Regex(@"\b\d{4}-\d{2}-\d{2}\b");
-            var match = regex.Match(vaccinationInfo);
-
-            if (match.Success && DateTime.TryParse(match.Value, out var date))
-            {
-                return date;
-            }
-            return null;
-        }
-
-        private int GetSlotNumberFromAppointmentDate(DateTime appointmentDate)
-        {
-            var hour = appointmentDate.Hour;
-
-            return hour switch
-            {
-                8 => (int)Slot.Slot_8h,
-                9 => (int)Slot.Slot_9h,
-                10 => (int)Slot.Slot_10h,
-                11 => (int)Slot.Slot_11h,
-                13 => (int)Slot.Slot_13h,
-                14 => (int)Slot.Slot_14h,
-                15 => (int)Slot.Slot_15h,
-                16 => (int)Slot.Slot_16h,
-                _ => throw new ArgumentException("Khung giờ hẹn không hợp lệ.")
-            };
-        }
 
         public async Task<BaseResponse<AppointmentWithVaccinationResponseDTO>> CreateAppointmentVaccinationAsync(CreateAppointmentVaccinationDTO createAppointmentVaccinationDTO, CancellationToken cancellationToken)
         {
@@ -1169,6 +1135,110 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
+        }
+        public async Task<BaseResponse<List<AppointmentResponseDTO>>> GetAppointmentByPetAndStatusAsync(int petId, AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointment = await _appointmentRepository.GetAppointmentByPetIdAndStatusAsync(petId, status, cancellationToken);
+                if (appointment == null)
+                {
+                    return new BaseResponse<List<AppointmentResponseDTO>>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn cho thú cưng này với trạng thái đã chỉ định.",
+                        Data = null
+                    };
+                }
+                var appointmentResponse = _mapper.Map<List<AppointmentResponseDTO>>(appointment);
+                return new BaseResponse<List<AppointmentResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy cuộc hẹn theo thú cưng và trạng thái thành công.",
+                    Data = appointmentResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy cuộc hẹn theo ID thú cưng và trạng thái.");
+                return new BaseResponse<List<AppointmentResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy cuộc hẹn theo ID thú cưng và trạng thái.",
+                    Data = null
+                };
+            }
+        }
+        public async Task<BaseResponse<List<AppointmentResponseDTO>>> GetAppointmentByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointments = await _appointmentRepository.GetAppointmentsByCustomerIdAsync(customerId, cancellationToken);
+                if (appointments == null || !appointments.Any())
+                {
+                    return new BaseResponse<List<AppointmentResponseDTO>>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn nào cho khách hàng này.",
+                        Data = null
+                    };
+                }
+                var appointmentResponses = _mapper.Map<List<AppointmentResponseDTO>>(appointments);
+                return new BaseResponse<List<AppointmentResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy tất cả cuộc hẹn theo ID khách hàng thành công.",
+                    Data = appointmentResponses
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn theo ID khách hàng.");
+                return new BaseResponse<List<AppointmentResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn theo ID khách hàng.",
+                    Data = null
+                };
+            }
+        }
+        private DateTime? ExtractDateFromVaccinationInfo(string vaccinationInfo)
+        {
+            if (string.IsNullOrWhiteSpace(vaccinationInfo))
+                return null;
+
+            // Tìm ngày theo định dạng yyyy-MM-dd trong chuỗi
+            var regex = new Regex(@"\b\d{4}-\d{2}-\d{2}\b");
+            var match = regex.Match(vaccinationInfo);
+
+            if (match.Success && DateTime.TryParse(match.Value, out var date))
+            {
+                return date;
+            }
+            return null;
+        }
+        private int GetSlotNumberFromAppointmentDate(DateTime appointmentDate)
+        {
+            var hour = appointmentDate.Hour;
+
+            return hour switch
+            {
+                8 => (int)Slot.Slot_8h,
+                9 => (int)Slot.Slot_9h,
+                10 => (int)Slot.Slot_10h,
+                11 => (int)Slot.Slot_11h,
+                13 => (int)Slot.Slot_13h,
+                14 => (int)Slot.Slot_14h,
+                15 => (int)Slot.Slot_15h,
+                16 => (int)Slot.Slot_16h,
+                _ => throw new ArgumentException("Khung giờ hẹn không hợp lệ.")
+            };
         }
     }
 }

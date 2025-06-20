@@ -372,14 +372,14 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByServiceType(EnumList.ServiceType serviceType, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<AppointmentDetailResponseDTO>>> GetAppointmentDetailByServiceType(EnumList.ServiceType serviceType, CancellationToken cancellationToken)
         {
             try
             {
                 var appointmentDetails = await _appointmentDetailRepository.GetAppointmentDetailsByServiceTypeAsync(serviceType, cancellationToken);
                 if (appointmentDetails == null || !appointmentDetails.Any())
                 {
-                    return new BaseResponse<AppointmentDetailResponseDTO>
+                    return new BaseResponse<List<AppointmentDetailResponseDTO>>
                     {
                         Code = 200,
                         Success = false,
@@ -388,18 +388,18 @@ namespace PetVax.Services.Service
                     };
                 }
                 var responseData = _mapper.Map<List<AppointmentDetailResponseDTO>>(appointmentDetails);
-                return new BaseResponse<AppointmentDetailResponseDTO>
+                return new BaseResponse<List<AppointmentDetailResponseDTO>>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Lấy chi tiết cuộc hẹn theo loại dịch vụ thành công.",
-                    Data = responseData.FirstOrDefault() // Assuming you want the first detail if multiple exist
+                    Data = responseData
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while getting appointment detail by service type.");
-                return new BaseResponse<AppointmentDetailResponseDTO>
+                return new BaseResponse<List<AppointmentDetailResponseDTO>>
                 {
                     Code = 500,
                     Success = false,
@@ -491,6 +491,79 @@ namespace PetVax.Services.Service
         public Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentDetailId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
+        }
+        public async Task<BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>> GetAppointmentVaccinationByPetId(int petId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointmentDetails = await _appointmentDetailRepository.GetAppointmentVaccinationDetailByPetId(petId, cancellationToken);
+                if (appointmentDetails == null)
+                {
+                    return new BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn tiêm phòng cho thú cưng này.",
+                        Data = null
+                    };
+                }
+                var appointmentVaccinationDetailResponse = _mapper.Map<List<AppointmentVaccinationDetailResponseDTO>>(appointmentDetails);
+                return new BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin tiêm phòng theo thú cưng thành công.",
+                    Data = appointmentVaccinationDetailResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy thông tin tiêm phòng theo ID thú cưng.");
+                return new BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy thông tin tiêm phòng theo ID thú cưng.",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>> GetAppointmentVaccinationByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointmentDetails = await _appointmentDetailRepository.GetAppointmentVaccinationDetailByPetIdAndStatus(petId, status, cancellationToken);
+                if (appointmentDetails == null)
+                {
+                    return new BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn tiêm phòng cho thú cưng này với trạng thái đã cung cấp.",
+                        Data = null
+                    };
+                }
+                var appointmentVaccinationDetailResponse = _mapper.Map<List<AppointmentVaccinationDetailResponseDTO>>(appointmentDetails);
+                return new BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin tiêm phòng theo thú cưng và trạng thái thành công.",
+                    Data = appointmentVaccinationDetailResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy thông tin tiêm phòng theo ID thú cưng và trạng thái.");
+                return new BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy thông tin tiêm phòng theo ID thú cưng và trạng thái.",
+                    Data = null
+                };
+            }
         }
     }
 }

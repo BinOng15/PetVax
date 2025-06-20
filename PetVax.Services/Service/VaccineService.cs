@@ -223,11 +223,11 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<VaccineResponseDTO>> GetVaccineByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<VaccineResponseDTO>>> GetVaccineByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
         {
             if (diseaseId <= 0)
             {
-                return new BaseResponse<VaccineResponseDTO>
+                return new BaseResponse<List<VaccineResponseDTO>>
                 {
                     Code = 400,
                     Success = false,
@@ -236,42 +236,30 @@ namespace PetVax.Services.Service
             }
             try
             {
-                // Get VaccineDisease by diseaseId
-                var vaccineDisease = await _vaccineDiseaseRepository.GetVaccineDiseaseByDiseaseIdAsync(diseaseId, cancellationToken);
-                if (vaccineDisease == null)
-                {
-                    return new BaseResponse<VaccineResponseDTO>
-                    {
-                        Code = 404,
-                        Success = false,
-                        Message = "Không tìm thấy vắc xin cho bệnh này.",
-                    };
-                }
-                var vaccineId = vaccineDisease.Select(vd => vd.VaccineId).FirstOrDefault();
-                // Get Vaccine by VaccineId from VaccineDisease
-                var vaccine = await _vaccineRepository.GetVaccineByIdAsync(vaccineId, cancellationToken);
+                var vaccine = await _vaccineRepository.GetVaccineByDiseaseId(diseaseId, cancellationToken);
                 if (vaccine == null)
                 {
-                    return new BaseResponse<VaccineResponseDTO>
+                    return new BaseResponse<List<VaccineResponseDTO>>
                     {
                         Code = 200,
-                        Success = false,
-                        Message = "Không tìm thấy vắc xin cho bệnh này.",
+                        Success = true,
+                        Message = "Vaccine không tồn tại với diseaseId này.",
+                        Data = null
                     };
                 }
-                var responseDTO = _mapper.Map<VaccineResponseDTO>(vaccine);
-                return new BaseResponse<VaccineResponseDTO>
+                var response = _mapper.Map<List<VaccineResponseDTO>>(vaccine);
+                return new BaseResponse<List<VaccineResponseDTO>>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Vắc xin được lấy thành công.",
-                    Data = responseDTO
+                    Data = response
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving vaccine by disease ID");
-                return new BaseResponse<VaccineResponseDTO>
+                return new BaseResponse<List<VaccineResponseDTO>>
                 {
                     Code = 500,
                     Success = false,
@@ -279,7 +267,6 @@ namespace PetVax.Services.Service
                 };
             }
         }
-
         public async Task<BaseResponse<VaccineResponseDTO>> GetVaccineByIdAsync(int vaccineId, CancellationToken cancellationToken)
         {
             if (vaccineId <= 0)

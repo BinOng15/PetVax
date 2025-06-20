@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.Enum;
 using PetVax.Services.IService;
 using static PetVax.BusinessObjects.DTO.AppointmentDTO.CreateAppointmentDTO;
 
@@ -40,12 +42,25 @@ namespace PetVax.Controllers
             var response = await _appointmentService.GetAppointmentByIdAsync(appointmentId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpGet("get-appointment-by-customer-id/{customerId}")]
+        public async Task<IActionResult> GetAppointmentByCustomerId(int customerId, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentService.GetAppointmentByCustomerIdAsync(customerId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
         [HttpGet("get-appointment-by-pet-id/{petId}")]
         public async Task<IActionResult> GetAppointmentByPetId(int petId, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentService.GetAppointmentByPetIdAsync(petId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpGet("get-appointment-by-pet-and-status/{petId}/{status}")]
+        public async Task<IActionResult> GetAppointmentByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentService.GetAppointmentByPetAndStatusAsync(petId, status, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+
         //[HttpPost("create-appointment")]
         //public async Task<IActionResult> CreateAppointment(CreateFullAppointmentDTO createFullAppointmentDTO,
         //    CancellationToken cancellationToken = default)
@@ -59,7 +74,9 @@ namespace PetVax.Controllers
         //    var response = await _appointmentService.UpdateAppointmentAsync(appointmentId, updateAppointmentDTO, cancellationToken);
         //    return StatusCode(response.Code, response);
         //}
+
         [HttpDelete("delete-appointment/{appointmentId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteAppointment(int appointmentId, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentService.DeleteAppointmentAsync(appointmentId, cancellationToken);

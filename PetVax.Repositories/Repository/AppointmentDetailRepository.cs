@@ -109,6 +109,24 @@ namespace PetVax.Repositories.Repository
                 .FirstOrDefaultAsync(ad => ad.AppointmentDetailId == id, cancellationToken);
         }
 
+        public async Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetId(int petId, CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(ad => ad.VaccineBatch)
+                .Include(ad => ad.Disease)
+                .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == EnumList.ServiceType.Vaccination)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(ad => ad.VaccineBatch)
+                .Include(ad => ad.Disease)
+                .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == EnumList.ServiceType.Vaccination && ad.AppointmentStatus == status)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<int> UpdateAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)
         {
             return await UpdateAsync(appointmentDetail, cancellationToken);
