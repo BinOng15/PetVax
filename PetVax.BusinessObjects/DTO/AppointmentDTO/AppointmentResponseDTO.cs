@@ -1,5 +1,6 @@
 ﻿using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.Enum;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,9 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
+
+        public CustomerResponseDTO CustomerResponseDTO { get; set; }
+        public PetResponseDTO PetResponseDTO { get; set; }
 
     }
     public class AppointmentWithDetailResponseDTO

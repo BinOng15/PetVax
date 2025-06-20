@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PetVax.BusinessObjects.DTO.AccountDTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,5 +26,7 @@ namespace PetVax.BusinessObjects.DTO.CustomerDTO
         public string? CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
+
+        public AccountResponseDTO AccountResponseDTO { get; set; }
     }
 }

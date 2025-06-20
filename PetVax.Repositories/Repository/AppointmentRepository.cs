@@ -43,23 +43,30 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<Appointment> GetAppointmentByIdAsync(int appointmentId, CancellationToken cancellationToken)
         {
-            return await GetByIdAsync(appointmentId, cancellationToken);
+            return await _context.Appointments
+                .Include(a => a.Customer)
+                .Include(a => a.Pet)
+                .FirstOrDefaultAsync(a => a.AppointmentId == appointmentId, cancellationToken);
         }
         public async Task<List<Appointment>> GetAppointmentByPetIdAndStatusAsync(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken)
         {
             return await _context.Set<Appointment>()
+                .Include(a => a.Customer)
+                .Include(a => a.Pet)
                 .Where(a => a.PetId == petId && a.AppointmentStatus == status)
                 .ToListAsync(cancellationToken);
         }
         public async Task<List<Appointment>> GetAppointmentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
             return await _context.Set<Appointment>()
+                .Include(a => a.Customer)
+                .Include(a => a.Pet)
                 .Where(a => a.CustomerId == customerId)
                 .ToListAsync(cancellationToken);
         }
         public async Task<List<Appointment>> GetAppointmentsByPetIdAsync(int petId, CancellationToken cancellationToken)
         {
-            return await _context.Set<Appointment>()
+            return await _context.Set<Appointment>().Include(a => a.Customer).Include(a => a.Pet)
                 .Where(a => a.PetId == petId)
                 .ToListAsync(cancellationToken);
         }

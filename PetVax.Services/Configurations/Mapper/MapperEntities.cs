@@ -38,17 +38,21 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreateCustomerDTO, Customer>();
             CreateMap<UpdateCustomerDTO, Customer>();
             CreateMap<Customer, CustomerResponseDTO>()
-                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image)); ;
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image))
+                .ForMember(dest => dest.AccountResponseDTO, opt => opt.MapFrom(src => src.Account));
 
             //Vet
-            CreateMap<Vet, VetResponseDTO>();
+            CreateMap<Vet, VetResponseDTO>()
+                .ForMember(dest => dest.Account, opt => opt.MapFrom(src => src.Account)).ReverseMap();
             CreateMap<CreateVetDTO, Vet>();
             CreateMap<UpdateVetRequest, Vet>();
 
             //VetSchedule
             CreateMap<CreateVetScheduleRequestDTO, VetSchedule>();
             CreateMap<UpdateVetScheduleRequestDTO, VetSchedule>();
-            CreateMap<VetSchedule, VetScheduleDTO>();
+            CreateMap<VetSchedule, VetScheduleDTO>()
+                .ForMember(dest => dest.VetResponse, opt => opt.MapFrom(src => src.Vet)).ReverseMap();
+
 
             //Vaccine
             CreateMap<CreateVaccineDTO, Vaccine>();
@@ -59,12 +63,17 @@ namespace PetVax.Services.Configurations.Mapper
             //VaccineDisease
             CreateMap<CreateVaccineDiseaseDTO, VaccineDisease>();
             CreateMap<UpdateVaccineDiseaseDTO, VaccineDisease>();
-            CreateMap<VaccineDisease, VaccineDiseaseResponseDTO>();
+            CreateMap<VaccineDisease, VaccineDiseaseResponseDTO>()
+                .ForMember(dest => dest.VaccineResponseDTO, opt => opt.MapFrom(src => src.Vaccine))
+                .ForMember(dest => dest.DiseaseResponseDTO, opt => opt.MapFrom(src => src.Disease))
+                .ReverseMap();
 
             // VaccineBatch
             CreateMap<CreateVaccineBatchDTO, VaccineBatch>();
             CreateMap<UpdateVaccineBatchDTO, VaccineBatch>();
-            CreateMap<VaccineBatch, VaccineBatchResponseDTO>();
+            CreateMap<VaccineBatch, VaccineBatchResponseDTO>()
+                .ForMember(dest => dest.VaccineResponseDTO, opt => opt.MapFrom(src => src.Vaccine))
+                .ReverseMap();
 
             //Disease
             CreateMap<CreateDiseaseDTO, Disease>();
@@ -75,12 +84,17 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreatePetRequestDTO, Pet>();
             CreateMap<UpdatePetRequestDTO, Pet>();
             CreateMap<Pet, PetResponseDTO>()
-                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image));
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image))
+                .ForMember(dest => dest.CustomerResponseDTO, opt => opt.MapFrom(src => src.Customer));
 
             //Appointment
             CreateMap<CreateAppointmentDTO, Appointment>();
             CreateMap<UpdateAppointmentDTO, Appointment>();
-            CreateMap<Appointment, AppointmentResponseDTO>();
+            CreateMap<Appointment, AppointmentResponseDTO>()
+                .ForMember(dest => dest.CustomerResponseDTO, opt => opt.MapFrom(src => src.Customer.FullName))
+                .ForMember(dest => dest.PetResponseDTO, opt => opt.MapFrom(src => src.Pet.Name))
+                .ReverseMap();
+
             CreateMap<Appointment, AppointmentWithDetailResponseDTO>();
             CreateMap<CreateAppointmentVaccinationDTO, Appointment>();
             CreateMap<UpdateAppointmentVaccinationDTO, Appointment>();
@@ -89,11 +103,18 @@ namespace PetVax.Services.Configurations.Mapper
             //AppointmentDetail
             CreateMap<CreateAppointmentDetailDTO, AppointmentDetail>();
             CreateMap<UpdateAppointmentDetailDTO, AppointmentDetail>();
-            CreateMap<AppointmentDetail, AppointmentDetailResponseDTO>();
+            CreateMap<AppointmentDetail, AppointmentDetailResponseDTO>()
+                .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease.Name))
+                .ForMember(dest => dest.MicrochipItem, opt => opt.MapFrom(src => src.MicrochipItem.Name))
+                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch.Vaccine))
+                .ForMember(dest => dest.PetPassport, opt => opt.MapFrom(src => src.PetPassport.PassportCode))
+                .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet.Name))
+                .ReverseMap();
+
             CreateMap<AppointmentDetail, AppointmentVaccinationDetailResponseDTO>()
-                .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
-                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
-                .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease))
+                .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet.Name))
+                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch.VaccineId))
+                .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease.Name))
                 .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
                 .ReverseMap();
 

@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.Enum;
+﻿using PetVax.BusinessObjects.DTO.VetDTO;
+using PetVax.BusinessObjects.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,7 @@ namespace PetVax.BusinessObjects.DTO.VetScheduleDTO
         public EnumList.VetScheduleStatus Status { get; set; } 
         public DateTime CreatedAt { get; set; } 
         public string CreatedBy { get; set; }
+
+        public VetResponseDTO VetResponse { get; set; }
     }
 }

@@ -35,6 +35,7 @@ namespace PetVax.Repositories.Repository
         {
             
             var customer = await _context.Customers
+                .Include(c => c.Account)
                 .FirstOrDefaultAsync(c => c.AccountId == accountId, cancellationToken);           
             return customer;
         }
@@ -42,6 +43,7 @@ namespace PetVax.Repositories.Repository
         public async Task<Customer> GetCustomerByIdAsync(int customerId, CancellationToken cancellationToken)
         {
             return await _context.Customers
+                .Include(c => c.Account)
                 .FirstOrDefaultAsync(c => c.CustomerId == customerId, cancellationToken);
         }
 

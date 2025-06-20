@@ -34,12 +34,15 @@ namespace PetVax.Repositories.Repository
 
         public async Task<VetSchedule> GetVetScheduleByIdAsync(int vetScheduleId, CancellationToken cancellationToken)
         {
-            return await _context.VetSchedules.FirstOrDefaultAsync(vs => vs.VetScheduleId == vetScheduleId, cancellationToken);
+            return await _context.VetSchedules
+                .Include(vs => vs.Vet)
+                .FirstOrDefaultAsync(vs => vs.VetScheduleId == vetScheduleId, cancellationToken);
         }
 
         public async Task<List<VetSchedule>> GetVetSchedulesByVetIdAsync(int vetId, CancellationToken cancellationToken)
         {
             return await _context.VetSchedules
+                .Include(vs => vs.Vet)
                 .Where(vs => vs.VetId == vetId)
                 .ToListAsync(cancellationToken);
         }

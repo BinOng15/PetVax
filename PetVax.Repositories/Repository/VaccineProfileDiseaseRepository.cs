@@ -31,12 +31,17 @@ namespace PetVax.Repositories.Repository
 
         public async Task<VaccineProfileDisease> GetVaccineProfileDiseaseByIdAsync(int vaccineProfileDiseaseId, CancellationToken cancellationToken)
         {
-            return await _context.VaccineProfileDiseases.FirstOrDefaultAsync(vpd => vpd.VaccineProfileDiseasesId == vaccineProfileDiseaseId, cancellationToken);
+            return await _context.VaccineProfileDiseases
+                .Include(vpd => vpd.VaccineProfile)
+                .Include(vpd => vpd.Disease)
+                .FirstOrDefaultAsync(vpd => vpd.VaccineProfileDiseasesId == vaccineProfileDiseaseId, cancellationToken);
         }
 
         public async Task<List<VaccineProfileDisease>> GetVaccineProfileDiseasesByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
         {
             return await _context.VaccineProfileDiseases
+                .Include(vpd => vpd.VaccineProfile)
+                .Include(vpd => vpd.Disease)
                 .Where(vpd => vpd.DiseaseId == diseaseId)
                 .ToListAsync(cancellationToken);
         }
@@ -44,6 +49,8 @@ namespace PetVax.Repositories.Repository
         public async Task<List<VaccineProfileDisease>> GetVaccineProfileDiseasesByVaccineProfileIdAsync(int vaccineProfileId, CancellationToken cancellationToken)
         {
             return await _context.VaccineProfileDiseases
+                .Include(vpd => vpd.VaccineProfile)
+                .Include(vpd => vpd.Disease)
                 .Where(vpd => vpd.VaccineProfileId == vaccineProfileId)
                 .ToListAsync(cancellationToken);
         }
