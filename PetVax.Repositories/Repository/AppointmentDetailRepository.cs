@@ -30,7 +30,18 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<AppointmentDetail>> GetAllAppointmentDetailsAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.AppointmentDetails
+                .Include(ad => ad.Vet)
+                .Include(ad => ad.MicrochipItem)
+                .Include(ad => ad.PetPassport)
+                .Include(ad => ad.HealthCondition)
+                .Include(ad => ad.VaccineBatch)
+                .Include(ad => ad.Disease)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Customer)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Pet)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<AppointmentDetail> GetAppointmentDetailByIdAsync(int id, CancellationToken cancellationToken)
@@ -158,14 +169,29 @@ namespace PetVax.Repositories.Repository
         public async Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetId(int petId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-                .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == EnumList.ServiceType.Vaccination)
+                .Where(ad => ad.Appointment.PetId == petId &&
+                            ad.ServiceType == EnumList.ServiceType.Vaccination)
+                .Include(ad => ad.Vet)
+                .Include(ad => ad.VaccineBatch)
+                    .ThenInclude(vb => vb.Vaccine)
+                .Include(ad => ad.Disease)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Pet)
                 .ToListAsync(cancellationToken);
         }
 
         public async Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-                .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == EnumList.ServiceType.Vaccination && ad.AppointmentStatus == status)
+                .Where(ad => ad.Appointment.PetId == petId &&
+                            ad.ServiceType == EnumList.ServiceType.Vaccination &&
+                            ad.AppointmentStatus == status)
+                .Include(ad => ad.Vet)
+                .Include(ad => ad.VaccineBatch)
+                    .ThenInclude(vb => vb.Vaccine)
+                .Include(ad => ad.Disease)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Pet)
                 .ToListAsync(cancellationToken);
         }
 
