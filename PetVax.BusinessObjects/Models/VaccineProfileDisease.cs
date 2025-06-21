@@ -16,6 +16,7 @@ namespace PetVax.BusinessObjects.Models
         public int VaccineProfileDiseasesId { get; set; }
         public int? VaccineProfileId { get; set; }
         public int? DiseaseId { get; set; }
+        public bool? isDeleted { get; set; } = false;
 
         public virtual Disease Disease { get; set; }
         public virtual VaccineProfile VaccineProfile { get; set; }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PediVax.BusinessObjects.DBContext;
 
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250621100748_updateDatabase_isDeleted")]
+    partial class updateDatabase_isDeleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,9 +58,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("isVerify")
                         .HasColumnType("bit");
 
@@ -70,28 +70,26 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 21, 10, 10, 49, 693, DateTimeKind.Utc).AddTicks(4957),
+                            CreatedAt = new DateTime(2025, 6, 21, 10, 7, 47, 491, DateTimeKind.Utc).AddTicks(752),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "KKI8xAl1HG7Gy31OMdTlL02mjW7NXsDSAYxGvbaqHhg=",
-                            PasswordSalt = "iAf/a1wSceLpU/l4asEKNhysXO+zmvSzOsvXWDR/ccQ=",
+                            PasswordHash = "UkjQaOuM3bNpMP5obR63pVt9I3b2G8BLq6ooCddcFRE=",
+                            PasswordSalt = "c19b4CSUUxRbTUOIRoOxVgKJ2jaatv8sbIBqosHIo3U=",
                             RefereshToken = "",
                             Role = 1,
-                            isDeleted = false,
                             isVerify = true
                         },
                         new
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 21, 10, 10, 49, 693, DateTimeKind.Utc).AddTicks(4963),
+                            CreatedAt = new DateTime(2025, 6, 21, 10, 7, 47, 491, DateTimeKind.Utc).AddTicks(760),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "a2LRW6W3fSUFF8Xob9XOctYK6237RjXO6M5a90TpmXo=",
-                            PasswordSalt = "sZoQyfJpNNy+0bZmpNNhXTLvhebZ6vI8JoXa+nK3rSk=",
+                            PasswordHash = "wpsjjCo2zAh3ddMksdTnNpJXDnzEUhOu5aZrWS+HKKQ=",
+                            PasswordSalt = "ur1TPv+egL/dcKThWtS6SPlYN5F/MsSM7Xoy0WAs/I4=",
                             RefereshToken = "",
                             Role = 2,
-                            isDeleted = false,
                             isVerify = true
                         });
                 });
@@ -141,9 +139,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Property<int>("ServiceType")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("AppointmentId");
 
@@ -220,9 +215,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Property<int?>("VetId")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("AppointmentDetailId");
 
@@ -307,9 +299,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("CustomerId");
 
                     b.HasIndex("AccountId")
@@ -366,9 +355,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<string>("Treatment")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("DiseaseId");
 
@@ -462,9 +448,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("HealthConditionId");
 
                     b.HasIndex("PetId");
@@ -517,9 +500,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("MembershipId");
 
                     b.ToTable("Membership");
@@ -559,9 +539,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("MicrochipId");
 
@@ -608,9 +585,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("MicrochipItemId");
 
@@ -669,9 +643,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Property<int>("VaccineId")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("PaymentId");
 
@@ -756,9 +727,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("isSterilized")
                         .HasColumnType("bit");
 
@@ -835,9 +803,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("isRabiesVaccinated")
                         .HasColumnType("bit");
 
@@ -891,9 +856,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("TransactionId");
 
                     b.HasIndex("CustomerId");
@@ -933,9 +895,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("ServiceHistoryId");
 
                     b.ToTable("ServiceHistory");
@@ -974,9 +933,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<string>("Species")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("VaccinationScheduleId");
 
@@ -1033,9 +989,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("VaccineId");
 
                     b.ToTable("Vaccine");
@@ -1078,9 +1031,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int>("VaccineId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("VaccineBatchId");
 
                     b.HasIndex("VaccineId");
@@ -1114,9 +1064,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Property<int>("VaccineId")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("VaccineDiseaseId");
 
@@ -1166,9 +1113,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int?>("VaccineBatchId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("VaccineExportId");
 
                     b.HasIndex("VaccineBatchId");
@@ -1212,9 +1156,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Property<int>("VaccineExportId")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("VaccineExportDetailId");
 
@@ -1278,9 +1219,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int?>("VaccinationScheduleId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("VaccineProfileId");
 
                     b.HasIndex("AppointmentDetailId");
@@ -1306,9 +1244,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Property<int?>("VaccineProfileId")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("VaccineProfileDiseasesId");
 
@@ -1358,9 +1293,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<int?>("VaccineBatchId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("VaccineReceiptId");
 
                     b.HasIndex("VaccineBatchId");
@@ -1401,9 +1333,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Property<int>("VaccineReceiptId")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("VaccineReceiptDetailId");
 
@@ -1457,9 +1386,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<string>("image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
                     b.HasKey("VetId");
 
                     b.HasIndex("AccountId")
@@ -1500,9 +1426,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Property<int>("VetId")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("VetScheduleId");
 

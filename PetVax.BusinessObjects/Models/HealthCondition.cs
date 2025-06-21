@@ -35,6 +35,7 @@ namespace PetVax.BusinessObjects.Models
         public string CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
+        public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual Pet Pet { get; set; }

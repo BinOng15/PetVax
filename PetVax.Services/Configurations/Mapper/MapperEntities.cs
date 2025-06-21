@@ -5,6 +5,7 @@ using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
+using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
@@ -121,6 +122,11 @@ namespace PetVax.Services.Configurations.Mapper
             //Microchip
             CreateMap<Microchip, MicrochipResponseDTO>();
             CreateMap<MicrochipRequestDTO, Microchip>();
+            CreateMap<MicrochipItem, MicrochipItemResponseDTO>();
+            CreateMap<CreateMicrochipItemRequest, MicrochipItem>();
+            CreateMap<MicrochipItem, BaseMicrochipItemResponse>()
+                .ForMember(dest => dest.MicrochipResponse, opt => opt.MapFrom(src => src.Microchip));
+            CreateMap<UpdateMicrochipItemRequest, MicrochipItem>();
 
             // VaccineProfile
             CreateMap<VaccineProfile, VaccineProfileResponseDTO>()

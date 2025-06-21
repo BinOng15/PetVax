@@ -29,20 +29,32 @@ namespace PetVax.Services.Service
         private readonly IMapper _mapper;
         private readonly ICloudinariService _cloudinariService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-            
-        public PetService(IPetRepository petRepository, ICustomerRepository customerRepository, ILogger<PetService> logger, IMapper mapper, ICloudinariService cloudinariService, IHttpContextAccessor httpContextAccessor, IVaccineProfileRepository vaccineProfileRepository, IVaccineProfileDiseaseRepository vaccineProfileDiseaseRepository)
+        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IMicrochipItemRepository _microchipItemRepository;
+
+        public PetService(
+            IPetRepository petRepository,
+            ICustomerRepository customerRepository,
+            IVaccineProfileRepository vaccineProfileRepository,
+            IVaccineProfileDiseaseRepository vaccineProfileDiseaseRepository,
+            ILogger<PetService> logger,
+            IMapper mapper,
+            ICloudinariService cloudinariService,
+            IHttpContextAccessor httpContextAccessor,
+            IAppointmentRepository appointmentRepository,
+            IMicrochipItemRepository microchipItemRepository)
         {
             _petRepository = petRepository;
             _customerRepository = customerRepository;
+            _vaccineProfileRepository = vaccineProfileRepository;
+            _vaccineProfileDiseaseRepository = vaccineProfileDiseaseRepository;
             _logger = logger;
             _mapper = mapper;
             _cloudinariService = cloudinariService;
             _httpContextAccessor = httpContextAccessor;
-            _vaccineProfileRepository = vaccineProfileRepository;
-            _vaccineProfileDiseaseRepository = vaccineProfileDiseaseRepository;
-            _vaccineProfileDiseaseRepository = vaccineProfileDiseaseRepository;
+            _appointmentRepository = appointmentRepository;
+            _microchipItemRepository = microchipItemRepository;
         }
-
         public async Task<DynamicResponse<PetResponseDTO>> GetAllPetsAsync(GetAllPetsRequestDTO getAllPetsRequest, CancellationToken cancellationToken)
         {
             try
@@ -473,6 +485,104 @@ namespace PetVax.Services.Service
                         Message = "Error while retrieving pets: " + (ex.InnerException?.Message ?? ex.Message),
                         Data = null
                     }
+                };
+            }
+        }
+
+        public async Task<BaseResponse<PetResponseDTO>> DeletePetById(int petId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var pet = await _petRepository.GetPetByIdAsync(petId, cancellationToken);
+                if (pet == null)
+                {
+                    _logger.LogWarning("Pet with ID {PetId} not found", petId);
+                    return new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm tháy pet",
+                        Data = null
+                    };
+                }
+
+                // Check if pet has appointments
+                var appointments = await _appointmentRepository.GetAppointmentsByPetIdAsync(petId, cancellationToken);
+                if (appointments != null && appointments.Any())
+                {
+                    foreach (var appointment in appointments)
+                    {
+                        if (appointment.AppointmentDate >= DateTime.Now)
+                        {
+                            _logger.LogWarning("Cannot delete pet with ID {PetId} because it has active appointments", petId);
+                            return new BaseResponse<PetResponseDTO>
+                            {
+                                Code = 200,
+                                Success = false,
+                                Message = "Không thể xóa pet vì có lịch hẹn liên kết",
+                                Data = null
+                            };
+                        }
+                        else
+                        {
+                            appointment.isDeleted = true;
+                            int deleteAppoiment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+
+                        }
+
+                    }
+                }
+            
+
+                    // Check if pet has microchip items
+                    var microchipItems = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(petId, cancellationToken);
+                    if (microchipItems != null)
+                    {
+                        microchipItems.isDeleted = true;
+                        int deleteMicrochipItem = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItems, cancellationToken);
+                    }
+
+                    //check if pet has vaccine profile
+                    var vaccineProfile = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(petId, cancellationToken);
+                    if (vaccineProfile != null)
+                    {
+                        vaccineProfile.isDeleted = true;
+                        int isVaccineProfileUpdated = await _vaccineProfileRepository.UpdateVaccineProfileAsync(vaccineProfile, cancellationToken);
+                    }
+
+                    pet.isDeleted = true;
+                    int isDeleted = await _petRepository.UpdatePetAsync(pet, cancellationToken);
+                    if (isDeleted <= 0)
+                    {
+                        _logger.LogWarning("Failed to delete pet with ID {PetId}", petId);
+                        return new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Không thể xóa pet",
+                            Data = null
+                        };
+                    }
+
+                    _logger.LogInformation("Pet with ID {PetId} deleted successfully", petId);
+                    return new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 200,
+                        Success = true,
+                        Message = "Pet xóa thành công",
+                        Data = null
+                    };
+                
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting pet with ID {PetId}", petId);
+                return new BaseResponse<PetResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Error while deleting pet: " + (ex.InnerException?.Message ?? ex.Message),
+                    Data = null
                 };
             }
         }

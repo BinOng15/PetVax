@@ -63,5 +63,12 @@ namespace PediVax.Controllers
             var response = await _petService.GetPetsByCustomerIdAsync(accountId, cancellationToken);
             return StatusCode(response.FirstOrDefault()?.Code ?? 200, response);
         }
+
+        [HttpDelete("delete-pet/{petId}")]
+        public async Task<IActionResult> DeletePet(int petId, CancellationToken cancellationToken = default)
+        {
+            var response = await _petService.DeletePetById(petId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
  }

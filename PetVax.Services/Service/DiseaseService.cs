@@ -288,7 +288,7 @@ namespace PetVax.Services.Service
         {
             try
             {
-                if (species != "Chó" && species != "Mèo")
+                if (species.ToLower() != "dog" && species.ToLower() != "cat")
                 {
                     _logger.LogError($"GetDiseaseBySpeciesAsync: Invalid species {species}");
                     return new BaseResponse<List<DiseaseResponseDTO>>

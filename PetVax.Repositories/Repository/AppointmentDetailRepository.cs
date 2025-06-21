@@ -199,5 +199,16 @@ namespace PetVax.Repositories.Repository
         {
             return await UpdateAsync(appointmentDetail, cancellationToken);
         }
+
+        public async Task<AppointmentDetail> GetAppointmentDetailandServiceTypeByPetIdAsync(int petId, CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(ad => ad.Vet)
+                .Include(ad => ad.PetPassport)
+                .Include(ad => ad.HealthCondition)
+                .Include(ad => ad.VaccineBatch)
+                .Include(ad => ad.Disease)
+                .FirstOrDefaultAsync(ad => ad.Appointment.PetId == petId, cancellationToken);
+        }
     }
 }

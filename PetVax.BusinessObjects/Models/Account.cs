@@ -24,6 +24,8 @@ namespace PetVax.BusinessObjects.Models
         public DateTime CreatedAt { get; set; }
         public string? CreatedBy { get; set; }
 
+        public bool? isDeleted { get; set; } = false; // Default to false, indicating the account is not deleted
+
 
         // Navigation properties
 

@@ -32,6 +32,7 @@ namespace PetVax.BusinessObjects.Models
         public string ApprovedBy { get; set; } // User who approved the passport
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
+        public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual Pet Pet { get; set; }

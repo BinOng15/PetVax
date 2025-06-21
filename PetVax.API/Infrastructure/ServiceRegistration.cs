@@ -38,6 +38,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVetScheduleRepository, VetScheduleRepository>();
             services.AddScoped<IMicrochipRepository, MicrochipRepository>();
             services.AddScoped<IVaccineProfileDiseaseRepository, VaccineProfileDiseaseRepository>();
+            services.AddScoped<IMicrochipItemRepository, MicrochipItemRepository>();
 
 
             //Register services
@@ -59,6 +60,8 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVetService, VetService>();
             services.AddScoped<IMicrochipService, MicrochipService>();
             services.AddHostedService<VetScheduleBackgroundService>();
+            services.AddScoped<IMicrochipItemService, MicrochipItemService>();
+
 
             #endregion
 
