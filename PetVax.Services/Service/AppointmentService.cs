@@ -1247,6 +1247,43 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<BaseResponse<List<AppointmentResponseDTO>>> GetAppointmentStatusAsync(AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointment = await _appointmentRepository.GetAppointmentsByStatusAsync(status, cancellationToken);
+                if (appointment == null || !appointment.Any())
+                {
+                    return new BaseResponse<List<AppointmentResponseDTO>>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn với trạng thái đã chỉ định.",
+                        Data = null
+                    };
+                }
+                var appointmentResponse = _mapper.Map<List<AppointmentResponseDTO>>(appointment);
+                return new BaseResponse<List<AppointmentResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy cuộc hẹn theo trạng thái thành công.",
+                    Data = appointmentResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy cuộc hẹn theo ID thú cưng và trạng thái.");
+                return new BaseResponse<List<AppointmentResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy cuộc hẹn theo ID thú cưng và trạng thái.",
+                    Data = null
+                };
+            }
+        }
         private DateTime? ExtractDateFromVaccinationInfo(string vaccinationInfo)
         {
             if (string.IsNullOrWhiteSpace(vaccinationInfo))
