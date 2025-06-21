@@ -22,6 +22,6 @@ namespace PetVax.BusinessObjects.Models
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string? CreatedBy { get; set; } // User who created the record
         public string? Notes { get; set; } // Additional notes about the microchip
-        bool? isDeleted { get; set; } = false;
+        public bool? isDeleted { get; set; } = false;
     }
 }
