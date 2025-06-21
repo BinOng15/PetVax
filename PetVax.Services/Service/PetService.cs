@@ -531,40 +531,28 @@ namespace PetVax.Services.Service
                         }
 
                     }
+                }
+            
 
                     // Check if pet has microchip items
                     var microchipItems = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(petId, cancellationToken);
                     if (microchipItems != null)
                     {
-                        _logger.LogWarning("Cannot delete pet with ID {PetId} because it has associated microchip items", petId);
-                        return new BaseResponse<PetResponseDTO>
-                        {
-                            Code = 200,
-                            Success = false,
-                            Message = "Không thể xóa pet vì có microchip liên kết",
-                            Data = null
-                        };
+                        microchipItems.isDeleted = true;
+                        int deleteMicrochipItem = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItems, cancellationToken);
                     }
 
                     //check if pet has vaccine profile
                     var vaccineProfile = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(petId, cancellationToken);
                     if (vaccineProfile != null)
                     {
-                        _logger.LogWarning("Cannot delete pet with ID {PetId} because it has an associated vaccine profile", petId);
-                        return new BaseResponse<PetResponseDTO>
-                        {
-                            Code = 200,
-                            Success = false,
-                            Message = "Không thể xóa pet vì có hồ sơ tiêm chủng liên kết",
-                            Data = null
-                        };
+                        vaccineProfile.isDeleted = true;
+                        int isVaccineProfileUpdated = await _vaccineProfileRepository.UpdateVaccineProfileAsync(vaccineProfile, cancellationToken);
                     }
-                    else
-                    {
-                        bool isVaccineProfileDeleted = await _vaccineProfileRepository.DeleteVaccineProfileAsync(vaccineProfile.VaccineProfileId, cancellationToken);
-                    }
-                    bool isDeleted = await _petRepository.DeletePetAsync(petId, cancellationToken);
-                    if (!isDeleted)
+
+                    pet.isDeleted = true;
+                    int isDeleted = await _petRepository.UpdatePetAsync(pet, cancellationToken);
+                    if (isDeleted <= 0)
                     {
                         _logger.LogWarning("Failed to delete pet with ID {PetId}", petId);
                         return new BaseResponse<PetResponseDTO>
@@ -584,7 +572,7 @@ namespace PetVax.Services.Service
                         Message = "Pet xóa thành công",
                         Data = null
                     };
-                }
+                
             }
             catch (Exception ex)
             {
