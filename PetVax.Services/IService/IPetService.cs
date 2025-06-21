@@ -18,5 +18,6 @@ namespace PetVax.Services.IService
 
         Task<BaseResponse<PetResponseDTO>> CreatePetAsync(CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken);
         Task<List<BaseResponse<PetResponseDTO>>> GetPetsByCustomerIdAsync(int accountId, CancellationToken cancellationToken);
+        Task<BaseResponse<PetResponseDTO>> DeletePetById(int petId, CancellationToken cancellationToken);
     }
 }

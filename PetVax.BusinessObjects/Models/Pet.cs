@@ -32,6 +32,7 @@ namespace PetVax.BusinessObjects.Models
         public string CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
+        bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual Customer Customer { get; set; } // Navigation to Customer table
