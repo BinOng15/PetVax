@@ -82,6 +82,17 @@ namespace PetVax.Repositories.Repository
                 .Where(a => a.PetId == petId)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<List<Appointment>> GetAppointmentsByStatusAsync(EnumList.AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            return await _context.Set<Appointment>()
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Account)
+                .Include(a => a.Pet)
+                .Where(a => a.AppointmentStatus == status)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<int> UpdateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken)
         {
             return await UpdateAsync(appointment, cancellationToken);

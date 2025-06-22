@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PediVax.BusinessObjects.DBContext;
+using PetVax.BusinessObjects.DTO;
+using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.Models;
 using PetVax.Services.IService;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PediVax.Controllers
 {
@@ -23,7 +25,7 @@ namespace PediVax.Controllers
             _microchipItemService = microchipItemService;
         }
 
-        [HttpGet("get-information-by-microchip-code")]
+        [HttpGet("get-information-of-pet-by-microchip-code")]
         public async Task<IActionResult> GetMicrochipItemsByMicrochipCode(string microchipCode, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(microchipCode))
@@ -46,6 +48,35 @@ namespace PediVax.Controllers
         public async Task<IActionResult> UpdateMicrochipItem(int id, [FromBody] UpdateMicrochipItemRequest microchipItem, CancellationToken cancellationToken = default)
         {
             var response = await _microchipItemService.UpdateMicrochipItemAsync(id, microchipItem, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+
+        [HttpGet("get-microchip-item-by-/{id}")]
+        public async Task<IActionResult> GetMicrochipItemById(int id, CancellationToken cancellationToken = default)
+        {
+            var response = await _microchipItemService.GetMicrochipItemByIdAsync(id, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+
+        [HttpGet("get-all-microchip-items")]
+        public async Task<IActionResult> GetAllMicrochipItemsPaging([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = null, CancellationToken cancellationToken = default)
+        {
+            var request = new GetAllItemsDTO
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                KeyWord = keyWord,
+                Status = status
+            };
+            var response = await _microchipItemService.GetAllMicrochipItemsPagingAsync(request, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+
+        [HttpDelete("delete-microchip-item/{id}")]
+        public async Task<IActionResult> DeleteMicrochipItem(int id, CancellationToken cancellationToken = default)
+        {
+
+            var response = await _microchipItemService.DeleteMicrochipItemAsync(id, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }

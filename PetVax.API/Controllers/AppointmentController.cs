@@ -8,6 +8,7 @@ using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.Enum;
 using PetVax.Services.IService;
 using static PetVax.BusinessObjects.DTO.AppointmentDTO.CreateAppointmentDTO;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PetVax.Controllers
 {
@@ -92,6 +93,13 @@ namespace PetVax.Controllers
         public async Task<IActionResult> UpdateAppointmentVaccination(int appointmentId, [FromForm] UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentService.UpdateAppointmentVaccination(appointmentId, updateAppointmentVaccinationDTO, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+
+        [HttpGet("get-appointment-by-status/{status}")]
+        public async Task<IActionResult> GetAppointmentByStatus(AppointmentStatus status, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentService.GetAppointmentStatusAsync(status, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }

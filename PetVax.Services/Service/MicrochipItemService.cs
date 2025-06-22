@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
@@ -309,7 +310,7 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                if(checkMicroipItem.PetId != null && checkMicroipItem.PetId > 0)
+                if (checkMicroipItem.PetId != null && checkMicroipItem.PetId > 0)
                 {
                     return new BaseResponse<BaseMicrochipItemResponse>
                     {
@@ -349,6 +350,164 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Message = "Lỗi khi cập nhật Microchip: " + ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<BaseMicrochipItemResponse>> GetMicrochipItemByIdAsync(int id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                //  Validate MicrochipItem exists
+                var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(id, cancellationToken);
+                if (microchipItem == null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "Microchip Item không tồn tại!",
+                        Data = null
+                    };
+                }
+
+                return new BaseResponse<BaseMicrochipItemResponse>
+                {
+                    Code = 200,
+                    Message = "Lấy Microchip Item thành công!",
+                    Data = _mapper.Map<BaseMicrochipItemResponse>(microchipItem)
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<BaseMicrochipItemResponse>
+                {
+                    Code = 500,
+                    Message = "Lỗi khi lấy Microchip: " + ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<MegaData<BaseMicrochipItemResponse>>> GetAllMicrochipItemsPagingAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var microchipItems = await _microchipItemRepository.GetAllMicrochipItemsAsync(cancellationToken);
+
+                // Filter by keyword if provided (search by Name or Description)
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
+                {
+                    var lowerKeyword = getAllItemsDTO.KeyWord.Trim().ToLower();
+                    microchipItems = microchipItems
+                        .Where(m => (m.Name != null && m.Name.ToLower().Contains(lowerKeyword)) ||
+                                    (m.Description != null && m.Description.ToLower().Contains(lowerKeyword)))
+                        .ToList();
+                }
+
+                // Pagination
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = microchipItems.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+
+                var pagedItems = microchipItems
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+
+                var responseData = new MegaData<BaseMicrochipItemResponse>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage,
+                        Sort = null,
+                        Order = null
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                        status = getAllItemsDTO?.Status,
+                    },
+                    PageData = _mapper.Map<List<BaseMicrochipItemResponse>>(pagedItems)
+                };
+
+                if (!pagedItems.Any())
+                {
+                    return new BaseResponse<MegaData<BaseMicrochipItemResponse>>
+                    {
+                        Code = 200,
+                        Success = true,
+                        Message = "Không tìm thấy Microchip Item nào phù hợp với tiêu chí tìm kiếm",
+                        Data = null
+                    };
+                }
+
+                return new BaseResponse<MegaData<BaseMicrochipItemResponse>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy danh sách Microchip Item thành công",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<MegaData<BaseMicrochipItemResponse>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Lỗi khi lấy danh sách Microchip Item: " + (ex.InnerException?.Message ?? ex.Message),
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<BaseMicrochipItemResponse>> DeleteMicrochipItemAsync(int microchipItemId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                //  Validate MicrochipItem exists
+                var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(microchipItemId, cancellationToken);
+                if (microchipItem == null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "Microchip Item không tồn tại!",
+                        Data = null
+                    };
+                }
+                //  Delete MicrochipItem
+                microchipItem.isDeleted = true;
+                var result = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
+                if (result <= 0)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 500,
+                        Message = "Lỗi khi xóa Microchip Item!",
+                        Data = null
+                    };
+                }
+                return new BaseResponse<BaseMicrochipItemResponse>
+                {
+                    Code = 200,
+                    Message = "Xóa Microchip Item thành công!",
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<BaseMicrochipItemResponse>
+                {
+                    Code = 500,
+                    Message = "Lỗi khi xóa Microchip Item: " + ex.Message,
                     Data = null
                 };
             }
