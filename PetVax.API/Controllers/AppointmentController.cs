@@ -102,5 +102,12 @@ namespace PetVax.Controllers
             var response = await _appointmentService.GetAppointmentStatusAsync(status, cancellationToken);
             return StatusCode(response.Code, response);
         }
+
+        [HttpGet("get-appointment-by-customer-and-status/{customerId}/{status}")]
+        public async Task<IActionResult> GetAppointmentByCustomerIddAndStatus(int customerId, AppointmentStatus status, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentService.GetAppointmentByCustomerIdAndStatusAsync(customerId, status, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

@@ -23,6 +23,7 @@ namespace PetVax.Repositories.IRepository
         Task<IDbContextTransaction> BeginTransactionAsync();
 
         Task<List<Appointment>> GetAppointmentsByStatusAsync(AppointmentStatus status, CancellationToken cancellationToken);
+        Task<List<Appointment>> GetAppointmentsByCustomerIdAndStatusAsync(int customerId, AppointmentStatus status, CancellationToken cancellationToken);
 
     }
 }
