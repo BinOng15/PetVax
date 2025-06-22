@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PetVax.Repositories.Repository
 {
@@ -96,6 +97,16 @@ namespace PetVax.Repositories.Repository
         public async Task<int> UpdateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken)
         {
             return await UpdateAsync(appointment, cancellationToken);
+        }
+
+        public async Task<List<Appointment>> GetAppointmentsByCustomerIdAndStatusAsync(int customerId, AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            return await _context.Set<Appointment>()
+                .Include(a => a.Customer)
+                .ThenInclude(c => c.Account)
+                .Include(a => a.Pet)
+                .Where(a => a.CustomerId == customerId && a.AppointmentStatus == status)
+                .ToListAsync(cancellationToken);
         }
     }
 }

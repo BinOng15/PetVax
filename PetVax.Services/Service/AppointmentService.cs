@@ -1299,6 +1299,43 @@ namespace PetVax.Services.Service
             }
             return null;
         }
+
+        public async Task<BaseResponse<List<AppointmentResponseDTO>>> GetAppointmentByCustomerIdAndStatusAsync(int customerId, AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointment = await _appointmentRepository.GetAppointmentsByCustomerIdAndStatusAsync(customerId, status, cancellationToken);
+                if (appointment == null)
+                {
+                    return new BaseResponse<List<AppointmentResponseDTO>>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn cho khách hàng này với trạng thái đã chỉ định.",
+                        Data = null
+                    };
+                }
+                var appointmentResponse = _mapper.Map<List<AppointmentResponseDTO>>(appointment);
+                return new BaseResponse<List<AppointmentResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy cuộc hẹn theo khách hàng và trạng thái thành công.",
+                    Data = appointmentResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy cuộc hẹn theo ID thú cưng và trạng thái.");
+                return new BaseResponse<List<AppointmentResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy cuộc hẹn theo ID thú cưng và trạng thái.",
+                    Data = null
+                };
+            }
+        }
         private int GetSlotNumberFromAppointmentDate(DateTime appointmentDate)
         {
             var hour = appointmentDate.Hour;
