@@ -53,7 +53,7 @@ namespace PediVax.Controllers
         [HttpPost("CreateMicrochip")]
         public async Task<IActionResult> CreateMicrochip([FromBody] MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken)
         {
-            var response = await _microchipService.CreateMicrochipAsync(microchipRequestDTO, cancellationToken);
+            var response = await _microchipService.CreateFullMicrochipAsync(microchipRequestDTO, cancellationToken);
             return Ok(response);
         }
         [HttpPut("UpdateMicrochip/{microchipId}")]

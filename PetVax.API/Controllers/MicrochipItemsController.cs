@@ -36,13 +36,13 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
 
-        [HttpPost("create-microchip-item")]
-        public async Task<IActionResult> CreateMicrochipItem([FromBody] CreateMicrochipItemRequest microchipItem, CancellationToken cancellationToken = default)
-        {
+        //[HttpPost("create-microchip-item")]
+        //public async Task<IActionResult> CreateMicrochipItem([FromBody] CreateMicrochipItemRequest microchipItem, CancellationToken cancellationToken = default)
+        //{
 
-            var response = await _microchipItemService.CreateMicrochipItemAsync(microchipItem, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
+        //    var response = await _microchipItemService.CreateMicrochipItemAsync(microchipItem, cancellationToken);
+        //    return StatusCode(response.Code, response);
+        //}
 
         [HttpPut("update-microchip-item/{id}")]
         public async Task<IActionResult> UpdateMicrochipItem(int id, [FromBody] UpdateMicrochipItemRequest microchipItem, CancellationToken cancellationToken = default)

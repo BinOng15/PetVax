@@ -151,111 +151,111 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<BaseMicrochipItemResponse>> CreateMicrochipItemAsync(CreateMicrochipItemRequest request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                //  Validate Microchip exists
-                var microchip = await _microchipRepository.GetMicrochipByIdAsync(request.MicrochipId, cancellationToken);
-                if (microchip == null || microchip.Status.Equals("Unavailable"))
-                {
-                    return new BaseResponse<BaseMicrochipItemResponse>
-                    {
-                        Code = 200,
-                        Message = "Microchip không tồn tại hoặc microchip chưa kích hoạt!",
-                        Data = null
-                    };
-                }
+        //public async Task<BaseResponse<BaseMicrochipItemResponse>> CreateMicrochipItemAsync(CreateMicrochipItemRequest request, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        //  Validate Microchip exists
+        //        var microchip = await _microchipRepository.GetMicrochipByIdAsync(request.MicrochipId, cancellationToken);
+        //        if (microchip == null || microchip.Status.Equals("Unavailable"))
+        //        {
+        //            return new BaseResponse<BaseMicrochipItemResponse>
+        //            {
+        //                Code = 200,
+        //                Message = "Microchip không tồn tại hoặc microchip chưa kích hoạt!",
+        //                Data = null
+        //            };
+        //        }
 
 
-                //  Check if MicrochipItem already exists
-                var checkMicroipItem = await _microchipItemRepository.GetMicrochipItemByMicrochipIdAsync(request.MicrochipId, cancellationToken);
+        //        //  Check if MicrochipItem already exists
+        //        var checkMicroipItem = await _microchipItemRepository.GetMicrochipItemByMicrochipIdAsync(request.MicrochipId, cancellationToken);
 
-                if (microchip.MicrochipId == checkMicroipItem?.MicrochipId)
-                {
-                    return new BaseResponse<BaseMicrochipItemResponse>
-                    {
-                        Code = 200,
-                        Message = "Microchip item đã được tạo!",
-                        Data = null
-                    };
-                }
+        //        if (microchip.MicrochipId == checkMicroipItem?.MicrochipId)
+        //        {
+        //            return new BaseResponse<BaseMicrochipItemResponse>
+        //            {
+        //                Code = 200,
+        //                Message = "Microchip item đã được tạo!",
+        //                Data = null
+        //            };
+        //        }
 
-                //  Check if Microchip is already installed
-                if (checkMicroipItem.PetId != null && checkMicroipItem.PetId > 0)
-                {
-                    return new BaseResponse<BaseMicrochipItemResponse>
-                    {
-                        Code = 200,
-                        Message = "Microchip đã được cấy vào cho thú cưng " + checkMicroipItem.PetId,
-                        Data = null
-                    };
-                }
+        //        //  Check if Microchip is already installed
+        //        if (checkMicroipItem.PetId != null && checkMicroipItem.PetId > 0)
+        //        {
+        //            return new BaseResponse<BaseMicrochipItemResponse>
+        //            {
+        //                Code = 200,
+        //                Message = "Microchip đã được cấy vào cho thú cưng " + checkMicroipItem.PetId,
+        //                Data = null
+        //            };
+        //        }
 
-                //  Check if Pet already has a MicrochipItem installed
-                var checkInstalled = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(request.PetId, cancellationToken);
-                if (checkInstalled != null)
-                {
-                    return new BaseResponse<BaseMicrochipItemResponse>
-                    {
-                        Code = 200,
-                        Message = "Thú cưng này đã được cấy microchip",
-                        Data = null
-                    };
-                }
+        //        //  Check if Pet already has a MicrochipItem installed
+        //        var checkInstalled = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(request.PetId, cancellationToken);
+        //        if (checkInstalled != null)
+        //        {
+        //            return new BaseResponse<BaseMicrochipItemResponse>
+        //            {
+        //                Code = 200,
+        //                Message = "Thú cưng này đã được cấy microchip",
+        //                Data = null
+        //            };
+        //        }
 
-                //  Validate Pet exists
-                var pet = await _petRepository.GetPetAndAppointmentByIdAsync(request.PetId, cancellationToken);
-                if (pet == null)
-                {
-                    return new BaseResponse<BaseMicrochipItemResponse>
-                    {
-                        Code = 200,
-                        Message = "Thú cưng không tồn tại!",
-                        Data = null
-                    };
-                }
+        //        //  Validate Pet exists
+        //        var pet = await _petRepository.GetPetAndAppointmentByIdAsync(request.PetId, cancellationToken);
+        //        if (pet == null)
+        //        {
+        //            return new BaseResponse<BaseMicrochipItemResponse>
+        //            {
+        //                Code = 200,
+        //                Message = "Thú cưng không tồn tại!",
+        //                Data = null
+        //            };
+        //        }
 
-                //  Map request to MicrochipItem entity
-                MicrochipItem microchipItem = new MicrochipItem();
+        //        //  Map request to MicrochipItem entity
+        //        MicrochipItem microchipItem = new MicrochipItem();
 
-                microchipItem.MicrochipId = request.MicrochipId;
-                microchipItem.PetId = request.PetId;
-                microchipItem.Name = request.Name;
-                microchipItem.Description = request.Description;
-                microchipItem.InstallationDate = request.InstallationDate;
-                microchipItem.CreatedAt = DateTime.UtcNow;
-                microchipItem.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+        //        microchipItem.MicrochipId = request.MicrochipId;
+        //        microchipItem.PetId = request.PetId;
+        //        microchipItem.Name = request.Name;
+        //        microchipItem.Description = request.Description;
+        //        microchipItem.InstallationDate = request.InstallationDate;
+        //        microchipItem.CreatedAt = DateTime.UtcNow;
+        //        microchipItem.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
 
-                if (request.PetId == null || request.PetId <= 0)
-                {
-                    microchipItem.Status = "InActive";
-                }
-                else
-                {
-                    microchipItem.Status = "Active";
-                }
-                //  Save to repository
-                var result = await _microchipItemRepository.CreateMicrochipItemAsync(microchipItem, cancellationToken);
-                var microchipItemCheck = await _microchipItemRepository.GetMicrochipItemByIdAsync(microchipItem.MicrochipItemId, cancellationToken);
-                return new BaseResponse<BaseMicrochipItemResponse>
-                {
-                    Code = 201,
-                    Message = "Tạo Microchip thành công!",
-                    Data = _mapper.Map<BaseMicrochipItemResponse>(microchipItemCheck)
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<BaseMicrochipItemResponse>
-                {
-                    Code = 500,
-                    Message = "Lỗi khi tạo Microchip: " + ex.Message,
-                    Data = null
-                };
-            }
+        //        if (request.PetId == null || request.PetId <= 0)
+        //        {
+        //            microchipItem.Status = "InActive";
+        //        }
+        //        else
+        //        {
+        //            microchipItem.Status = "Active";
+        //        }
+        //        //  Save to repository
+        //        var result = await _microchipItemRepository.CreateMicrochipItemAsync(microchipItem, cancellationToken);
+        //        var microchipItemCheck = await _microchipItemRepository.GetMicrochipItemByIdAsync(microchipItem.MicrochipItemId, cancellationToken);
+        //        return new BaseResponse<BaseMicrochipItemResponse>
+        //        {
+        //            Code = 201,
+        //            Message = "Tạo Microchip thành công!",
+        //            Data = _mapper.Map<BaseMicrochipItemResponse>(microchipItemCheck)
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new BaseResponse<BaseMicrochipItemResponse>
+        //        {
+        //            Code = 500,
+        //            Message = "Lỗi khi tạo Microchip: " + ex.Message,
+        //            Data = null
+        //        };
+        //    }
 
-        }
+        //}
 
         public async Task<BaseResponse<BaseMicrochipItemResponse>> UpdateMicrochipItemAsync(int microchipItemId, UpdateMicrochipItemRequest request, CancellationToken cancellationToken)
         {
