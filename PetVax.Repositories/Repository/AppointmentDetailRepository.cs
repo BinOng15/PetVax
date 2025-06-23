@@ -210,5 +210,14 @@ namespace PetVax.Repositories.Repository
                 .Include(ad => ad.Disease)
                 .FirstOrDefaultAsync(ad => ad.Appointment.PetId == petId, cancellationToken);
         }
+
+        public async Task<AppointmentDetail> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(ad => ad.Vet)
+                .Include(ad => ad.VaccineBatch)
+                .Include(ad => ad.Disease)
+                .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
+        }
     }
 }

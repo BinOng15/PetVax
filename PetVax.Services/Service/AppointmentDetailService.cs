@@ -591,5 +591,42 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var vaccinations = await _appointmentDetailRepository.GetAppointmentVaccinationByAppointmentId(appointmentId, cancellationToken);
+                if (vaccinations == null)
+                {
+                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy thông tin lịch tiêm theo id lịch hẹn",
+                        Data = null
+                    };
+                }
+                var vaccinationResponse = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(vaccinations);
+                return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin lịch tiêm thành công",
+                    Data = vaccinationResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy thông tin tiêm phòng theo id lịch hẹn");
+                return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy thông tin tiêm phòng theo id lịch hẹn",
+                    Data = null
+                };
+            }
+        }
     }
 }
