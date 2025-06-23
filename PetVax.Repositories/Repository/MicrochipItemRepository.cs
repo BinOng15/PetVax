@@ -18,7 +18,9 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<int> CreateMicrochipItemAsync(MicrochipItem microchipItem, CancellationToken cancellationToken)
         {
-            return await CreateAsync(microchipItem, cancellationToken);
+            _context.Add(microchipItem);
+            await _context.SaveChangesAsync(cancellationToken);
+            return microchipItem.MicrochipItemId;
         }
 
         public async Task<bool> DeleteMicrochipItemAsync(int microchipItemId, CancellationToken cancellationToken)

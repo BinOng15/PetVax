@@ -36,13 +36,13 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
 
-        [HttpPost("create-microchip-item")]
-        public async Task<IActionResult> CreateMicrochipItem([FromBody] CreateMicrochipItemRequest microchipItem, CancellationToken cancellationToken = default)
-        {
+        //[HttpPost("create-microchip-item")]
+        //public async Task<IActionResult> CreateMicrochipItem([FromBody] CreateMicrochipItemRequest microchipItem, CancellationToken cancellationToken = default)
+        //{
 
-            var response = await _microchipItemService.CreateMicrochipItemAsync(microchipItem, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
+        //    var response = await _microchipItemService.CreateMicrochipItemAsync(microchipItem, cancellationToken);
+        //    return StatusCode(response.Code, response);
+        //}
 
         [HttpPut("update-microchip-item/{id}")]
         public async Task<IActionResult> UpdateMicrochipItem(int id, [FromBody] UpdateMicrochipItemRequest microchipItem, CancellationToken cancellationToken = default)
@@ -77,6 +77,13 @@ namespace PediVax.Controllers
         {
 
             var response = await _microchipItemService.DeleteMicrochipItemAsync(id, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+
+        [HttpPatch("assign-chip-for-pet/{micorchipItemId}/{petId}")]
+        public async Task<IActionResult> AssignChipForPet(int micorchipItemId, int petId, CancellationToken cancellationToken = default)
+        {
+            var response = await _microchipItemService.AssignChipForPet(micorchipItemId, petId, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }
