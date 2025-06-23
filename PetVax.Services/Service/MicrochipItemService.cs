@@ -512,5 +512,78 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<BaseResponse<BaseMicrochipItemResponse>> AssignChipForPet(int id, int petId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                //  Validate Pet exists
+                var pet = await _petRepository.GetPetAndAppointmentByIdAsync(petId, cancellationToken);
+                if (pet == null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "Thú cưng không tồn tại!",
+                        Data = null
+                    };
+                }
+
+                var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(id, cancellationToken);
+                if (microchipItem == null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "Microchip Item không tồn tại!",
+                        Data = null
+                    };
+                }
+
+                if(microchipItem.PetId != null && microchipItem.PetId > 0)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "Microchip đã được cấy vào cho thú cưng khác",
+                        Data = null
+                    };
+                }
+                else
+                {
+                    microchipItem.PetId = petId;
+                }
+
+                 //  Check if Pet already has a MicrochipItem installed
+                 var checkInstalled = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(petId, cancellationToken);
+                if (checkInstalled != null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "Thú cưng này đã được cấy microchip",
+                        Data = null
+                    };
+                }
+                var result = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
+
+                return new BaseResponse<BaseMicrochipItemResponse>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Gắn Microchip cho thú cưng thành công",
+                    Data = _mapper.Map<BaseMicrochipItemResponse>(microchipItem)
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<BaseMicrochipItemResponse>
+                {
+                    Code = 500,
+                    Message = "Lỗi khi cập nhật Microchip: " + ex.Message,
+                    Data = null
+                };
+            }
+        }
     }
 }

@@ -79,5 +79,12 @@ namespace PediVax.Controllers
             var response = await _microchipItemService.DeleteMicrochipItemAsync(id, cancellationToken);
             return StatusCode(response.Code, response);
         }
+
+        [HttpPatch("assign-chip-for-pet/{micorchipItemId}/{petId}")]
+        public async Task<IActionResult> AssignChipForPet(int micorchipItemId, int petId, CancellationToken cancellationToken = default)
+        {
+            var response = await _microchipItemService.AssignChipForPet(micorchipItemId, petId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }
