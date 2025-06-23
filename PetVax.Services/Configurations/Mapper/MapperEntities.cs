@@ -119,6 +119,10 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease))
                 .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment));
 
+            CreateMap<AppointmentDetail, AppointmentMicrochipResponseDTO>()
+                .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
+                .ForMember(dest => dest.MicrochipItem, opt => opt.MapFrom(src => src.MicrochipItem));
+
             //Microchip
             CreateMap<Microchip, MicrochipResponseDTO>();
             CreateMap<MicrochipRequestDTO, Microchip>();

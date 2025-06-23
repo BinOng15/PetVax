@@ -24,4 +24,10 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         [Required(ErrorMessage = "Vui lòng chọn bệnh để tiêm")]
         public int DiseaseId { get; set; }
     }
+
+    public class CreateAppointmentDetailMicrochipDTO
+    {
+        [Required(ErrorMessage = "Vui lòng chọn mã microchip")]
+        public int MicrochipItemId { get; set; }
+    }
 }

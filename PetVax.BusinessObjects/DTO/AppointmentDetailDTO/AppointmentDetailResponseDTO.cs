@@ -1,5 +1,6 @@
 ﻿using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.Enum;
@@ -79,9 +80,9 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
-        public string? ModifiedBy { get; set; } // User who last modified the record
-        public VetResponseDTO Vet { get; set; } // Navigation to Vet table
-        public MicrochipItemResponseDTO MicrochipItem { get; set; } // Navigation to MicrochipItem table
+        public string? ModifiedBy { get; set; }
+        public VetResponseDTO Vet { get; set; }// User who last modified the record
+        public BaseMicrochipItemResponse MicrochipItem { get; set; } // Navigation to MicrochipItem table
     }
 
     public class AppointmentHealthCertificateResponseDTO
