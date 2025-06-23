@@ -16,11 +16,11 @@ namespace PetVax.Repositories.Repository
         public AppointmentDetailRepository() : base()
         {
         }
-        public async Task<int> AddAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)
+        public async Task<AppointmentDetail> AddAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)
         {
             _context.Add(appointmentDetail);
             await _context.SaveChangesAsync(cancellationToken);
-            return appointmentDetail.AppointmentDetailId;
+            return appointmentDetail;
         }
 
         public async Task<bool> DeleteAppointmentDetailAsync(int id, CancellationToken cancellationToken)
@@ -52,6 +52,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Disease)
                 .Include(a => a.VaccineBatch)
                 .Include(a => a.MicrochipItem)
+                    .ThenInclude(m => m.Microchip)
                 .FirstOrDefaultAsync(a => a.AppointmentDetailId == id, cancellationToken);
         }
 

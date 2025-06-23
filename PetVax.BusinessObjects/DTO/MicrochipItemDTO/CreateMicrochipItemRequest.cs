@@ -8,7 +8,6 @@ namespace PetVax.BusinessObjects.DTO.MicrochipItemDTO
 {
     public class CreateMicrochipItemRequest
     {
-        public int MicrochipId { get; set; } // Foreign key to Microchip table
         public int? PetId { get; set; } // Foreign key to Pet table
         public string Name { get; set; } // e.g., "Microchip A", "Microchip B"
         public string Description { get; set; } // e.g., "Microchip for pet identification"
