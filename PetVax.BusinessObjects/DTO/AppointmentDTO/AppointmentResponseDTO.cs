@@ -27,9 +27,10 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
+        public bool? isDeleted { get; set; } = false; // Soft delete flag
 
         public CustomerResponseDTO CustomerResponseDTO { get; set; }
-        public PetResponseDTO PetResponseDTO { get; set; }
+        public PetResponseDTOs PetResponseDTO { get; set; }
 
     }
     public class AppointmentWithDetailResponseDTO
@@ -42,6 +43,16 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
     {
         public AppointmentResponseDTO Appointment { get; set; }
         public AppointmentVaccinationDetailResponseDTO Vaccinations { get; set; }
+    }
+
+    public class AppointmentForVaccinationResponseDTO
+    {
+        public AppointmentResponseDTO Appointment { get; set; }
+        public AppointmentHasDiseaseResponseDTO AppointmentHasDiseaseResponseDTO { get; set; }
+    }
+    public class AppointmentHasDiseaseResponseDTO
+    {
+        public int DiseaseId { get; set; }
     }
 
     public class AppointmentWithMicorchipResponseDTO

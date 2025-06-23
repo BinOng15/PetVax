@@ -44,7 +44,6 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Customer) // Load Customer
                     .ThenInclude(c => c.Account) // Load Account của Customer
                 .Include(a => a.Pet) // Load Pet
-                    .ThenInclude(p => p.Customer) // Load Customer của Pet (nếu cần)
                 .ToListAsync(cancellationToken);
         }
         public async Task<Appointment> GetAppointmentByIdAsync(int appointmentId, CancellationToken cancellationToken)
@@ -61,7 +60,6 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                    .ThenInclude(p => p.Customer)
                 .Where(a => a.PetId == petId && a.AppointmentStatus == status)
                 .ToListAsync(cancellationToken);
         }
@@ -106,6 +104,46 @@ namespace PetVax.Repositories.Repository
                 .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
                 .Where(a => a.CustomerId == customerId && a.AppointmentStatus == status)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Appointment>> GetAppointmentsByDateRangeAsync(DateTime from, DateTime to, CancellationToken cancellationToken)
+        {
+            return await _context.Set<Appointment>()
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Account)
+                .Include(a => a.Pet)
+                .Where(a => a.AppointmentDate >= from && a.AppointmentDate <= to)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Appointment>> GetPastAppointmentsByCustomerIdAsync(DateTime now, int customerId, CancellationToken cancellationToken)
+        {
+            return await _context.Set<Appointment>()
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Account)
+                .Include(a => a.Pet)
+                .Where(a => a.AppointmentDate < now && a.CustomerId == customerId)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Appointment>> GetTodayAppointmentsByCustomerIdAsync(DateTime today, int customerId, CancellationToken cancellationToken)
+        {
+            return await _context.Set<Appointment>()
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Account)
+                .Include(a => a.Pet)
+                .Where(a => a.AppointmentDate.Date == today.Date && a.CustomerId == customerId)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Appointment>> GetFutureAppointmentsByCustomerIdAsync(DateTime now, int customerId, CancellationToken cancellationToken)
+        {
+            return await _context.Set<Appointment>()
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Account)
+                .Include(a => a.Pet)
+                .Where(a => a.AppointmentDate > now && a.CustomerId == customerId)
                 .ToListAsync(cancellationToken);
         }
     }

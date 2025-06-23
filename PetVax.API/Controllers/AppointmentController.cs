@@ -83,6 +83,12 @@ namespace PetVax.Controllers
             var response = await _appointmentService.DeleteAppointmentAsync(appointmentId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpGet("get-appointment-vaccination-by-id/{appointmentId}")]
+        public async Task<IActionResult> GetAppointmentVaccinationById(int appointmentId, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentService.GetAppointmentVaccinationByIdAsync(appointmentId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
         [HttpPost("create-appointment-vaccination")]
         public async Task<IActionResult> CreateAppointmentVaccination([FromBody] CreateAppointmentVaccinationDTO createAppointmentVaccinationDTO, CancellationToken cancellationToken = default)
         {
@@ -95,25 +101,61 @@ namespace PetVax.Controllers
             var response = await _appointmentService.UpdateAppointmentVaccination(appointmentId, updateAppointmentVaccinationDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
-
+        [HttpPut("update-appointment/{appointmentId}")]
+        public async Task<IActionResult> UpdateAppointment(int appointmentId, [FromBody] UpdateAppointmentForVaccinationDTO updateAppointmentForVaccinationDTO, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentService.UpdateAppointmentVaccinationAsync(appointmentId, updateAppointmentForVaccinationDTO, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
         [HttpGet("get-appointment-by-status/{status}")]
         public async Task<IActionResult> GetAppointmentByStatus(AppointmentStatus status, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentService.GetAppointmentStatusAsync(status, cancellationToken);
             return StatusCode(response.Code, response);
         }
-
         [HttpGet("get-appointment-by-customer-and-status/{customerId}/{status}")]
         public async Task<IActionResult> GetAppointmentByCustomerIddAndStatus(int customerId, AppointmentStatus status, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentService.GetAppointmentByCustomerIdAndStatusAsync(customerId, status, cancellationToken);
             return StatusCode(response.Code, response);
         }
-
         [HttpPost("create-appointment-microchip")]
         public async Task<IActionResult> CreateAppointmentMicrochip([FromBody] CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentService.CreateAppointmentMicrochipAsync(createAppointmentMicrochipDTO, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+        [HttpGet("get-past-appointments-by-customer-id/{customerId}")]
+        public async Task<IActionResult> GetPastAppointmentsByCustomerId(int customerId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+        {
+            var request = new GetAllItemsDTO
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+            var response = await _appointmentService.GetPastAppointmentsByCustomerIdAsync(customerId, request, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+        [HttpGet("get-today-appointments-by-customer-id/{customerId}")]
+        public async Task<IActionResult> GetTodayAppointmentsByCustomerId(int customerId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+        {
+            var request = new GetAllItemsDTO
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+            var response = await _appointmentService.GetTodayAppointmentsByCustomerIdAsync(customerId, request, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+        [HttpGet("get-future-appointments-by-customer-id/{customerId}")]
+        public async Task<IActionResult> GetFutureAppointmentsByCustomerId(int customerId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+        {
+            var request = new GetAllItemsDTO
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+            var response = await _appointmentService.GetFutureAppointmentsByCustomerIdAsync(customerId, request, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }

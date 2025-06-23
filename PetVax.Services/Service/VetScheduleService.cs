@@ -63,6 +63,7 @@ namespace PetVax.Services.Service
                     SearchInfo = new SearchCondition
                     {
                         keyWord = getAllItemsDTO?.KeyWord,
+                        status = getAllItemsDTO?.Status
                     },
                     PageData = pagedSchedules.Select(vs => new VetScheduleDTO
                     {

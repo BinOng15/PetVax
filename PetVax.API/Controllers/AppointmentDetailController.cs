@@ -59,16 +59,22 @@ namespace PediVax.Controllers
             var response = await _appointmentDetailService.DeleteAppointmentDetail(appointmentDetailId, cancellationToken);
             return StatusCode(response.Code, response);
         }
-        [HttpGet("get-appointment-vaccination-by-pet-id/{petId}")]
+        [HttpGet("get-appointment-detail-vaccination-by-pet-id/{petId}")]
         public async Task<IActionResult> GetAppointmentVaccinationByPetId(int petId, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentDetailService.GetAppointmentVaccinationByPetId(petId, cancellationToken);
             return StatusCode(response.Code, response);
         }
-        [HttpGet("get-appointment-vaccination-by-pet-id-and-status/{petId}/{status}")]
+        [HttpGet("get-appointment-detail-vaccination-by-pet-id-and-status/{petId}/{status}")]
         public async Task<IActionResult> GetAppointmentVaccinationByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentDetailService.GetAppointmentVaccinationByPetIdAndStatus(petId, status, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+        [HttpGet("get-appointment-detail-vaccination-by-appointment-id/{appointmentId}")]
+        public async Task<IActionResult> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentDetailService.GetAppointmentVaccinationByAppointmentId(appointmentId, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }

@@ -178,6 +178,7 @@ namespace PetVax.Services.Service
                     SearchInfo = new SearchCondition
                     {
                         keyWord = getAllItemsDTO?.KeyWord,
+                        status = getAllItemsDTO?.Status
                     },
                     PageData = _mapper.Map<List<DiseaseResponseDTO>>(pagedVaccines)
                 };

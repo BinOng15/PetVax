@@ -447,6 +447,7 @@ namespace PetVax.Services.Service
                     SearchInfo = new SearchCondition
                     {
                         keyWord = getAllItemsDTO?.KeyWord,
+                        status = getAllItemsDTO?.Status
                     },
                     PageData = _mapper.Map<List<AppointmentResponseDTO>>(pagedAppointments)
                 };
@@ -652,11 +653,42 @@ namespace PetVax.Services.Service
                     };
                 }
 
-
+                // Validate allowed status transitions
+                var currentStatus = appointment.AppointmentStatus;
+                var newStatus = updateAppointmentVaccinationDTO.AppointmentStatus ?? currentStatus;
+                bool isValidTransition = false;
+                switch (currentStatus)
+                {
+                    case EnumList.AppointmentStatus.Processing:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Confirmed || newStatus == EnumList.AppointmentStatus.Cancelled;
+                        break;
+                    case EnumList.AppointmentStatus.Confirmed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.CheckedIn || newStatus == EnumList.AppointmentStatus.Rejected;
+                        break;
+                    case EnumList.AppointmentStatus.CheckedIn:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Processed;
+                        break;
+                    case EnumList.AppointmentStatus.Processed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Completed;
+                        break;
+                    default:
+                        isValidTransition = false;
+                        break;
+                }
+                if (newStatus != currentStatus && !isValidTransition)
+                {
+                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = $"Không thể chuyển trạng thái từ {currentStatus} sang {newStatus}.",
+                        Data = null
+                    };
+                }
 
                 bool isStatusChangeToProcessed = updateAppointmentVaccinationDTO.AppointmentStatus.HasValue &&
-                                                updateAppointmentVaccinationDTO.AppointmentStatus.Value == EnumList.AppointmentStatus.Processed &&
-                                                appointment.AppointmentStatus != EnumList.AppointmentStatus.Processed;
+                                                 updateAppointmentVaccinationDTO.AppointmentStatus.Value == EnumList.AppointmentStatus.Processed &&
+                                                 appointment.AppointmentStatus != EnumList.AppointmentStatus.Processed;
 
                 if (appointment.ServiceType != EnumList.ServiceType.Vaccination)
                 {
@@ -696,7 +728,7 @@ namespace PetVax.Services.Service
                                 Data = null
                             };
                         }
-                        vaccineBatch.Quantity -= 1; // Giảm số lượng vaccine trong lô
+                        vaccineBatch.Quantity -= 1;
                         await _vaccineBatchRepository.UpdateVaccineBatchAsync(vaccineBatch, cancellationToken);
                     }
                 }
@@ -742,10 +774,14 @@ namespace PetVax.Services.Service
                         };
                     }
                 }
-                var newStatus = updateAppointmentVaccinationDTO.AppointmentStatus ?? appointmentDetail.AppointmentStatus;
                 appointmentDetail.VetId = updateAppointmentVaccinationDTO.VetId;
                 appointmentDetail.Dose = updateAppointmentVaccinationDTO.Dose;
                 appointmentDetail.Reaction = updateAppointmentVaccinationDTO.Reaction;
+                appointmentDetail.Temperature = updateAppointmentVaccinationDTO.Temperature;
+                appointmentDetail.HeartRate = updateAppointmentVaccinationDTO.HeartRate;
+                appointmentDetail.Others = updateAppointmentVaccinationDTO.Others;
+                appointmentDetail.GeneralCondition = updateAppointmentVaccinationDTO.GeneralCondition;
+                appointmentDetail.Notes = updateAppointmentVaccinationDTO.Notes;
                 appointmentDetail.AppointmentStatus = newStatus;
                 appointmentDetail.NextVaccinationInfo = updateAppointmentVaccinationDTO.NextVaccinationInfo;
                 appointmentDetail.ModifiedAt = DateTime.UtcNow;
@@ -755,15 +791,11 @@ namespace PetVax.Services.Service
                 appointment.ModifiedAt = DateTime.UtcNow;
                 appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
-                // Thực hiện cập nhật trong transaction
                 using (var transaction = await _appointmentRepository.BeginTransactionAsync())
                 {
                     try
                     {
-                        // Cập nhật AppointmentDetail
                         int rowEffected = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
-
-                        // Cập nhật Appointment
                         var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
 
                         if (rowEffected <= 0 || updatedAppointment == null)
@@ -792,7 +824,7 @@ namespace PetVax.Services.Service
                                 Reaction = appointmentDetail.Reaction,
                                 NextVaccinationInfo = appointmentDetail.NextVaccinationInfo,
                                 IsActive = true,
-                                IsCompleted = true, // Đánh dấu là đã hoàn thành
+                                IsCompleted = true,
                                 ModifiedAt = DateTime.UtcNow,
                                 ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
                             };
@@ -805,10 +837,10 @@ namespace PetVax.Services.Service
                                 existingProfile.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? existingProfile.NextVaccinationInfo;
                                 existingProfile.IsActive = true;
                                 existingProfile.VaccineProfileDiseases = _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken).Result ?? new List<VaccineProfileDisease>();
-                                existingProfile.IsCompleted = true; // Đánh dấu là đã hoàn thành
+                                existingProfile.IsCompleted = true;
                                 existingProfile.ModifiedAt = DateTime.UtcNow;
                                 existingProfile.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-                                        
+
                                 int vaccineProfileid = existingProfile.VaccineProfileId;
                                 var existingProfileDisease = await _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByVaccineProfileIdAsync(vaccineProfileid, cancellationToken);
 
@@ -1410,7 +1442,7 @@ namespace PetVax.Services.Service
             }
 
             var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(createAppointmentMicrochipDTO.AppointmentDetailMicrochip.MicrochipItemId, cancellationToken);
-            if( microchipItem == null)
+            if (microchipItem == null)
             {
                 return new BaseResponse<AppointmentWithMicorchipResponseDTO>
                 {
@@ -1420,8 +1452,8 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
-            
-            
+
+
             try
             {
                 var random = new Random();
@@ -1462,7 +1494,7 @@ namespace PetVax.Services.Service
                     MicrochipItemId = createAppointmentMicrochipDTO.AppointmentDetailMicrochip.MicrochipItemId,
                 };
 
-                
+
                 var createdAppointmentDetail = await _appointmentDetailRepository.AddAppointmentDetailAsync(appointmentDetail, cancellationToken);
                 if (createdAppointmentDetail == null)
                 {
@@ -1474,7 +1506,7 @@ namespace PetVax.Services.Service
                         Message = "Không thể tạo chi tiết cuộc hẹn cấy microchip.",
                         Data = null
                     };
-                }               
+                }
 
                 var createdAppointmentDetailId = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(createdAppointmentDetail.AppointmentDetailId, cancellationToken);
                 if (createdAppointmentId == null || createdAppointmentDetailId == null)
@@ -1506,6 +1538,394 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Đã xảy ra lỗi khi tạo cuộc hẹn tiêm phòng. " + ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<AppointmentForVaccinationResponseDTO>> UpdateAppointmentVaccinationAsync(int appointmentId, UpdateAppointmentForVaccinationDTO updateAppointmentForVaccinationDTO, CancellationToken cancellationToken)
+        {
+            if (updateAppointmentForVaccinationDTO == null || updateAppointmentForVaccinationDTO.Appointment == null || updateAppointmentForVaccinationDTO.UpdateDiseaseForAppointmentDTO == null)
+            {
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Dữ liệu cập nhật cuộc hẹn tiêm phòng không hợp lệ.",
+                    Data = null
+                };
+            }
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
+            if (appointment == null)
+            {
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 404,
+                    Success = false,
+                    Message = "Không tìm thấy cuộc hẹn với ID đã cung cấp.",
+                    Data = null
+                };
+            }
+            var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentId, cancellationToken);
+            if (appointmentDetail == null)
+            {
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 404,
+                    Success = false,
+                    Message = "Không tìm thấy chi tiết cuộc hẹn với ID đã cung cấp.",
+                    Data = null
+                };
+            }
+            try
+            {
+                // Chỉ cập nhật DiseaseId cho appointmentDetail
+                if (updateAppointmentForVaccinationDTO.UpdateDiseaseForAppointmentDTO.DiseaseId > 0)
+                {
+                    appointmentDetail.DiseaseId = updateAppointmentForVaccinationDTO.UpdateDiseaseForAppointmentDTO.DiseaseId;
+                    appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                    appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                    await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                }
+                // Lấy lại thông tin đã cập nhật
+                var updatedAppointment = await _appointmentRepository.GetAppointmentByIdAsync(appointment.AppointmentId, cancellationToken);
+                var updatedAppointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetail.AppointmentDetailId, cancellationToken);
+
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Cập nhật DiseaseId cho chi tiết cuộc hẹn thành công.",
+                    Data = new AppointmentForVaccinationResponseDTO
+                    {
+                        Appointment = _mapper.Map<AppointmentResponseDTO>(updatedAppointment),
+                        AppointmentHasDiseaseResponseDTO = _mapper.Map<AppointmentHasDiseaseResponseDTO>(updatedAppointmentDetail)
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật cuộc hẹn tiêm phòng.");
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi cập nhật cuộc hẹn tiêm phòng.",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<AppointmentForVaccinationResponseDTO>> GetAppointmentVaccinationByIdAsync(int appointmentId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
+                if (appointment == null)
+                {
+                    return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn với ID đã cung cấp.",
+                        Data = null
+                    };
+                }
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentId, cancellationToken);
+                if (appointmentDetail == null)
+                {
+                    return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn với ID đã cung cấp.",
+                        Data = null
+                    };
+                }
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin cuộc hẹn tiêm phòng thành công.",
+                    Data = new AppointmentForVaccinationResponseDTO
+                    {
+                        Appointment = _mapper.Map<AppointmentResponseDTO>(appointment),
+                        AppointmentHasDiseaseResponseDTO = _mapper.Map<AppointmentHasDiseaseResponseDTO>(appointmentDetail)
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy thông tin cuộc hẹn tiêm phòng.");
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy thông tin cuộc hẹn tiêm phòng.",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<DynamicResponse<AppointmentResponseDTO>> GetPastAppointmentsByCustomerIdAsync(int customerId, GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var now = DateTime.UtcNow;
+                var appointments = await _appointmentRepository.GetPastAppointmentsByCustomerIdAsync(now, customerId, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
+                {
+                    var keyword = getAllItemsDTO.KeyWord.ToLower();
+                    appointments = appointments
+                        .Where(a =>
+                            // Search by AppointmentCode (case-insensitive)
+                            (a.AppointmentCode != null && a.AppointmentCode.ToLower().Contains(keyword)) ||
+
+                            // Search by Pet Name (case-insensitive, check null)
+                            (a.Pet != null &&
+                             a.Pet.Name != null &&
+                             a.Pet.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Customer FullName (case-insensitive, check null)
+                            (a.Customer != null &&
+                             a.Customer.FullName != null &&
+                             a.Customer.FullName.ToLower().Contains(keyword)) ||
+
+                            // Search by Location (convert enum to string)
+                            (a.Location.ToString().ToLower().Contains(keyword)) ||
+
+                            // Search by ServiceType (convert enum to string)
+                            (a.ServiceType.ToString().ToLower().Contains(keyword)) ||
+
+                            // Search by Address (case-insensitive, check null)
+                            (a.Address != null && a.Address.ToLower().Contains(keyword))
+                        )
+                        .ToList();
+                }
+
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = appointments.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+
+                var pagedAppointments = appointments
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+
+                var responseData = new MegaData<AppointmentResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                    },
+                    PageData = _mapper.Map<List<AppointmentResponseDTO>>(pagedAppointments)
+                };
+
+                if (!pagedAppointments.Any())
+                {
+                    return new DynamicResponse<AppointmentResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn nào.",
+                        Data = null
+                    };
+                }
+                return new DynamicResponse<AppointmentResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy tất cả cuộc hẹn thành công.",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn trong quá khứ.");
+                return new DynamicResponse<AppointmentResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn trong quá khứ.",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<DynamicResponse<AppointmentResponseDTO>> GetTodayAppointmentsByCustomerIdAsync(int customerId, GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var today = DateTime.UtcNow.Date;
+                var appointments = await _appointmentRepository.GetTodayAppointmentsByCustomerIdAsync(today, customerId, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
+                {
+                    var keyword = getAllItemsDTO.KeyWord.ToLower();
+                    appointments = appointments
+                        .Where(a =>
+                            // Search by AppointmentCode (case-insensitive)
+                            (a.AppointmentCode != null && a.AppointmentCode.ToLower().Contains(keyword)) ||
+                            // Search by Pet Name (case-insensitive, check null)
+                            (a.Pet != null &&
+                             a.Pet.Name != null &&
+                             a.Pet.Name.ToLower().Contains(keyword)) ||
+                            // Search by Customer FullName (case-insensitive, check null)
+                            (a.Customer != null &&
+                             a.Customer.FullName != null &&
+                             a.Customer.FullName.ToLower().Contains(keyword)) ||
+                            // Search by Location (convert enum to string)
+                            (a.Location.ToString().ToLower().Contains(keyword)) ||
+                            // Search by ServiceType (convert enum to string)
+                            (a.ServiceType.ToString().ToLower().Contains(keyword)) ||
+                            // Search by Address (case-insensitive, check null)
+                            (a.Address != null && a.Address.ToLower().Contains(keyword))
+                        )
+                        .ToList();
+                }
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = appointments.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+                var pagedAppointments = appointments
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+                var responseData = new MegaData<AppointmentResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                    },
+                    PageData = _mapper.Map<List<AppointmentResponseDTO>>(pagedAppointments)
+                };
+                if (!pagedAppointments.Any())
+                {
+                    return new DynamicResponse<AppointmentResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn nào trong ngày hôm nay.",
+                        Data = null
+                    };
+                }
+                return new DynamicResponse<AppointmentResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy tất cả cuộc hẹn trong ngày hôm nay thành công.",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn trong ngày hôm nay.");
+                return new DynamicResponse<AppointmentResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn trong ngày hôm nay.",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<DynamicResponse<AppointmentResponseDTO>> GetFutureAppointmentsByCustomerIdAsync(int customerId, GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var now = DateTime.UtcNow;
+                var appointments = await _appointmentRepository.GetFutureAppointmentsByCustomerIdAsync(now, customerId, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
+                {
+                    var keyword = getAllItemsDTO.KeyWord.ToLower();
+                    appointments = appointments
+                        .Where(a =>
+                            // Search by AppointmentCode (case-insensitive)
+                            (a.AppointmentCode != null && a.AppointmentCode.ToLower().Contains(keyword)) ||
+                            // Search by Pet Name (case-insensitive, check null)
+                            (a.Pet != null &&
+                             a.Pet.Name != null &&
+                             a.Pet.Name.ToLower().Contains(keyword)) ||
+                            // Search by Customer FullName (case-insensitive, check null)
+                            (a.Customer != null &&
+                             a.Customer.FullName != null &&
+                             a.Customer.FullName.ToLower().Contains(keyword)) ||
+                            // Search by Location (convert enum to string)
+                            (a.Location.ToString().ToLower().Contains(keyword)) ||
+                            // Search by ServiceType (convert enum to string)
+                            (a.ServiceType.ToString().ToLower().Contains(keyword)) ||
+                            // Search by Address (case-insensitive, check null)
+                            (a.Address != null && a.Address.ToLower().Contains(keyword))
+                        )
+                        .ToList();
+                }
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = appointments.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+                var pagedAppointments = appointments
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+                var responseData = new MegaData<AppointmentResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                    },
+                    PageData = _mapper.Map<List<AppointmentResponseDTO>>(pagedAppointments)
+                };
+                if (!pagedAppointments.Any())
+                {
+                    return new DynamicResponse<AppointmentResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn nào trong tương lai.",
+                        Data = null
+                    };
+                }
+                return new DynamicResponse<AppointmentResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy tất cả cuộc hẹn trong tương lai thành công.",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn trong tương lai.");
+                return new DynamicResponse<AppointmentResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn trong tương lai.",
                     Data = null
                 };
             }

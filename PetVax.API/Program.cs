@@ -110,6 +110,9 @@ public class Program
         builder.Services.AddScoped<IVetService, VetService>();
         builder.Services.AddScoped<IVetScheduleRepository, VetScheduleRepository>();
         builder.Services.AddScoped<IVetScheduleService, VetScheduleService>();
+
+        builder.Services.AddHostedService<VetScheduleBackgroundService>();
+
         var app = builder.Build();
 
         // Enable Swagger only in Development

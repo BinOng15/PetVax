@@ -15,7 +15,10 @@ namespace PetVax.BusinessObjects.DTO.MicrochipDTO
         public decimal Price { get; set; } // Price of the microchip
         public string Status { get; set; }
         public string Notes { get; set; }
-
-        
+        public DateTime CreatedAt { get; set; } // Date when the record was created
+        public string CreatedBy { get; set; } // User who created the record
+        public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
+        public string? ModifiedBy { get; set; } // User who last modified the record
+        public bool? isDeleted { get; set; } = false; // Default to false, indicating the microchip is not deleted
     }
 }

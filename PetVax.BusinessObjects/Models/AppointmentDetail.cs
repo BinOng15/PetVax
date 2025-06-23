@@ -29,6 +29,11 @@ namespace PetVax.BusinessObjects.Models
         public string? NextVaccinationInfo { get; set; } // e.g., "Next vaccination due on 2023-12-01"
         public DateTime AppointmentDate { get; set; } // Date of the appointment
         public Enum.EnumList.AppointmentStatus AppointmentStatus { get; set; }
+        public string? Temperature { get; set; } // For vaccination
+        public string? HeartRate { get; set; } // For vaccination
+        public string? GeneralCondition { get; set; } // General condition of the pet during the appointment
+        public string? Others { get; set; } // Any other notes or observations during the appointment
+        public string? Notes { get; set; } // Additional notes for the appointment detail
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified

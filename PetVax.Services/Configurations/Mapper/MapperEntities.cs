@@ -89,6 +89,7 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<Pet, PetResponseDTO>()
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image))
                 .ForMember(dest => dest.CustomerResponseDTO, opt => opt.MapFrom(src => src.Customer));
+            CreateMap<Pet, PetResponseDTOs>();
 
             //Appointment
             CreateMap<CreateAppointmentDTO, Appointment>();
@@ -99,12 +100,13 @@ namespace PetVax.Services.Configurations.Mapper
 
             CreateMap<Appointment, AppointmentWithDetailResponseDTO>();
             CreateMap<CreateAppointmentVaccinationDTO, Appointment>();
-            CreateMap<UpdateAppointmentVaccinationDTO, Appointment>();
+            CreateMap<UpdateAppointmentForVaccinationDTO, AppointmentForVaccinationResponseDTO>();
             CreateMap<Appointment, AppointmentWithVaccinationResponseDTO>();
 
             //AppointmentDetail
             CreateMap<CreateAppointmentDetailDTO, AppointmentDetail>();
             CreateMap<UpdateAppointmentDetailDTO, AppointmentDetail>();
+            CreateMap<UpdateAppointmentVaccinationDTO, Appointment>();
             CreateMap<AppointmentDetail, AppointmentDetailResponseDTO>()
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
                 .ForMember(dest => dest.MicrochipItem, opt => opt.MapFrom(src => src.MicrochipItem))
@@ -113,6 +115,8 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
                 .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease));
 
+            CreateMap<AppointmentDetail, AppointmentForVaccinationResponseDTO>();
+            CreateMap<AppointmentDetail, AppointmentHasDiseaseResponseDTO>();
             CreateMap<AppointmentDetail, AppointmentVaccinationDetailResponseDTO>()
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
                 .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
@@ -145,3 +149,5 @@ namespace PetVax.Services.Configurations.Mapper
         }
     }   
 }
+
+

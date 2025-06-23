@@ -96,6 +96,7 @@ namespace PetVax.Services.Service
                     SearchInfo = new SearchCondition
                     {
                         keyWord = getAllPetsRequest?.KeyWord,
+                        status = getAllPetsRequest?.Status,
                     },
                     PageData = pateVets.Select(p => new PetResponseDTO
                     {

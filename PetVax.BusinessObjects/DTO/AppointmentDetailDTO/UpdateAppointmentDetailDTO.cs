@@ -32,6 +32,11 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public string? Dose { get; set; }
         public string? Reaction { get; set; }
         public string? NextVaccinationInfo { get; set; }
+        public string? Temperature { get; set; }
+        public string? HeartRate { get; set; }
+        public string? GeneralCondition { get; set; }
+        public string? Others { get; set; }
+        public string? Notes { get; set; }
         public DateTime? AppointmentDate { get; set; }
         public EnumList.AppointmentStatus? AppointmentStatus { get; set; }
     }
