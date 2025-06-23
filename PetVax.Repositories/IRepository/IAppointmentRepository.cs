@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
+using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.Enum;
 using PetVax.BusinessObjects.Models;
 using System;
@@ -6,13 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static PetVax.BusinessObjects.DTO.ResponseModel;
 using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PetVax.Repositories.IRepository
 {
     public interface IAppointmentRepository
     {
-        Task<int> CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken);
+        Task<Appointment> CreateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken);
         Task<bool> DeleteAppointmentAsync(int appointmentId, CancellationToken cancellationToken);
         Task<List<Appointment>> GetAllAppointmentsAsync(CancellationToken cancellationToken);
         Task<Appointment> GetAppointmentByIdAsync(int appointmentId, CancellationToken cancellationToken);
@@ -25,5 +27,6 @@ namespace PetVax.Repositories.IRepository
         Task<List<Appointment>> GetAppointmentsByStatusAsync(AppointmentStatus status, CancellationToken cancellationToken);
         Task<List<Appointment>> GetAppointmentsByCustomerIdAndStatusAsync(int customerId, AppointmentStatus status, CancellationToken cancellationToken);
 
+        
     }
 }

@@ -1,5 +1,6 @@
 ﻿using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.Enum;
 using System;
@@ -41,5 +42,11 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
     {
         public AppointmentResponseDTO Appointment { get; set; }
         public AppointmentVaccinationDetailResponseDTO Vaccinations { get; set; }
+    }
+
+    public class AppointmentWithMicorchipResponseDTO
+    {
+        public AppointmentResponseDTO Appointment { get; set; }
+        public AppointmentMicrochipResponseDTO Microchip { get; set; }
     }
 }
