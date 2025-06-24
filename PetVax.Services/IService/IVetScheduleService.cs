@@ -17,5 +17,7 @@ namespace PetVax.Services.IService
         Task<BaseResponse<VetScheduleDTO>> UpdateVetScheduleAsync(UpdateVetScheduleRequestDTO request, CancellationToken cancellationToken);
         Task<List<BaseResponse<VetScheduleDTO>>> GetAllVetSchedulesByVetIdAsync(int vetId, CancellationToken cancellationToken);
         Task<BaseResponse<VetScheduleDTO>> DeleteVetScheduleAsync(int vetScheduleId, CancellationToken cancellationToken);
+        Task<List<BaseResponse<VetScheduleDTO>>> GetAllVetSchedulesByDateAndSlotAsync(DateTime? date, int? slot, CancellationToken cancellationToken);
+        Task<List<BaseResponse<VetScheduleDTO>>> GetVetScheduleFromDateToDate(DateTime? fromDate, DateTime? toDate, CancellationToken cancellationToken);
     }
 }
