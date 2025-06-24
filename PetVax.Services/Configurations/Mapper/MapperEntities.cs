@@ -10,7 +10,6 @@ using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineDTO;
-using PetVax.BusinessObjects.DTO.VaccineProfileDiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineProfileDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
@@ -138,13 +137,8 @@ namespace PetVax.Services.Configurations.Mapper
 
             // VaccineProfile
             CreateMap<VaccineProfile, VaccineProfileResponseDTO>()
-                .ForMember(dest => dest.VaccineProfileDiseaseResponse,
-                    opt => opt.MapFrom(src => src.VaccineProfileDiseases));
-
-            // VaccineProfileDisease
-            CreateMap<VaccineProfileDisease, VaccineProfileDiseaseResponse>()
-                .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease))
-                .ForMember(dest => dest.VaccineProfile, opt => opt.MapFrom(src => src.VaccineProfile));
+                .ForMember(dest => dest.AppointmentDetail,
+                    opt => opt.MapFrom(src => src.AppointmentDetail));
 
         }
     }   

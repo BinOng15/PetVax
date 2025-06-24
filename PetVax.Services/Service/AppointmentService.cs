@@ -32,7 +32,6 @@ namespace PetVax.Services.Service
         private readonly IVaccineBatchRepository _vaccineBatchRepository;
         private readonly IVaccineProfileRepository _vaccineProfileRepository;
         private readonly IVetScheduleRepository _vetScheduleRepository;
-        private readonly IVaccineProfileDiseaseRepository _vaccineProfileDiseaseRepository;
         private readonly ILogger<AppointmentService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -48,7 +47,6 @@ namespace PetVax.Services.Service
             IVaccineBatchRepository vaccineBatchRepository,
             IVaccineProfileRepository vaccineProfileRepository,
             IVetScheduleRepository vetScheduleRepository,
-            IVaccineProfileDiseaseRepository vaccineProfileDiseaseRepository,
             ILogger<AppointmentService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -63,7 +61,6 @@ namespace PetVax.Services.Service
             _vaccineBatchRepository = vaccineBatchRepository;
             _vaccineProfileRepository = vaccineProfileRepository;
             _vetScheduleRepository = vetScheduleRepository;
-            _vaccineProfileDiseaseRepository = vaccineProfileDiseaseRepository;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -812,68 +809,60 @@ namespace PetVax.Services.Service
 
                         if (isStatusChangeToProcessed)
                         {
-                            var existingProfile = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(appointment.PetId, cancellationToken);
+                            // Lấy danh sách vaccine profile của pet
+                            var existingProfiles = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(appointment.PetId, cancellationToken);
 
-                            var vaccineProfile = new VaccineProfile
+                            // Nếu chưa có profile cho bệnh này thì tạo mới
+                            if (existingProfiles == null || (existingProfiles is IList<VaccineProfile> list && !list.Any(p => p.DiseaseId == appointmentDetail.DiseaseId)))
                             {
-                                PetId = appointment.PetId,
-                                VaccineProfileDiseases = new List<VaccineProfileDisease>(),
-                                AppointmentDetailId = appointmentDetail.AppointmentDetailId,
-                                VaccinationDate = appointmentDetail.AppointmentDate,
-                                Dose = appointmentDetail.Dose,
-                                Reaction = appointmentDetail.Reaction,
-                                NextVaccinationInfo = appointmentDetail.NextVaccinationInfo,
-                                IsActive = true,
-                                IsCompleted = true,
-                                ModifiedAt = DateTime.UtcNow,
-                                ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
-                            };
-                            if (existingProfile != null)
+                                var newProfile = new VaccineProfile
+                                {
+                                    PetId = appointment.PetId,
+                                    DiseaseId = appointmentDetail.DiseaseId,
+                                    AppointmentDetailId = appointmentDetail.AppointmentDetailId,
+                                    VaccinationDate = appointmentDetail.AppointmentDate,
+                                    Dose = appointmentDetail.Dose,
+                                    Reaction = appointmentDetail.Reaction,
+                                    NextVaccinationInfo = appointmentDetail.NextVaccinationInfo,
+                                    IsActive = true,
+                                    IsCompleted = true,
+                                    CreatedAt = DateTime.UtcNow,
+                                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                                    ModifiedAt = DateTime.UtcNow,
+                                    ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
+                                };
+                                await _vaccineProfileRepository.CreateVaccineProfileAsync(newProfile, cancellationToken);
+                            }
+                            else
                             {
-                                existingProfile.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
-                                existingProfile.VaccinationDate = appointmentDetail.AppointmentDate;
-                                existingProfile.Dose = appointmentDetail.Dose ?? existingProfile.Dose;
-                                existingProfile.Reaction = appointmentDetail.Reaction ?? existingProfile.Reaction;
-                                existingProfile.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? existingProfile.NextVaccinationInfo;
-                                existingProfile.IsActive = true;
-                                existingProfile.VaccineProfileDiseases = _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken).Result ?? new List<VaccineProfileDisease>();
-                                existingProfile.IsCompleted = true;
-                                existingProfile.ModifiedAt = DateTime.UtcNow;
-                                existingProfile.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-
-                                int vaccineProfileid = existingProfile.VaccineProfileId;
-                                var existingProfileDisease = await _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByVaccineProfileIdAsync(vaccineProfileid, cancellationToken);
-
-                                var existingDisease = existingProfileDisease.FirstOrDefault(d => d.DiseaseId == appointmentDetail.DiseaseId);
-
-                                if (existingDisease == null && appointmentDetail.DiseaseId.HasValue)
+                                // Nếu đã có profile cho bệnh này thì cập nhật
+                                var profileToUpdate = (existingProfiles is IList<VaccineProfile> list2 ? list2 : new List<VaccineProfile> { existingProfiles })
+                                    .FirstOrDefault(p => p.DiseaseId == appointmentDetail.DiseaseId);
+                                if (profileToUpdate != null)
                                 {
-                                    var newVaccineProfileDisease = new VaccineProfileDisease
-                                    {
-                                        DiseaseId = appointmentDetail.DiseaseId,
-                                        VaccineProfileId = existingProfile.VaccineProfileId,
-                                    };
+                                    profileToUpdate.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
+                                    profileToUpdate.VaccinationDate = appointmentDetail.AppointmentDate;
+                                    profileToUpdate.Dose = appointmentDetail.Dose ?? profileToUpdate.Dose;
+                                    profileToUpdate.Reaction = appointmentDetail.Reaction ?? profileToUpdate.Reaction;
+                                    profileToUpdate.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? profileToUpdate.NextVaccinationInfo;
+                                    profileToUpdate.IsActive = true;
+                                    profileToUpdate.IsCompleted = true;
+                                    profileToUpdate.ModifiedAt = DateTime.UtcNow;
+                                    profileToUpdate.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
-                                    await _vaccineProfileDiseaseRepository.CreateVaccineProfileDiseaseAsync(newVaccineProfileDisease, cancellationToken);
+                                    await _vaccineProfileRepository.UpdateVaccineProfileAsync(profileToUpdate, cancellationToken);
                                 }
-                                else if (existingDisease != null)
-                                {
-                                    existingDisease.DiseaseId = appointmentDetail.DiseaseId;
-                                    await _vaccineProfileDiseaseRepository.UpdateVaccineProfileDiseaseAsync(existingDisease, cancellationToken);
-                                }
-
-                                await _vaccineProfileRepository.UpdateVaccineProfileAsync(existingProfile, cancellationToken);
                             }
                         }
 
                         await transaction.CommitAsync();
-
+                        var appointmentVaccinationDetailResponse = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(appointmentDetail);
                         return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
                         {
                             Code = 200,
                             Success = true,
-                            Message = "Cập nhật thông tin tiêm phòng cho cuộc hẹn thành công.",
-                            Data = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(appointmentDetail)
+                            Message = "Cập nhật thông tin tiêm phòng thành công.",
+                            Data = appointmentVaccinationDetailResponse
                         };
                     }
                     catch (Exception ex)
