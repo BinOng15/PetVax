@@ -51,7 +51,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPost("Create-schedule")]
-       // [Authorize(Roles = "Admin, Vet")]
+        [Authorize(Roles = "Admin, Vet")]
         public async Task<ActionResult> CreateVetSchedule([FromBody] CreateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.CreateVetScheduleAsync(request, cancellationToken);
@@ -86,6 +86,25 @@ namespace PediVax.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("Get-schedules-by-date-and-slot")]
+        [Authorize(Roles = "Admin, Vet, Staff")]
+        public async Task<ActionResult> GetVetSchedulesByDateAndSlot([FromQuery] DateTime? date, [FromQuery] int? slot, CancellationToken cancellationToken)
+        {
+            var response = await _vetScheduleService.GetAllVetSchedulesByDateAndSlotAsync(date, slot, cancellationToken);
+  
+            return Ok(response);
+        }
+
+        [HttpGet("Get-schedules-from-date-to-date")]
+        //[Authorize(Roles = "Admin, Vet, Staff")]
+        public async Task<ActionResult> GetVetSchedulesFromDateToDate([FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, CancellationToken cancellationToken)
+        {
+            var response = await _vetScheduleService.GetVetScheduleFromDateToDate(fromDate, toDate, cancellationToken);
+  
+            return Ok(response);
+        }
+
     }
 
 }

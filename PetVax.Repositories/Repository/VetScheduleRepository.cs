@@ -29,7 +29,10 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<VetSchedule>> GetAllVetSchedulesAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.VetSchedules
+                .Include(vs => vs.Vet)
+                .Where(vs => vs.isDeleted != true)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<VetSchedule> GetVetScheduleByIdAsync(int vetScheduleId, CancellationToken cancellationToken)
@@ -43,7 +46,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VetSchedules
                 .Include(vs => vs.Vet)
-                .Where(vs => vs.VetId == vetId)
+                .Where(vs => vs.VetId == vetId && vs.isDeleted != true)
                 .ToListAsync(cancellationToken);
         }
 
@@ -90,6 +93,38 @@ namespace PetVax.Repositories.Repository
                 (int)Slot.Slot_16h => 16,
                 _ => throw new ArgumentException("Slot number không hợp lệ")
             };
+        }
+
+        public async Task<List<VetSchedule>> GetVetSchedulesByDateAndSlotAsync(DateTime? date, int? slot, CancellationToken cancellationToken)
+        {
+            return await _context.VetSchedules
+                .Include(vs => vs.Vet)
+                .Where(vs => vs.ScheduleDate.Date == date && vs.SlotNumber == slot && vs.isDeleted != true)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<VetSchedule>> GetVetSchedulesByDateAsync(DateTime? date, CancellationToken cancellationToken)
+        {
+            return await _context.VetSchedules
+                .Include(vs => vs.Vet)
+                .Where(vs => vs.ScheduleDate.Date == date && vs.isDeleted != true)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<VetSchedule>> GetVetSchedulesBySlotAsync(int? slot, CancellationToken cancellationToken)
+        {
+            return await _context.VetSchedules
+                .Include(vs => vs.Vet)
+                .Where(vs => vs.SlotNumber == slot && vs.isDeleted != true)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<VetSchedule>> GetVetSchedulesFromDateToDateAsync(DateTime? fromDate, DateTime? toDate, CancellationToken cancellationToken)
+        {
+            return await _context.VetSchedules
+                .Include(vs => vs.Vet)
+                .Where(vs => vs.ScheduleDate.Date >= fromDate && vs.ScheduleDate.Date <= toDate && vs.isDeleted != true)
+                .ToListAsync(cancellationToken);
         }
     }
 }
