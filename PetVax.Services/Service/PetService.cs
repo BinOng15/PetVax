@@ -319,6 +319,17 @@ namespace PetVax.Services.Service
                     pet.Image = null;
                 }
 
+                if (pet.Species != "Dog" && pet.Species != "Cat" && pet.Species != "dog" && pet.Species != "cat")
+                {
+                    return new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = $"Để tạo loài vui lòng nhập 'Dog' hoặc 'Cat'",
+                        Data = null
+                    };
+                }
+
                 var dob = DateTime.Parse(createPetRequest.DateOfBirth);
                 var today = DateTime.Today;
                 int age = today.Year - dob.Year;
@@ -356,16 +367,18 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                // Use GetAllVaccinationSchedule instead of GetAllVaccineProfilesAsync
+                // Only get schedules with matching species
                 var vaccinationSchedules = await _vaccinationScheduleRepository.GetAllVaccinationSchedulesAsync(cancellationToken);
+                var matchedSchedules = vaccinationSchedules
+                    .Where(s => string.Equals(s.Species?.Trim(), pet.Species?.Trim(), StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
                 var vaccineProfilesToCreate = new List<VaccineProfile>();
 
-                foreach (var schedule in vaccinationSchedules)
+                foreach (var schedule in matchedSchedules)
                 {
-                    // If schedule has AgeInterval in weeks, calculate preferred date
                     if (schedule is VaccinationSchedule vaccinationSchedule)
                     {
-                        // Convert AgeInterval (assumed in weeks) to days
                         DateTime preferedDate = dob.AddDays(vaccinationSchedule.AgeInterval * 7);
                         var newVaccineProfile = new VaccineProfile
                         {
@@ -375,7 +388,8 @@ namespace PetVax.Services.Service
                             PreferedDate = preferedDate,
                             IsCompleted = false,
                             CreatedAt = DateTime.UtcNow,
-                            CreatedBy = GetCurrentUserName()
+                            CreatedBy = GetCurrentUserName(),
+                            Dose = vaccinationSchedule.DoseNumber // Set Dose from DoseNumber
                         };
                         vaccineProfilesToCreate.Add(newVaccineProfile);
                     }

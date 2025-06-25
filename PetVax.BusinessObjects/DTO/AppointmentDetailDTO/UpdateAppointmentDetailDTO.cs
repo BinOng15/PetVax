@@ -16,7 +16,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public int? MicrochipItemId { get; set; }
         public int? PassportId { get; set; }
         public int? HealthConditionId { get; set; }
-        public string? Dose { get; set; }
+        public int? Dose { get; set; }
         public string? Reaction { get; set; }
         public string? NextVaccinationInfo { get; set; }
         public DateTime? AppointmentDate { get; set; }
@@ -29,7 +29,6 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public int? VetId { get; set; }
         public int? DiseaseId { get; set; }
         public int? VaccineBatchId { get; set; }
-        public string? Dose { get; set; }
         public string? Reaction { get; set; }
         public string? NextVaccinationInfo { get; set; }
         public string? Temperature { get; set; }

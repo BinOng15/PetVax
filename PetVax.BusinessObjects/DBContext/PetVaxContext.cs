@@ -319,9 +319,9 @@ namespace PediVax.BusinessObjects.DBContext
                 .WithMany(p => p.VaccineProfiles) // Thêm ICollection<VaccineProfile> VaccineProfiles vào class Pet nếu chưa có
                 .HasForeignKey(vp => vp.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<VaccineProfile>()
-                .HasIndex(vp => new { vp.PetId, vp.DiseaseId })
-                .IsUnique();
+            //modelBuilder.Entity<VaccineProfile>()
+            //    .HasIndex(vp => new { vp.PetId, vp.DiseaseId })
+            //    .IsUnique();
 
             modelBuilder.Entity<VaccineProfile>()
                 .HasOne(vp => vp.AppointmentDetail)

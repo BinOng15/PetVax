@@ -372,6 +372,48 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<BaseResponse<List<VaccineProfileResponseDTO>>> GetListVaccineProfileByPetIdAsync(int petId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(petId, cancellationToken);
+                var data = vaccineProfiles?.Select(vp => new VaccineProfileResponseDTO
+                {
+                    VaccineProfileId = vp.VaccineProfileId,
+                    PetId = vp.PetId,
+                    DiseaseId = vp.DiseaseId,
+                    AppointmentDetailId = vp.AppointmentDetailId,
+                    VaccinationScheduleId = vp.VaccinationScheduleId,
+                    PreferedDate = vp.PreferedDate,
+                    VaccinationDate = vp.VaccinationDate,
+                    Dose = vp.Dose,
+                    Reaction = vp.Reaction,
+                    NextVaccinationInfo = vp.NextVaccinationInfo,
+                    IsActive = vp.IsActive,
+                    IsCompleted = vp.IsCompleted,
+                    CreatedAt = vp.CreatedAt,
+                }).ToList() ?? new List<VaccineProfileResponseDTO>();
+
+                return new BaseResponse<List<VaccineProfileResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy danh sách hồ sơ tiêm chủng cho thú cưng thành công.",
+                    Data = data
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<VaccineProfileResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = $"Có lỗi khi lấy danh sách hồ sơ tiêm chủng cho thú cưng: {ex.Message}",
+                    Data = new List<VaccineProfileResponseDTO>()
+                };
+            }
+        }
     }
 }
                 

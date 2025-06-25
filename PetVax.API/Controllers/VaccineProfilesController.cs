@@ -41,14 +41,24 @@ namespace PediVax.Controllers
             return Ok(response);
         }
 
+        //[HttpGet("GetVaccineProfileByPetId/{petId}")]
+        //public async Task<IActionResult> GetVaccineProfileByPetId(int petId, CancellationToken cancellationToken)
+        //{
+        //    if (petId <= 0)
+        //    {
+        //        return BadRequest("Invalid pet ID.");
+        //    }
+        //    var response = await _vaccineProfileService.GetVaccineProfileByPetIdAsync(petId, cancellationToken);
+        //    return Ok(response);
+        //}
         [HttpGet("GetVaccineProfileByPetId/{petId}")]
-        public async Task<IActionResult> GetVaccineProfileByPetId(int petId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetListVaccineProfileByPetId(int petId, CancellationToken cancellationToken)
         {
             if (petId <= 0)
             {
                 return BadRequest("Invalid pet ID.");
             }
-            var response = await _vaccineProfileService.GetVaccineProfileByPetIdAsync(petId, cancellationToken);
+            var response = await _vaccineProfileService.GetListVaccineProfileByPetIdAsync(petId, cancellationToken);
             return Ok(response);
         }
 
