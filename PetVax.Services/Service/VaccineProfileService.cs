@@ -142,12 +142,6 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                // Kiểm tra null cho VaccineProfileDiseases
-                if (vaccineProfile.VaccineProfileDiseases == null)
-                {
-                    vaccineProfile.VaccineProfileDiseases = new List<VaccineProfileDisease>();
-                }
-
                 var result = _mapper.Map<VaccineProfileResponseDTO>(vaccineProfile);
 
                 return new BaseResponse<VaccineProfileResponseDTO>

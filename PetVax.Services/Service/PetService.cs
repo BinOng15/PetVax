@@ -24,7 +24,7 @@ namespace PetVax.Services.Service
         private readonly IPetRepository _petRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IVaccineProfileRepository _vaccineProfileRepository;
-        private readonly IVaccineProfileDiseaseRepository _vaccineProfileDiseaseRepository;
+        private readonly IVaccinationScheduleRepository _vaccinationScheduleRepository;
         private readonly ILogger<PetService> _logger;
         private readonly IMapper _mapper;
         private readonly ICloudinariService _cloudinariService;
@@ -36,7 +36,7 @@ namespace PetVax.Services.Service
             IPetRepository petRepository,
             ICustomerRepository customerRepository,
             IVaccineProfileRepository vaccineProfileRepository,
-            IVaccineProfileDiseaseRepository vaccineProfileDiseaseRepository,
+            IVaccinationScheduleRepository vaccinationScheduleRepository,
             ILogger<PetService> logger,
             IMapper mapper,
             ICloudinariService cloudinariService,
@@ -47,7 +47,7 @@ namespace PetVax.Services.Service
             _petRepository = petRepository;
             _customerRepository = customerRepository;
             _vaccineProfileRepository = vaccineProfileRepository;
-            _vaccineProfileDiseaseRepository = vaccineProfileDiseaseRepository;
+            _vaccinationScheduleRepository = vaccinationScheduleRepository;
             _logger = logger;
             _mapper = mapper;
             _cloudinariService = cloudinariService;
@@ -307,7 +307,6 @@ namespace PetVax.Services.Service
 
         public async Task<BaseResponse<PetResponseDTO>> CreatePetAsync(CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken)
         {
-        
             try
             {
                 var pet = _mapper.Map<Pet>(createPetRequest);
@@ -320,13 +319,12 @@ namespace PetVax.Services.Service
                     pet.Image = null;
                 }
 
-                var dob = DateTime.Parse(createPetRequest.DateOfBirth); 
+                var dob = DateTime.Parse(createPetRequest.DateOfBirth);
                 var today = DateTime.Today;
                 int age = today.Year - dob.Year;
-
                 if (dob.Date > today.AddYears(-age))
                 {
-                    age--; 
+                    age--;
                 }
                 var random = new Random();
 
@@ -358,37 +356,66 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                var vaccineProfile = new VaccineProfile
-                {
-                    PetId = pet.PetId,
-                    IsCompleted = false, // Mặc định chưa tiêm đủ
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = GetCurrentUserName()
-                };
+                // Use GetAllVaccinationSchedule instead of GetAllVaccineProfilesAsync
+                var vaccinationSchedules = await _vaccinationScheduleRepository.GetAllVaccinationSchedulesAsync(cancellationToken);
+                var vaccineProfilesToCreate = new List<VaccineProfile>();
 
-                var vaccineProfileCreated = await _vaccineProfileRepository.CreateVaccineProfileAsync(vaccineProfile, cancellationToken);
-                if (vaccineProfileCreated <= 0)
+                foreach (var schedule in vaccinationSchedules)
                 {
-                    _logger.LogWarning("Failed to create vaccine profile for pet with ID {PetId}", pet.PetId);
-                    return new BaseResponse<PetResponseDTO>
+                    // If schedule has AgeInterval in weeks, calculate preferred date
+                    if (schedule is VaccinationSchedule vaccinationSchedule)
                     {
-                        Code = 200,
-                        Success = false,
-                        Message = "Lỗi khi tạo hồ sơ tiêm chủng cho thú cưng",
-                        Data = null
-                    };
+                        // Convert AgeInterval (assumed in weeks) to days
+                        DateTime preferedDate = dob.AddDays(vaccinationSchedule.AgeInterval * 7);
+                        var newVaccineProfile = new VaccineProfile
+                        {
+                            PetId = pet.PetId,
+                            VaccinationScheduleId = vaccinationSchedule.VaccinationScheduleId,
+                            DiseaseId = vaccinationSchedule.DiseaseId,
+                            PreferedDate = preferedDate,
+                            IsCompleted = false,
+                            CreatedAt = DateTime.UtcNow,
+                            CreatedBy = GetCurrentUserName()
+                        };
+                        vaccineProfilesToCreate.Add(newVaccineProfile);
+                    }
+                }
+
+                if (vaccineProfilesToCreate.Any())
+                {
+                    foreach (var vp in vaccineProfilesToCreate)
+                    {
+                        await _vaccineProfileRepository.CreateVaccineProfileAsync(vp, cancellationToken);
+                    }
+                    _logger.LogInformation("Vaccine profiles created for pet with ID {PetId}", pet.PetId);
                 }
                 else
                 {
-                    _logger.LogInformation("Vaccine profile created successfully for pet with ID {PetId}", pet.PetId);
+                    // Fallback: create a default vaccine profile if no schedule found
+                    var vaccineProfile = new VaccineProfile
+                    {
+                        PetId = pet.PetId,
+                        IsCompleted = false,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = GetCurrentUserName()
+                    };
+                    var vaccineProfileCreated = await _vaccineProfileRepository.CreateVaccineProfileAsync(vaccineProfile, cancellationToken);
+                    if (vaccineProfileCreated <= 0)
+                    {
+                        _logger.LogWarning("Failed to create vaccine profile for pet with ID {PetId}", pet.PetId);
+                        return new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Lỗi khi tạo hồ sơ tiêm chủng cho thú cưng",
+                            Data = null
+                        };
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Vaccine profile created successfully for pet with ID {PetId}", pet.PetId);
+                    }
                 }
-
-                var vaccineProfileDisease = new VaccineProfileDisease
-                {
-                    DiseaseId = null,
-                    VaccineProfileId = vaccineProfile.VaccineProfileId,
-                };
-                await _vaccineProfileDiseaseRepository.CreateVaccineProfileDiseaseAsync(vaccineProfileDisease, cancellationToken);
 
                 var createdPet = await _petRepository.GetPetByIdAsync(pet.PetId, cancellationToken);
                 var responseDTO = _mapper.Map<PetResponseDTO>(createdPet);
