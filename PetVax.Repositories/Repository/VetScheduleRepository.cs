@@ -73,7 +73,7 @@ namespace PetVax.Repositories.Repository
                 {
                     schedule.Status = EnumList.VetScheduleStatus.Unavailable;
                     schedule.ModifiedAt = DateTime.UtcNow;
-                    schedule.ModifiedBy = "System-Auto"; // Hoặc tên người dùng hiện tại nếu có
+                    schedule.ModifiedBy = "System-Auto";
                 }
             }
             await _context.SaveChangesAsync(cancellationToken);

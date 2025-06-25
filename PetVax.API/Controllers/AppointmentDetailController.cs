@@ -23,6 +23,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-all-appointment-details")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
         public async Task<IActionResult> GetAllAppointmentDetails([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, CancellationToken cancellationToken = default)
         {
             var request = new GetAllItemsDTO

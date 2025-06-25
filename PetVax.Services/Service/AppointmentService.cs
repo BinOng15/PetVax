@@ -1133,6 +1133,52 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
+
+            // Check if the pet has already completed all doses for this disease
+            var vaccinationSchedule = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId, cancellationToken);
+            if (vaccinationSchedule != null)
+            {
+                var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(pet.PetId, cancellationToken);
+                var profilesForDisease = vaccineProfiles?.Where(p => p.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId).ToList() ?? new List<VaccineProfile>();
+
+                // Calculate totalDose from DoseNumber of VaccinationSchedule
+                int totalDose = vaccinationSchedule.DoseNumber;
+
+                int completedDoses = profilesForDisease.Count(p => p.IsCompleted == true);
+                if (totalDose > 0 && completedDoses >= totalDose)
+                {
+                    return new BaseResponse<AppointmentWithVaccinationResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Bệnh này đã được tiêm đủ liều lượng theo lịch tiêm chủng cho thú cưng. Không thể tạo thêm lịch tiêm cho bệnh này.",
+                        Data = null
+                    };
+                }
+            }
+            if (vaccinationSchedule != null)
+            {
+                var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(pet.PetId, cancellationToken);
+                var profilesForDisease = vaccineProfiles?.Where(p => p.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId).ToList() ?? new List<VaccineProfile>();
+
+                // Assume that the number of doses required is stored in a property called "TotalDose" in VaccinationSchedule
+                // If not, adjust this logic to match your data model
+                var totalDoseProp = vaccinationSchedule.GetType().GetProperty("TotalDose");
+                int totalDose = totalDoseProp != null ? (int)(totalDoseProp.GetValue(vaccinationSchedule) ?? 0) : 0;
+
+                int completedDoses = profilesForDisease.Count(p => p.IsCompleted == true);
+                if (totalDose > 0 && completedDoses >= totalDose)
+                {
+                    return new BaseResponse<AppointmentWithVaccinationResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Bệnh này đã được tiêm đủ liều lượng theo lịch tiêm chủng. Không thể tạo thêm lịch tiêm cho bệnh này.",
+                        Data = null
+                    };
+                }
+            }
+
             try
             {
                 var random = new Random();

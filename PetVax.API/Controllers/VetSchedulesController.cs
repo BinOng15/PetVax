@@ -51,7 +51,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPost("Create-schedule")]
-        //[Authorize(Roles = "Admin, Vet")]
+        [Authorize(Roles = "Admin, Vet")]
         public async Task<ActionResult> CreateVetSchedule([FromBody] CreateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.CreateVetScheduleAsync(request, cancellationToken);

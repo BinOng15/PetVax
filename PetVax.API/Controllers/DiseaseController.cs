@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
@@ -44,18 +45,21 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpPost("create-disease")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> CreateDisease([FromForm] CreateDiseaseDTO createDiseaseDTO, CancellationToken cancellationToken)
         {
             var response = await _diseaseService.CreateDiseaseAsync(createDiseaseDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpPut("update-disease/{diseaseId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> UpdateDisease([FromForm] UpdateDiseaseDTO updateDiseaseDTO, int diseaseId, CancellationToken cancellationToken)
         {
             var response = await _diseaseService.UpdateDiseaseAsync(diseaseId, updateDiseaseDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpDelete("delete-disease/{diseaseId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteDisease(int diseaseId, CancellationToken cancellationToken)
         {
             var response = await _diseaseService.DeleteDiseaseAsync(diseaseId, cancellationToken);

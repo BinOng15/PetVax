@@ -1,4 +1,5 @@
 ﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("GetAllMicrochips")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
         public async Task<IActionResult> GetAllMicrochips([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, CancellationToken cancellationToken = default)
         {
             var request = new GetAllItemsDTO
@@ -51,12 +53,14 @@ namespace PediVax.Controllers
         }
 
         [HttpPost("CreateMicrochip")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> CreateMicrochip([FromBody] MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken)
         {
             var response = await _microchipService.CreateFullMicrochipAsync(microchipRequestDTO, cancellationToken);
             return Ok(response);
         }
         [HttpPut("UpdateMicrochip/{microchipId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> UpdateMicrochip(int microchipId, [FromBody] MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken)
         {
             var response = await _microchipService.UpdateMicrochipAsync(microchipId, microchipRequestDTO, cancellationToken);
@@ -64,6 +68,7 @@ namespace PediVax.Controllers
         }
 
         [HttpDelete("DeleteMicrochip/{microchipId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteMicrochip(int microchipId, CancellationToken cancellationToken)
         {
             var response = await _microchipService.DeleteMicrochipAsync(microchipId, cancellationToken);

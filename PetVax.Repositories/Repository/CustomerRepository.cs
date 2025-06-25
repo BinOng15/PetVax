@@ -28,7 +28,9 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<Customer>> GetAllCustomersAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.Customers
+                .Include(c => c.Account)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Customer> GetCustomerByAccountId(int accountId, CancellationToken cancellationToken)

@@ -67,6 +67,7 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpPost("create-vet")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateVet([FromBody] CreateVetDTO createVetDTO, CancellationToken cancellationToken = default)
         {
             var response = await _vetService.CreateVetAsync(createVetDTO, cancellationToken);

@@ -26,6 +26,7 @@ namespace PetVax.Controllers
         }
 
         [HttpGet("get-all-appointments")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
         public async Task<IActionResult> GetAllAppointments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, CancellationToken cancellationToken = default)
         {
             var request = new GetAllItemsDTO
