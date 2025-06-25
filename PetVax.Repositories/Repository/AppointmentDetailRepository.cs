@@ -201,11 +201,9 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<AppointmentDetail> UpdateAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)
+        public async Task<int> UpdateAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)
         {
-             _context.Update(appointmentDetail);
-             _context.SaveChangesAsync(cancellationToken);
-                return appointmentDetail;
+            return await UpdateAsync(appointmentDetail, cancellationToken);
         }
 
         public async Task<AppointmentDetail> GetAppointmentDetailandServiceTypeByPetIdAsync(int petId, CancellationToken cancellationToken)
