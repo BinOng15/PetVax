@@ -32,7 +32,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.AppointmentDetails
                 .Include(ad => ad.Vet)
-                .Include(ad => ad.MicrochipItem)
+                .Include(ad => ad.MicrochipItem).ThenInclude(mc => mc.Microchip)
                 .Include(ad => ad.PetPassport)
                 .Include(ad => ad.HealthCondition)
                 .Include(ad => ad.VaccineBatch)
@@ -67,6 +67,18 @@ namespace PetVax.Repositories.Repository
                 .FirstOrDefaultAsync(ad => ad.Appointment.PetId == petId, cancellationToken);
         }
 
+            public async Task<List<AppointmentDetail>> GetAllAppointmentDetailByPetIdAsync(int petId, CancellationToken cancellationToken)
+            {
+                return await _context.AppointmentDetails
+                    .Include(a => a.Appointment)
+                    .Include(a => a.Vet)
+                    .Include(a => a.Disease)
+                    .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
+                    .Include(a => a.VaccineBatch)
+                    .Where(ad => ad.Appointment.PetId == petId)
+                    .ToListAsync(cancellationToken);
+            }
+
         public async Task<AppointmentDetail> GetAppointmentDetailsByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
@@ -99,7 +111,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Appointment)
                 .Include(a => a.Vet)
                 .Include(a => a.Disease)
-                .Include(a => a.MicrochipItem)
+                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
                 .Include(a => a.VaccineBatch)
                 .FirstOrDefaultAsync(ad => ad.HealthConditionId == healthConditionId, cancellationToken);
         }
@@ -108,7 +120,7 @@ namespace PetVax.Repositories.Repository
         {
             return _context.AppointmentDetails
                 .Include(a => a.Appointment)
-                .Include(a => a.MicrochipItem)
+                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
                 .FirstOrDefaultAsync(ad => ad.MicrochipItemId == microchipItemId, cancellationToken);
         }
 
@@ -124,7 +136,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Appointment)
                 .Include(a => a.Vet)
                 .Include(a => a.Disease)
-                .Include(a => a.MicrochipItem)
+                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
                 .Include(a => a.VaccineBatch)
                 .Where(ad => ad.ServiceType == serviceType)
                 .ToListAsync(cancellationToken);
@@ -136,7 +148,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Appointment)
                 .Include(a => a.Vet)
                 .Include(a => a.Disease)
-                .Include(a => a.MicrochipItem)
+                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
                 .Include(a => a.VaccineBatch)
                 .Where(ad => ad.AppointmentStatus == status)
                 .ToListAsync(cancellationToken);
@@ -158,7 +170,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Appointment)
                 .Include(a => a.Vet)
                 .Include(a => a.Disease)
-                .Include(a => a.MicrochipItem)
+                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
                 .Include(a => a.VaccineBatch)
                 .FirstOrDefaultAsync(ad => ad.VetId == vetId, cancellationToken);
         }
@@ -214,6 +226,7 @@ namespace PetVax.Repositories.Repository
                 .Include(ad => ad.HealthCondition)
                 .Include(ad => ad.VaccineBatch)
                 .Include(ad => ad.Disease)
+                .Include(ad => ad.MicrochipItem).ThenInclude(m => m.Microchip)
                 .FirstOrDefaultAsync(ad => ad.Appointment.PetId == petId, cancellationToken);
         }
 

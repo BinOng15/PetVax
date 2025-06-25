@@ -34,7 +34,7 @@ namespace PetVax.Repositories.Repository
         {
             return _context.Pets
                 .Include(p => p.Appointments)
-                .Include(p => p.Customer)
+                .Include(p => p.Customer).ThenInclude(c => c.Account)
                 .Include(p => p.MicrochipItems)
                 .FirstOrDefaultAsync(p => p.PetId == petId, cancellationToken);
         }

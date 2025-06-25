@@ -36,6 +36,11 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore());
             CreateMap<Account, AccountResponseDTO>();
 
+            CreateMap<Customer, CustomerResponseDTO>()
+                 .ForMember(dest => dest.AccountResponseDTO, opt => opt.Ignore()); 
+
+
+
             //Customer
             CreateMap<CreateCustomerDTO, Customer>();
             CreateMap<UpdateCustomerDTO, Customer>();
@@ -137,6 +142,12 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<MicrochipItem, BaseMicrochipItemResponse>()
                 .ForMember(dest => dest.MicrochipResponse, opt => opt.MapFrom(src => src.Microchip));
             CreateMap<UpdateMicrochipItemRequest, MicrochipItem>();
+
+            CreateMap<Pet, PetMicrochipItemResponse>()
+             .ForMember(dest => dest.AppointmentDetails, opt => opt.Ignore())
+             .ForMember(dest => dest.Customer, opt => opt.Ignore());
+            CreateMap<MicrochipItem, MicrochipItemResponse>()
+                .ForMember(dest => dest.Pet, opt => opt.Ignore());
 
             // VaccineProfile
             CreateMap<VaccineProfile, VaccineProfileResponseDTO>()

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using PetVax.BusinessObjects.DTO;
+using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
@@ -44,9 +45,9 @@ namespace PetVax.Services.Service
         {
             try
             {
-                //  Get MicrochipItem by code
+                // Get MicrochipItem by code
                 var microchipItem = await _microchipItemRepository.GetMicrochipItemByMicrochipCodedAsync(code, cancellationToken);
-                if (microchipItem == null)
+                if (microchipItem == null || microchipItem.PetId == null)
                 {
                     return new BaseResponse<MicrochipItemResponse>
                     {
@@ -56,7 +57,7 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                //  Get corresponding Pet
+                // Get Pet with Customer and other details
                 var pet = await _petRepository.GetPetAndAppointmentByIdAsync(microchipItem.PetId, cancellationToken);
                 if (pet == null)
                 {
@@ -64,79 +65,31 @@ namespace PetVax.Services.Service
                     {
                         Code = 200,
                         Message = "Microchip chưa được gắn cho thú cưng!",
-                        Data = _mapper.Map<MicrochipItemResponse>(microchipItem)
+                        Data = null
                     };
                 }
 
-                //  Get AppointmentDetail information (if any)
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailandServiceTypeByPetIdAsync(pet.PetId, cancellationToken);
+                // Get all appointment details for the Pet
+                var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailByPetIdAsync(pet.PetId, cancellationToken);
+                var appointmentDetailDtos = _mapper.Map<List<AppointmentDetailResponseDTO>>(appointmentDetails);
 
-                //  Use AutoMapper for AppointmentDetail
-                AppointmentDetailResponseDTO? appointmentDetailDto = null;
-                if (appointmentDetail != null)
-                {
-                    appointmentDetailDto = _mapper.Map<AppointmentDetailResponseDTO>(appointmentDetail);
-                }
+                // Map Customer
+                var customerDto = _mapper.Map<CustomerResponseDTO>(pet.Customer);
+                customerDto.AccountResponseDTO = _mapper.Map<AccountResponseDTO>(pet.Customer.Account);
 
-                //  Manually create DTO for Customer
-                var customerDto = pet.Customer == null ? null : new CustomerResponseDTO
-                {
-                    CustomerId = pet.Customer.CustomerId,
-                    AccountId = pet.Customer.AccountId,
-                    MembershipId = pet.Customer.MembershipId,
-                    CustomerCode = pet.Customer.CustomerCode,
-                    FullName = pet.Customer.FullName,
-                    UserName = pet.Customer.UserName,
-                    Image = pet.Customer.Image,
-                    PhoneNumber = pet.Customer.PhoneNumber,
-                    DateOfBirth = pet.Customer.DateOfBirth,
-                    Gender = pet.Customer.Gender,
-                    Address = pet.Customer.Address,
-                    CurrentPoints = pet.Customer.CurrentPoints,
-                    CreatedAt = pet.Customer.CreatedAt,
-                    CreatedBy = pet.Customer.CreatedBy,
-                    ModifiedAt = pet.Customer.ModifiedAt,
-                    ModifiedBy = pet.Customer.ModifiedBy
-                };
+                // Map Pet
+                var petDto = _mapper.Map<PetMicrochipItemResponse>(pet);
+                petDto.AppointmentDetails = appointmentDetailDtos;
+                petDto.Customer = customerDto;
 
-                // Manually create DTO for Pet
-                var petDto = new PetMicrochipItemResponse
-                {
-                    PetId = pet.PetId,
-                    CustomerId = pet.CustomerId,
-                    PetCode = pet.PetCode,
-                    Name = pet.Name,
-                    Species = pet.Species,
-                    Breed = pet.Breed,
-                    Gender = pet.Gender,
-                    DateOfBirth = pet.DateOfBirth,
-                    PlaceToLive = pet.PlaceToLive,
-                    PlaceOfBirth = pet.PlaceOfBirth,
-                    Image = pet.Image,
-                    Weight = pet.Weight,
-                    Color = pet.Color,
-                    Nationality = pet.Nationality,
-                    isSterilized = pet.isSterilized,
-                    AppointmentDetail = appointmentDetailDto,
-                    Customer = customerDto
-                };
+                // Map MicrochipItem
+                var microchipItemResponse = _mapper.Map<MicrochipItemResponse>(microchipItem);
+                microchipItemResponse.Pet = petDto;
 
-                //  Manually create DTO for MicrochipItem
-                var microchipItemResponse = new MicrochipItemResponse
-                {
-                    MicrochipId = microchipItem.MicrochipId,
-                    Name = microchipItem.Name,
-                    Description = microchipItem.Description,
-                    InstallationDate = microchipItem.InstallationDate,
-                    Status = microchipItem.Status,
-                    Pet = petDto
-                };
-
-                // Return result
                 return new BaseResponse<MicrochipItemResponse>
                 {
                     Code = 200,
-                    Message = "Lấy thông tin Microchip thành công!",
+                    Message = "Lấy thông tin Microchip và thú cưng thành công!",
                     Data = microchipItemResponse
                 };
             }
@@ -150,6 +103,7 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
 
         //public async Task<BaseResponse<BaseMicrochipItemResponse>> CreateMicrochipItemAsync(CreateMicrochipItemRequest request, CancellationToken cancellationToken)
         //{
