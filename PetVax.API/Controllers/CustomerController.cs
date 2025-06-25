@@ -30,7 +30,7 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpGet("get-customer-by-account-id/{accountId}")]
-        [Authorize(Roles = "Admin, Customer")]
+        [Authorize(Roles = "Admin, Customer, Staff")]
         public async Task<IActionResult> GetCustomerByAccountId(int accountId, CancellationToken cancellationToken)
         {
             var response = await _customerService.GetCustomerByAccountIdAsync(accountId, cancellationToken);
@@ -41,7 +41,7 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpGet("get-all-customers")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> GetAllCustomers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, CancellationToken cancellationToken = default)
         {
             var request = new GetAllCustomerRequestDTO
@@ -72,7 +72,7 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpDelete("delete-customer/{customerId}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteCustomer(int customerId, CancellationToken cancellationToken)
         {
             if (customerId <= 0)

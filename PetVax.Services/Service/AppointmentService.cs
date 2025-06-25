@@ -31,6 +31,7 @@ namespace PetVax.Services.Service
         private readonly IAppointmentDetailRepository _appointmentDetailRepository;
         private readonly IVaccineBatchRepository _vaccineBatchRepository;
         private readonly IVaccineProfileRepository _vaccineProfileRepository;
+        private readonly IVaccinationScheduleRepository _vaccinationScheduleRepository;
         private readonly IVetScheduleRepository _vetScheduleRepository;
         private readonly ILogger<AppointmentService> _logger;
         private readonly IMapper _mapper;
@@ -46,6 +47,7 @@ namespace PetVax.Services.Service
             IAppointmentDetailRepository appointmentDetailRepository,
             IVaccineBatchRepository vaccineBatchRepository,
             IVaccineProfileRepository vaccineProfileRepository,
+            IVaccinationScheduleRepository vaccinationScheduleRepository,
             IVetScheduleRepository vetScheduleRepository,
             ILogger<AppointmentService> logger,
             IMapper mapper,
@@ -60,6 +62,7 @@ namespace PetVax.Services.Service
             _appointmentDetailRepository = appointmentDetailRepository;
             _vaccineBatchRepository = vaccineBatchRepository;
             _vaccineProfileRepository = vaccineProfileRepository;
+            _vaccinationScheduleRepository = vaccinationScheduleRepository;
             _vetScheduleRepository = vetScheduleRepository;
             _logger = logger;
             _mapper = mapper;
@@ -68,276 +71,276 @@ namespace PetVax.Services.Service
             _microchipRepository = microchipRepository;
         }
 
-        public async Task<BaseResponse<AppointmentResponseDTO>> CreateAppointmentAsync(CreateAppointmentDTO createAppointmentDTO, CancellationToken cancellationToken)
-        {
-            if (createAppointmentDTO == null)
-            {
-                return new BaseResponse<AppointmentResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Dữ liệu cuộc hẹn không hợp lệ.",
-                    Data = null
-                };
-            }
+        //public async Task<BaseResponse<AppointmentResponseDTO>> CreateAppointmentAsync(CreateAppointmentDTO createAppointmentDTO, CancellationToken cancellationToken)
+        //{
+        //    if (createAppointmentDTO == null)
+        //    {
+        //        return new BaseResponse<AppointmentResponseDTO>
+        //        {
+        //            Code = 400,
+        //            Success = false,
+        //            Message = "Dữ liệu cuộc hẹn không hợp lệ.",
+        //            Data = null
+        //        };
+        //    }
 
-            // Validate address based on location
-            if (createAppointmentDTO.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(createAppointmentDTO.Address))
-            {
-                return new BaseResponse<AppointmentResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
-                    Data = null
-                };
-            }
-            if (createAppointmentDTO.Location == EnumList.Location.Clinic)
-            {
-                // If Clinic, ignore address (set to null or empty)
-                createAppointmentDTO.Address = "Đại học FPT TP. Hồ Chí Minh";
-            }
+        //    // Validate address based on location
+        //    if (createAppointmentDTO.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(createAppointmentDTO.Address))
+        //    {
+        //        return new BaseResponse<AppointmentResponseDTO>
+        //        {
+        //            Code = 400,
+        //            Success = false,
+        //            Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+        //            Data = null
+        //        };
+        //    }
+        //    if (createAppointmentDTO.Location == EnumList.Location.Clinic)
+        //    {
+        //        // If Clinic, ignore address (set to null or empty)
+        //        createAppointmentDTO.Address = "Đại học FPT TP. Hồ Chí Minh";
+        //    }
 
-            var pet = await _petRepository.GetPetByIdAsync(createAppointmentDTO.PetId, cancellationToken);
-            if (pet == null || pet.CustomerId != createAppointmentDTO.CustomerId)
-            {
-                return new BaseResponse<AppointmentResponseDTO>
-                {
-                    Code = 404,
-                    Success = false,
-                    Message = "Thú cưng này không thuộc quyền sở hữu của chủ nuôi này",
-                    Data = null
-                };
-            }
+        //    var pet = await _petRepository.GetPetByIdAsync(createAppointmentDTO.PetId, cancellationToken);
+        //    if (pet == null || pet.CustomerId != createAppointmentDTO.CustomerId)
+        //    {
+        //        return new BaseResponse<AppointmentResponseDTO>
+        //        {
+        //            Code = 404,
+        //            Success = false,
+        //            Message = "Thú cưng này không thuộc quyền sở hữu của chủ nuôi này",
+        //            Data = null
+        //        };
+        //    }
 
-            try
-            {
-                var random = new Random();
+        //    try
+        //    {
+        //        var random = new Random();
 
-                var appointment = _mapper.Map<Appointment>(createAppointmentDTO);
-                appointment.AppointmentCode = "AP" + random.Next(0, 1000000).ToString("D6");
-                appointment.AppointmentDate = createAppointmentDTO.AppointmentDate;
-                appointment.ServiceType = createAppointmentDTO.ServiceType;
-                appointment.Location = createAppointmentDTO.Location;
-                appointment.Address = createAppointmentDTO.Address;
-                appointment.AppointmentStatus = EnumList.AppointmentStatus.Processing;
-                appointment.CreatedAt = DateTime.UtcNow;
-                appointment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+        //        var appointment = _mapper.Map<Appointment>(createAppointmentDTO);
+        //        appointment.AppointmentCode = "AP" + random.Next(0, 1000000).ToString("D6");
+        //        appointment.AppointmentDate = createAppointmentDTO.AppointmentDate;
+        //        appointment.ServiceType = createAppointmentDTO.ServiceType;
+        //        appointment.Location = createAppointmentDTO.Location;
+        //        appointment.Address = createAppointmentDTO.Address;
+        //        appointment.AppointmentStatus = EnumList.AppointmentStatus.Processing;
+        //        appointment.CreatedAt = DateTime.UtcNow;
+        //        appointment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
-                var createdAppointment = await _appointmentRepository.CreateAppointmentAsync(appointment, cancellationToken);
-                if (createdAppointment == null)
-                {
-                    return new BaseResponse<AppointmentResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Không thể tạo cuộc hẹn.",
-                        Data = null
-                    };
-                }
+        //        var createdAppointment = await _appointmentRepository.CreateAppointmentAsync(appointment, cancellationToken);
+        //        if (createdAppointment == null)
+        //        {
+        //            return new BaseResponse<AppointmentResponseDTO>
+        //            {
+        //                Code = 500,
+        //                Success = false,
+        //                Message = "Không thể tạo cuộc hẹn.",
+        //                Data = null
+        //            };
+        //        }
 
-                var appointmentResponse = _mapper.Map<AppointmentResponseDTO>(appointment);
-                return new BaseResponse<AppointmentResponseDTO>
-                {
-                    Code = 201,
-                    Success = true,
-                    Message = "Tạo cuộc hẹn thành công.",
-                    Data = appointmentResponse
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Đã xảy ra lỗi khi tạo cuộc hẹn.");
-                return new BaseResponse<AppointmentResponseDTO>
-                {
-                    Code = 500,
-                    Success = false,
-                    Message = "Đã xảy ra lỗi khi tạo cuộc hẹn.",
-                    Data = null
-                };
-            }
-        }
+        //        var appointmentResponse = _mapper.Map<AppointmentResponseDTO>(appointment);
+        //        return new BaseResponse<AppointmentResponseDTO>
+        //        {
+        //            Code = 201,
+        //            Success = true,
+        //            Message = "Tạo cuộc hẹn thành công.",
+        //            Data = appointmentResponse
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Đã xảy ra lỗi khi tạo cuộc hẹn.");
+        //        return new BaseResponse<AppointmentResponseDTO>
+        //        {
+        //            Code = 500,
+        //            Success = false,
+        //            Message = "Đã xảy ra lỗi khi tạo cuộc hẹn.",
+        //            Data = null
+        //        };
+        //    }
+        //}
 
-        public async Task<BaseResponse<AppointmentWithDetailResponseDTO>> CreateFullAppointmentAsync(CreateFullAppointmentDTO createFullAppointmentDTO, CancellationToken cancellationToken)
-        {
-            if (createFullAppointmentDTO == null)
-            {
-                return new BaseResponse<AppointmentWithDetailResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Dữ liệu để tạo cuộc hẹn không hợp lệ.",
-                    Data = default!
-                };
-            }
-            // Validate address based on location
-            if (createFullAppointmentDTO.Appointment.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(createFullAppointmentDTO.Appointment.Address))
-            {
-                return new BaseResponse<AppointmentWithDetailResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
-                    Data = default!
-                };
-            }
-            if (createFullAppointmentDTO.Appointment.Location == EnumList.Location.Clinic)
-            {
-                // If Clinic, ignore address (set to null or empty)
-                createFullAppointmentDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
-            }
+        //public async Task<BaseResponse<AppointmentWithDetailResponseDTO>> CreateFullAppointmentAsync(CreateFullAppointmentDTO createFullAppointmentDTO, CancellationToken cancellationToken)
+        //{
+        //    if (createFullAppointmentDTO == null)
+        //    {
+        //        return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //        {
+        //            Code = 400,
+        //            Success = false,
+        //            Message = "Dữ liệu để tạo cuộc hẹn không hợp lệ.",
+        //            Data = default!
+        //        };
+        //    }
+        //    // Validate address based on location
+        //    if (createFullAppointmentDTO.Appointment.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(createFullAppointmentDTO.Appointment.Address))
+        //    {
+        //        return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //        {
+        //            Code = 400,
+        //            Success = false,
+        //            Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+        //            Data = default!
+        //        };
+        //    }
+        //    if (createFullAppointmentDTO.Appointment.Location == EnumList.Location.Clinic)
+        //    {
+        //        // If Clinic, ignore address (set to null or empty)
+        //        createFullAppointmentDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
+        //    }
 
-            var pet = await _petRepository.GetPetByIdAsync(createFullAppointmentDTO.Appointment.PetId, cancellationToken);
-            if (pet == null || pet.CustomerId != createFullAppointmentDTO.Appointment.CustomerId)
-            {
-                return new BaseResponse<AppointmentWithDetailResponseDTO>
-                {
-                    Code = 404,
-                    Success = false,
-                    Message = "Thú cưng này không thuộc quyền sở hữu của chủ nuôi này",
-                    Data = default!
-                };
-            }
+        //    var pet = await _petRepository.GetPetByIdAsync(createFullAppointmentDTO.Appointment.PetId, cancellationToken);
+        //    if (pet == null || pet.CustomerId != createFullAppointmentDTO.Appointment.CustomerId)
+        //    {
+        //        return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //        {
+        //            Code = 404,
+        //            Success = false,
+        //            Message = "Thú cưng này không thuộc quyền sở hữu của chủ nuôi này",
+        //            Data = default!
+        //        };
+        //    }
 
-            // Check DiseaseId before creating Appointment
-            if (createFullAppointmentDTO.Appointment.ServiceType == EnumList.ServiceType.Vaccination)
-            {
-                if (createFullAppointmentDTO.AppointmentDetail.DiseaseId == null || createFullAppointmentDTO.AppointmentDetail.DiseaseId <= 0)
-                {
-                    return new BaseResponse<AppointmentWithDetailResponseDTO>
-                    {
-                        Code = 400,
-                        Success = false,
-                        Message = "Vui lòng cung cấp DiseaseId cho dịch vụ tiêm phòng.",
-                        Data = default!
-                    };
-                }
-                // Kiểm tra xem DiseaseId có tồn tại không
-                var disease = await _diseaseRepository.GetDiseaseByIdAsync(createFullAppointmentDTO.AppointmentDetail.DiseaseId.Value, cancellationToken);
-                if (disease == null)
-                {
-                    return new BaseResponse<AppointmentWithDetailResponseDTO>
-                    {
-                        Code = 404,
-                        Success = false,
-                        Message = "Không tìm thấy bệnh với ID đã cung cấp.",
-                        Data = default!
-                    };
-                }
-            }
+        //    // Check DiseaseId before creating Appointment
+        //    if (createFullAppointmentDTO.Appointment.ServiceType == EnumList.ServiceType.Vaccination)
+        //    {
+        //        if (createFullAppointmentDTO.AppointmentDetail.DiseaseId == null || createFullAppointmentDTO.AppointmentDetail.DiseaseId <= 0)
+        //        {
+        //            return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //            {
+        //                Code = 400,
+        //                Success = false,
+        //                Message = "Vui lòng cung cấp DiseaseId cho dịch vụ tiêm phòng.",
+        //                Data = default!
+        //            };
+        //        }
+        //        // Kiểm tra xem DiseaseId có tồn tại không
+        //        var disease = await _diseaseRepository.GetDiseaseByIdAsync(createFullAppointmentDTO.AppointmentDetail.DiseaseId.Value, cancellationToken);
+        //        if (disease == null)
+        //        {
+        //            return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //            {
+        //                Code = 404,
+        //                Success = false,
+        //                Message = "Không tìm thấy bệnh với ID đã cung cấp.",
+        //                Data = default!
+        //            };
+        //        }
+        //    }
 
-            try
-            {
-                var random = new Random();
+        //    try
+        //    {
+        //        var random = new Random();
 
-                var appointment = _mapper.Map<Appointment>(createFullAppointmentDTO.Appointment);
-                appointment.AppointmentCode = "AP" + random.Next(0, 1000000).ToString("D6");
-                appointment.AppointmentDate = createFullAppointmentDTO.Appointment.AppointmentDate;
-                appointment.ServiceType = createFullAppointmentDTO.Appointment.ServiceType;
-                appointment.Location = createFullAppointmentDTO.Appointment.Location;
-                appointment.Address = createFullAppointmentDTO.Appointment.Address;
-                appointment.AppointmentStatus = EnumList.AppointmentStatus.Processing;
-                appointment.CreatedAt = DateTime.UtcNow;
-                appointment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+        //        var appointment = _mapper.Map<Appointment>(createFullAppointmentDTO.Appointment);
+        //        appointment.AppointmentCode = "AP" + random.Next(0, 1000000).ToString("D6");
+        //        appointment.AppointmentDate = createFullAppointmentDTO.Appointment.AppointmentDate;
+        //        appointment.ServiceType = createFullAppointmentDTO.Appointment.ServiceType;
+        //        appointment.Location = createFullAppointmentDTO.Appointment.Location;
+        //        appointment.Address = createFullAppointmentDTO.Appointment.Address;
+        //        appointment.AppointmentStatus = EnumList.AppointmentStatus.Processing;
+        //        appointment.CreatedAt = DateTime.UtcNow;
+        //        appointment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
-                var createdAppointmentId = await _appointmentRepository.CreateAppointmentAsync(appointment, cancellationToken);
-                if (createdAppointmentId == null)
-                {
-                    return new BaseResponse<AppointmentWithDetailResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Không thể tạo cuộc hẹn.",
-                        Data = default!
-                    };
-                }
+        //        var createdAppointmentId = await _appointmentRepository.CreateAppointmentAsync(appointment, cancellationToken);
+        //        if (createdAppointmentId == null)
+        //        {
+        //            return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //            {
+        //                Code = 500,
+        //                Success = false,
+        //                Message = "Không thể tạo cuộc hẹn.",
+        //                Data = default!
+        //            };
+        //        }
 
-                // Lấy lại bản ghi Appointment vừa tạo để đảm bảo có đầy đủ thông tin (ID, ...)
-                var createdAppointment = await _appointmentRepository.GetAppointmentByIdAsync(createdAppointmentId.AppointmentId, cancellationToken);
-                if (createdAppointment == null)
-                {
-                    return new BaseResponse<AppointmentWithDetailResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Không thể lấy thông tin cuộc hẹn vừa tạo.",
-                        Data = default!
-                    };
-                }
-                var appointmentResponse = _mapper.Map<AppointmentResponseDTO>(createdAppointment);
+        //        // Lấy lại bản ghi Appointment vừa tạo để đảm bảo có đầy đủ thông tin (ID, ...)
+        //        var createdAppointment = await _appointmentRepository.GetAppointmentByIdAsync(createdAppointmentId.AppointmentId, cancellationToken);
+        //        if (createdAppointment == null)
+        //        {
+        //            return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //            {
+        //                Code = 500,
+        //                Success = false,
+        //                Message = "Không thể lấy thông tin cuộc hẹn vừa tạo.",
+        //                Data = default!
+        //            };
+        //        }
+        //        var appointmentResponse = _mapper.Map<AppointmentResponseDTO>(createdAppointment);
 
-                var appointmentDetail = new AppointmentDetail
-                {
-                    AppointmentId = appointmentResponse.AppointmentId,
-                    AppointmentDate = appointmentResponse.AppointmentDate,
-                    ServiceType = appointmentResponse.ServiceType,
-                    AppointmentStatus = appointmentResponse.AppointmentStatus,
-                    AppointmentDetailCode = "AD" + random.Next(0, 1000000).ToString("D6"),
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
-                };
+        //        var appointmentDetail = new AppointmentDetail
+        //        {
+        //            AppointmentId = appointmentResponse.AppointmentId,
+        //            AppointmentDate = appointmentResponse.AppointmentDate,
+        //            ServiceType = appointmentResponse.ServiceType,
+        //            AppointmentStatus = appointmentResponse.AppointmentStatus,
+        //            AppointmentDetailCode = "AD" + random.Next(0, 1000000).ToString("D6"),
+        //            CreatedAt = DateTime.UtcNow,
+        //            CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+        //        };
 
-                if (appointmentResponse.ServiceType == EnumList.ServiceType.Vaccination)
-                {
-                    // Gán DiseaseId nếu có
-                    var diseaseIdProp = typeof(AppointmentDetail).GetProperty("DiseaseId");
-                    if (diseaseIdProp != null && createFullAppointmentDTO.AppointmentDetail.DiseaseId != null)
-                    {
-                        diseaseIdProp.SetValue(appointmentDetail, createFullAppointmentDTO.AppointmentDetail.DiseaseId);
-                    }
-                }
+        //        if (appointmentResponse.ServiceType == EnumList.ServiceType.Vaccination)
+        //        {
+        //            // Gán DiseaseId nếu có
+        //            var diseaseIdProp = typeof(AppointmentDetail).GetProperty("DiseaseId");
+        //            if (diseaseIdProp != null && createFullAppointmentDTO.AppointmentDetail.DiseaseId != null)
+        //            {
+        //                diseaseIdProp.SetValue(appointmentDetail, createFullAppointmentDTO.AppointmentDetail.DiseaseId);
+        //            }
+        //        }
 
-                var createdAppointmentDetailId = await _appointmentDetailRepository.AddAppointmentDetailAsync(appointmentDetail, cancellationToken);
-                if (createdAppointmentDetailId == null)
-                {
-                    return new BaseResponse<AppointmentWithDetailResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Không thể tạo chi tiết cuộc hẹn.",
-                        Data = default!
-                    };
-                }
+        //        var createdAppointmentDetailId = await _appointmentDetailRepository.AddAppointmentDetailAsync(appointmentDetail, cancellationToken);
+        //        if (createdAppointmentDetailId == null)
+        //        {
+        //            return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //            {
+        //                Code = 500,
+        //                Success = false,
+        //                Message = "Không thể tạo chi tiết cuộc hẹn.",
+        //                Data = default!
+        //            };
+        //        }
 
-                // Lấy lại bản ghi AppointmentDetail vừa tạo
-                var createdAppointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(createdAppointmentDetailId.AppointmentDetailId, cancellationToken);
-                if (createdAppointmentDetail == null)
-                {
-                    return new BaseResponse<AppointmentWithDetailResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Không thể lấy thông tin chi tiết cuộc hẹn vừa tạo.",
-                        Data = default!
-                    };
-                }
-                var appointmentDetailResponse = _mapper.Map<AppointmentDetailResponseDTO>(createdAppointmentDetail);
-                // Map the appointment and appointment detail to the response DTO
-                var appointmentWithDetailResponse = new AppointmentWithDetailResponseDTO
-                {
-                    Appointment = appointmentResponse,
-                    AppointmentDetail = appointmentDetailResponse
-                };
-                return new BaseResponse<AppointmentWithDetailResponseDTO>
-                {
-                    Code = 201,
-                    Success = true,
-                    Message = "Tạo cuộc hẹn và chi tiết cuộc hẹn thành công.",
-                    Data = appointmentWithDetailResponse
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while creating appointment.");
-                return new BaseResponse<AppointmentWithDetailResponseDTO>
-                {
-                    Code = 500,
-                    Success = false,
-                    Message = "Đã xảy ra lỗi khi tạo cuộc hẹn.",
-                    Data = default!
-                };
-            }
-        }
+        //        // Lấy lại bản ghi AppointmentDetail vừa tạo
+        //        var createdAppointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(createdAppointmentDetailId.AppointmentDetailId, cancellationToken);
+        //        if (createdAppointmentDetail == null)
+        //        {
+        //            return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //            {
+        //                Code = 500,
+        //                Success = false,
+        //                Message = "Không thể lấy thông tin chi tiết cuộc hẹn vừa tạo.",
+        //                Data = default!
+        //            };
+        //        }
+        //        var appointmentDetailResponse = _mapper.Map<AppointmentDetailResponseDTO>(createdAppointmentDetail);
+        //        // Map the appointment and appointment detail to the response DTO
+        //        var appointmentWithDetailResponse = new AppointmentWithDetailResponseDTO
+        //        {
+        //            Appointment = appointmentResponse,
+        //            AppointmentDetail = appointmentDetailResponse
+        //        };
+        //        return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //        {
+        //            Code = 201,
+        //            Success = true,
+        //            Message = "Tạo cuộc hẹn và chi tiết cuộc hẹn thành công.",
+        //            Data = appointmentWithDetailResponse
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error occurred while creating appointment.");
+        //        return new BaseResponse<AppointmentWithDetailResponseDTO>
+        //        {
+        //            Code = 500,
+        //            Success = false,
+        //            Message = "Đã xảy ra lỗi khi tạo cuộc hẹn.",
+        //            Data = default!
+        //        };
+        //    }
+        //}
 
         public async Task<BaseResponse<bool>> DeleteAppointmentAsync(int appointmentId, CancellationToken cancellationToken)
         {
@@ -554,75 +557,75 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmentResponseDTO>> UpdateAppointmentAsync(int appointmentId, UpdateAppointmentDTO updateAppointmentDTO, CancellationToken cancellationToken)
-        {
-            if (updateAppointmentDTO == null)
-            {
-                return new BaseResponse<AppointmentResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Dữ liệu cuộc hẹn không hợp lệ.",
-                    Data = null
-                };
-            }
-            try
-            {
-                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
-                if (appointment == null)
-                {
-                    return new BaseResponse<AppointmentResponseDTO>
-                    {
-                        Code = 404,
-                        Success = false,
-                        Message = "Cuộc hẹn không tồn tại.",
-                        Data = null
-                    };
-                }
+        //public async Task<BaseResponse<AppointmentResponseDTO>> UpdateAppointmentAsync(int appointmentId, UpdateAppointmentDTO updateAppointmentDTO, CancellationToken cancellationToken)
+        //{
+        //    if (updateAppointmentDTO == null)
+        //    {
+        //        return new BaseResponse<AppointmentResponseDTO>
+        //        {
+        //            Code = 400,
+        //            Success = false,
+        //            Message = "Dữ liệu cuộc hẹn không hợp lệ.",
+        //            Data = null
+        //        };
+        //    }
+        //    try
+        //    {
+        //        var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
+        //        if (appointment == null)
+        //        {
+        //            return new BaseResponse<AppointmentResponseDTO>
+        //            {
+        //                Code = 404,
+        //                Success = false,
+        //                Message = "Cuộc hẹn không tồn tại.",
+        //                Data = null
+        //            };
+        //        }
 
-                if (updateAppointmentDTO.AppointmentDate.HasValue)
-                    appointment.AppointmentDate = updateAppointmentDTO.AppointmentDate.Value;
-                if (updateAppointmentDTO.ServiceType.HasValue)
-                    appointment.ServiceType = updateAppointmentDTO.ServiceType.Value;
-                if (updateAppointmentDTO.Location.HasValue)
-                    appointment.Location = updateAppointmentDTO.Location.Value;
-                if (!string.IsNullOrWhiteSpace(updateAppointmentDTO.Address))
-                    appointment.Address = updateAppointmentDTO.Address;
-                appointment.ModifiedAt = DateTime.UtcNow;
-                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-                var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
-                if (updatedAppointment == null)
-                {
-                    return new BaseResponse<AppointmentResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Không thể cập nhật cuộc hẹn.",
-                        Data = null
-                    };
-                }
+        //        if (updateAppointmentDTO.AppointmentDate.HasValue)
+        //            appointment.AppointmentDate = updateAppointmentDTO.AppointmentDate.Value;
+        //        if (updateAppointmentDTO.ServiceType.HasValue)
+        //            appointment.ServiceType = updateAppointmentDTO.ServiceType.Value;
+        //        if (updateAppointmentDTO.Location.HasValue)
+        //            appointment.Location = updateAppointmentDTO.Location.Value;
+        //        if (!string.IsNullOrWhiteSpace(updateAppointmentDTO.Address))
+        //            appointment.Address = updateAppointmentDTO.Address;
+        //        appointment.ModifiedAt = DateTime.UtcNow;
+        //        appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+        //        var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+        //        if (updatedAppointment == null)
+        //        {
+        //            return new BaseResponse<AppointmentResponseDTO>
+        //            {
+        //                Code = 500,
+        //                Success = false,
+        //                Message = "Không thể cập nhật cuộc hẹn.",
+        //                Data = null
+        //            };
+        //        }
 
-                var appointmentResponse = _mapper.Map<AppointmentResponseDTO>(updatedAppointment);
-                return new BaseResponse<AppointmentResponseDTO>
-                {
-                    Code = 200,
-                    Success = true,
-                    Message = "Cập nhật cuộc hẹn thành công.",
-                    Data = appointmentResponse
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật cuộc hẹn.");
-                return new BaseResponse<AppointmentResponseDTO>
-                {
-                    Code = 500,
-                    Success = false,
-                    Message = "Đã xảy ra lỗi khi cập nhật cuộc hẹn.",
-                    Data = null
-                };
-            }
-        }
+        //        var appointmentResponse = _mapper.Map<AppointmentResponseDTO>(updatedAppointment);
+        //        return new BaseResponse<AppointmentResponseDTO>
+        //        {
+        //            Code = 200,
+        //            Success = true,
+        //            Message = "Cập nhật cuộc hẹn thành công.",
+        //            Data = appointmentResponse
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật cuộc hẹn.");
+        //        return new BaseResponse<AppointmentResponseDTO>
+        //        {
+        //            Code = 500,
+        //            Success = false,
+        //            Message = "Đã xảy ra lỗi khi cập nhật cuộc hẹn.",
+        //            Data = null
+        //        };
+        //    }
+        //}
 
         public async Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken)
         {
@@ -650,7 +653,6 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                // Validate allowed status transitions
                 var currentStatus = appointment.AppointmentStatus;
                 var newStatus = updateAppointmentVaccinationDTO.AppointmentStatus ?? currentStatus;
                 bool isValidTransition = false;
@@ -759,20 +761,19 @@ namespace PetVax.Services.Service
                 appointmentDetail.VaccineBatchId = updateAppointmentVaccinationDTO.VaccineBatchId;
                 if (appointmentDetail.VaccineBatchId.HasValue)
                 {
-                    var vaccineDisease = await _vaccineDiseaseRepository.GetVaccineDiseaseByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken);
-                    if (vaccineDisease == null)
+                    var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(appointmentDetail.VaccineBatchId.Value, cancellationToken);
+                    if (vaccineBatch == null)
                     {
                         return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
                         {
                             Code = 400,
                             Success = false,
-                            Message = "VaccineBatchId không hợp lệ với DiseaseId đã cung cấp.",
+                            Message = "VaccineBatchId không hợp lệ.",
                             Data = null
                         };
                     }
                 }
                 appointmentDetail.VetId = updateAppointmentVaccinationDTO.VetId;
-                appointmentDetail.Dose = updateAppointmentVaccinationDTO.Dose;
                 appointmentDetail.Reaction = updateAppointmentVaccinationDTO.Reaction;
                 appointmentDetail.Temperature = updateAppointmentVaccinationDTO.Temperature;
                 appointmentDetail.HeartRate = updateAppointmentVaccinationDTO.HeartRate;
@@ -792,6 +793,34 @@ namespace PetVax.Services.Service
                 {
                     try
                     {
+                        // Xác định Dose gần nhất chưa hoàn thành cho pet và disease
+                        int? newDose = null;
+                        if (appointmentDetail.DiseaseId.HasValue)
+                        {
+                            var existingProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(appointment.PetId, cancellationToken);
+                            var profilesForDisease = existingProfiles?
+                                .Where(p => p.DiseaseId == appointmentDetail.DiseaseId)
+                                .ToList() ?? new List<VaccineProfile>();
+
+                            // Tìm profile chưa hoàn thành có số dose nhỏ nhất
+                            var unfinishedProfile = profilesForDisease
+                                .Where(p => p.IsCompleted.HasValue && !p.IsCompleted.Value)
+                                .OrderBy(p => p.Dose ?? 0)
+                                .FirstOrDefault();
+
+                            if (unfinishedProfile != null && unfinishedProfile.Dose.HasValue)
+                            {
+                                newDose = unfinishedProfile.Dose.Value;
+                            }
+                            else
+                            {
+                                // Nếu tất cả đã hoàn thành, lấy max dose + 1
+                                var maxDose = profilesForDisease.Where(p => p.Dose.HasValue).Select(p => p.Dose.Value).DefaultIfEmpty(0).Max();
+                                newDose = maxDose + 1;
+                            }
+                        }
+                        appointmentDetail.Dose = newDose;
+
                         int rowEffected = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
                         var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
 
@@ -807,50 +836,38 @@ namespace PetVax.Services.Service
                             };
                         }
 
-                        if (isStatusChangeToProcessed)
+                        if (isStatusChangeToProcessed && appointmentDetail.VaccineBatchId.HasValue)
                         {
-                            // Lấy danh sách vaccine profile của pet
-                            var existingProfiles = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(appointment.PetId, cancellationToken);
-
-                            // Nếu chưa có profile cho bệnh này thì tạo mới
-                            if (existingProfiles == null || (existingProfiles is IList<VaccineProfile> list && !list.Any(p => p.DiseaseId == appointmentDetail.DiseaseId)))
+                            var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(appointmentDetail.VaccineBatchId.Value, cancellationToken);
+                            if (vaccineBatch != null)
                             {
-                                var newProfile = new VaccineProfile
-                                {
-                                    PetId = appointment.PetId,
-                                    DiseaseId = appointmentDetail.DiseaseId,
-                                    AppointmentDetailId = appointmentDetail.AppointmentDetailId,
-                                    VaccinationDate = appointmentDetail.AppointmentDate,
-                                    Dose = appointmentDetail.Dose,
-                                    Reaction = appointmentDetail.Reaction,
-                                    NextVaccinationInfo = appointmentDetail.NextVaccinationInfo,
-                                    IsActive = true,
-                                    IsCompleted = true,
-                                    CreatedAt = DateTime.UtcNow,
-                                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
-                                    ModifiedAt = DateTime.UtcNow,
-                                    ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
-                                };
-                                await _vaccineProfileRepository.CreateVaccineProfileAsync(newProfile, cancellationToken);
-                            }
-                            else
-                            {
-                                // Nếu đã có profile cho bệnh này thì cập nhật
-                                var profileToUpdate = (existingProfiles is IList<VaccineProfile> list2 ? list2 : new List<VaccineProfile> { existingProfiles })
-                                    .FirstOrDefault(p => p.DiseaseId == appointmentDetail.DiseaseId);
-                                if (profileToUpdate != null)
-                                {
-                                    profileToUpdate.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
-                                    profileToUpdate.VaccinationDate = appointmentDetail.AppointmentDate;
-                                    profileToUpdate.Dose = appointmentDetail.Dose ?? profileToUpdate.Dose;
-                                    profileToUpdate.Reaction = appointmentDetail.Reaction ?? profileToUpdate.Reaction;
-                                    profileToUpdate.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? profileToUpdate.NextVaccinationInfo;
-                                    profileToUpdate.IsActive = true;
-                                    profileToUpdate.IsCompleted = true;
-                                    profileToUpdate.ModifiedAt = DateTime.UtcNow;
-                                    profileToUpdate.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                                var vaccineDiseases = await _vaccineDiseaseRepository.GetVaccineDiseaseByVaccineIdAsync(vaccineBatch.VaccineId, cancellationToken);
+                                var diseaseIds = vaccineDiseases?.Select(vd => vd.DiseaseId).Distinct().ToList() ?? new List<int>();
+                                var existingProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(appointment.PetId, cancellationToken);
 
-                                    await _vaccineProfileRepository.UpdateVaccineProfileAsync(profileToUpdate, cancellationToken);
+                                foreach (var diseaseId in diseaseIds)
+                                {
+                                    var vaccinationSchedule = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(diseaseId, cancellationToken);
+                                    // Tìm profile có dose = doseNumber, isCompleted = false
+                                    int doseNumber = newDose ?? 1;
+                                    var profileToUpdate = existingProfiles?
+                                        .FirstOrDefault(p => p.DiseaseId == diseaseId && (p.Dose ?? 0) == doseNumber && (p.IsCompleted.HasValue && !p.IsCompleted.Value));
+
+                                    if (profileToUpdate != null)
+                                    {
+                                        profileToUpdate.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
+                                        profileToUpdate.VaccinationDate = appointmentDetail.AppointmentDate;
+                                        profileToUpdate.Dose = doseNumber;
+                                        profileToUpdate.Reaction = appointmentDetail.Reaction ?? profileToUpdate.Reaction;
+                                        profileToUpdate.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? profileToUpdate.NextVaccinationInfo;
+                                        profileToUpdate.IsActive = true;
+                                        profileToUpdate.IsCompleted = true;
+                                        profileToUpdate.VaccinationScheduleId = vaccinationSchedule?.VaccinationScheduleId;
+                                        profileToUpdate.ModifiedAt = DateTime.UtcNow;
+                                        profileToUpdate.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                                        await _vaccineProfileRepository.UpdateVaccineProfileAsync(profileToUpdate, cancellationToken);
+                                    }
+                                    // Không tạo mới profile nếu không tìm thấy
                                 }
                             }
                         }
@@ -1311,21 +1328,22 @@ namespace PetVax.Services.Service
                 };
             }
         }
-        private DateTime? ExtractDateFromVaccinationInfo(string vaccinationInfo)
-        {
-            if (string.IsNullOrWhiteSpace(vaccinationInfo))
-                return null;
+        
+        //private DateTime? ExtractDateFromVaccinationInfo(string vaccinationInfo)
+        //{
+        //    if (string.IsNullOrWhiteSpace(vaccinationInfo))
+        //        return null;
 
-            // Tìm ngày theo định dạng yyyy-MM-dd trong chuỗi
-            var regex = new Regex(@"\b\d{4}-\d{2}-\d{2}\b");
-            var match = regex.Match(vaccinationInfo);
+        //    // Tìm ngày theo định dạng yyyy-MM-dd trong chuỗi
+        //    var regex = new Regex(@"\b\d{4}-\d{2}-\d{2}\b");
+        //    var match = regex.Match(vaccinationInfo);
 
-            if (match.Success && DateTime.TryParse(match.Value, out var date))
-            {
-                return date;
-            }
-            return null;
-        }
+        //    if (match.Success && DateTime.TryParse(match.Value, out var date))
+        //    {
+        //        return date;
+        //    }
+        //    return null;
+        //}
 
         public async Task<BaseResponse<List<AppointmentResponseDTO>>> GetAppointmentByCustomerIdAndStatusAsync(int customerId, AppointmentStatus status, CancellationToken cancellationToken)
         {

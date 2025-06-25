@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PediVax.BusinessObjects.DBContext;
 
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250625160046_updateDoseStringToInt")]
+    partial class updateDoseStringToInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,11 +73,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 25, 16, 12, 2, 760, DateTimeKind.Utc).AddTicks(2758),
+                            CreatedAt = new DateTime(2025, 6, 25, 16, 0, 45, 495, DateTimeKind.Utc).AddTicks(7808),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "vp1UB0tWfvY8O+3oOLsaTWGUkAqHKCt3VwCR+aNe0rQ=",
-                            PasswordSalt = "539egAEbuX8Xqywpt4GQHLodNyX20DKsczCJlWoOlbQ=",
+                            PasswordHash = "P/MBXlC7CBtwL2Qrd+5OUfYYDIVE8awGWgFeeZYWFxc=",
+                            PasswordSalt = "/bbk5li4Tpzpz00xMaD3yoDZNNxxRFiy37QdzEIIwFE=",
                             RefereshToken = "",
                             Role = 1,
                             isDeleted = false,
@@ -84,11 +87,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 6, 25, 16, 12, 2, 760, DateTimeKind.Utc).AddTicks(2764),
+                            CreatedAt = new DateTime(2025, 6, 25, 16, 0, 45, 495, DateTimeKind.Utc).AddTicks(7812),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "3S9N4PY+glIsYTtPB2rZmytgU5hzxKYPlJMxpkp8bKQ=",
-                            PasswordSalt = "hr/C+wxsaL7tZDdQhEdGZKuoEFD8Ol+WW0SLM+DBP9I=",
+                            PasswordHash = "DMuPx1kZ7ViCKQ8EhKdlwmBfnboXAj2HO+wmgKkEVic=",
+                            PasswordSalt = "dDSrn3AD2hoNFoBNE0n21vt+Rd80H6LKoLEPn9jfAyo=",
                             RefereshToken = "",
                             Role = 2,
                             isDeleted = false,
@@ -1305,9 +1308,11 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("DiseaseId");
 
-                    b.HasIndex("PetId");
-
                     b.HasIndex("VaccinationScheduleId");
+
+                    b.HasIndex("PetId", "DiseaseId")
+                        .IsUnique()
+                        .HasFilter("[DiseaseId] IS NOT NULL");
 
                     b.ToTable("VaccineProfile");
                 });

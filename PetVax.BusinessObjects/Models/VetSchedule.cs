@@ -17,7 +17,7 @@ namespace PetVax.BusinessObjects.Models
         public int VetScheduleId { get; set; } // Unique identifier for the vet schedule
         public int VetId { get; set; } // Foreign key to Vet table
         public DateTime ScheduleDate { get; set; } // Date of the schedule
-        public int SlotNumber { get; set; } // e.g., 1 for first slot, 2 for second slot, etc.
+        public int SlotNumber { get; set; }
         public EnumList.VetScheduleStatus Status { get; set; } // e.g., "Active", "Cancelled", "Completed"
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string CreatedBy { get; set; } // User who created the record

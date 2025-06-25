@@ -13,16 +13,16 @@ namespace PetVax.Services.IService
     public interface IAppointmentDetailService
     {
         Task<DynamicResponse<AppointmentDetailResponseDTO>> GetAllAppointmentDetail (GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailById(int appointmentDetailId, CancellationToken cancellationToken);
+        //Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailById(int appointmentDetailId, CancellationToken cancellationToken);
         //Task<BaseResponse<AppointmentDetailResponseDTO>> CreateAppointmentDetail(CreateAppointmentDetailDTO createAppointmentDetailDTO, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentDetailResponseDTO>> UpdateAppointmentDetail(int appointmentDetailId, UpdateAppointmentDetailDTO updateAppointmentDetailDTO, CancellationToken cancellationToken);
+        //Task<BaseResponse<AppointmentDetailResponseDTO>> UpdateAppointmentDetail(int appointmentDetailId, UpdateAppointmentDetailDTO updateAppointmentDetailDTO, CancellationToken cancellationToken);
         Task<BaseResponse<bool>> DeleteAppointmentDetail(int appointmentDetailId, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByAppointmentId(int appointmentId, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByPetId(int petId, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByVetId(int vetId, CancellationToken cancellationToken);
+        //Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByAppointmentId(int appointmentId, CancellationToken cancellationToken);
+        //Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByPetId(int petId, CancellationToken cancellationToken);
+        //Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByVetId(int vetId, CancellationToken cancellationToken);
         Task<BaseResponse<List<AppointmentDetailResponseDTO>>> GetAppointmentDetailByServiceType(EnumList.ServiceType serviceType, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByStatus(EnumList.AppointmentStatus status, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentDetailId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken);
+        //Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByStatus(EnumList.AppointmentStatus status, CancellationToken cancellationToken);
+        //Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentDetailId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken);
         Task<BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>> GetAppointmentVaccinationByPetId(int petId, CancellationToken cancellationToken);
         Task<BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>> GetAppointmentVaccinationByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken);

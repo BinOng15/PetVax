@@ -222,10 +222,9 @@ namespace PetVax.Services.Service
                             (d.ServiceType.ToString().ToLower().Contains(keyword)) ||
 
                             // Search by Appointment status (enum)
-                            (d.AppointmentStatus.ToString().ToLower().Contains(keyword)) ||
+                            (d.AppointmentStatus.ToString().ToLower().Contains(keyword))
 
                             // Search by Dose information
-                            (d.Dose != null && d.Dose.ToLower().Contains(keyword))
                         )
                         .ToList();
                 }
@@ -288,116 +287,116 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByAppointmentId(int appointmentId, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appointmentId, cancellationToken);
-                if (appointmentDetail == null)
-                {
-                    return new BaseResponse<AppointmentDetailResponseDTO>
-                    {
-                        Code = 200,
-                        Success = false,
-                        Message = "Không tìm thấy chi tiết cuộc hẹn cho ID đã cung cấp.",
-                        Data = null
-                    };
-                }
-                var responseData = _mapper.Map<AppointmentDetailResponseDTO>(appointmentDetail);
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 200,
-                    Success = true,
-                    Message = "Lấy chi tiết cuộc hẹn thành công.",
-                    Data = responseData
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting appointment detail by appointment ID.");
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 500,
-                    Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn.",
-                    Data = null
-                };
-            }
-        }
+        //public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByAppointmentId(int appointmentId, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appointmentId, cancellationToken);
+        //        if (appointmentDetail == null)
+        //        {
+        //            return new BaseResponse<AppointmentDetailResponseDTO>
+        //            {
+        //                Code = 200,
+        //                Success = false,
+        //                Message = "Không tìm thấy chi tiết cuộc hẹn cho ID đã cung cấp.",
+        //                Data = null
+        //            };
+        //        }
+        //        var responseData = _mapper.Map<AppointmentDetailResponseDTO>(appointmentDetail);
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 200,
+        //            Success = true,
+        //            Message = "Lấy chi tiết cuộc hẹn thành công.",
+        //            Data = responseData
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error occurred while getting appointment detail by appointment ID.");
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 500,
+        //            Success = false,
+        //            Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn.",
+        //            Data = null
+        //        };
+        //    }
+        //}
 
-        public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailById(int appointmentDetailId, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetailId, cancellationToken);
-                if (appointmentDetail == null)
-                {
-                    return new BaseResponse<AppointmentDetailResponseDTO>
-                    {
-                        Code = 200,
-                        Success = false,
-                        Message = "Không tìm thấy chi tiết cuộc hẹn cho ID đã cung cấp.",
-                        Data = null
-                    };
-                }
-                var responseData = _mapper.Map<AppointmentDetailResponseDTO>(appointmentDetail);
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 200,
-                    Success = true,
-                    Message = "Lấy chi tiết cuộc hẹn thành công.",
-                    Data = responseData
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting appointment detail by ID.");
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 500,
-                    Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn.",
-                    Data = null
-                };
-            }
-        }
+        //public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailById(int appointmentDetailId, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetailId, cancellationToken);
+        //        if (appointmentDetail == null)
+        //        {
+        //            return new BaseResponse<AppointmentDetailResponseDTO>
+        //            {
+        //                Code = 200,
+        //                Success = false,
+        //                Message = "Không tìm thấy chi tiết cuộc hẹn cho ID đã cung cấp.",
+        //                Data = null
+        //            };
+        //        }
+        //        var responseData = _mapper.Map<AppointmentDetailResponseDTO>(appointmentDetail);
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 200,
+        //            Success = true,
+        //            Message = "Lấy chi tiết cuộc hẹn thành công.",
+        //            Data = responseData
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error occurred while getting appointment detail by ID.");
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 500,
+        //            Success = false,
+        //            Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn.",
+        //            Data = null
+        //        };
+        //    }
+        //}
 
-        public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByPetId(int petId, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var appointmentDetails = await _appointmentDetailRepository.GetAppointmentDetailByPetIdAsync(petId, cancellationToken);
-                if (appointmentDetails == null)
-                {
-                    return new BaseResponse<AppointmentDetailResponseDTO>
-                    {
-                        Code = 200,
-                        Success = false,
-                        Message = "Không tìm thấy chi tiết cuộc hẹn cho Pet ID đã cung cấp.",
-                        Data = null
-                    };
-                }
-                var responseData = _mapper.Map<List<AppointmentDetailResponseDTO>>(appointmentDetails);
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 200,
-                    Success = true,
-                    Message = "Lấy chi tiết cuộc hẹn theo Pet ID thành công.",
-                    Data = responseData.FirstOrDefault() // Assuming you want the first detail if multiple exist
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting appointment detail by pet ID.");
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 500,
-                    Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn theo Pet ID.",
-                    Data = null
-                };
-            }
-        }
+        //public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByPetId(int petId, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        var appointmentDetails = await _appointmentDetailRepository.GetAppointmentDetailByPetIdAsync(petId, cancellationToken);
+        //        if (appointmentDetails == null)
+        //        {
+        //            return new BaseResponse<AppointmentDetailResponseDTO>
+        //            {
+        //                Code = 200,
+        //                Success = false,
+        //                Message = "Không tìm thấy chi tiết cuộc hẹn cho Pet ID đã cung cấp.",
+        //                Data = null
+        //            };
+        //        }
+        //        var responseData = _mapper.Map<List<AppointmentDetailResponseDTO>>(appointmentDetails);
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 200,
+        //            Success = true,
+        //            Message = "Lấy chi tiết cuộc hẹn theo Pet ID thành công.",
+        //            Data = responseData.FirstOrDefault() // Assuming you want the first detail if multiple exist
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error occurred while getting appointment detail by pet ID.");
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 500,
+        //            Success = false,
+        //            Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn theo Pet ID.",
+        //            Data = null
+        //        };
+        //    }
+        //}
 
         public async Task<BaseResponse<List<AppointmentDetailResponseDTO>>> GetAppointmentDetailByServiceType(EnumList.ServiceType serviceType, CancellationToken cancellationToken)
         {
@@ -436,89 +435,89 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByStatus(EnumList.AppointmentStatus status, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var appointmentDetails = await _appointmentDetailRepository.GetAppointmentDetailsByStatusAsync(status, cancellationToken);
-                if (appointmentDetails == null || !appointmentDetails.Any())
-                {
-                    return new BaseResponse<AppointmentDetailResponseDTO>
-                    {
-                        Code = 200,
-                        Success = false,
-                        Message = "Không tìm thấy chi tiết cuộc hẹn cho trạng thái đã cung cấp.",
-                        Data = null
-                    };
-                }
-                var responseData = _mapper.Map<List<AppointmentDetailResponseDTO>>(appointmentDetails);
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 200,
-                    Success = true,
-                    Message = "Lấy chi tiết cuộc hẹn theo trạng thái thành công.",
-                    Data = responseData.FirstOrDefault() // Assuming you want the first detail if multiple exist
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting appointment detail by status.");
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 500,
-                    Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn theo trạng thái.",
-                    Data = null
-                };
-            }
-        }
+        //public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByStatus(EnumList.AppointmentStatus status, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        var appointmentDetails = await _appointmentDetailRepository.GetAppointmentDetailsByStatusAsync(status, cancellationToken);
+        //        if (appointmentDetails == null || !appointmentDetails.Any())
+        //        {
+        //            return new BaseResponse<AppointmentDetailResponseDTO>
+        //            {
+        //                Code = 200,
+        //                Success = false,
+        //                Message = "Không tìm thấy chi tiết cuộc hẹn cho trạng thái đã cung cấp.",
+        //                Data = null
+        //            };
+        //        }
+        //        var responseData = _mapper.Map<List<AppointmentDetailResponseDTO>>(appointmentDetails);
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 200,
+        //            Success = true,
+        //            Message = "Lấy chi tiết cuộc hẹn theo trạng thái thành công.",
+        //            Data = responseData.FirstOrDefault() // Assuming you want the first detail if multiple exist
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error occurred while getting appointment detail by status.");
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 500,
+        //            Success = false,
+        //            Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn theo trạng thái.",
+        //            Data = null
+        //        };
+        //    }
+        //}
 
-        public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByVetId(int vetId, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var appointmentDetails = await _appointmentDetailRepository.GetAppointmentDetailsByVetIdAsync(vetId, cancellationToken);
-                if (appointmentDetails == null)
-                {
-                    return new BaseResponse<AppointmentDetailResponseDTO>
-                    {
-                        Code = 200,
-                        Success = false,
-                        Message = "Không tìm thấy chi tiết cuộc hẹn cho Vet ID đã cung cấp.",
-                        Data = null
-                    };
-                }
-                var responseData = _mapper.Map<List<AppointmentDetailResponseDTO>>(appointmentDetails);
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 200,
-                    Success = true,
-                    Message = "Lấy chi tiết cuộc hẹn theo Vet ID thành công.",
-                    Data = responseData.FirstOrDefault() // Assuming you want the first detail if multiple exist
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting appointment detail by vet ID.");
-                return new BaseResponse<AppointmentDetailResponseDTO>
-                {
-                    Code = 500,
-                    Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn theo Vet ID.",
-                    Data = null
-                };
-            }
-        }
+        //public async Task<BaseResponse<AppointmentDetailResponseDTO>> GetAppointmentDetailByVetId(int vetId, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        var appointmentDetails = await _appointmentDetailRepository.GetAppointmentDetailsByVetIdAsync(vetId, cancellationToken);
+        //        if (appointmentDetails == null)
+        //        {
+        //            return new BaseResponse<AppointmentDetailResponseDTO>
+        //            {
+        //                Code = 200,
+        //                Success = false,
+        //                Message = "Không tìm thấy chi tiết cuộc hẹn cho Vet ID đã cung cấp.",
+        //                Data = null
+        //            };
+        //        }
+        //        var responseData = _mapper.Map<List<AppointmentDetailResponseDTO>>(appointmentDetails);
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 200,
+        //            Success = true,
+        //            Message = "Lấy chi tiết cuộc hẹn theo Vet ID thành công.",
+        //            Data = responseData.FirstOrDefault() // Assuming you want the first detail if multiple exist
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error occurred while getting appointment detail by vet ID.");
+        //        return new BaseResponse<AppointmentDetailResponseDTO>
+        //        {
+        //            Code = 500,
+        //            Success = false,
+        //            Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn theo Vet ID.",
+        //            Data = null
+        //        };
+        //    }
+        //}
 
-        public Task<BaseResponse<AppointmentDetailResponseDTO>> UpdateAppointmentDetail(int appointmentDetailId, UpdateAppointmentDetailDTO updateAppointmentDetailDTO, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<BaseResponse<AppointmentDetailResponseDTO>> UpdateAppointmentDetail(int appointmentDetailId, UpdateAppointmentDetailDTO updateAppointmentDetailDTO, CancellationToken cancellationToken)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentDetailId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentDetailId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken)
+        //{
+        //    throw new NotImplementedException();
+        //}
         public async Task<BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>> GetAppointmentVaccinationByPetId(int petId, CancellationToken cancellationToken)
         {
             try

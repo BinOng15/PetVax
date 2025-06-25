@@ -24,7 +24,7 @@ namespace PetVax.BusinessObjects.Models
         public int? VaccineBatchId { get; set; } // Foreign key to VaccineBatch table
         public int? DiseaseId { get; set; } // Foreign key to Disease table, if applicable (for vaccinations)
         public string AppointmentDetailCode { get; set; } // e.g., "AD123456", unique identifier for the appointment detail
-        public string? Dose { get; set; } // e.g., "1st Dose", "2nd Dose"
+        public int? Dose { get; set; }
         public string? Reaction { get; set; } // e.g., "None", "Mild", "Severe"
         public string? NextVaccinationInfo { get; set; } // e.g., "Next vaccination due on 2023-12-01"
         public DateTime AppointmentDate { get; set; } // Date of the appointment
