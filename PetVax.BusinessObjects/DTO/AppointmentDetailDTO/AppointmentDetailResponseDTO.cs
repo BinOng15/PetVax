@@ -1,6 +1,7 @@
 ﻿using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
+using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.Enum;
@@ -83,7 +84,6 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public int AppointmentDetailId { get; set; }
         public int AppointmentId { get; set; }
         public string AppointmentDetailCode { get; set; }
-        public int VetId { get; set; }
         public EnumList.ServiceType ServiceType { get; set; }
         public int? MicrochipItemId { get; set; }
         public DateTime AppointmentDate { get; set; } // Date of the appointment
@@ -94,6 +94,8 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public string? ModifiedBy { get; set; }
         public VetResponseDTO Vet { get; set; }// User who last modified the record
         public BaseMicrochipItemResponse MicrochipItem { get; set; } // Navigation to MicrochipItem table
+
+        public AppointmentResponseDTO Appointment { get; set; } // Navigation to Pet table
     }
 
     public class AppointmentHealthCertificateResponseDTO

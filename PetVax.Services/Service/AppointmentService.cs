@@ -627,275 +627,7 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken)
-        {
-            if (updateAppointmentVaccinationDTO == null)
-            {
-                return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Dữ liệu cập nhật tiêm phòng không hợp lệ.",
-                    Data = null
-                };
-            }
-            try
-            {
-                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
-                if (appointment == null)
-                {
-                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                    {
-                        Code = 404,
-                        Success = false,
-                        Message = "Cuộc hẹn không tồn tại.",
-                        Data = null
-                    };
-                }
-
-                // Validate allowed status transitions
-                var currentStatus = appointment.AppointmentStatus;
-                var newStatus = updateAppointmentVaccinationDTO.AppointmentStatus ?? currentStatus;
-                bool isValidTransition = false;
-                switch (currentStatus)
-                {
-                    case EnumList.AppointmentStatus.Processing:
-                        isValidTransition = newStatus == EnumList.AppointmentStatus.Confirmed || newStatus == EnumList.AppointmentStatus.Cancelled;
-                        break;
-                    case EnumList.AppointmentStatus.Confirmed:
-                        isValidTransition = newStatus == EnumList.AppointmentStatus.CheckedIn || newStatus == EnumList.AppointmentStatus.Rejected;
-                        break;
-                    case EnumList.AppointmentStatus.CheckedIn:
-                        isValidTransition = newStatus == EnumList.AppointmentStatus.Processed;
-                        break;
-                    case EnumList.AppointmentStatus.Processed:
-                        isValidTransition = newStatus == EnumList.AppointmentStatus.Completed;
-                        break;
-                    default:
-                        isValidTransition = false;
-                        break;
-                }
-                if (newStatus != currentStatus && !isValidTransition)
-                {
-                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                    {
-                        Code = 400,
-                        Success = false,
-                        Message = $"Không thể chuyển trạng thái từ {currentStatus} sang {newStatus}.",
-                        Data = null
-                    };
-                }
-
-                bool isStatusChangeToProcessed = updateAppointmentVaccinationDTO.AppointmentStatus.HasValue &&
-                                                 updateAppointmentVaccinationDTO.AppointmentStatus.Value == EnumList.AppointmentStatus.Processed &&
-                                                 appointment.AppointmentStatus != EnumList.AppointmentStatus.Processed;
-
-                if (appointment.ServiceType != EnumList.ServiceType.Vaccination)
-                {
-                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                    {
-                        Code = 400,
-                        Success = false,
-                        Message = "Cuộc hẹn này không phải là dịch vụ tiêm phòng.",
-                        Data = null
-                    };
-                }
-
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appointmentId, cancellationToken);
-                if (appointmentDetail == null)
-                {
-                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                    {
-                        Code = 404,
-                        Success = false,
-                        Message = "Chi tiết cuộc hẹn không tồn tại.",
-                        Data = null
-                    };
-                }
-
-                if (isStatusChangeToProcessed && appointmentDetail.VaccineBatchId.HasValue)
-                {
-                    var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(appointmentDetail.VaccineBatchId.Value, cancellationToken);
-                    if (vaccineBatch != null)
-                    {
-                        if (vaccineBatch.Quantity <= 0)
-                        {
-                            return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                            {
-                                Code = 400,
-                                Success = false,
-                                Message = "VaccineBatchId không hợp lệ hoặc đã hết hàng.",
-                                Data = null
-                            };
-                        }
-                        vaccineBatch.Quantity -= 1;
-                        await _vaccineBatchRepository.UpdateVaccineBatchAsync(vaccineBatch, cancellationToken);
-                    }
-                }
-
-                if (updateAppointmentVaccinationDTO.VetId.HasValue)
-                {
-                    var appointmentDate = appointmentDetail.AppointmentDate;
-                    var slotNumber = GetSlotNumberFromAppointmentDate(appointmentDate);
-
-                    var vetSchedules = await _vetScheduleRepository.GetVetSchedulesByVetIdAsync(updateAppointmentVaccinationDTO.VetId.Value, cancellationToken);
-
-                    var isValidSchedule = vetSchedules.Any(s =>
-                        s.ScheduleDate.Date == appointmentDate.Date &&
-                        s.SlotNumber == slotNumber &&
-                        s.Status == EnumList.VetScheduleStatus.Available);
-
-                    if (!isValidSchedule)
-                    {
-                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                        {
-                            Code = 400,
-                            Success = false,
-                            Message = "Bác sĩ không có lịch làm việc vào thời gian này.",
-                            Data = null
-                        };
-                    }
-                }
-
-                // Cập nhật thông tin tiêm phòng
-                appointmentDetail.DiseaseId = updateAppointmentVaccinationDTO.DiseaseId;
-                appointmentDetail.VaccineBatchId = updateAppointmentVaccinationDTO.VaccineBatchId;
-                if (appointmentDetail.VaccineBatchId.HasValue)
-                {
-                    var vaccineDisease = await _vaccineDiseaseRepository.GetVaccineDiseaseByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken);
-                    if (vaccineDisease == null)
-                    {
-                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                        {
-                            Code = 400,
-                            Success = false,
-                            Message = "VaccineBatchId không hợp lệ với DiseaseId đã cung cấp.",
-                            Data = null
-                        };
-                    }
-                }
-                appointmentDetail.VetId = updateAppointmentVaccinationDTO.VetId;
-                appointmentDetail.Dose = updateAppointmentVaccinationDTO.Dose;
-                appointmentDetail.Reaction = updateAppointmentVaccinationDTO.Reaction;
-                appointmentDetail.Temperature = updateAppointmentVaccinationDTO.Temperature;
-                appointmentDetail.HeartRate = updateAppointmentVaccinationDTO.HeartRate;
-                appointmentDetail.Others = updateAppointmentVaccinationDTO.Others;
-                appointmentDetail.GeneralCondition = updateAppointmentVaccinationDTO.GeneralCondition;
-                appointmentDetail.Notes = updateAppointmentVaccinationDTO.Notes;
-                appointmentDetail.AppointmentStatus = newStatus;
-                appointmentDetail.NextVaccinationInfo = updateAppointmentVaccinationDTO.NextVaccinationInfo;
-                appointmentDetail.ModifiedAt = DateTime.UtcNow;
-                appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-
-                appointment.AppointmentStatus = newStatus;
-                appointment.ModifiedAt = DateTime.UtcNow;
-                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-
-                using (var transaction = await _appointmentRepository.BeginTransactionAsync())
-                {
-                    try
-                    {
-                        int rowEffected = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
-                        var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
-
-                        if (rowEffected <= 0 || updatedAppointment == null)
-                        {
-                            await transaction.RollbackAsync();
-                            return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                            {
-                                Code = 500,
-                                Success = false,
-                                Message = "Không thể cập nhật thông tin tiêm phòng cho cuộc hẹn.",
-                                Data = null
-                            };
-                        }
-
-                        if (isStatusChangeToProcessed)
-                        {
-                            var existingProfile = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(appointment.PetId, cancellationToken);
-
-                            var vaccineProfile = new VaccineProfile
-                            {
-                                PetId = appointment.PetId,
-                                VaccineProfileDiseases = new List<VaccineProfileDisease>(),
-                                AppointmentDetailId = appointmentDetail.AppointmentDetailId,
-                                VaccinationDate = appointmentDetail.AppointmentDate,
-                                Dose = appointmentDetail.Dose,
-                                Reaction = appointmentDetail.Reaction,
-                                NextVaccinationInfo = appointmentDetail.NextVaccinationInfo,
-                                IsActive = true,
-                                IsCompleted = true,
-                                ModifiedAt = DateTime.UtcNow,
-                                ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
-                            };
-                            if (existingProfile != null)
-                            {
-                                existingProfile.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
-                                existingProfile.VaccinationDate = appointmentDetail.AppointmentDate;
-                                existingProfile.Dose = appointmentDetail.Dose ?? existingProfile.Dose;
-                                existingProfile.Reaction = appointmentDetail.Reaction ?? existingProfile.Reaction;
-                                existingProfile.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? existingProfile.NextVaccinationInfo;
-                                existingProfile.IsActive = true;
-                                existingProfile.VaccineProfileDiseases = _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken).Result ?? new List<VaccineProfileDisease>();
-                                existingProfile.IsCompleted = true;
-                                existingProfile.ModifiedAt = DateTime.UtcNow;
-                                existingProfile.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-
-                                int vaccineProfileid = existingProfile.VaccineProfileId;
-                                var existingProfileDisease = await _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByVaccineProfileIdAsync(vaccineProfileid, cancellationToken);
-
-                                var existingDisease = existingProfileDisease.FirstOrDefault(d => d.DiseaseId == appointmentDetail.DiseaseId);
-
-                                if (existingDisease == null && appointmentDetail.DiseaseId.HasValue)
-                                {
-                                    var newVaccineProfileDisease = new VaccineProfileDisease
-                                    {
-                                        DiseaseId = appointmentDetail.DiseaseId,
-                                        VaccineProfileId = existingProfile.VaccineProfileId,
-                                    };
-
-                                    await _vaccineProfileDiseaseRepository.CreateVaccineProfileDiseaseAsync(newVaccineProfileDisease, cancellationToken);
-                                }
-                                else if (existingDisease != null)
-                                {
-                                    existingDisease.DiseaseId = appointmentDetail.DiseaseId;
-                                    await _vaccineProfileDiseaseRepository.UpdateVaccineProfileDiseaseAsync(existingDisease, cancellationToken);
-                                }
-
-                                await _vaccineProfileRepository.UpdateVaccineProfileAsync(existingProfile, cancellationToken);
-                            }
-                        }
-
-                        await transaction.CommitAsync();
-
-                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                        {
-                            Code = 200,
-                            Success = true,
-                            Message = "Cập nhật thông tin tiêm phòng cho cuộc hẹn thành công.",
-                            Data = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(appointmentDetail)
-                        };
-                    }
-                    catch (Exception ex)
-                    {
-                        await transaction.RollbackAsync();
-                        _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật thông tin tiêm phòng cho cuộc hẹn.");
-                        throw;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật thông tin tiêm phòng cho cuộc hẹn.");
-                return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
-                {
-                    Code = 500,
-                    Success = false,
-                    Message = "Đã xảy ra lỗi khi cập nhật thông tin tiêm phòng cho cuộc hẹn.",
-                    Data = null
-                };
-            }
-        }
+      
 
         //    private async Task UpdateVaccineProfilesForInjectedVaccinationAppointment(
         //AppointmentDetail appointmentDetail,
@@ -1374,9 +1106,27 @@ namespace PetVax.Services.Service
                 };
             }
         }
-        private int GetSlotNumberFromAppointmentDate(DateTime appointmentDate)
+        private int GetSlotNumberFromAppointmentDate(DateTime appointmenDate)
         {
-            var hour = appointmentDate.Hour;
+            var hour = appointmenDate.Hour;
+
+            return hour switch
+            {
+                8 => (int)Slot.Slot_8h,
+                9 => (int)Slot.Slot_9h,
+                10 => (int)Slot.Slot_10h,
+                11 => (int)Slot.Slot_11h,
+                13 => (int)Slot.Slot_13h,
+                14 => (int)Slot.Slot_14h,
+                15 => (int)Slot.Slot_15h,
+                16 => (int)Slot.Slot_16h,
+                _ => throw new ArgumentException("Khung giờ hẹn không hợp lệ.")
+            };
+        }
+
+        private int GetSlotNumberFromTime(TimeOnly time)
+        {
+            var hour = time.Hour;
 
             return hour switch
             {
@@ -1430,30 +1180,6 @@ namespace PetVax.Services.Service
                 };
             }
 
-            if (createAppointmentMicrochipDTO.AppointmentDetailMicrochip.MicrochipItemId == null || createAppointmentMicrochipDTO.AppointmentDetailMicrochip.MicrochipItemId <= 0)
-            {
-                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Vui lòng chọn microchip để cấy cho thú cưng.",
-                    Data = null
-                };
-            }
-
-            var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(createAppointmentMicrochipDTO.AppointmentDetailMicrochip.MicrochipItemId, cancellationToken);
-            if (microchipItem == null)
-            {
-                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
-                {
-                    Code = 404,
-                    Success = false,
-                    Message = "Không tìm thấy microchip với ID đã cung cấp.",
-                    Data = null
-                };
-            }
-
-
             try
             {
                 var random = new Random();
@@ -1491,7 +1217,6 @@ namespace PetVax.Services.Service
                     AppointmentDetailCode = "AD" + random.Next(0, 1000000).ToString("D6"),
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
-                    MicrochipItemId = createAppointmentMicrochipDTO.AppointmentDetailMicrochip.MicrochipItemId,
                 };
 
 
@@ -1930,5 +1655,626 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken)
+        {
+            if (updateAppointmentVaccinationDTO == null)
+            {
+                return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Dữ liệu cập nhật tiêm phòng không hợp lệ.",
+                    Data = null
+                };
+            }
+            try
+            {
+                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
+                if (appointment == null)
+                {
+                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Cuộc hẹn không tồn tại.",
+                        Data = null
+                    };
+                }
+
+                // Validate allowed status transitions
+                var currentStatus = appointment.AppointmentStatus;
+                var newStatus = updateAppointmentVaccinationDTO.AppointmentStatus ?? currentStatus;
+                bool isValidTransition = false;
+                switch (currentStatus)
+                {
+                    case EnumList.AppointmentStatus.Processing:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Confirmed || newStatus == EnumList.AppointmentStatus.Cancelled;
+                        break;
+                    case EnumList.AppointmentStatus.Confirmed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.CheckedIn || newStatus == EnumList.AppointmentStatus.Rejected;
+                        break;
+                    case EnumList.AppointmentStatus.CheckedIn:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Processed;
+                        break;
+                    case EnumList.AppointmentStatus.Processed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Completed;
+                        break;
+                    default:
+                        isValidTransition = false;
+                        break;
+                }
+                if (newStatus != currentStatus && !isValidTransition)
+                {
+                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = $"Không thể chuyển trạng thái từ {currentStatus} sang {newStatus}.",
+                        Data = null
+                    };
+                }
+
+                bool isStatusChangeToProcessed = updateAppointmentVaccinationDTO.AppointmentStatus.HasValue &&
+                                                 updateAppointmentVaccinationDTO.AppointmentStatus.Value == EnumList.AppointmentStatus.Processed &&
+                                                 appointment.AppointmentStatus != EnumList.AppointmentStatus.Processed;
+
+                if (appointment.ServiceType != EnumList.ServiceType.Vaccination)
+                {
+                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Cuộc hẹn này không phải là dịch vụ tiêm phòng.",
+                        Data = null
+                    };
+                }
+
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appointmentId, cancellationToken);
+                if (appointmentDetail == null)
+                {
+                    return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Chi tiết cuộc hẹn không tồn tại.",
+                        Data = null
+                    };
+                }
+
+                if (isStatusChangeToProcessed && appointmentDetail.VaccineBatchId.HasValue)
+                {
+                    var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(appointmentDetail.VaccineBatchId.Value, cancellationToken);
+                    if (vaccineBatch != null)
+                    {
+                        if (vaccineBatch.Quantity <= 0)
+                        {
+                            return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                            {
+                                Code = 400,
+                                Success = false,
+                                Message = "VaccineBatchId không hợp lệ hoặc đã hết hàng.",
+                                Data = null
+                            };
+                        }
+                        vaccineBatch.Quantity -= 1;
+                        await _vaccineBatchRepository.UpdateVaccineBatchAsync(vaccineBatch, cancellationToken);
+                    }
+                }
+
+                if (updateAppointmentVaccinationDTO.VetId.HasValue)
+                {
+                    var appointmentDate = appointmentDetail.AppointmentDate;
+                    var slotNumber = GetSlotNumberFromAppointmentDate(appointmentDate);
+
+                    var vetSchedules = await _vetScheduleRepository.GetVetSchedulesByVetIdAsync(updateAppointmentVaccinationDTO.VetId.Value, cancellationToken);
+
+                    var isValidSchedule = vetSchedules.Any(s =>
+                        s.ScheduleDate.Date == appointmentDate.Date &&
+                        s.SlotNumber == slotNumber &&
+                        s.Status == EnumList.VetScheduleStatus.Available);
+
+                    if (!isValidSchedule)
+                    {
+                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Bác sĩ không có lịch làm việc vào thời gian này.",
+                            Data = null
+                        };
+                    }
+                }
+
+                // Cập nhật thông tin tiêm phòng
+                appointmentDetail.DiseaseId = updateAppointmentVaccinationDTO.DiseaseId;
+                appointmentDetail.VaccineBatchId = updateAppointmentVaccinationDTO.VaccineBatchId;
+                if (appointmentDetail.VaccineBatchId.HasValue)
+                {
+                    var vaccineDisease = await _vaccineDiseaseRepository.GetVaccineDiseaseByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken);
+                    if (vaccineDisease == null)
+                    {
+                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "VaccineBatchId không hợp lệ với DiseaseId đã cung cấp.",
+                            Data = null
+                        };
+                    }
+                }
+                appointmentDetail.VetId = updateAppointmentVaccinationDTO.VetId;
+                appointmentDetail.Dose = updateAppointmentVaccinationDTO.Dose;
+                appointmentDetail.Reaction = updateAppointmentVaccinationDTO.Reaction;
+                appointmentDetail.Temperature = updateAppointmentVaccinationDTO.Temperature;
+                appointmentDetail.HeartRate = updateAppointmentVaccinationDTO.HeartRate;
+                appointmentDetail.Others = updateAppointmentVaccinationDTO.Others;
+                appointmentDetail.GeneralCondition = updateAppointmentVaccinationDTO.GeneralCondition;
+                appointmentDetail.Notes = updateAppointmentVaccinationDTO.Notes;
+                appointmentDetail.AppointmentStatus = newStatus;
+                appointmentDetail.NextVaccinationInfo = updateAppointmentVaccinationDTO.NextVaccinationInfo;
+                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                appointment.AppointmentStatus = newStatus;
+                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                using (var transaction = await _appointmentRepository.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        var rowEffected = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                        var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+
+                        if (updatedAppointment == null)
+                        {
+                            await transaction.RollbackAsync();
+                            return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                            {
+                                Code = 500,
+                                Success = false,
+                                Message = "Không thể cập nhật thông tin tiêm phòng cho cuộc hẹn.",
+                                Data = null
+                            };
+                        }
+
+                        if (isStatusChangeToProcessed)
+                        {
+                            var existingProfile = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(appointment.PetId, cancellationToken);
+
+                            var vaccineProfile = new VaccineProfile
+                            {
+                                PetId = appointment.PetId,
+                                VaccineProfileDiseases = new List<VaccineProfileDisease>(),
+                                AppointmentDetailId = appointmentDetail.AppointmentDetailId,
+                                VaccinationDate = appointmentDetail.AppointmentDate,
+                                Dose = appointmentDetail.Dose,
+                                Reaction = appointmentDetail.Reaction,
+                                NextVaccinationInfo = appointmentDetail.NextVaccinationInfo,
+                                IsActive = true,
+                                IsCompleted = true,
+                                ModifiedAt = DateTime.UtcNow,
+                                ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
+                            };
+                            if (existingProfile != null)
+                            {
+                                existingProfile.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
+                                existingProfile.VaccinationDate = appointmentDetail.AppointmentDate;
+                                existingProfile.Dose = appointmentDetail.Dose ?? existingProfile.Dose;
+                                existingProfile.Reaction = appointmentDetail.Reaction ?? existingProfile.Reaction;
+                                existingProfile.NextVaccinationInfo = appointmentDetail.NextVaccinationInfo ?? existingProfile.NextVaccinationInfo;
+                                existingProfile.IsActive = true;
+                                existingProfile.VaccineProfileDiseases = _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByDiseaseIdAsync(appointmentDetail.DiseaseId.Value, cancellationToken).Result ?? new List<VaccineProfileDisease>();
+                                existingProfile.IsCompleted = true;
+                                existingProfile.ModifiedAt = DateTime.UtcNow;
+                                existingProfile.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                                int vaccineProfileid = existingProfile.VaccineProfileId;
+                                var existingProfileDisease = await _vaccineProfileDiseaseRepository.GetVaccineProfileDiseasesByVaccineProfileIdAsync(vaccineProfileid, cancellationToken);
+
+                                var existingDisease = existingProfileDisease.FirstOrDefault(d => d.DiseaseId == appointmentDetail.DiseaseId);
+
+                                if (existingDisease == null && appointmentDetail.DiseaseId.HasValue)
+                                {
+                                    var newVaccineProfileDisease = new VaccineProfileDisease
+                                    {
+                                        DiseaseId = appointmentDetail.DiseaseId,
+                                        VaccineProfileId = existingProfile.VaccineProfileId,
+                                    };
+
+                                    await _vaccineProfileDiseaseRepository.CreateVaccineProfileDiseaseAsync(newVaccineProfileDisease, cancellationToken);
+                                }
+                                else if (existingDisease != null)
+                                {
+                                    existingDisease.DiseaseId = appointmentDetail.DiseaseId;
+                                    await _vaccineProfileDiseaseRepository.UpdateVaccineProfileDiseaseAsync(existingDisease, cancellationToken);
+                                }
+
+                                await _vaccineProfileRepository.UpdateVaccineProfileAsync(existingProfile, cancellationToken);
+                            }
+                        }
+
+                        await transaction.CommitAsync();
+
+                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                        {
+                            Code = 200,
+                            Success = true,
+                            Message = "Cập nhật thông tin tiêm phòng cho cuộc hẹn thành công.",
+                            Data = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(appointmentDetail)
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật thông tin tiêm phòng cho cuộc hẹn.");
+                        throw;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật thông tin tiêm phòng cho cuộc hẹn.");
+                return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi cập nhật thông tin tiêm phòng cho cuộc hẹn.",
+                    Data = null
+                };
+            }
+        }
+
+
+        public async Task<BaseResponse<AppointmentMicrochipResponseDTO>> UpdateAppointmentMicrochip(UpdateAppointmentMicrochipDTO updateAppointmentMicrochipDTO, CancellationToken cancellationToken)
+        {
+            if (updateAppointmentMicrochipDTO == null)
+            {
+                return new BaseResponse<AppointmentMicrochipResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Dữ liệu cập nhật không hợp lệ.",
+                    Data = null
+                };
+            }
+            try
+            {
+                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(updateAppointmentMicrochipDTO.AppointmentId, cancellationToken);
+                if (appointment == null)
+                {
+                    return new BaseResponse<AppointmentMicrochipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Cuộc hẹn không tồn tại.",
+                        Data = null
+                    };
+                }
+
+
+                // Validate allowed status transitions
+                var currentStatus = appointment.AppointmentStatus;
+                var newStatus = updateAppointmentMicrochipDTO.AppointmentStatus ?? currentStatus;
+                bool isValidTransition = false;
+                switch (currentStatus)
+                {
+                    case EnumList.AppointmentStatus.Processing:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Confirmed || newStatus == EnumList.AppointmentStatus.Cancelled;
+                        break;
+                    case EnumList.AppointmentStatus.Confirmed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.CheckedIn || newStatus == EnumList.AppointmentStatus.Rejected;
+                        break;
+                    case EnumList.AppointmentStatus.CheckedIn:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Processed;
+                        break;
+                    case EnumList.AppointmentStatus.Processed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Completed;
+                        break;
+                    default:
+                        isValidTransition = false;
+                        break;
+                }
+                if (newStatus != currentStatus && !isValidTransition)
+                {
+                    return new BaseResponse<AppointmentMicrochipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = $"Không thể chuyển trạng thái từ {currentStatus} sang {newStatus}.",
+                        Data = null
+                    };
+                }
+
+                bool isStatusChangeToProcessed = updateAppointmentMicrochipDTO.AppointmentStatus.HasValue &&
+                                                 updateAppointmentMicrochipDTO.AppointmentStatus.Value == EnumList.AppointmentStatus.Processed &&
+                                                 appointment.AppointmentStatus != EnumList.AppointmentStatus.Processed;
+
+                if (appointment.ServiceType != EnumList.ServiceType.Microchip)
+                {
+                    return new BaseResponse<AppointmentMicrochipResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Cuộc hẹn này không phải là dịch vụ cấy microchip.",
+                        Data = null
+                    };
+                }
+
+ 
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(updateAppointmentMicrochipDTO.AppointmentId, cancellationToken);
+                if (appointmentDetail == null)
+                {
+                    return new BaseResponse<AppointmentMicrochipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Chi tiết cuộc hẹn không tồn tại.",
+                        Data = null
+                    };
+                }
+
+                if (updateAppointmentMicrochipDTO.VetId.HasValue)
+                {
+                    var appointmentDate = appointmentDetail.AppointmentDate;
+                    var slotNumber = GetSlotNumberFromAppointmentDate(appointmentDate);
+
+                    var vetSchedules = await _vetScheduleRepository.GetVetSchedulesByVetIdAsync(updateAppointmentMicrochipDTO.VetId.Value, cancellationToken);
+
+                    var isValidSchedule = vetSchedules.Any(s =>
+                        s.ScheduleDate.Date == appointmentDate.Date &&
+                        s.SlotNumber == slotNumber &&
+                        s.Status == EnumList.VetScheduleStatus.Available);
+
+                    if (!isValidSchedule)
+                    {
+                        return new BaseResponse<AppointmentMicrochipResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Bác sĩ không có lịch làm việc vào thời gian này.",
+                            Data = null
+                        };
+                    }
+                }
+
+                // Cập nhật thông tin microchip
+
+                var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(updateAppointmentMicrochipDTO.MicrochipItemId, cancellationToken);
+                if (microchipItem == null)
+                {
+                    return new BaseResponse<AppointmentMicrochipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Microchip không tồn tại.",
+                        Data = null
+                    };
+                }else if (microchipItem.IsUsed == true)
+                {
+                    return new BaseResponse<AppointmentMicrochipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Microchip đã được sử dụng.",
+                        Data = null
+                    };
+                }
+                else
+                {
+                    microchipItem.IsUsed = true;
+                    int rowEffected = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
+                }
+
+                appointmentDetail.VetId = updateAppointmentMicrochipDTO.VetId;
+                appointmentDetail.MicrochipItemId = updateAppointmentMicrochipDTO.MicrochipItemId;
+                appointmentDetail.AppointmentStatus = newStatus;
+                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                appointment.AppointmentStatus = newStatus;
+                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                using (var transaction = await _appointmentRepository.BeginTransactionAsync())
+                {
+                    try
+                    {
+
+                        var rowEffected = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                        var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+
+                        if ( updatedAppointment == null)
+                        {
+                            await transaction.RollbackAsync();
+                            return new BaseResponse<AppointmentMicrochipResponseDTO>
+                            {
+                                Code = 500,
+                                Success = false,
+                                Message = "Không thể cập nhật thông tin microchip cho cuộc hẹn.",
+                                Data = null
+                            };
+                        }
+                        var appointmentDetailResponse = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(updateAppointmentMicrochipDTO.AppointmentId, cancellationToken);
+
+                        await transaction.CommitAsync();
+
+                      
+
+                        return new BaseResponse<AppointmentMicrochipResponseDTO>
+                        {
+                            Code = 200,
+                            Success = true,
+                            Message = "Cập nhật thông tin microchip cho cuộc hẹn thành công.",
+                            Data = _mapper.Map<AppointmentMicrochipResponseDTO>(appointmentDetailResponse)
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật thông tin  cho cuộc hẹn.");
+                        throw;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<AppointmentMicrochipResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi cập nhật thông tin microchip cho cuộc hẹn." + ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> UpdateAppointmentMicrochipAsync(int appointmentId, CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken)
+        {
+
+            var appointmentExist = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
+            if (appointmentExist == null)
+            {
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Cuộc hẹn không tồn tại.",
+                    Data = null
+                };
+            }
+            if (appointmentExist.AppointmentStatus == AppointmentStatus.Confirmed)
+            {
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Cuộc hẹn đã được xác nhận, không thể cập nhật!",
+                    Data = null
+                };
+            }
+            if (createAppointmentMicrochipDTO == null)
+            {
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Dữ liệu tạo cuộc hẹn tiêm phòng không hợp lệ.",
+                    Data = null
+                };
+            }
+            if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(createAppointmentMicrochipDTO.Appointment.Address))
+            {
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                    Data = null
+                };
+            }
+            if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.Clinic)
+            {
+                createAppointmentMicrochipDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
+            }
+            var pet = await _petRepository.GetPetByIdAsync(createAppointmentMicrochipDTO.Appointment.PetId, cancellationToken);
+            if (pet == null || pet.CustomerId != createAppointmentMicrochipDTO.Appointment.CustomerId)
+            {
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Thú cưng này không thuộc quyền sở hữu của chủ nuôi này",
+                    Data = null
+                };
+            }
+
+            try
+            {
+
+                appointmentExist = _mapper.Map<Appointment>(createAppointmentMicrochipDTO.Appointment);
+
+                appointmentExist.AppointmentDate = createAppointmentMicrochipDTO.Appointment.AppointmentDate;
+                appointmentExist.ServiceType = createAppointmentMicrochipDTO.Appointment.ServiceType;
+                appointmentExist.Location = createAppointmentMicrochipDTO.Appointment.Location;
+                appointmentExist.Address = createAppointmentMicrochipDTO.Appointment.Address;
+                appointmentExist.AppointmentStatus = EnumList.AppointmentStatus.Processing;
+                appointmentExist.ModifiedAt = DateTime.UtcNow;
+                appointmentExist.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                var updateAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointmentExist, cancellationToken);
+                if (updateAppointment == null )
+                {
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không thể tạo cuộc hẹn cấy microchip.",
+                        Data = null
+                    };
+                }
+
+                var appoimentCheck = await _appointmentRepository.GetAppointmentByIdAsync(updateAppointment.AppointmentId, cancellationToken);
+
+                var appointmentDetail = new AppointmentDetail
+                {
+                    AppointmentId = appoimentCheck.AppointmentId,
+                    AppointmentDate = appoimentCheck.AppointmentDate,
+                    ServiceType = appoimentCheck.ServiceType,
+                    AppointmentStatus = appoimentCheck.AppointmentStatus,
+                    ModifiedAt = DateTime.UtcNow,
+                    ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                };
+
+
+                var updatedAppointmentDetail = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                if (updatedAppointmentDetail == null)
+                {
+                    await _appointmentRepository.DeleteAppointmentAsync(appoimentCheck.AppointmentId, cancellationToken);
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không thể tạo chi tiết cuộc hẹn cấy microchip.",
+                        Data = null
+                    };
+                }
+
+                var createdAppointmentDetailId = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(updatedAppointmentDetail.AppointmentDetailId, cancellationToken);
+                if (updatedAppointmentDetail == null || createdAppointmentDetailId == null)
+                {
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Lỗi khi lấy thông tin cuộc hẹn đã tạo.",
+                        Data = null
+                    };
+                }
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 201,
+                    Success = true,
+                    Message = "Tạo cuộc hẹn tiêm phòng thành công.",
+                    Data = new AppointmentWithMicorchipResponseDTO
+                    {
+                        Appointment = _mapper.Map<AppointmentResponseDTO>(appoimentCheck),
+                        Microchip = _mapper.Map<AppointmentMicrochipResponseDTO>(createdAppointmentDetailId)
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi tạo cuộc hẹn tiêm phòng. " + ex.Message,
+                    Data = null
+                };
+            }
+        }
+
     }
 }

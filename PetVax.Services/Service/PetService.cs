@@ -527,7 +527,7 @@ namespace PetVax.Services.Service
                         else
                         {
                             appointment.isDeleted = true;
-                            int deleteAppoiment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+                            var deleteAppoiment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
 
                         }
 

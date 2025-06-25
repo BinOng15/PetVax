@@ -26,6 +26,8 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; } // User who last modified the record
         public bool? isDeleted { get; set; } = false;
 
+        public bool? IsUsed { get; set; } = false; // Indicates if the microchip is currently in use
+
         // Navigation properties
         public virtual Microchip Microchip { get; set; } // Navigation to Microchip table
     }

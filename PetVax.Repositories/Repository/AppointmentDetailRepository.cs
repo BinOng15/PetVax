@@ -70,12 +70,17 @@ namespace PetVax.Repositories.Repository
         public async Task<AppointmentDetail> GetAppointmentDetailsByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-                .Include(a => a.Appointment)
-                .Include(a => a.Vet)
-                .Include(a => a.Disease)
-                .Include(a => a.MicrochipItem)
-                .Include(a => a.VaccineBatch)
-                .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
+     .Include(a => a.Appointment)
+         .ThenInclude(a => a.Customer)    
+     .Include(a => a.Appointment)
+         .ThenInclude(a => a.Pet)          
+     .Include(a => a.Vet)
+     .Include(a => a.Disease)
+     .Include(a => a.MicrochipItem)
+         .ThenInclude(m => m.Microchip)
+     .Include(a => a.VaccineBatch)
+     .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
+
         }
 
         public async Task<AppointmentDetail> GetAppointmentDetailsByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
@@ -196,9 +201,11 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<int> UpdateAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)
+        public async Task<AppointmentDetail> UpdateAppointmentDetailAsync(AppointmentDetail appointmentDetail, CancellationToken cancellationToken)
         {
-            return await UpdateAsync(appointmentDetail, cancellationToken);
+             _context.Update(appointmentDetail);
+             _context.SaveChangesAsync(cancellationToken);
+                return appointmentDetail;
         }
 
         public async Task<AppointmentDetail> GetAppointmentDetailandServiceTypeByPetIdAsync(int petId, CancellationToken cancellationToken)
