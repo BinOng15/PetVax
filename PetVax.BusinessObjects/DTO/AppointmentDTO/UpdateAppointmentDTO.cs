@@ -27,4 +27,5 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
     {
         public int? DiseaseId { get; set; }
     }
+
 }

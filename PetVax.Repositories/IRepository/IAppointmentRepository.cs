@@ -18,7 +18,7 @@ namespace PetVax.Repositories.IRepository
         Task<bool> DeleteAppointmentAsync(int appointmentId, CancellationToken cancellationToken);
         Task<List<Appointment>> GetAllAppointmentsAsync(CancellationToken cancellationToken);
         Task<Appointment> GetAppointmentByIdAsync(int appointmentId, CancellationToken cancellationToken);
-        Task<int> UpdateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken);
+        Task<Appointment> UpdateAppointmentAsync(Appointment appointment, CancellationToken cancellationToken);
         Task<List<Appointment>> GetAppointmentsByPetIdAsync(int petId, CancellationToken cancellationToken);
         Task<List<Appointment>> GetAppointmentByPetIdAndStatusAsync(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken);
         Task<List<Appointment>> GetAppointmentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken);

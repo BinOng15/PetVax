@@ -119,12 +119,7 @@ namespace PetVax.Controllers
             var response = await _appointmentService.GetAppointmentByCustomerIdAndStatusAsync(customerId, status, cancellationToken);
             return StatusCode(response.Code, response);
         }
-        [HttpPost("create-appointment-microchip")]
-        public async Task<IActionResult> CreateAppointmentMicrochip([FromBody] CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken = default)
-        {
-            var response = await _appointmentService.CreateAppointmentMicrochipAsync(createAppointmentMicrochipDTO, cancellationToken);
-            return StatusCode(response.Code, response);
-        }
+        
         [HttpGet("get-past-appointments-by-customer-id/{customerId}")]
         public async Task<IActionResult> GetPastAppointmentsByCustomerId(int customerId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
         {

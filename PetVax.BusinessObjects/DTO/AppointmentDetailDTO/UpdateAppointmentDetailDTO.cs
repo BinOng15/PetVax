@@ -43,10 +43,9 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
 
     public class UpdateAppointmentMicrochipDTO
     {
-        public int? AppointmentId { get; set; }
+        public int AppointmentId { get; set; }
         public int? VetId { get; set; }
-        public int? MicrochipItemId { get; set; }
-        public DateTime? AppointmentDate { get; set; }
+        public int MicrochipItemId { get; set; }
         public EnumList.AppointmentStatus? AppointmentStatus { get; set; }
     }
 
