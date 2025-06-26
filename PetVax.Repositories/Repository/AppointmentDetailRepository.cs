@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PetVax.Repositories.Repository
 {
@@ -122,6 +123,19 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Appointment)
                 .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
                 .FirstOrDefaultAsync(ad => ad.MicrochipItemId == microchipItemId, cancellationToken);
+        }
+
+        public async Task<List<AppointmentDetail>> GetAppointmentDetaiMicrochiplsByPetIdAsync(int petId, CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(ad => ad.MicrochipItem).ThenInclude(mi => mi.Microchip)
+                .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Pet)
+                .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == ServiceType.Microchip)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<AppointmentDetail> GetAppointmentDetailsByPassportIdAsync(int passportId, CancellationToken cancellationToken)

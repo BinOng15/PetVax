@@ -98,24 +98,7 @@ namespace PetVax.Services.Service
                         keyWord = getAllPetsRequest?.KeyWord,
                         status = getAllPetsRequest?.Status,
                     },
-                    PageData = pateVets.Select(p => new PetResponseDTO
-                    {
-                        PetId = p.PetId,
-                        PetCode = p.PetCode,
-                        CustomerId = p.CustomerId,
-                        Name = p.Name,
-                        Species = p.Species,
-                        Breed = p.Breed,
-                        Gender = p.Gender,
-                        DateOfBirth = p.DateOfBirth,
-                        PlaceToLive = p.PlaceToLive,
-                        PlaceOfBirth = p.PlaceOfBirth,
-                        Image = p.Image,
-                        Weight = p.Weight,
-                        Color = p.Color,
-                        Nationality = p.Nationality,
-                        isSterilized = p.isSterilized
-                    }).ToList()
+                    PageData = pateVets.Select(p => _mapper.Map<PetResponseDTO>(p)).ToList()
                 };
 
                 if (!pateVets.Any())
@@ -152,14 +135,14 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<PetResponseDTO>> UpdatePetAsync(UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken)
+        public async Task<BaseResponse<PetResponseDTO>> UpdatePetAsync(int petId, UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken)
         {
             try
             {
-                var pet = await _petRepository.GetPetByIdAsync(updatePetRequest.PetId, cancellationToken);
+                var pet = await _petRepository.GetPetByIdAsync(petId, cancellationToken);
                 if (pet == null)
                 {
-                    _logger.LogWarning("Pet with ID {PetId} not found", updatePetRequest.PetId);
+                    _logger.LogWarning("Pet with ID {PetId} not found", petId);
                     return new BaseResponse<PetResponseDTO>
                     {
                         Code = 200,
@@ -199,7 +182,7 @@ namespace PetVax.Services.Service
                 int update = await _petRepository.UpdatePetAsync(pet, cancellationToken);
                 if (update <= 0)
                 {
-                    _logger.LogWarning("No changes made to pet with ID {PetId}", updatePetRequest.PetId);
+                    _logger.LogWarning("No changes made to pet with ID {PetId}", petId);
                     return new BaseResponse<PetResponseDTO>
                     {
                         Code = 200,
@@ -209,7 +192,7 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                _logger.LogInformation("Pet with ID {PetId} updated successfully", updatePetRequest.PetId);
+                _logger.LogInformation("Pet with ID {PetId} updated successfully", petId);
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 200,
@@ -238,7 +221,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating pet with ID {PetId}", updatePetRequest.PetId);
+                _logger.LogError(ex, "Error updating pet with ID {PetId}", petId);
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 500,
@@ -266,30 +249,16 @@ namespace PetVax.Services.Service
                     };
                 }
                 _logger.LogInformation("Retrieved pet with ID {PetId} successfully", petId);
+
+                // Use AutoMapper to map Pet entity to PetResponseDTO
+                var petResponse = _mapper.Map<PetResponseDTO>(pet);
+
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Pet retrieved successfully",
-                    Data = new PetResponseDTO
-                    {
-                        PetId = pet.PetId,
-                        PetCode = pet.PetCode,
-                        CustomerId = pet.CustomerId,
-                        Name = pet.Name,
-                        Species = pet.Species,
-                        Breed = pet.Breed,
-                        Gender = pet.Gender,
-                        DateOfBirth = pet.DateOfBirth,
-                        PlaceToLive = pet.PlaceToLive,
-                        PlaceOfBirth = pet.PlaceOfBirth,
-                        Image = pet.Image,
-                        Weight = pet.Weight,
-                        Color = pet.Color,
-                        Nationality = pet.Nationality,
-                        isSterilized = pet.isSterilized
-                    }
-
+                    Data = petResponse
                 };
             }
             catch (Exception ex)
@@ -488,24 +457,7 @@ namespace PetVax.Services.Service
                         }
                     };
                 }
-                var petResponses = pets.Select(p => new PetResponseDTO
-                {
-                    PetId = p.PetId,
-                    PetCode = p.PetCode,
-                    CustomerId = p.CustomerId,
-                    Name = p.Name,
-                    Species = p.Species,
-                    Breed = p.Breed,
-                    Gender = p.Gender,
-                    DateOfBirth = p.DateOfBirth,
-                    PlaceToLive = p.PlaceToLive,
-                    PlaceOfBirth = p.PlaceOfBirth,
-                    Image = p.Image,
-                    Weight = p.Weight,
-                    Color = p.Color,
-                    Nationality = p.Nationality,
-                    isSterilized = p.isSterilized
-                }).ToList();
+                var petResponses = pets.Select(p => _mapper.Map<PetResponseDTO>(p)).ToList();
 
                 return petResponses.Select(p => new BaseResponse<PetResponseDTO>
                 {

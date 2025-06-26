@@ -11,10 +11,11 @@ namespace PediVax.Controllers
     public class AppointmentForMicrochip : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
-
-        public AppointmentForMicrochip(IAppointmentService appointmentService)
+        private readonly IAppointmentDetailService _appointmentDetailService;
+        public AppointmentForMicrochip(IAppointmentService appointmentService, IAppointmentDetailService appointmentDetailService)
         {
             _appointmentService = appointmentService;
+            _appointmentDetailService = appointmentDetailService;
         }
 
         [HttpPost("create-appointment-microchip")]
@@ -35,6 +36,13 @@ namespace PediVax.Controllers
         public async Task<IActionResult> UpdateAppointmentMicrochipById(int appointmentId, [FromBody] CreateAppointmentMicrochipDTO updateAppointmentForMicrochipDTO, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentService.UpdateAppointmentMicrochipAsync(appointmentId, updateAppointmentForMicrochipDTO, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+
+        [HttpGet("get-appointment-microchip-by-pet-id/{petId}")]
+        public async Task<IActionResult> GetAppointmentMicrochipByPetId(int petId, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentDetailService.GetAppointmentMicrochipByPetId(petId, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }

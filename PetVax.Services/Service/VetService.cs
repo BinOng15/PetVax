@@ -76,16 +76,7 @@ namespace PetVax.Services.Service
                         keyWord = getAllVetRequest?.KeyWord,
                         status = getAllVetRequest?.Status,
                     },
-                    PageData = pateVets.Select(v => new VetResponseDTO
-                    {
-                        VetId = v.VetId,
-                        AccountId = v.AccountId,
-                        VetCode = v.VetCode,
-                        Name = v.Name,
-                        Specialization = v.Specialization,
-                        DateOfBirth = v.DateOfBirth,
-                        PhoneNumber = v.PhoneNumber
-                    }).ToList()
+                    PageData = pateVets.Select(v => _mapper.Map<VetResponseDTO>(v)).ToList()
                 };
 
                 if (!pateVets.Any())
@@ -150,31 +141,21 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                if(updateVetRequest.Image != null)
+                if (updateVetRequest.Image != null)
                 {
                     existingVet.image = await _cloudinariService.UploadImage(updateVetRequest.Image);
-                }
-                else
-                {
-                    existingVet.image = existingVet.image;
                 }
                 // Map updated properties
                 existingVet.Name = updateVetRequest.Name ?? existingVet.Name;
                 existingVet.PhoneNumber = updateVetRequest.PhoneNumber ?? existingVet.PhoneNumber;
                 existingVet.Specialization = updateVetRequest.Specialization ?? existingVet.Specialization;
                 existingVet.DateOfBirth = updateVetRequest.DateOfBirth ?? existingVet.DateOfBirth;
+
                 int result = await _vetRepository.UpdateVetAsync(existingVet, cancellationToken);
 
                 if (result > 0)
                 {
-                    var responseData = new VetResponseDTO();
-                    responseData.VetId = existingVet.VetId;
-                    responseData.AccountId = existingVet.AccountId;
-                    responseData.VetCode = existingVet.VetCode;
-                    responseData.Name = existingVet.Name;
-                    responseData.PhoneNumber = existingVet.PhoneNumber;
-                    responseData.Specialization = existingVet.Specialization;
-                    responseData.DateOfBirth = existingVet.DateOfBirth; ;
+                    var responseData = _mapper.Map<VetResponseDTO>(existingVet);
                     _logger.LogInformation("Updated Vet with ID {VetId} successfully", updateVetRequest.VetId);
                     return new BaseResponse<VetResponseDTO>
                     {
@@ -203,7 +184,6 @@ namespace PetVax.Services.Service
                     Success = false,
                     Message = "Error while updating veterinarian: " + (ex.InnerException?.Message ?? ex.Message),
                     Data = null
-
                 };
             }
         }
@@ -235,14 +215,7 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                var responseData = new VetResponseDTO();
-                responseData.VetId = vet.VetId;
-                responseData.AccountId = vet.AccountId;
-                responseData.VetCode = vet.VetCode;
-                responseData.Name = vet.Name;
-                responseData.PhoneNumber = vet.PhoneNumber;
-                responseData.Specialization = vet.Specialization;
-                responseData.DateOfBirth = vet.DateOfBirth;
+                var responseData = _mapper.Map<VetResponseDTO>(vet);
                 _logger.LogInformation("Retrieved Vet with ID {VetId} successfully", vetId);
                 return new BaseResponse<VetResponseDTO>
                 {
