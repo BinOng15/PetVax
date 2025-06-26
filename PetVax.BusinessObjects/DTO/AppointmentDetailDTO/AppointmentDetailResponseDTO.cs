@@ -42,7 +42,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public bool? isDeleted { get; set; } = false; // Soft delete flag
 
         public VetResponseDTO Vet { get; set; } // Navigation to Vet table
-        public MicrochipItemResponseDTO MicrochipItem { get; set; } // Navigation to MicrochipItem table
+        public BaseMicrochipItemResponse MicrochipItem { get; set; } // Navigation to MicrochipItem table
         public PetPassportResponseDTO PetPassport { get; set; } // Navigation to PetPassport table
         public HealthConditionResponseDTO HealthCondition { get; set; } // Navigation to HealthCondition table
         public VaccineBatchResponseDTO VaccineBatch { get; set; } // Navigation to VaccineBatch table

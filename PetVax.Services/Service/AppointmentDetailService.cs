@@ -224,7 +224,7 @@ namespace PetVax.Services.Service
                             // Search by Appointment status (enum)
                             (d.AppointmentStatus.ToString().ToLower().Contains(keyword))
 
-                            // Search by Dose information
+                        // Search by Dose information
                         )
                         .ToList();
                 }
@@ -625,6 +625,45 @@ namespace PetVax.Services.Service
                     Success = false,
                     Message = "Đã xảy ra lỗi khi lấy thông tin tiêm phòng theo id lịch hẹn",
                     Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetId(int petId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointmentDetails = await _appointmentDetailRepository.GetAppointmentDetaiMicrochiplsByPetIdAsync(petId, cancellationToken);
+                if (appointmentDetails == null || !appointmentDetails.Any())
+                {
+                    return new BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn microchip cho thú cưng này.",
+                        Data = new List<AppointmenDetialMicorchipResponseDTO>()
+                    };
+                }
+
+                // Manually map AppointmentDetail to AppointmenDetialMicorchipResponseDTO
+                var appointmentMicrochipResponse = _mapper.Map<List<AppointmenDetialMicorchipResponseDTO>>(appointmentDetails);
+
+                return new BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin microchip theo thú cưng thành công.",
+                    Data = appointmentMicrochipResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy thông tin microchip theo ID thú cưng." + ex.Message,
+                    Data = new List<AppointmenDetialMicorchipResponseDTO>()
                 };
             }
         }

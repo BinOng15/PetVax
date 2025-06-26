@@ -26,7 +26,7 @@ namespace PetVax.BusinessObjects.DTO.MicrochipItemDTO
         public string Color { get; set; }
         public string Nationality { get; set; }
         public bool isSterilized { get; set; }
-        public AppointmentDetailResponseDTO AppointmentDetail { get; set; } // Details of the appointment associated with the pet
+        public List<AppointmentDetailResponseDTO> AppointmentDetails { get; set; } // Details of the appointment associated with the pet
         public CustomerResponseDTO Customer { get; set; } // Details of the customer associated with the pet
     }
 }

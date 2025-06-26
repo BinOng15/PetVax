@@ -38,10 +38,10 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
 
-        [HttpPut("update-pet")]
-        public async Task<IActionResult> UpdatePet([FromBody] UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken = default)
+        [HttpPut("update-pet-by/{petId}")]
+        public async Task<IActionResult> UpdatePet(int petId, [FromBody] UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken = default)
         {
-            var response = await _petService.UpdatePetAsync(updatePetRequest, cancellationToken);
+            var response = await _petService.UpdatePetAsync(petId, updatePetRequest, cancellationToken);
             return StatusCode(response.Code, response);
         }
 

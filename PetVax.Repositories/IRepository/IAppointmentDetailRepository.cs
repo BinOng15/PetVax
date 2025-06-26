@@ -31,5 +31,7 @@ namespace PetVax.Repositories.IRepository
         Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetId(int petId, CancellationToken cancellationToken);
         Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken);
         Task<AppointmentDetail> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken);
+        Task<List<AppointmentDetail>> GetAllAppointmentDetailByPetIdAsync(int petId, CancellationToken cancellationToken);
+        Task<List<AppointmentDetail>> GetAppointmentDetaiMicrochiplsByPetIdAsync(int petId, CancellationToken cancellationToken);
     }
 }

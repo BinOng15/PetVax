@@ -12,7 +12,7 @@ namespace PetVax.Services.IService
     public interface IPetService
     {
         Task<DynamicResponse<PetResponseDTO>> GetAllPetsAsync(GetAllPetsRequestDTO getAllPetsRequest, CancellationToken cancellationToken);
-        Task<BaseResponse<PetResponseDTO>> UpdatePetAsync(UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken);
+        Task<BaseResponse<PetResponseDTO>> UpdatePetAsync(int petId, UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken);
 
         Task<BaseResponse<PetResponseDTO>> GetPetByIdAsync(int petId, CancellationToken cancellationToken);
 
