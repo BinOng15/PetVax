@@ -45,5 +45,12 @@ namespace PediVax.Controllers
             var response = await _appointmentDetailService.GetAppointmentMicrochipByPetId(petId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+
+        [HttpGet("get-appoinment-microchip-by-appointment-detail/{appointmentDetailId}")]
+        public async Task<IActionResult> GetAppointmentMicrochipByAppoinmentDetailId(int appointmentDetailId, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentDetailService.GetAppointmentMicrochipByAppointmentDetailId(appointmentDetailId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

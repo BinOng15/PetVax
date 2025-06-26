@@ -28,5 +28,6 @@ namespace PetVax.Services.IService
         Task<BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>> GetAppointmentVaccinationByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken);
         Task<BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetId(int petId, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmenDetialMicorchipResponseDTO>> GetAppointmentMicrochipByAppointmentDetailId(int appointmentDetailId, CancellationToken cancellationToken);
     }
 }

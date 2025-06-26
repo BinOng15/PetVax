@@ -667,5 +667,43 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<BaseResponse<AppointmenDetialMicorchipResponseDTO>> GetAppointmentMicrochipByAppointmentDetailId(int appointmentDetailId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetailId, cancellationToken);
+                if (appointmentDetail == null)
+                {
+                    return new BaseResponse<AppointmenDetialMicorchipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn microchip với AppointmentDetailId này.",
+                        Data = null
+                    };
+                }
+
+                var appointmentMicrochipResponse = _mapper.Map<AppointmenDetialMicorchipResponseDTO>(appointmentDetail);
+
+                return new BaseResponse<AppointmenDetialMicorchipResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin microchip theo AppointmentDetailId thành công.",
+                    Data = appointmentMicrochipResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<AppointmenDetialMicorchipResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy thông tin microchip theo AppointmentDetailId. " + ex.Message,
+                    Data = null
+                };
+            }
+        }
     }
 }
