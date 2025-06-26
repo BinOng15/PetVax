@@ -24,14 +24,17 @@ namespace PetVax.Services.Service
         private readonly ILogger<VetService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICloudinariService _cloudinariService;
+        private readonly IVetScheduleRepository _vetScheduleRepository;
 
-        public VetService(IVetRepository vetRepository, IMapper mapper, ILogger<VetService> logger, IHttpContextAccessor httpContextAccessor, ICloudinariService cloudinariService)
+        public VetService(IVetRepository vetRepository, IMapper mapper, ILogger<VetService> logger,
+            IHttpContextAccessor httpContextAccessor, ICloudinariService cloudinariService, IVetScheduleRepository vetScheduleRepository)
         {
             _vetRepository = vetRepository;
             _mapper = mapper;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _cloudinariService = cloudinariService;
+            _vetScheduleRepository = vetScheduleRepository;
         }
         public async Task<DynamicResponse<VetResponseDTO>> GetAllVetsAsync(GetAllVetRequestDTO getAllVetRequest, CancellationToken cancellationToken)
         {
@@ -244,7 +247,6 @@ namespace PetVax.Services.Service
             {
                 if (vetId <= 0)
                 {
-                    _logger.LogWarning("Invalid Vet ID: {VetId}", vetId);
                     return new BaseResponse<VetResponseDTO>
                     {
                         Code = 200,
@@ -256,33 +258,43 @@ namespace PetVax.Services.Service
                 var existingVet = await _vetRepository.GetVetByIdAsync(vetId, cancellationToken);
                 if (existingVet == null)
                 {
-                    _logger.LogWarning("Vet with ID {VetId} not found", vetId);
+
                     return new BaseResponse<VetResponseDTO>
                     {
                         Code = 200,
                         Success = false,
-                        Message = "Vet not found",
+                        Message = "Không tìm thấy vet",
                         Data = null
                     };
                 }
-                bool isDeleted = await _vetRepository.DeleteVetAsync(vetId, cancellationToken);
-                if (isDeleted)
+                existingVet.isDeleted = true;
+                int isDeleted = await _vetRepository.UpdateVetAsync(existingVet, cancellationToken);
+
+                var vetSchedules = await _vetScheduleRepository.GetVetSchedulesByVetIdAsync(vetId, cancellationToken);
+                if (vetSchedules != null && vetSchedules.Any())
                 {
-                    _logger.LogInformation("Deleted Vet with ID {VetId} successfully", vetId);
+                    foreach (var schedule in vetSchedules)
+                    {
+                        schedule.isDeleted = true;
+                        await _vetScheduleRepository.UpdateVetScheduleAsync(schedule, cancellationToken);
+                    }
+                }
+                if (isDeleted > 0)
+                {
                     return new BaseResponse<VetResponseDTO>
                     {
                         Code = 200,
                         Success = true,
-                        Message = "Veterinarian deleted successfully",
+                        Message = "Xóa thành công",
                         Data = null
                     };
                 }
-                _logger.LogWarning("Failed to delete Vet with ID {VetId}", vetId);
+
                 return new BaseResponse<VetResponseDTO>
                 {
                     Code = 200,
                     Success = false,
-                    Message = "Failed to delete veterinarian",
+                    Message = "Xóa không thành công",
                     Data = null
                 };
             }
