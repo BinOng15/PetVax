@@ -48,12 +48,12 @@ namespace PetVax.Repositories.Repository
         public async Task<AppointmentDetail> GetAppointmentDetailByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-                .Include(a => a.Appointment)
-                .Include(a => a.Vet)
-                .Include(a => a.Disease)
-                .Include(a => a.VaccineBatch)
-                .Include(a => a.MicrochipItem)
-                    .ThenInclude(m => m.Microchip)
+                .Include(ad => ad.MicrochipItem).ThenInclude(mi => mi.Microchip)
+                .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Pet)
                 .FirstOrDefaultAsync(a => a.AppointmentDetailId == id, cancellationToken);
         }
 

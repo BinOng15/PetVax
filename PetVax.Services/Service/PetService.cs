@@ -65,8 +65,11 @@ namespace PetVax.Services.Service
                 if (!string.IsNullOrWhiteSpace(getAllPetsRequest?.KeyWord))
                 {
                     var keyword = getAllPetsRequest.KeyWord.Trim().ToLower();
+                    var status = getAllPetsRequest?.Status;
                     pets = pets
-                        .Where(a => a.Name.ToLower().Contains(keyword))
+                        .Where(a => a.Name.ToLower().Contains(keyword) || a.PetCode.ToLower().Contains(keyword)
+                        || a.Species.ToLower().Contains(keyword) || a.Breed.ToLower().Contains(keyword)
+                        || a.isSterilized == status)
                         .ToList();
                 }
 
