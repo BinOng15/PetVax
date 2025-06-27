@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.Services.IService;
@@ -50,6 +51,13 @@ namespace PediVax.Controllers
         public async Task<IActionResult> GetAppointmentMicrochipByAppoinmentDetailId(int appointmentDetailId, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentDetailService.GetAppointmentMicrochipByAppointmentDetailId(appointmentDetailId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+
+        [HttpGet("get-all-appointment-microchip")]
+        public async Task<IActionResult> GetAllAppointmentMicrochip([FromQuery] GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentDetailService.GetAllAppointmemtMicrochipAsync(getAllItemsDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
     }

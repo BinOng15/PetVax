@@ -138,6 +138,19 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<AppointmentDetail>> GetAllAppointmentDetailsMicrochipAsync(CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+           .Include(ad => ad.MicrochipItem).ThenInclude(mi => mi.Microchip)
+           .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+           .Include(ad => ad.Appointment)
+               .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
+           .Include(ad => ad.Appointment)
+               .ThenInclude(a => a.Pet)
+           .Where(ad => ad.Appointment.ServiceType == ServiceType.Microchip)
+           .ToListAsync(cancellationToken);
+        }
+
         public async Task<AppointmentDetail> GetAppointmentDetailsByPassportIdAsync(int passportId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
@@ -253,5 +266,7 @@ namespace PetVax.Repositories.Repository
                 .Include(ad => ad.Appointment)
                 .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
         }
+
+
     }
 }

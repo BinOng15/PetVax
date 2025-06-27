@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using static PetVax.BusinessObjects.DTO.ResponseModel;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PetVax.Services.Service
 {
@@ -701,6 +702,86 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Đã xảy ra lỗi khi lấy thông tin microchip theo AppointmentDetailId. " + ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<DynamicResponse<AppointmenDetialMicorchipResponseDTO>> GetAllAppointmemtMicrochipAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailsMicrochipAsync(cancellationToken);
+                if (appointmentDetails == null || !appointmentDetails.Any())
+                {
+                    return new DynamicResponse<AppointmenDetialMicorchipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn microchip nào.",
+                        Data = null
+                    };
+                }
+
+                // Filtering by keyword if provided
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO?.KeyWord))
+                {
+                    var keyword = getAllItemsDTO.KeyWord.ToLower();
+                    appointmentDetails = appointmentDetails
+                        .Where(d =>
+                            (d.AppointmentDetailCode != null && d.AppointmentDetailCode.ToLower().Contains(keyword)) ||
+                            (d.MicrochipItem != null && d.MicrochipItem.Name != null && d.MicrochipItem.Name.ToLower().Contains(keyword)) ||
+                            (d.ServiceType.ToString().ToLower().Contains(keyword))
+                        )
+                        .ToList();
+                }
+
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = appointmentDetails.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+
+                var pagedDetails = appointmentDetails
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+
+                var responseData = _mapper.Map<List<AppointmenDetialMicorchipResponseDTO>>(pagedDetails);
+
+                var megaData = new MegaData<AppointmenDetialMicorchipResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                        status = getAllItemsDTO?.Status,
+                    },
+                    PageData = responseData
+                };
+
+                return new DynamicResponse<AppointmenDetialMicorchipResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy tất cả chi tiết cuộc hẹn microchip thành công.",
+                    Data = megaData
+                };
+            }
+            catch (Exception ex)
+            {
+
+                return new DynamicResponse<AppointmenDetialMicorchipResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả chi tiết cuộc hẹn microchip.",
                     Data = null
                 };
             }
