@@ -506,6 +506,7 @@ namespace PetVax.Services.Service
                 else
                 {
                     microchipItem.PetId = petId;
+                    microchipItem.IsUsed = true;
                 }
 
                  //  Check if Pet already has a MicrochipItem installed

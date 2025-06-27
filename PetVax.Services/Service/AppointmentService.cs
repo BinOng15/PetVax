@@ -2113,12 +2113,15 @@ namespace PetVax.Services.Service
                 else
                 {
                     microchipItem.IsUsed = true;
+                    microchipItem.Location =  updateAppointmentMicrochipDTO.Location;
                     int rowEffected = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
+
                 }
 
                 appointmentDetail.VetId = updateAppointmentMicrochipDTO.VetId;
                 appointmentDetail.MicrochipItemId = updateAppointmentMicrochipDTO.MicrochipItemId;
                 appointmentDetail.AppointmentStatus = newStatus;
+                appointmentDetail.Notes = updateAppointmentMicrochipDTO.Note;
                 appointmentDetail.ModifiedAt = DateTime.UtcNow;
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
