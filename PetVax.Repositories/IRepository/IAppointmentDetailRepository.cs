@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PetVax.Repositories.IRepository
 {
@@ -33,10 +34,10 @@ namespace PetVax.Repositories.IRepository
         //Vaccination
         Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken);
         Task<AppointmentDetail> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken);
-        Task<List<AppointmentDetail>> GetAllAppointmentForVaccinationAsync(CancellationToken cancellationToken);
+        Task<List<AppointmentDetail>> GetAllAppointmentDetailsForVaccinationAsync(CancellationToken cancellationToken);
 
         //Microchip
         Task<List<AppointmentDetail>> GetAppointmentDetaiMicrochiplsByPetIdAsync(int petId, CancellationToken cancellationToken);
-        Task<List<AppointmentDetail>> GetAllAppointmentForMicrochipAsync(CancellationToken cancellationToken);
+        Task<List<AppointmentDetail>> GetAllAppointmentDetailsMicrochipAsync(CancellationToken cancellationToken);
     }
 }
