@@ -19,6 +19,7 @@ namespace PetVax.BusinessObjects.Models
         public string Name { get; set; } // e.g., "Microchip A", "Microchip B"
         public string Description { get; set; } // e.g., "Microchip for pet identification"
         public DateTime InstallationDate { get; set; } // Date when the microchip was installed
+        public string? Location { get; set; }
         public string Status { get; set; } // e.g., "Active", "Inactive", "Lost"
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string? CreatedBy { get; set; } // User who created the record
