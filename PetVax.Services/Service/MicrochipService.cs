@@ -161,6 +161,7 @@ namespace PetVax.Services.Service
                         };
                     }
                 }
+                microchipItem.IsUsed = true;
                 microchipItem.Name = request.createMicrochipItemRequest.Name;
                 microchipItem.Description = request.createMicrochipItemRequest.Description;
                 microchipItem.InstallationDate = request.createMicrochipItemRequest.InstallationDate;
