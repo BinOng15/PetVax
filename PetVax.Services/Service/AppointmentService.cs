@@ -357,14 +357,20 @@ namespace PetVax.Services.Service
                         Data = false
                     };
                 }
-                bool isDeleted = await _appointmentRepository.DeleteAppointmentAsync(appointmentId, cancellationToken);
-                if (isDeleted)
+
+                // Soft delete: set isDeleted = true
+                appointment.isDeleted = true;
+                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+                if (updatedAppointment != null && updatedAppointment.isDeleted == true)
                 {
                     return new BaseResponse<bool>
                     {
                         Code = 200,
                         Success = true,
-                        Message = "Xóa cuộc hẹn thành công.",
+                        Message = "Xóa cuộc hẹn thành công (đã chuyển sang trạng thái đã xóa).",
                         Data = true
                     };
                 }
@@ -1670,7 +1676,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentForVaccinationResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy cuộc hẹn với ID đã cung cấp.",
                         Data = null
@@ -1681,7 +1687,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentForVaccinationResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn với ID đã cung cấp.",
                         Data = null
@@ -2329,7 +2335,12 @@ namespace PetVax.Services.Service
         {
             try
             {
-                var appointments = await _appointmentDetailRepository.GetAllAppointmentForVaccinationAsync(cancellationToken);
+                var appointments = await _appointmentDetailRepository.GetAllAppointmentDetailsForVaccinationAsync(cancellationToken);
+                // Only show items where isDeleted is false or null (not deleted)
+                appointments = appointments
+                    .Where(d => d.isDeleted == false || d.isDeleted == null)
+                    .ToList();
+
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
                     var keyword = getAllItemsDTO.KeyWord.ToLower();
@@ -2373,8 +2384,15 @@ namespace PetVax.Services.Service
                     SearchInfo = new SearchCondition
                     {
                         keyWord = getAllItemsDTO?.KeyWord,
+                        is_Delete = getAllItemsDTO?.Status
                     },
-                    PageData = _mapper.Map<List<AppointmentForVaccinationResponseDTO>>(pagedAppointments)
+                    PageData = pagedAppointments.Select(detail =>
+                        new AppointmentForVaccinationResponseDTO
+                        {
+                            Appointment = _mapper.Map<AppointmentResponseDTO>(detail.Appointment),
+                            AppointmentHasDiseaseResponseDTO = _mapper.Map<AppointmentHasDiseaseResponseDTO>(detail)
+                        }
+                    ).ToList()
                 };
                 if (!pagedAppointments.Any())
                 {

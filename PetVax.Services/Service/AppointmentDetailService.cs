@@ -189,9 +189,59 @@ namespace PetVax.Services.Service
         //    }
         //}
 
-        public Task<BaseResponse<bool>> DeleteAppointmentDetail(int appointmentDetailId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<bool>> DeleteAppointmentDetail(int appointmentDetailId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetailId, cancellationToken);
+                if (appointmentDetail == null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn với ID đã cung cấp.",
+                        Data = false
+                    };
+                }
+
+                appointmentDetail.isDeleted = true;
+                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                var updateResult = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                if (updateResult > 0)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        Code = 200,
+                        Success = true,
+                        Message = "Xóa chi tiết cuộc hẹn (mềm) thành công.",
+                        Data = true
+                    };
+                }
+                else
+                {
+                    return new BaseResponse<bool>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không thể xóa chi tiết cuộc hẹn (mềm).",
+                        Data = false
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while soft deleting appointment detail.");
+                return new BaseResponse<bool>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi xóa chi tiết cuộc hẹn (mềm).",
+                    Data = false
+                };
+            }
         }
 
         public async Task<DynamicResponse<AppointmentDetailResponseDTO>> GetAllAppointmentDetail(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
