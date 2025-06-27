@@ -24,10 +24,10 @@ namespace PetVax.Repositories.Repository
             return appointmentDetail;
         }
 
-        public async Task<bool> DeleteAppointmentDetailAsync(int id, CancellationToken cancellationToken)
-        {
-            return await DeleteAsync(id, cancellationToken);
-        }
+        //public async Task<bool> DeleteAppointmentDetailAsync(int id, CancellationToken cancellationToken)
+        //{
+        //    return await DeleteAsync(id, cancellationToken);
+        //}
 
         public async Task<List<AppointmentDetail>> GetAllAppointmentDetailsAsync(CancellationToken cancellationToken)
         {
@@ -58,73 +58,73 @@ namespace PetVax.Repositories.Repository
                 .FirstOrDefaultAsync(a => a.AppointmentDetailId == id, cancellationToken);
         }
 
-        public async Task<AppointmentDetail> GetAppointmentDetailByPetIdAsync(int petId, CancellationToken cancellationToken)
+        //public async Task<AppointmentDetail> GetAppointmentDetailByPetIdAsync(int petId, CancellationToken cancellationToken)
+        //{
+        //    return await _context.AppointmentDetails
+        //        .Include(a => a.Appointment)
+        //        .Include(a => a.Vet)
+        //        .Include(a => a.Disease)
+        //        .Include(a => a.MicrochipItem)
+        //        .Include(a => a.VaccineBatch)
+        //        .FirstOrDefaultAsync(ad => ad.Appointment.PetId == petId, cancellationToken);
+        //}
+
+        public async Task<List<AppointmentDetail>> GetAllAppointmentDetailByPetIdAsync(int petId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
                 .Include(a => a.Appointment)
                 .Include(a => a.Vet)
                 .Include(a => a.Disease)
-                .Include(a => a.MicrochipItem)
+                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
                 .Include(a => a.VaccineBatch)
-                .FirstOrDefaultAsync(ad => ad.Appointment.PetId == petId, cancellationToken);
+                .Where(ad => ad.Appointment.PetId == petId)
+                .ToListAsync(cancellationToken);
         }
-
-            public async Task<List<AppointmentDetail>> GetAllAppointmentDetailByPetIdAsync(int petId, CancellationToken cancellationToken)
-            {
-                return await _context.AppointmentDetails
-                    .Include(a => a.Appointment)
-                    .Include(a => a.Vet)
-                    .Include(a => a.Disease)
-                    .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
-                    .Include(a => a.VaccineBatch)
-                    .Where(ad => ad.Appointment.PetId == petId)
-                    .ToListAsync(cancellationToken);
-            }
 
         public async Task<AppointmentDetail> GetAppointmentDetailsByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-     .Include(a => a.Appointment)
-         .ThenInclude(a => a.Customer)    
-     .Include(a => a.Appointment)
-         .ThenInclude(a => a.Pet)          
-     .Include(a => a.Vet)
-     .Include(a => a.Disease)
-     .Include(a => a.MicrochipItem)
-         .ThenInclude(m => m.Microchip)
-     .Include(a => a.VaccineBatch)
-     .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
+             .Include(a => a.Appointment)
+                 .ThenInclude(a => a.Customer)    
+             .Include(a => a.Appointment)
+                 .ThenInclude(a => a.Pet)          
+             .Include(a => a.Vet)
+             .Include(a => a.Disease)
+             .Include(a => a.MicrochipItem)
+                 .ThenInclude(m => m.Microchip)
+             .Include(a => a.VaccineBatch)
+             .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
 
         }
 
-        public async Task<AppointmentDetail> GetAppointmentDetailsByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
-        {
-            return await _context.AppointmentDetails
-                .Include(a => a.Appointment)
-                .Include(a => a.Vet)
-                .Include(a => a.Disease)
-                .Include(a => a.VaccineBatch)
-                .FirstOrDefaultAsync(ad => ad.DiseaseId == diseaseId, cancellationToken);
-        }
+        //public async Task<AppointmentDetail> GetAppointmentDetailsByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
+        //{
+        //    return await _context.AppointmentDetails
+        //        .Include(a => a.Appointment)
+        //        .Include(a => a.Vet)
+        //        .Include(a => a.Disease)
+        //        .Include(a => a.VaccineBatch)
+        //        .FirstOrDefaultAsync(ad => ad.DiseaseId == diseaseId, cancellationToken);
+        //}
 
-        public async Task<AppointmentDetail> GetAppointmentDetailsByHealthConditionIdAsync(int healthConditionId, CancellationToken cancellationToken)
-        {
-            return await _context.AppointmentDetails
-                .Include(a => a.Appointment)
-                .Include(a => a.Vet)
-                .Include(a => a.Disease)
-                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
-                .Include(a => a.VaccineBatch)
-                .FirstOrDefaultAsync(ad => ad.HealthConditionId == healthConditionId, cancellationToken);
-        }
+        //public async Task<AppointmentDetail> GetAppointmentDetailsByHealthConditionIdAsync(int healthConditionId, CancellationToken cancellationToken)
+        //{
+        //    return await _context.AppointmentDetails
+        //        .Include(a => a.Appointment)
+        //        .Include(a => a.Vet)
+        //        .Include(a => a.Disease)
+        //        .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
+        //        .Include(a => a.VaccineBatch)
+        //        .FirstOrDefaultAsync(ad => ad.HealthConditionId == healthConditionId, cancellationToken);
+        //}
 
-        public Task<AppointmentDetail> GetAppointmentDetailsByMicrochipItemIdAsync(int microchipItemId, CancellationToken cancellationToken)
-        {
-            return _context.AppointmentDetails
-                .Include(a => a.Appointment)
-                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
-                .FirstOrDefaultAsync(ad => ad.MicrochipItemId == microchipItemId, cancellationToken);
-        }
+        //public Task<AppointmentDetail> GetAppointmentDetailsByMicrochipItemIdAsync(int microchipItemId, CancellationToken cancellationToken)
+        //{
+        //    return _context.AppointmentDetails
+        //        .Include(a => a.Appointment)
+        //        .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
+        //        .FirstOrDefaultAsync(ad => ad.MicrochipItemId == microchipItemId, cancellationToken);
+        //}
 
         public async Task<List<AppointmentDetail>> GetAppointmentDetaiMicrochiplsByPetIdAsync(int petId, CancellationToken cancellationToken)
         {
@@ -139,11 +139,11 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<AppointmentDetail> GetAppointmentDetailsByPassportIdAsync(int passportId, CancellationToken cancellationToken)
-        {
-            return await _context.AppointmentDetails
-                .FirstOrDefaultAsync(ad => ad.PassportId == passportId, cancellationToken);
-        }
+        //public async Task<AppointmentDetail> GetAppointmentDetailsByPassportIdAsync(int passportId, CancellationToken cancellationToken)
+        //{
+        //    return await _context.AppointmentDetails
+        //        .FirstOrDefaultAsync(ad => ad.PassportId == passportId, cancellationToken);
+        //}
 
         public async Task<List<AppointmentDetail>> GetAppointmentDetailsByServiceTypeAsync(EnumList.ServiceType serviceType, CancellationToken cancellationToken)
         {
@@ -157,47 +157,47 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<AppointmentDetail>> GetAppointmentDetailsByStatusAsync(EnumList.AppointmentStatus status, CancellationToken cancellationToken)
-        {
-            return await _context.AppointmentDetails
-                .Include(a => a.Appointment)
-                .Include(a => a.Vet)
-                .Include(a => a.Disease)
-                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
-                .Include(a => a.VaccineBatch)
-                .Where(ad => ad.AppointmentStatus == status)
-                .ToListAsync(cancellationToken);
-        }
+        //public async Task<List<AppointmentDetail>> GetAppointmentDetailsByStatusAsync(EnumList.AppointmentStatus status, CancellationToken cancellationToken)
+        //{
+        //    return await _context.AppointmentDetails
+        //        .Include(a => a.Appointment)
+        //        .Include(a => a.Vet)
+        //        .Include(a => a.Disease)
+        //        .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
+        //        .Include(a => a.VaccineBatch)
+        //        .Where(ad => ad.AppointmentStatus == status)
+        //        .ToListAsync(cancellationToken);
+        //}
 
-        public async Task<AppointmentDetail> GetAppointmentDetailsByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
-        {
-            return await _context.AppointmentDetails
-                .Include(a => a.Appointment)
-                .Include(a => a.Vet)
-                .Include(a => a.Disease)
-                .Include(a => a.VaccineBatch)
-                .FirstOrDefaultAsync(ad => ad.VaccineBatchId == vaccineBatchId, cancellationToken);
-        }
+        //public async Task<AppointmentDetail> GetAppointmentDetailsByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
+        //{
+        //    return await _context.AppointmentDetails
+        //        .Include(a => a.Appointment)
+        //        .Include(a => a.Vet)
+        //        .Include(a => a.Disease)
+        //        .Include(a => a.VaccineBatch)
+        //        .FirstOrDefaultAsync(ad => ad.VaccineBatchId == vaccineBatchId, cancellationToken);
+        //}
 
-        public Task<AppointmentDetail> GetAppointmentDetailsByVetIdAsync(int vetId, CancellationToken cancellationToken)
-        {
-            return _context.AppointmentDetails
-                .Include(a => a.Appointment)
-                .Include(a => a.Vet)
-                .Include(a => a.Disease)
-                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
-                .Include(a => a.VaccineBatch)
-                .FirstOrDefaultAsync(ad => ad.VetId == vetId, cancellationToken);
-        }
+        //public Task<AppointmentDetail> GetAppointmentDetailsByVetIdAsync(int vetId, CancellationToken cancellationToken)
+        //{
+        //    return _context.AppointmentDetails
+        //        .Include(a => a.Appointment)
+        //        .Include(a => a.Vet)
+        //        .Include(a => a.Disease)
+        //        .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
+        //        .Include(a => a.VaccineBatch)
+        //        .FirstOrDefaultAsync(ad => ad.VetId == vetId, cancellationToken);
+        //}
 
-        public async Task<AppointmentDetail> GetAppointmentDetailWithRelationsAsync(int id, CancellationToken cancellationToken)
-        {
-            return await _context.AppointmentDetails
-                .Include(ad => ad.Vet)
-                .Include(ad => ad.VaccineBatch)
-                .Include(ad => ad.Disease)
-                .FirstOrDefaultAsync(ad => ad.AppointmentDetailId == id, cancellationToken);
-        }
+        //public async Task<AppointmentDetail> GetAppointmentDetailWithRelationsAsync(int id, CancellationToken cancellationToken)
+        //{
+        //    return await _context.AppointmentDetails
+        //        .Include(ad => ad.Vet)
+        //        .Include(ad => ad.VaccineBatch)
+        //        .Include(ad => ad.Disease)
+        //        .FirstOrDefaultAsync(ad => ad.AppointmentDetailId == id, cancellationToken);
+        //}
 
         public async Task<List<AppointmentDetail>> GetAppointmentVaccinationDetailByPetId(int petId, CancellationToken cancellationToken)
         {
@@ -233,17 +233,17 @@ namespace PetVax.Repositories.Repository
             return await UpdateAsync(appointmentDetail, cancellationToken);
         }
 
-        public async Task<AppointmentDetail> GetAppointmentDetailandServiceTypeByPetIdAsync(int petId, CancellationToken cancellationToken)
-        {
-            return await _context.AppointmentDetails
-                .Include(ad => ad.Vet)
-                .Include(ad => ad.PetPassport)
-                .Include(ad => ad.HealthCondition)
-                .Include(ad => ad.VaccineBatch)
-                .Include(ad => ad.Disease)
-                .Include(ad => ad.MicrochipItem).ThenInclude(m => m.Microchip)
-                .FirstOrDefaultAsync(ad => ad.Appointment.PetId == petId, cancellationToken);
-        }
+        //public async Task<AppointmentDetail> GetAppointmentDetailandServiceTypeByPetIdAsync(int petId, CancellationToken cancellationToken)
+        //{
+        //    return await _context.AppointmentDetails
+        //        .Include(ad => ad.Vet)
+        //        .Include(ad => ad.PetPassport)
+        //        .Include(ad => ad.HealthCondition)
+        //        .Include(ad => ad.VaccineBatch)
+        //        .Include(ad => ad.Disease)
+        //        .Include(ad => ad.MicrochipItem).ThenInclude(m => m.Microchip)
+        //        .FirstOrDefaultAsync(ad => ad.Appointment.PetId == petId, cancellationToken);
+        //}
 
         public async Task<AppointmentDetail> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken)
         {
@@ -253,6 +253,30 @@ namespace PetVax.Repositories.Repository
                 .Include(ad => ad.Disease)
                 .Include(ad => ad.Appointment)
                 .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
+        }
+
+        public async Task<List<AppointmentDetail>> GetAllAppointmentForVaccinationAsync(CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(ad => ad.Vet)
+                .Include(ad => ad.VaccineBatch)
+                    .ThenInclude(vb => vb.Vaccine)
+                .Include(ad => ad.Disease)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Pet)
+                .Where(ad => ad.ServiceType == ServiceType.Vaccination)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<AppointmentDetail>> GetAllAppointmentForMicrochipAsync(CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(ad => ad.Vet)
+                .Include(ad => ad.MicrochipItem).ThenInclude(mi => mi.Microchip)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Pet)
+                .Where(ad => ad.ServiceType == ServiceType.Microchip)
+                .ToListAsync(cancellationToken);
         }
     }
 }

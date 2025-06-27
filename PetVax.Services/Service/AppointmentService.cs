@@ -2325,6 +2325,87 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<DynamicResponse<AppointmentForVaccinationResponseDTO>> GetAllAppointmentVaccinationAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointments = await _appointmentDetailRepository.GetAllAppointmentForVaccinationAsync(cancellationToken);
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
+                {
+                    var keyword = getAllItemsDTO.KeyWord.ToLower();
+                    appointments = appointments
+                        .Where(d =>
+                            // Search by AppointmentDetailCode
+                            (d.AppointmentDetailCode != null && d.AppointmentDetailCode.ToLower().Contains(keyword)) ||
+
+                            // Search by Vet name
+                            (d.Vet != null && d.Vet.Name != null && d.Vet.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Vaccine batch code
+                            (d.VaccineBatch != null && d.VaccineBatch.Vaccine.Name != null && d.VaccineBatch.Vaccine.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Disease name
+                            (d.Disease != null && d.Disease.Name != null && d.Disease.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Appointment status (enum)
+                            (d.AppointmentStatus.ToString().ToLower().Contains(keyword))
+                        )
+                        .ToList();
+                }
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = appointments.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+                var pagedAppointments = appointments
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+                var responseData = new MegaData<AppointmentForVaccinationResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                    },
+                    PageData = _mapper.Map<List<AppointmentForVaccinationResponseDTO>>(pagedAppointments)
+                };
+                if (!pagedAppointments.Any())
+                {
+                    return new DynamicResponse<AppointmentForVaccinationResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn tiêm phòng nào.",
+                        Data = null
+                    };
+                }
+                return new DynamicResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy tất cả cuộc hẹn tiêm phòng thành công.",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn tiêm phòng.");
+                return new DynamicResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn tiêm phòng.",
+                    Data = null
+                };
+            }
+        }
 
     }
 }
