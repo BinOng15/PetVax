@@ -39,8 +39,8 @@ namespace PediVax.Controllers
         }
 
         [HttpPut("update-vet")]
-        [Authorize(Roles = "Admin, Vet")]
-        public async Task<IActionResult> UpdateVet([FromForm] UpdateVetRequest updateVetRequest, CancellationToken cancellationToken = default)
+        [Authorize(Roles = "Admin, Vet, Staff")]
+        public async Task<IActionResult> UpdateVet([FromBody] UpdateVetRequest updateVetRequest, CancellationToken cancellationToken = default)
         {
 
             var response = await _vetService.UpdateVetsAsync(updateVetRequest, cancellationToken);
@@ -67,8 +67,8 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpPost("create-vet")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateVet([FromForm] CreateVetDTO createVetDTO, CancellationToken cancellationToken = default)
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> CreateVet([FromBody] CreateVetDTO createVetDTO, CancellationToken cancellationToken = default)
         {
             var response = await _vetService.CreateVetAsync(createVetDTO, cancellationToken);
             return StatusCode(response.Code, response);

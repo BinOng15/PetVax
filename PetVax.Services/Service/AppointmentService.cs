@@ -357,14 +357,20 @@ namespace PetVax.Services.Service
                         Data = false
                     };
                 }
-                bool isDeleted = await _appointmentRepository.DeleteAppointmentAsync(appointmentId, cancellationToken);
-                if (isDeleted)
+
+                // Soft delete: set isDeleted = true
+                appointment.isDeleted = true;
+                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+                if (updatedAppointment != null && updatedAppointment.isDeleted == true)
                 {
                     return new BaseResponse<bool>
                     {
                         Code = 200,
                         Success = true,
-                        Message = "Xóa cuộc hẹn thành công.",
+                        Message = "Xóa cuộc hẹn thành công (đã chuyển sang trạng thái đã xóa).",
                         Data = true
                     };
                 }
@@ -711,6 +717,35 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
+
+                // --- BẮT ĐẦU CHECK VACCINEBATCH VÀ DISEASEID ---
+                if (updateAppointmentVaccinationDTO.VaccineBatchId.HasValue && updateAppointmentVaccinationDTO.DiseaseId.HasValue)
+                {
+                    var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(updateAppointmentVaccinationDTO.VaccineBatchId.Value, cancellationToken);
+                    if (vaccineBatch == null)
+                    {
+                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "VaccineBatchId không hợp lệ.",
+                            Data = null
+                        };
+                    }
+                    var vaccineDiseases = await _vaccineDiseaseRepository.GetVaccineDiseaseByVaccineIdAsync(vaccineBatch.VaccineId, cancellationToken);
+                    var diseaseIdsOfBatch = vaccineDiseases?.Select(vd => vd.DiseaseId).ToList() ?? new List<int>();
+                    if (!diseaseIdsOfBatch.Contains(updateAppointmentVaccinationDTO.DiseaseId.Value))
+                    {
+                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "DiseaseId không hợp lệ hoặc không liên kết với VaccineId của VaccineBatch đã chọn.",
+                            Data = null
+                        };
+                    }
+                }
+                // --- KẾT THÚC CHECK VACCINEBATCH VÀ DISEASEID ---
 
                 if (isStatusChangeToProcessed && appointmentDetail.VaccineBatchId.HasValue)
                 {
@@ -1135,17 +1170,18 @@ namespace PetVax.Services.Service
             }
 
             // Check if the pet has already completed all doses for this disease
-            var vaccinationSchedule = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId, cancellationToken);
-            if (vaccinationSchedule != null)
+            var vaccinationSchedules = await _vaccinationScheduleRepository.GetAllVaccinationSchedulesAsync(cancellationToken);
+            var schedulesForDisease = vaccinationSchedules
+                .Where(s => s.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId)
+                .ToList();
+            int totalDose = schedulesForDisease.Sum(s => s.DoseNumber);
+
+            if (totalDose > 0)
             {
                 var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(pet.PetId, cancellationToken);
                 var profilesForDisease = vaccineProfiles?.Where(p => p.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId).ToList() ?? new List<VaccineProfile>();
-
-                // Calculate totalDose from DoseNumber of VaccinationSchedule
-                int totalDose = vaccinationSchedule.DoseNumber;
-
                 int completedDoses = profilesForDisease.Count(p => p.IsCompleted == true);
-                if (totalDose > 0 && completedDoses >= totalDose)
+                if (completedDoses >= totalDose)
                 {
                     return new BaseResponse<AppointmentWithVaccinationResponseDTO>
                     {
@@ -1156,15 +1192,15 @@ namespace PetVax.Services.Service
                     };
                 }
             }
-            if (vaccinationSchedule != null)
+            if (vaccinationSchedules != null)
             {
                 var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(pet.PetId, cancellationToken);
                 var profilesForDisease = vaccineProfiles?.Where(p => p.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId).ToList() ?? new List<VaccineProfile>();
 
                 // Assume that the number of doses required is stored in a property called "TotalDose" in VaccinationSchedule
                 // If not, adjust this logic to match your data model
-                var totalDoseProp = vaccinationSchedule.GetType().GetProperty("TotalDose");
-                int totalDose = totalDoseProp != null ? (int)(totalDoseProp.GetValue(vaccinationSchedule) ?? 0) : 0;
+                var totalDoseProp = vaccinationSchedules.GetType().GetProperty("TotalDose");
+                int totalDoses = totalDoseProp != null ? (int)(totalDoseProp.GetValue(vaccinationSchedules) ?? 0) : 0;
 
                 int completedDoses = profilesForDisease.Count(p => p.IsCompleted == true);
                 if (totalDose > 0 && completedDoses >= totalDose)
@@ -1670,7 +1706,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentForVaccinationResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy cuộc hẹn với ID đã cung cấp.",
                         Data = null
@@ -1681,7 +1717,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentForVaccinationResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn với ID đã cung cấp.",
                         Data = null
@@ -2328,6 +2364,99 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<DynamicResponse<AppointmentForVaccinationResponseDTO>> GetAllAppointmentVaccinationAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointments = await _appointmentDetailRepository.GetAllAppointmentDetailsForVaccinationAsync(cancellationToken);
+                // Only show items where isDeleted is false or null (not deleted)
+                appointments = appointments
+                    .Where(d => d.isDeleted == false || d.isDeleted == null)
+                    .ToList();
+
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
+                {
+                    var keyword = getAllItemsDTO.KeyWord.ToLower();
+                    appointments = appointments
+                        .Where(d =>
+                            // Search by AppointmentDetailCode
+                            (d.AppointmentDetailCode != null && d.AppointmentDetailCode.ToLower().Contains(keyword)) ||
+
+                            // Search by Vet name
+                            (d.Vet != null && d.Vet.Name != null && d.Vet.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Vaccine batch code
+                            (d.VaccineBatch != null && d.VaccineBatch.Vaccine.Name != null && d.VaccineBatch.Vaccine.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Disease name
+                            (d.Disease != null && d.Disease.Name != null && d.Disease.Name.ToLower().Contains(keyword)) ||
+
+                            // Search by Appointment status (enum)
+                            (d.AppointmentStatus.ToString().ToLower().Contains(keyword))
+                        )
+                        .ToList();
+                }
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = appointments.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+                var pagedAppointments = appointments
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+                var responseData = new MegaData<AppointmentForVaccinationResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                        is_Delete = getAllItemsDTO?.Status
+                    },
+                    PageData = pagedAppointments.Select(detail =>
+                        new AppointmentForVaccinationResponseDTO
+                        {
+                            Appointment = _mapper.Map<AppointmentResponseDTO>(detail.Appointment),
+                            AppointmentHasDiseaseResponseDTO = _mapper.Map<AppointmentHasDiseaseResponseDTO>(detail)
+                        }
+                    ).ToList()
+                };
+                if (!pagedAppointments.Any())
+                {
+                    return new DynamicResponse<AppointmentForVaccinationResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn tiêm phòng nào.",
+                        Data = null
+                    };
+                }
+                return new DynamicResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy tất cả cuộc hẹn tiêm phòng thành công.",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn tiêm phòng.");
+                return new DynamicResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả cuộc hẹn tiêm phòng.",
+                    Data = null
+                };
+            }
+        }
 
     }
 }

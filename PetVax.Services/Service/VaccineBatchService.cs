@@ -46,6 +46,7 @@ namespace PetVax.Services.Service
                     };
                 }
                 var vaccineBatch = _mapper.Map<VaccineBatch>(createVaccineBatchDTO);
+                vaccineBatch.BatchNumber = "BATCH" + new Random().Next(100000, 1000000).ToString();
                 vaccineBatch.CreateAt = DateTime.UtcNow;
                 vaccineBatch.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 int batchId = await _vaccineBatchRepository.CreateVaccineBatchAsync(vaccineBatch, cancellationToken);
