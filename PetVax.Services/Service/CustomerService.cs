@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.ExternalService;
 using PetVax.Services.IService;
@@ -21,14 +22,16 @@ namespace PetVax.Services.Service
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<CustomerService> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICloudinariService _cloudinariService;
 
 
-        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger, ICloudinariService cloudinariService)
+        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger, IHttpContextAccessor httpContextAccessor, ICloudinariService cloudinariService)
         {
             _customerRepository = customerRepository;
             _mapper = mapper;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
             _cloudinariService = cloudinariService;
         }
 
@@ -47,8 +50,12 @@ namespace PetVax.Services.Service
                         Data = false
                     };
                 }
-                bool isDeleted = await _customerRepository.DeleteCustomerAsync(customerId, cancellationToken);
-                if (isDeleted)
+                customer.isDeleted = true;
+                customer.ModifiedAt = DateTime.UtcNow;
+                customer.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                int result = await _customerRepository.UpdateCustomerAsync(customer, cancellationToken);
+                if (result > 0)
                 {
                     return new BaseResponse<bool>
                     {

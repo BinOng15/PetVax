@@ -191,11 +191,11 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey<AppointmentDetail>(ad => ad.HealthConditionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // AppointmentDetail - VaccineBatch (1-1)
+            // AppointmentDetail - VaccineBatch (N-1)
             modelBuilder.Entity<AppointmentDetail>()
                 .HasOne(ad => ad.VaccineBatch)
-                .WithOne()
-                .HasForeignKey<AppointmentDetail>(ad => ad.VaccineBatchId)
+                .WithMany(vb => vb.AppointmentDetails)
+                .HasForeignKey(ad => ad.VaccineBatchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             //AppointmentDetail - Disease (1-N, optional)

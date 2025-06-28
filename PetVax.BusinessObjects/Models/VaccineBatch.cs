@@ -29,5 +29,6 @@ namespace PetVax.BusinessObjects.Models
         public virtual Vaccine Vaccine { get; set; } // Navigation to Vaccine table
         public virtual ICollection<VaccineReceipt> VaccineReceipts { get; set; } // Collection of vaccine receipts associated with this batch
         public virtual ICollection<VaccineExport> VaccineExports { get; set; } // Collection of vaccine exports associated with this batch
+        public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; }
     }
 }

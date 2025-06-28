@@ -1,5 +1,6 @@
 ﻿using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.Enum;
@@ -53,6 +54,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
     public class AppointmentHasDiseaseResponseDTO
     {
         public int DiseaseId { get; set; }
+        public DiseaseResponseDTO Disease { get; set; }
     }
 
     public class AppointmentWithMicorchipResponseDTO

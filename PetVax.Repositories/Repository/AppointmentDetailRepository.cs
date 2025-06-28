@@ -54,6 +54,7 @@ namespace PetVax.Repositories.Repository
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Pet)
+                .Include(ad => ad.Disease)
                 .FirstOrDefaultAsync(a => a.AppointmentDetailId == id, cancellationToken);
         }
 
@@ -68,31 +69,31 @@ namespace PetVax.Repositories.Repository
                 .FirstOrDefaultAsync(ad => ad.Appointment.PetId == petId, cancellationToken);
         }
 
-            public async Task<List<AppointmentDetail>> GetAllAppointmentDetailByPetIdAsync(int petId, CancellationToken cancellationToken)
-            {
-                return await _context.AppointmentDetails
-                    .Include(a => a.Appointment)
-                    .Include(a => a.Vet)
-                    .Include(a => a.Disease)
-                    .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
-                    .Include(a => a.VaccineBatch)
-                    .Where(ad => ad.Appointment.PetId == petId)
-                    .ToListAsync(cancellationToken);
-            }
+        public async Task<List<AppointmentDetail>> GetAllAppointmentDetailByPetIdAsync(int petId, CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(a => a.Appointment)
+                .Include(a => a.Vet)
+                .Include(a => a.Disease)
+                .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
+                .Include(a => a.VaccineBatch)
+                .Where(ad => ad.Appointment.PetId == petId)
+                .ToListAsync(cancellationToken);
+        }
 
         public async Task<AppointmentDetail> GetAppointmentDetailsByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-     .Include(a => a.Appointment)
-         .ThenInclude(a => a.Customer)    
-     .Include(a => a.Appointment)
-         .ThenInclude(a => a.Pet)          
-     .Include(a => a.Vet)
-     .Include(a => a.Disease)
-     .Include(a => a.MicrochipItem)
-         .ThenInclude(m => m.Microchip)
-     .Include(a => a.VaccineBatch)
-     .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
+             .Include(a => a.Appointment)
+                 .ThenInclude(a => a.Customer)
+             .Include(a => a.Appointment)
+                 .ThenInclude(a => a.Pet)
+             .Include(a => a.Vet)
+             .Include(a => a.Disease)
+             .Include(a => a.MicrochipItem)
+                 .ThenInclude(m => m.Microchip)
+             .Include(a => a.VaccineBatch)
+             .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
 
         }
 
@@ -138,6 +139,11 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<AppointmentDetail> GetAppointmentDetailsByPassportIdAsync(int passportId, CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .FirstOrDefaultAsync(ad => ad.PassportId == passportId, cancellationToken);
+        }
         public async Task<List<AppointmentDetail>> GetAllAppointmentDetailsMicrochipAsync(CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
@@ -149,12 +155,6 @@ namespace PetVax.Repositories.Repository
                .ThenInclude(a => a.Pet)
            .Where(ad => ad.Appointment.ServiceType == ServiceType.Microchip)
            .ToListAsync(cancellationToken);
-        }
-
-        public async Task<AppointmentDetail> GetAppointmentDetailsByPassportIdAsync(int passportId, CancellationToken cancellationToken)
-        {
-            return await _context.AppointmentDetails
-                .FirstOrDefaultAsync(ad => ad.PassportId == passportId, cancellationToken);
         }
 
         public async Task<List<AppointmentDetail>> GetAppointmentDetailsByServiceTypeAsync(EnumList.ServiceType serviceType, CancellationToken cancellationToken)
@@ -267,6 +267,19 @@ namespace PetVax.Repositories.Repository
                 .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
         }
 
-
+        public async Task<List<AppointmentDetail>> GetAllAppointmentDetailsForVaccinationAsync(CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+                .Include(ad => ad.Vet)
+                .Include(ad => ad.VaccineBatch)
+                    .ThenInclude(vb => vb.Vaccine)
+                .Include(ad => ad.Disease)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Pet)
+                .Where(ad => ad.ServiceType == ServiceType.Vaccination)
+                .ToListAsync(cancellationToken);
+        }
     }
 }
