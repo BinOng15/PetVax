@@ -148,8 +148,10 @@ namespace PetVax.Services.Service
                 if (request.createMicrochipItemRequest.PetId == null || request.createMicrochipItemRequest.PetId <= 0)
                 {
                     microchipItem.PetId = null;
+                    microchipItem.Location = null;
+                    microchipItem.IsUsed = false;
                 }
-                else {
+                else  {
                     var pet = await _petRepository.GetPetAndAppointmentByIdAsync(request.createMicrochipItemRequest.PetId, cancellationToken);
                     if (pet == null)
                     {
@@ -160,8 +162,11 @@ namespace PetVax.Services.Service
                             Data = null
                         };
                     }
-                }
-                microchipItem.IsUsed = true;
+
+                    microchipItem.PetId = pet.PetId;
+                    microchipItem.IsUsed = true;
+                    microchipItem.Location = request.createMicrochipItemRequest.Location; // Giả sử Pet có thuộc tính Location
+                }    
                 microchipItem.Name = request.createMicrochipItemRequest.Name;
                 microchipItem.Description = request.createMicrochipItemRequest.Description;
                 microchipItem.InstallationDate = request.createMicrochipItemRequest.InstallationDate;

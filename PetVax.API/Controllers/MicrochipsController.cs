@@ -53,7 +53,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPost("CreateMicrochip")]
-        [Authorize(Roles = "Admin, Staff")]
+        //[Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> CreateMicrochip([FromBody] MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken)
         {
             var response = await _microchipService.CreateFullMicrochipAsync(microchipRequestDTO, cancellationToken);
