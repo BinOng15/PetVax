@@ -718,6 +718,35 @@ namespace PetVax.Services.Service
                     };
                 }
 
+                // --- BẮT ĐẦU CHECK VACCINEBATCH VÀ DISEASEID ---
+                if (updateAppointmentVaccinationDTO.VaccineBatchId.HasValue && updateAppointmentVaccinationDTO.DiseaseId.HasValue)
+                {
+                    var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(updateAppointmentVaccinationDTO.VaccineBatchId.Value, cancellationToken);
+                    if (vaccineBatch == null)
+                    {
+                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "VaccineBatchId không hợp lệ.",
+                            Data = null
+                        };
+                    }
+                    var vaccineDiseases = await _vaccineDiseaseRepository.GetVaccineDiseaseByVaccineIdAsync(vaccineBatch.VaccineId, cancellationToken);
+                    var diseaseIdsOfBatch = vaccineDiseases?.Select(vd => vd.DiseaseId).ToList() ?? new List<int>();
+                    if (!diseaseIdsOfBatch.Contains(updateAppointmentVaccinationDTO.DiseaseId.Value))
+                    {
+                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "DiseaseId không hợp lệ hoặc không liên kết với VaccineId của VaccineBatch đã chọn.",
+                            Data = null
+                        };
+                    }
+                }
+                // --- KẾT THÚC CHECK VACCINEBATCH VÀ DISEASEID ---
+
                 if (isStatusChangeToProcessed && appointmentDetail.VaccineBatchId.HasValue)
                 {
                     var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(appointmentDetail.VaccineBatchId.Value, cancellationToken);
@@ -1141,17 +1170,18 @@ namespace PetVax.Services.Service
             }
 
             // Check if the pet has already completed all doses for this disease
-            var vaccinationSchedule = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId, cancellationToken);
-            if (vaccinationSchedule != null)
+            var vaccinationSchedules = await _vaccinationScheduleRepository.GetAllVaccinationSchedulesAsync(cancellationToken);
+            var schedulesForDisease = vaccinationSchedules
+                .Where(s => s.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId)
+                .ToList();
+            int totalDose = schedulesForDisease.Sum(s => s.DoseNumber);
+
+            if (totalDose > 0)
             {
                 var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(pet.PetId, cancellationToken);
                 var profilesForDisease = vaccineProfiles?.Where(p => p.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId).ToList() ?? new List<VaccineProfile>();
-
-                // Calculate totalDose from DoseNumber of VaccinationSchedule
-                int totalDose = vaccinationSchedule.DoseNumber;
-
                 int completedDoses = profilesForDisease.Count(p => p.IsCompleted == true);
-                if (totalDose > 0 && completedDoses >= totalDose)
+                if (completedDoses >= totalDose)
                 {
                     return new BaseResponse<AppointmentWithVaccinationResponseDTO>
                     {
@@ -1162,15 +1192,15 @@ namespace PetVax.Services.Service
                     };
                 }
             }
-            if (vaccinationSchedule != null)
+            if (vaccinationSchedules != null)
             {
                 var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(pet.PetId, cancellationToken);
                 var profilesForDisease = vaccineProfiles?.Where(p => p.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId).ToList() ?? new List<VaccineProfile>();
 
                 // Assume that the number of doses required is stored in a property called "TotalDose" in VaccinationSchedule
                 // If not, adjust this logic to match your data model
-                var totalDoseProp = vaccinationSchedule.GetType().GetProperty("TotalDose");
-                int totalDose = totalDoseProp != null ? (int)(totalDoseProp.GetValue(vaccinationSchedule) ?? 0) : 0;
+                var totalDoseProp = vaccinationSchedules.GetType().GetProperty("TotalDose");
+                int totalDoses = totalDoseProp != null ? (int)(totalDoseProp.GetValue(vaccinationSchedules) ?? 0) : 0;
 
                 int completedDoses = profilesForDisease.Count(p => p.IsCompleted == true);
                 if (totalDose > 0 && completedDoses >= totalDose)
