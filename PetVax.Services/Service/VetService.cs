@@ -148,8 +148,12 @@ namespace PetVax.Services.Service
                 {
                     existingVet.image = await _cloudinariService.UploadImage(updateVetRequest.Image);
                 }
-                // Map updated properties
-                existingVet.Name = updateVetRequest.Name ?? existingVet.Name;
+                else
+                {
+                    existingVet.image = null;
+                }
+                    // Map updated properties
+                    existingVet.Name = updateVetRequest.Name ?? existingVet.Name;
                 existingVet.PhoneNumber = updateVetRequest.PhoneNumber ?? existingVet.PhoneNumber;
                 existingVet.Specialization = updateVetRequest.Specialization ?? existingVet.Specialization;
                 existingVet.DateOfBirth = updateVetRequest.DateOfBirth ?? existingVet.DateOfBirth;
