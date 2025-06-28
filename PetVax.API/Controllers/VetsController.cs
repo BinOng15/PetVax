@@ -25,7 +25,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-all-vets")]
-        [Authorize(Roles = "Admin, Vet")]
+        [Authorize(Roles = "Admin, Vet, Staff")]
         public async Task<IActionResult> GetAllVets([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, CancellationToken cancellationToken = default)
         {
             var request = new GetAllVetRequestDTO
@@ -40,7 +40,7 @@ namespace PediVax.Controllers
 
         [HttpPut("update-vet")]
         [Authorize(Roles = "Admin, Vet")]
-        public async Task<IActionResult> UpdateVet([FromBody] UpdateVetRequest updateVetRequest, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UpdateVet([FromForm] UpdateVetRequest updateVetRequest, CancellationToken cancellationToken = default)
         {
 
             var response = await _vetService.UpdateVetsAsync(updateVetRequest, cancellationToken);
@@ -68,7 +68,7 @@ namespace PediVax.Controllers
         }
         [HttpPost("create-vet")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateVet([FromBody] CreateVetDTO createVetDTO, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateVet([FromForm] CreateVetDTO createVetDTO, CancellationToken cancellationToken = default)
         {
             var response = await _vetService.CreateVetAsync(createVetDTO, cancellationToken);
             return StatusCode(response.Code, response);
