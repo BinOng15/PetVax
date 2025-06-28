@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PediVax.BusinessObjects.DBContext;
 
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250628032007_Location_microchip")]
+    partial class Location_microchip
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,13 +73,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-
                             CreatedAt = new DateTime(2025, 6, 28, 3, 20, 7, 250, DateTimeKind.Utc).AddTicks(7662),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
                             PasswordHash = "lusxvYfKNMavUZlW09aXjobS9gukrR2sLYIU819MhbA=",
                             PasswordSalt = "VyR+Wycf9GZk+uAYNz1zN7z+ePxaPP38n53GjoDz9gg=",
-
                             RefereshToken = "",
                             Role = 1,
                             isDeleted = false,
@@ -91,7 +92,6 @@ namespace PetVax.BusinessObjects.Migrations
                             Email = "staff@petvax.com",
                             PasswordHash = "AQwFp7Y/2ZSJbilBkqDni69480oJ5YS+bodL5c1zWPw=",
                             PasswordSalt = "LXqaMm0/2q8BjhoFrVccbfAgY9yZXEJ/GlEcdUvecuM=",
-
                             RefereshToken = "",
                             Role = 2,
                             isDeleted = false,
@@ -263,7 +263,9 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasIndex("ServiceHistoryId");
 
-                    b.HasIndex("VaccineBatchId");
+                    b.HasIndex("VaccineBatchId")
+                        .IsUnique()
+                        .HasFilter("[VaccineBatchId] IS NOT NULL");
 
                     b.HasIndex("VetId");
 
@@ -1564,8 +1566,8 @@ namespace PetVax.BusinessObjects.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PetVax.BusinessObjects.Models.VaccineBatch", "VaccineBatch")
-                        .WithMany("AppointmentDetails")
-                        .HasForeignKey("VaccineBatchId")
+                        .WithOne()
+                        .HasForeignKey("PetVax.BusinessObjects.Models.AppointmentDetail", "VaccineBatchId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PetVax.BusinessObjects.Models.Vet", "Vet")
@@ -1922,8 +1924,6 @@ namespace PetVax.BusinessObjects.Migrations
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineBatch", b =>
                 {
-                    b.Navigation("AppointmentDetails");
-
                     b.Navigation("VaccineExports");
 
                     b.Navigation("VaccineReceipts");

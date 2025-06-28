@@ -15,6 +15,8 @@ namespace PetVax.BusinessObjects.DTO.MicrochipDTO
         public string Description { get; set; }
         public decimal Price { get; set; }
         public string Notes { get; set; }
+
+
         public CreateMicrochipItemRequest createMicrochipItemRequest { get; set; } 
     }
 }
