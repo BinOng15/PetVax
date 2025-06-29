@@ -155,11 +155,28 @@ namespace PetVax.Repositories.Repository
             var expiredAppointments = await _context.Appointments
                 .Where(a => a.AppointmentDate < currentDateTime && a.AppointmentStatus == AppointmentStatus.Processing)
                 .ToListAsync(cancellationToken);
+
+            if (expiredAppointments.Count == 0)
+                return;
+
+            var expiredAppointmentIds = expiredAppointments.Select(a => a.AppointmentId).ToList();
+
+            var expiredDetails = await _context.AppointmentDetails
+                .Where(d => expiredAppointmentIds.Contains(d.AppointmentId) && d.AppointmentStatus == AppointmentStatus.Processing)
+                .ToListAsync(cancellationToken);
+
             foreach (var appointment in expiredAppointments)
             {
                 appointment.AppointmentStatus = AppointmentStatus.Cancelled;
                 _context.Update(appointment);
             }
+
+            foreach (var detail in expiredDetails)
+            {
+                detail.AppointmentStatus = AppointmentStatus.Cancelled;
+                _context.Update(detail);
+            }
+
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
