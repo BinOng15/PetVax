@@ -135,7 +135,7 @@ namespace PetVax.Repositories.Repository
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Pet)
-                .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == ServiceType.Microchip)
+                .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == ServiceType.Microchip && ad.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
@@ -153,7 +153,7 @@ namespace PetVax.Repositories.Repository
                .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
            .Include(ad => ad.Appointment)
                .ThenInclude(a => a.Pet)
-           .Where(ad => ad.Appointment.ServiceType == ServiceType.Microchip)
+           .Where(ad => ad.Appointment.ServiceType == ServiceType.Microchip && ad.isDeleted == false)
            .ToListAsync(cancellationToken);
         }
 
