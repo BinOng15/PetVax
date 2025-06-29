@@ -112,6 +112,7 @@ public class Program
         builder.Services.AddScoped<IVetScheduleService, VetScheduleService>();
 
         builder.Services.AddHostedService<VetScheduleBackgroundService>();
+        builder.Services.AddHostedService<AppointmentBackgroundService>();
 
         var app = builder.Build();
 

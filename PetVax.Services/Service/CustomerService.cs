@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.ExternalService;
@@ -51,7 +52,7 @@ namespace PetVax.Services.Service
                     };
                 }
                 customer.isDeleted = true;
-                customer.ModifiedAt = DateTime.UtcNow;
+                customer.ModifiedAt = DateTimeHelper.Now();
                 customer.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
                 int result = await _customerRepository.UpdateCustomerAsync(customer, cancellationToken);
@@ -278,7 +279,7 @@ namespace PetVax.Services.Service
                 if (!string.IsNullOrWhiteSpace(updateCustomerDTO.Address))
                     customer.Address = updateCustomerDTO.Address;
 
-                customer.ModifiedAt = DateTime.UtcNow;
+                customer.ModifiedAt = DateTimeHelper.Now();
 
                 int updatedCustomerId = await _customerRepository.UpdateCustomerAsync(customer, cancellationToken);
                 if (updatedCustomerId <= 0)

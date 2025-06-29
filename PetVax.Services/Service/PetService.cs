@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository;
@@ -179,7 +180,7 @@ namespace PetVax.Services.Service
                 pet.Color = updatePetRequest?.Color ?? pet.Color;
                 pet.Nationality = updatePetRequest.Nationality ?? pet.Nationality;
                 pet.isSterilized = updatePetRequest.isSterilized;
-                pet.ModifiedAt = DateTime.UtcNow;
+                pet.ModifiedAt = DateTimeHelper.Now();
                 pet.ModifiedBy = GetCurrentUserName();
 
                 int update = await _petRepository.UpdatePetAsync(pet, cancellationToken);
@@ -324,7 +325,7 @@ namespace PetVax.Services.Service
                 pet.Color = createPetRequest.Color;
                 pet.Nationality = createPetRequest.Nationality;
                 pet.isSterilized = createPetRequest.isSterilized;
-                pet.CreatedAt = DateTime.UtcNow;
+                pet.CreatedAt = DateTimeHelper.Now();
                 pet.CreatedBy = GetCurrentUserName();
 
                 var createdPetId = await _petRepository.CreatePetAsync(pet, cancellationToken);
@@ -359,7 +360,7 @@ namespace PetVax.Services.Service
                             DiseaseId = vaccinationSchedule.DiseaseId,
                             PreferedDate = preferedDate,
                             IsCompleted = false,
-                            CreatedAt = DateTime.UtcNow,
+                            CreatedAt = DateTimeHelper.Now(),
                             CreatedBy = GetCurrentUserName(),
                             Dose = vaccinationSchedule.DoseNumber // Set Dose from DoseNumber
                         };
@@ -382,7 +383,7 @@ namespace PetVax.Services.Service
                     {
                         PetId = pet.PetId,
                         IsCompleted = false,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTimeHelper.Now(),
                         CreatedBy = GetCurrentUserName()
                     };
                     var vaccineProfileCreated = await _vaccineProfileRepository.CreateVaccineProfileAsync(vaccineProfile, cancellationToken);
@@ -509,7 +510,7 @@ namespace PetVax.Services.Service
                 {
                     foreach (var appointment in appointments)
                     {
-                        if (appointment.AppointmentDate >= DateTime.Now)
+                        if (appointment.AppointmentDate >= DateTimeHelper.Now())
                         {
                             _logger.LogWarning("Cannot delete pet with ID {PetId} because it has active appointments", petId);
                             return new BaseResponse<PetResponseDTO>

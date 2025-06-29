@@ -3,7 +3,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.Helpers;
 using PetVax.Repositories.IRepository;
-using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace PetVax.Services.Service
 {
-    public class VetScheduleBackgroundService : BackgroundService
+    public class AppointmentBackgroundService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly TimeSpan _period = TimeSpan.FromMinutes(30);
-        private readonly ILogger<VetScheduleBackgroundService> _logger;
+        private readonly ILogger<AppointmentBackgroundService> _logger;
 
-        public VetScheduleBackgroundService(IServiceProvider serviceProvider, ILogger<VetScheduleBackgroundService> logger)
+        public AppointmentBackgroundService(IServiceProvider serviceProvider, ILogger<AppointmentBackgroundService> logger)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -27,16 +26,15 @@ namespace PetVax.Services.Service
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             using var timer = new PeriodicTimer(_period);
-            _logger.LogInformation("Vet Schedule Background Service is starting.");
-
+            _logger.LogInformation("Appointment Background Service is starting.");
             while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
             {
-                _logger.LogInformation("Running vet schedule update at {time}", DateTimeHelper.Now());
+                _logger.LogInformation("Running appointment update at {time}", DateTimeHelper.Now());
                 using var scope = _serviceProvider.CreateScope();
-                var vetScheduleService = scope.ServiceProvider.GetRequiredService<IVetScheduleRepository>();
+                var appointmentService = scope.ServiceProvider.GetRequiredService<IAppointmentRepository>();
 
-                await vetScheduleService.UpdateExpiredVetScheduleAsync(stoppingToken);
-                _logger.LogInformation("Completed vet schedules update");
+                await appointmentService.UpdateExpiredAppointmentsAsync(stoppingToken);
+                _logger.LogInformation("Completed appointment update");
             }
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.VaccineDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.ExternalService;
@@ -73,7 +74,7 @@ namespace PetVax.Services.Service
                 vaccine.VaccineCode = "VX" + random.Next(0, 1000000).ToString("D6");
                 vaccine.Image = await _cloudinariService.UploadImage(createVaccineDTO.Image);
                 vaccine.Status = "Active";
-                vaccine.CreatedAt = DateTime.UtcNow;
+                vaccine.CreatedAt = DateTimeHelper.Now();
                 vaccine.CreatedBy = GetCurrentUserName(); // Or get from context if available
 
                 var createdVaccineId = await _vaccineRepository.CreateVaccineAsync(vaccine, cancellationToken);
@@ -434,7 +435,7 @@ namespace PetVax.Services.Service
                 if (updateVaccineDTO.Image != null)
                     existingVaccine.Image = await _cloudinariService.UploadImage(updateVaccineDTO.Image);
 
-                existingVaccine.ModifiedAt = DateTime.UtcNow;
+                existingVaccine.ModifiedAt = DateTimeHelper.Now();
                 existingVaccine.ModifiedBy = GetCurrentUserName();
 
                 var updatedVaccine = await _vaccineRepository.UpdateVaccineAsync(existingVaccine, cancellationToken);

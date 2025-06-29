@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineProfileDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -178,7 +179,7 @@ namespace PetVax.Services.Service
                 vaccineProfile.NextVaccinationInfo = vaccineProfileRequest.NextVaccinationInfo;
                 vaccineProfile.Dose = vaccineProfileRequest.Dose;
                 vaccineProfile.Reaction = vaccineProfileRequest.Reaction;
-                vaccineProfile.CreatedAt = DateTime.UtcNow;
+                vaccineProfile.CreatedAt = DateTimeHelper.Now();
                 vaccineProfile.IsActive = true;
 
                 var pet = await _petRepository.GetPetByIdAsync(vaccineProfileRequest.PetId, cancellationToken);
@@ -231,7 +232,7 @@ namespace PetVax.Services.Service
                         NextVaccinationInfo = vaccineProfile.NextVaccinationInfo,
                         IsActive = vaccineProfile.IsActive,
                         IsCompleted = vaccineProfile.IsCompleted,
-                        CreatedAt = DateTime.UtcNow, // Assuming CreatedAt is set to current time
+                        CreatedAt = DateTimeHelper.Now(), // Assuming CreatedAt is set to current time
                     },
                     Success = true,
                     Message = "Vaccine profile created successfully."
@@ -289,7 +290,7 @@ namespace PetVax.Services.Service
                 existingVaccineProfile.Dose = vaccineProfileRequest.Dose;
                 existingVaccineProfile.Reaction = vaccineProfileRequest.Reaction;
                 existingVaccineProfile.NextVaccinationInfo = vaccineProfileRequest.NextVaccinationInfo;
-                existingVaccineProfile.ModifiedAt = DateTime.UtcNow;
+                existingVaccineProfile.ModifiedAt = DateTimeHelper.Now();
                 var updateResult = await _vaccineProfileRepository.UpdateVaccineProfileAsync(existingVaccineProfile, cancellationToken);
                 if (updateResult <= 0)
                 {

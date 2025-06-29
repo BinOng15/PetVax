@@ -74,7 +74,7 @@ namespace PetVax.Services.Service
                     Role = EnumList.Role.Staff,
                     AccessToken = string.Empty,
                     RefereshToken = string.Empty,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.Now(),
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system",
                     isVerify = true
                 };

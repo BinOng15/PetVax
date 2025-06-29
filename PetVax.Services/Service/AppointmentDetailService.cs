@@ -5,6 +5,7 @@ using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.Enum;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -206,7 +207,7 @@ namespace PetVax.Services.Service
                 }
 
                 appointmentDetail.isDeleted = true;
-                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.ModifiedAt = DateTimeHelper.Now();
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
                 var updateResult = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);

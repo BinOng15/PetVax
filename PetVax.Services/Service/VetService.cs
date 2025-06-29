@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository;
@@ -348,7 +349,7 @@ namespace PetVax.Services.Service
                 vets.Specialization = createVetDTO.Specialization?.Trim();
                 vets.PhoneNumber = createVetDTO.PhoneNumber?.Trim();
                 vets.DateOfBirth = createVetDTO.DateOfBirth;
-                vets.CreateAt = DateTime.UtcNow;
+                vets.CreateAt = DateTimeHelper.Now();
                 vets.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
                 var result = await _vetRepository.CreateVetAsync(vets, cancellationToken);

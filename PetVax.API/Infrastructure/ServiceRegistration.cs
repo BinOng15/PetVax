@@ -62,6 +62,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVaccineBatchService, VaccineBatchService>();
 
             services.AddHostedService<VetScheduleBackgroundService>();
+            services.AddHostedService<AppointmentBackgroundService>();
 
             #endregion
 

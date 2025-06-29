@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -49,7 +50,7 @@ namespace PetVax.Services.Service
 
                 vaccineDisease.VaccineId = createVaccineDiseaseDTO.VaccineId;
                 vaccineDisease.DiseaseId = createVaccineDiseaseDTO.DiseaseId;
-                vaccineDisease.CreatedAt = DateTime.UtcNow;
+                vaccineDisease.CreatedAt = DateTimeHelper.Now();
                 vaccineDisease.CreatedBy = GetCurrentUserName();
 
                 var vaccineDiseaseId = await _vaccineDiseaseRepository.CreateVaccineDiseaseAsync(vaccineDisease, cancellationToken);
@@ -343,7 +344,7 @@ namespace PetVax.Services.Service
                     };
                 }
                 var updatedVaccineDisease = _mapper.Map(updateVaccineDiseaseDTO, existingVaccineDisease);
-                updatedVaccineDisease.ModifiedAt = DateTime.UtcNow;
+                updatedVaccineDisease.ModifiedAt = DateTimeHelper.Now();
                 updatedVaccineDisease.ModifiedBy = GetCurrentUserName();
                 var result = await _vaccineDiseaseRepository.UpdateVaccineDiseaseAsync(updatedVaccineDisease, cancellationToken);
                 if (result <= 0)

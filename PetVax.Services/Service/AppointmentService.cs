@@ -7,6 +7,7 @@ using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.VaccineProfileDTO;
 using PetVax.BusinessObjects.Enum;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository;
@@ -360,7 +361,7 @@ namespace PetVax.Services.Service
 
                 // Soft delete: set isDeleted = true
                 appointment.isDeleted = true;
-                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedAt = DateTimeHelper.Now();
                 appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
                 var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
@@ -817,11 +818,11 @@ namespace PetVax.Services.Service
                 appointmentDetail.Notes = updateAppointmentVaccinationDTO.Notes;
                 appointmentDetail.AppointmentStatus = newStatus;
                 appointmentDetail.NextVaccinationInfo = updateAppointmentVaccinationDTO.NextVaccinationInfo;
-                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.ModifiedAt = DateTimeHelper.Now();
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
                 appointment.AppointmentStatus = newStatus;
-                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedAt = DateTimeHelper.Now();
                 appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
                 using (var transaction = await _appointmentRepository.BeginTransactionAsync())
@@ -898,7 +899,7 @@ namespace PetVax.Services.Service
                                         profileToUpdate.IsActive = true;
                                         profileToUpdate.IsCompleted = true;
                                         profileToUpdate.VaccinationScheduleId = vaccinationSchedule?.VaccinationScheduleId;
-                                        profileToUpdate.ModifiedAt = DateTime.UtcNow;
+                                        profileToUpdate.ModifiedAt = DateTimeHelper.Now();
                                         profileToUpdate.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
                                         await _vaccineProfileRepository.UpdateVaccineProfileAsync(profileToUpdate, cancellationToken);
                                     }

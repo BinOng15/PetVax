@@ -148,5 +148,19 @@ namespace PetVax.Repositories.Repository
                 .Where(a => a.AppointmentDate > now && a.CustomerId == customerId)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task UpdateExpiredAppointmentsAsync(CancellationToken cancellationToken)
+        {
+            var currentDateTime = DateTime.UtcNow;
+            var expiredAppointments = await _context.Appointments
+                .Where(a => a.AppointmentDate < currentDateTime && a.AppointmentStatus == AppointmentStatus.Processing)
+                .ToListAsync(cancellationToken);
+            foreach (var appointment in expiredAppointments)
+            {
+                appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                _context.Update(appointment);
+            }
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }
