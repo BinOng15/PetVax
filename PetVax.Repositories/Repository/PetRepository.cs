@@ -30,6 +30,7 @@ namespace PetVax.Repositories.Repository
             return await _context.Pets
                 .Include(p => p.Customer).ThenInclude(c => c.Account)
                 .Include(p => p.MicrochipItems)
+                .Where(p => p.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
@@ -60,7 +61,7 @@ namespace PetVax.Repositories.Repository
             return await _context.Pets
                 .Include(p => p.Customer).ThenInclude(c => c.Account)
                 .Include(p => p.MicrochipItems)
-                .Where(p => p.CustomerId == customerId)
+                .Where(p => p.CustomerId == customerId && p.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 

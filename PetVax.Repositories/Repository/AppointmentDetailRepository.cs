@@ -85,7 +85,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.AppointmentDetails
              .Include(a => a.Appointment)
-                 .ThenInclude(a => a.Customer)
+                 .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
              .Include(a => a.Appointment)
                  .ThenInclude(a => a.Pet)
              .Include(a => a.Vet)
@@ -122,6 +122,10 @@ namespace PetVax.Repositories.Repository
         {
             return _context.AppointmentDetails
                 .Include(a => a.Appointment)
+                    .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
+                .Include(a => a.Appointment)
+                    .ThenInclude(a => a.Pet)
+                .Include(a => a.Vet)
                 .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
                 .FirstOrDefaultAsync(ad => ad.MicrochipItemId == microchipItemId, cancellationToken);
         }
@@ -135,7 +139,7 @@ namespace PetVax.Repositories.Repository
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Pet)
-                .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == ServiceType.Microchip)
+                .Where(ad => ad.Appointment.PetId == petId && ad.ServiceType == ServiceType.Microchip && ad.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
@@ -153,7 +157,7 @@ namespace PetVax.Repositories.Repository
                .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
            .Include(ad => ad.Appointment)
                .ThenInclude(a => a.Pet)
-           .Where(ad => ad.Appointment.ServiceType == ServiceType.Microchip)
+           .Where(ad => ad.Appointment.ServiceType == ServiceType.Microchip && ad.isDeleted == false)
            .ToListAsync(cancellationToken);
         }
 

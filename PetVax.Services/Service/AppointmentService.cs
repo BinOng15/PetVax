@@ -2124,34 +2124,39 @@ namespace PetVax.Services.Service
                     }
                 }
 
-                // Cập nhật thông tin microchip
+                // Update microchip item if provided
 
-                var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(updateAppointmentMicrochipDTO.MicrochipItemId, cancellationToken);
-                if (microchipItem == null)
+                if (updateAppointmentMicrochipDTO.MicrochipItemId > 0)
                 {
-                    return new BaseResponse<AppointmentMicrochipResponseDTO>
+                    var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(updateAppointmentMicrochipDTO.MicrochipItemId, cancellationToken);
+                    if (microchipItem == null)
                     {
-                        Code = 200,
-                        Success = false,
-                        Message = "Microchip không tồn tại.",
-                        Data = null
-                    };
-                }else if (microchipItem.IsUsed == true)
-                {
-                    return new BaseResponse<AppointmentMicrochipResponseDTO>
+                        return new BaseResponse<AppointmentMicrochipResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Microchip không tồn tại.",
+                            Data = null
+                        };
+                    }
+                    else if (microchipItem.IsUsed == true)
                     {
-                        Code = 200,
-                        Success = false,
-                        Message = "Microchip đã được sử dụng.",
-                        Data = null
-                    };
-                }
-                else
-                {
-                    microchipItem.IsUsed = true;
-                    microchipItem.Location =  updateAppointmentMicrochipDTO.Location;
-                    int rowEffected = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
+                        return new BaseResponse<AppointmentMicrochipResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Microchip đã được sử dụng.",
+                            Data = null
+                        };
+                    }
+                    else
+                    {
+                        microchipItem.IsUsed = true;
+                        microchipItem.Location = updateAppointmentMicrochipDTO.Description;
+                        int rowEffected = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
 
+                    }
+                    ;
                 }
 
                 appointmentDetail.VetId = updateAppointmentMicrochipDTO.VetId;
