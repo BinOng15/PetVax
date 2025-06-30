@@ -19,5 +19,6 @@ namespace PetVax.BusinessObjects.DTO.DiseaseDTO
         public string CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
+        public bool? isDeleted { get; set; } = false; // Default to false, indicating the disease is not deleted
     }
 }

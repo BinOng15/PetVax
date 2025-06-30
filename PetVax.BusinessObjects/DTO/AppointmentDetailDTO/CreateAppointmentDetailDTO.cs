@@ -18,4 +18,11 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public int? HealthConditionId { get; set; }
         public string? Dose { get; set; }
     }
+
+    public class CreateAppointmentDetailVaccinationDTO
+    {
+        [Required(ErrorMessage = "Vui lòng chọn bệnh để tiêm")]
+        public int DiseaseId { get; set; }
+    }
+
 }

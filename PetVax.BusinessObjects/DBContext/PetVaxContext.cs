@@ -15,6 +15,31 @@ namespace PediVax.BusinessObjects.DBContext
         public PetVaxContext() { }
         public PetVaxContext(DbContextOptions<PetVaxContext> options) : base(options) { }
 
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
+        //        var configuration = new ConfigurationBuilder()
+        //            .SetBasePath(Directory.GetCurrentDirectory())
+        //            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        //            .AddEnvironmentVariables()
+        //            .Build();
+
+        //        string connectionString = configuration.GetConnectionString("PostgreSQL");
+
+        //        if (string.IsNullOrEmpty(connectionString))
+        //        {
+        //            throw new InvalidOperationException("Không thể lấy ConnectionString.");
+        //        }
+
+        //        optionsBuilder.UseNpgsql(connectionString, options =>
+        //        {
+        //            options.EnableRetryOnFailure();
+        //        });
+
+        //    }
+        //}
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -25,18 +50,14 @@ namespace PediVax.BusinessObjects.DBContext
                     .AddEnvironmentVariables()
                     .Build();
 
-                string connectionString = configuration.GetConnectionString("PostgreSQL");
+                string connectionString = configuration.GetConnectionString("DefaultConnection");
 
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     throw new InvalidOperationException("Không thể lấy ConnectionString.");
                 }
 
-                optionsBuilder.UseNpgsql(connectionString, options =>
-                {
-                    options.EnableRetryOnFailure();
-                });
-
+                optionsBuilder.UseSqlServer(connectionString);
             }
         }
 
@@ -69,6 +90,7 @@ namespace PediVax.BusinessObjects.DBContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //modelBuilder.HasDefaultSchema("public");
             base.OnModelCreating(modelBuilder);
 
             // Customer - Account (1-1)
@@ -169,11 +191,11 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey<AppointmentDetail>(ad => ad.HealthConditionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // AppointmentDetail - VaccineBatch (1-1)
+            // AppointmentDetail - VaccineBatch (N-1)
             modelBuilder.Entity<AppointmentDetail>()
                 .HasOne(ad => ad.VaccineBatch)
-                .WithOne()
-                .HasForeignKey<AppointmentDetail>(ad => ad.VaccineBatchId)
+                .WithMany(vb => vb.AppointmentDetails)
+                .HasForeignKey(ad => ad.VaccineBatchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             //AppointmentDetail - Disease (1-N, optional)
@@ -244,13 +266,6 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey(vd => vd.DiseaseId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // VaccineProfile - Disease (N-1)
-            modelBuilder.Entity<VaccineProfile>()
-                .HasOne(vp => vp.Disease)
-                .WithMany(d => d.VaccineProfiles)
-                .HasForeignKey(vp => vp.DiseaseId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<VaccinationSchedule>()
                 .HasOne(vs => vs.Disease)
                 .WithMany(d => d.VaccinationSchedules)
@@ -260,9 +275,10 @@ namespace PediVax.BusinessObjects.DBContext
             // VaccinationSchedule - VaccineProfile (1-N)
             modelBuilder.Entity<VaccinationSchedule>()
                 .HasMany(vs => vs.VaccineProfiles)
-                .WithOne()
-                .HasForeignKey("VaccinationScheduleId")
+                .WithOne(vp => vp.VaccinationSchedule)
+                .HasForeignKey(vp => vp.VaccinationScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
 
             // VaccineExportDetail - VaccineBatch (N-1, optional)
             modelBuilder.Entity<VaccineExportDetail>()
@@ -297,12 +313,15 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey(vrd => vrd.VaccineBatchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // VaccineProfile - Pet (1-1)
+            // VaccineProfile - Pet (1-N)
             modelBuilder.Entity<VaccineProfile>()
                 .HasOne(vp => vp.Pet)
-                .WithOne()
-                .HasForeignKey<VaccineProfile>(vp => vp.PetId)
+                .WithMany(p => p.VaccineProfiles) // Thêm ICollection<VaccineProfile> VaccineProfiles vào class Pet nếu chưa có
+                .HasForeignKey(vp => vp.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<VaccineProfile>()
+            //    .HasIndex(vp => new { vp.PetId, vp.DiseaseId })
+            //    .IsUnique();
 
             modelBuilder.Entity<VaccineProfile>()
                 .HasOne(vp => vp.AppointmentDetail)

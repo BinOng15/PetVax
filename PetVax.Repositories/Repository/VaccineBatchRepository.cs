@@ -28,12 +28,15 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<VaccineBatch>> GetAllVaccineBatchAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.VaccineBatches
+                .Include(vb => vb.Vaccine)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<VaccineBatch> GetVaccineBatchByIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
         {
             return await _context.VaccineBatches
+                .Include(vb => vb.Vaccine)
                 .FirstOrDefaultAsync(vb => vb.VaccineBatchId == vaccineBatchId, cancellationToken);
         }
 
@@ -44,11 +47,11 @@ namespace PetVax.Repositories.Repository
                 .FirstOrDefaultAsync(vb => vb.Vaccine.VaccineCode == vaccineCode, cancellationToken);
         }
 
-        public async Task<VaccineBatch> GetVaccineBatchByVaccineId(string vaccineId, CancellationToken cancellationToken)
+        public async Task<VaccineBatch> GetVaccineBatchByVaccineId(int vaccineId, CancellationToken cancellationToken)
         {
             return await _context.VaccineBatches
                 .Include(vb => vb.Vaccine)
-                .FirstOrDefaultAsync(vb => vb.Vaccine.VaccineId.ToString() == vaccineId, cancellationToken);
+                .FirstOrDefaultAsync(vb => vb.Vaccine.VaccineId == vaccineId, cancellationToken);
         }
 
         public async Task<int> UpdateVaccineBatchAsync(VaccineBatch vaccineBatch, CancellationToken cancellationToken)

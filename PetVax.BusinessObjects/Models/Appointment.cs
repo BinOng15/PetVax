@@ -9,7 +9,7 @@ using PetVax.BusinessObjects.Enum;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("Appointment", Schema = "dbo")]
+    [Table("Appointment")]
     public class Appointment
     {
         [Key]
@@ -27,6 +27,7 @@ namespace PetVax.BusinessObjects.Models
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
+        public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual Customer Customer { get; set; } // Navigation to Customer table

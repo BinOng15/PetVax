@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-all-pets")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
         public async Task<IActionResult> GetAllPets([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, CancellationToken cancellationToken = default)
         {
             var request = new GetAllPetsRequestDTO
@@ -36,10 +38,10 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
 
-        [HttpPut("update-pet")]
-        public async Task<IActionResult> UpdatePet([FromBody] UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken = default)
+        [HttpPut("update-pet-by/{petId}")]
+        public async Task<IActionResult> UpdatePet(int petId, [FromBody] UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken = default)
         {
-            var response = await _petService.UpdatePetAsync(updatePetRequest, cancellationToken);
+            var response = await _petService.UpdatePetAsync(petId, updatePetRequest, cancellationToken);
             return StatusCode(response.Code, response);
         }
 
@@ -62,6 +64,13 @@ namespace PediVax.Controllers
         {
             var response = await _petService.GetPetsByCustomerIdAsync(accountId, cancellationToken);
             return StatusCode(response.FirstOrDefault()?.Code ?? 200, response);
+        }
+
+        [HttpDelete("delete-pet/{petId}")]
+        public async Task<IActionResult> DeletePet(int petId, CancellationToken cancellationToken = default)
+        {
+            var response = await _petService.DeletePetById(petId, cancellationToken);
+            return StatusCode(response.Code, response);
         }
     }
  }

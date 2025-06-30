@@ -9,7 +9,6 @@ namespace PetVax.BusinessObjects.DTO.PetDTO
 {
     public class UpdatePetRequestDTO
     {
-        public int PetId { get; set; }
         public string Name { get; set; }
         public string Species { get; set; } // e.g., Dog, Cat
         public string Breed { get; set; }

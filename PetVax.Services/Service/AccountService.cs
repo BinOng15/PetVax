@@ -48,7 +48,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "CreateAccountDTO cannot be null"
+                    Message = "Dữ liệu tạo tài khoản cho staff không được để trống"
                 };
             }
             try
@@ -59,7 +59,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 409,
                         Success = false,
-                        Message = "Email already exists"
+                        Message = "Email này đã có trong hệ thống"
                     };
                 }
 
@@ -87,7 +87,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Failed to create staff account in the database"
+                        Message = "Lỗi khi tạo tài khoản cho staff"
                     };
                 }
 
@@ -96,18 +96,18 @@ namespace PetVax.Services.Service
                 {
                     Code = 201,
                     Success = true,
-                    Message = "Staff account created successfully",
+                    Message = "Tạo tài khoản cho staff thành công",
                     Data = _mapper.Map<AccountResponseDTO>(account)
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating staff account");
+                _logger.LogError(ex, "Lỗi khi tạo tài khoản cho staff");
                 return new BaseResponse<AccountResponseDTO>
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Error while saving account: " + ex.InnerException?.Message ?? ex.Message
+                    Message = "Lỗi khi tạo staff: " + ex.InnerException?.Message ?? ex.Message
                 };
             }
         }
@@ -120,7 +120,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "CreateAccountDTO cannot be null"
+                    Message = "Lỗi khi tạo tài khoản cho Vet: Dữ liệu không được để trống"
                 };
             }
             try
@@ -131,7 +131,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 409,
                         Success = false,
-                        Message = "Email already exists"
+                        Message = "Email này đã có trong hệ thống"
                     };
                 }
 
@@ -157,7 +157,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Failed to create vet account in the database"
+                        Message = "Lỗi khi tạo tài khoản cho Vet"
                     };
                 }
 
@@ -169,7 +169,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Failed to retrieve created account after creation"
+                        Message = "Lỗi khi lấy thông tin tài khoản đã tạo"
                     };
                 }
 
@@ -189,7 +189,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Failed to create Vet entity in the database"
+                        Message = "Lỗi khi tạo tài khoản cho Vet",
                     };
                 }
 
@@ -198,7 +198,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 201,
                     Success = true,
-                    Message = "Vet account created successfully",
+                    Message = "Tạo tài khoản cho Vet thành công",
                     Data = _mapper.Map<AccountResponseDTO>(createdAccount)
                 };
             }
@@ -209,7 +209,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Error while saving account: " + ex.InnerException?.Message ?? ex.Message
+                    Message = "Lỗi khi tạo tài khoản cho Vet: " + ex.InnerException?.Message ?? ex.Message
                 };
             }
         }
@@ -222,7 +222,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Account ID must be greater than zero",
+                    Message = "Tài khoản phải có id lớn hơn 0",
                     Data = false
                 };
             }
@@ -236,7 +236,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "No account found with the provided ID",
+                        Message = "Không tìm thấy tài khoản với ID " + accountId,
                         Data = false
                     };
                 }
@@ -245,7 +245,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Account deleted successfully",
+                    Message = "Tài khoản đã được xóa thành công",
                     Data = true
                 };
             }
@@ -256,7 +256,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Error while deleting account: " + ex.InnerException?.Message ?? ex.Message,
+                    Message = "Lỗi khi xóa tài khoản: " + ex.InnerException?.Message ?? ex.Message,
                     Data = false
                 };
             }
@@ -270,7 +270,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Email cannot be empty"
+                    Message = "Email không được để trống hoặc chỉ chứa khoảng trắng",
                 };
             }
             try
@@ -281,9 +281,10 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("No account found with email {Email}", email);
                     return new BaseResponse<AccountResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "No account found with the provided email"
+                        Message = "Không tìm thấy tài khoản với email " + email,
+                        Data = null
                     };
                 }
                 _logger.LogInformation("Account retrieved successfully for email {Email}", email);
@@ -291,7 +292,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Account retrieved successfully",
+                    Message = "Tài khoản đã được lấy thành công",
                     Data = _mapper.Map<AccountResponseDTO>(account)
                 };
             }
@@ -302,7 +303,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Error while retrieving account: " + ex.InnerException?.Message ?? ex.Message
+                    Message = "Lỗi khi lấy tài khoản: " + ex.InnerException?.Message ?? ex.Message,
                 };
             }
         }
@@ -315,7 +316,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Account ID must be greater than zero"
+                    Message = "Tài khoản phải có id lớn hơn 0",
                 };
             }
             try
@@ -326,9 +327,10 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("No account found with ID {AccountId}", accountId);
                     return new BaseResponse<AccountResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "No account found with the provided ID"
+                        Message = "Không tìm thấy tài khoản với ID " + accountId,
+                        Data = null
                     };
                 }
                 _logger.LogInformation("Account retrieved successfully for ID {AccountId}", accountId);
@@ -336,7 +338,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Account retrieved successfully",
+                    Message = "Tài khoản đã được lấy thành công",
                     Data = _mapper.Map<AccountResponseDTO>(account)
                 };
             }
@@ -347,7 +349,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Error while retrieving account: " + ex.InnerException?.Message ?? ex.Message
+                    Message = "Lỗi khi lấy tài khoản: " + (ex.InnerException?.Message ?? ex.Message),
                 };
             }
         }
@@ -411,10 +413,10 @@ namespace PetVax.Services.Service
                     _logger.LogInformation("No accounts found for the given criteria");
                     return new DynamicResponse<AccountResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
-                        Message = "No accounts found",
-                        Data = responseData
+                        Code = 200,
+                        Success = true,
+                        Message = "Không tìm thấy tài khoản nào phù hợp với tiêu chí tìm kiếm",
+                        Data = null
                     };
                 }
 
@@ -423,7 +425,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Accounts retrieved successfully",
+                    Message = "Đã lấy danh sách tài khoản thành công",
                     Data = responseData
                 };
             }
@@ -434,7 +436,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Error while retrieving accounts: " + (ex.InnerException?.Message ?? ex.Message),
+                    Message = "Lỗi khi lấy danh sách tài khoản: " + (ex.InnerException?.Message ?? ex.Message),
                     Data = null
                 };
             }
@@ -448,7 +450,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Account ID must be greater than zero",
+                    Message = "Tài khoản phải có id lớn hơn 0",
                     Data = false
                 };
             }
@@ -458,7 +460,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "UpdateAccountDTO cannot be null",
+                    Message = "Dữ liệu cập nhật tài khoản không được để trống",
                     Data = false
                 };
                 return response;
@@ -470,7 +472,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Invalid role specified",
+                    Message = "Vai trò không hợp lệ. Chỉ có thể là Staff, Vet hoặc Customer",
                     Data = false
                 };
             }
@@ -485,7 +487,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "No account found with the provided ID",
+                        Message = "Không tìm thấy tài khoản với ID " + accountId,
                         Data = false
                     };
                 }
@@ -496,7 +498,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 409,
                         Success = false,
-                        Message = "Email already exists",
+                        Message = "Email này đã có trong hệ thống",
                         Data = false
                     };
                 }
@@ -521,7 +523,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Failed to update account in the database",
+                        Message = "Lỗi khi cập nhật tài khoản",
                         Data = false
                     };
                 }
@@ -530,7 +532,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Account updated successfully",
+                    Message = "Tài khoản đã được cập nhật thành công",
                     Data = true
                 };
             }
@@ -541,7 +543,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Error while updating account: " + ex.InnerException?.Message ?? ex.Message,
+                    Message = "Lỗi khi cập nhật tài khoản: " + (ex.InnerException?.Message ?? ex.Message),
                     Data = false
                 };
             }

@@ -33,7 +33,12 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVaccineBatchRepository, VaccineBatchRepository>();
             services.AddScoped<IVaccineDiseaseRepository, VaccineDiseaseRepository>();
             services.AddScoped<IVaccineProfileRepository, VaccineProfileRepository>();
-            
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IVetRepository, VetRepository>();          
+            services.AddScoped<IVetScheduleRepository, VetScheduleRepository>();
+            services.AddScoped<IMicrochipRepository, MicrochipRepository>();
+            services.AddScoped<IMicrochipItemRepository, MicrochipItemRepository>();
+            services.AddScoped<IVaccinationScheduleRepository, VaccinationScheduleRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -50,7 +55,13 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVaccineProfileService, VaccineProfileService>();
             services.AddScoped<IAppointmentService, AppointmentService>();
             services.AddScoped<IAppointmentDetailService, AppointmentDetailService>();
+            services.AddScoped<IVetScheduleService, VetScheduleService>();
+            services.AddScoped<IVetService, VetService>();
+            services.AddScoped<IMicrochipService, MicrochipService>();
+            services.AddScoped<IMicrochipItemService, MicrochipItemService>();
+            services.AddScoped<IVaccineBatchService, VaccineBatchService>();
 
+            services.AddHostedService<VetScheduleBackgroundService>();
 
             #endregion
 

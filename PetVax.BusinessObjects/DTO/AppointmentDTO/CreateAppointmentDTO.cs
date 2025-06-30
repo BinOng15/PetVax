@@ -37,4 +37,17 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
         public CreateAppointmentDTO Appointment { get; set; }
         public CreateAppointmentDetailDTO AppointmentDetail { get; set; }
     }
+
+    public class CreateAppointmentVaccinationDTO
+    {
+        public CreateAppointmentDTO Appointment { get; set; }
+        public CreateAppointmentDetailVaccinationDTO AppointmentDetailVaccination { get; set; }
+    }
+
+    public class CreateAppointmentMicrochipDTO
+    {
+        public CreateAppointmentDTO Appointment { get; set; }
+    }
+
+
 }

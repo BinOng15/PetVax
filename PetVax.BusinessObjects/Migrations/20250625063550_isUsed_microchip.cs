@@ -6,46 +6,52 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetVax.BusinessObjects.Migrations
 {
     /// <inheritdoc />
-    public partial class DeployVer2 : Migration
+    public partial class isUsed_microchip : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<bool>(
+                name: "IsUsed",
+                table: "MicrochipItem",
+                type: "bit",
+                nullable: true);
+
             migrationBuilder.UpdateData(
-                schema: "dbo",
                 table: "Account",
                 keyColumn: "AccountId",
                 keyValue: 1,
                 columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
-                values: new object[] { new DateTime(2025, 6, 17, 15, 36, 45, 985, DateTimeKind.Utc).AddTicks(2732), "pT7nTY1B1sTK9uG6hFk0GSyGAx7zpY1GD5qEMZSg2h0=", "a+6nfn79B7Bns0rqmQ7JJQBTYa5Lyk+nBV3UcUXsDH4=" });
+                values: new object[] { new DateTime(2025, 6, 25, 6, 35, 50, 157, DateTimeKind.Utc).AddTicks(9291), "a66PWWq3O3Ow+YsiBAtqjEZLbMcHNg/jVoAR1u72pKk=", "av8ErR+4xoBsPPSul1JbeoY8QLiTNIce/Z7HlpRbw3o=" });
 
             migrationBuilder.UpdateData(
-                schema: "dbo",
                 table: "Account",
                 keyColumn: "AccountId",
                 keyValue: 2,
                 columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
-                values: new object[] { new DateTime(2025, 6, 17, 15, 36, 45, 985, DateTimeKind.Utc).AddTicks(2737), "OAbDfIckamF/Ew7wpD42k0y7cUnsVE9iRtXX9DGqXo8=", "EfHo6C1rrYubJxyx6h+1TesIbramCp1qyAFQSsPynGY=" });
+                values: new object[] { new DateTime(2025, 6, 25, 6, 35, 50, 157, DateTimeKind.Utc).AddTicks(9296), "pkJLo00KOUGF9Rq9zKdi3Do/K7B5wML5bWtUyqL/v70=", "E8SCuUy3q4BDikDaSYDBVGn2WFjCih7u7iELPZN4ySM=" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropColumn(
+                name: "IsUsed",
+                table: "MicrochipItem");
+
             migrationBuilder.UpdateData(
-                schema: "dbo",
                 table: "Account",
                 keyColumn: "AccountId",
                 keyValue: 1,
                 columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
-                values: new object[] { new DateTime(2025, 6, 17, 11, 2, 16, 854, DateTimeKind.Utc).AddTicks(1977), "UNVWxAtt+E1QI04q+XTUBxJBSpiwyfkbud78z5g2BXQ=", "BqiyeMxTP7aIgdSVoHZHqWtIq5SKRlWTaDk4j1f2JtQ=" });
+                values: new object[] { new DateTime(2025, 6, 23, 18, 14, 23, 219, DateTimeKind.Utc).AddTicks(8895), "zPUWUxm7CKyFi9qdurAgfFG41JNG0wbMMGTlUomUvw0=", "A6SPaEm4qnfS4c/mnnVjKp0SVyP54Mx9YfNV8Ykxh1o=" });
 
             migrationBuilder.UpdateData(
-                schema: "dbo",
                 table: "Account",
                 keyColumn: "AccountId",
                 keyValue: 2,
                 columns: new[] { "CreatedAt", "PasswordHash", "PasswordSalt" },
-                values: new object[] { new DateTime(2025, 6, 17, 11, 2, 16, 854, DateTimeKind.Utc).AddTicks(1982), "qc2xxr93Kos1zyQ0cZuwXwhu5E+VQLwypeqkQdBsonQ=", "exvfw/X+lxFkrK16DAaqeKtvRtWw4i6kwDjoZ2ATY5M=" });
+                values: new object[] { new DateTime(2025, 6, 23, 18, 14, 23, 219, DateTimeKind.Utc).AddTicks(8900), "4dsHrVk0EE5YOIJUJZ1nDqOp3QUtW8k4IolYCdVJddk=", "xXxKWQylEX0Ej+PpITNZG+Uwvf+t5rRRie8tpAihcZE=" });
         }
     }
 }
