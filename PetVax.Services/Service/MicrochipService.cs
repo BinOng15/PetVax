@@ -302,34 +302,102 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<MicrochipResponseDTO>> UpdateMicrochipAsync(int microchipId, MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<BaseMicrochipItemResponse>> UpdateMicrochipAsync(int microchipId, MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken)
         {
             try
             {
                 var existingMicrochip = await _microchipRepository.GetMicrochipByIdAsync(microchipId, cancellationToken);
                 if (existingMicrochip == null)
                 {
-                    return new BaseResponse<MicrochipResponseDTO>
+                    return new BaseResponse<BaseMicrochipItemResponse>
                     {
                         Code = 200,
                         Message = "Microchip không tồn tại",
                         Data = null
                     };
                 }
-                var updatedMicrochip = _mapper.Map(microchipRequestDTO, existingMicrochip);
-                updatedMicrochip.MicrochipId = microchipId;
-                var result = await _microchipRepository.UpdateMicrochipAsync(updatedMicrochip, cancellationToken);
+
+                existingMicrochip.MicrochipCode = microchipRequestDTO.MicrochipCode;
+                existingMicrochip.Name = microchipRequestDTO.Name;
+                existingMicrochip.Description = microchipRequestDTO.Description;
+                existingMicrochip.Price = microchipRequestDTO.Price;
+                existingMicrochip.Notes = microchipRequestDTO.Notes;
+                
+                // Kiểm tra MicrochipItem có tồn tại không
+                var microchipItem = await _microchipItemRepository.GetMicrochipItemByMicrochipIdAsync(microchipId, cancellationToken);
+
+                if (microchipItem == null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "MicrochipItem không tồn tại",
+                        Data = null
+                    };
+                }
+
+                if(microchipItem.IsUsed == true)
+                {                 
+                        return new BaseResponse<BaseMicrochipItemResponse>
+                        {
+                            Code = 200,
+                            Message = "Microchip này đã được cấy cho thú cưng khác",
+                            Data = null
+                        };                   
+                }
+                //check microchipItem.PetId
+                if (microchipRequestDTO.createMicrochipItemRequest.PetId != null && microchipRequestDTO.createMicrochipItemRequest.PetId > 0)
+                {
+                    var microchipItemByPet = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(microchipRequestDTO.createMicrochipItemRequest.PetId, cancellationToken);
+                    if (microchipItemByPet != null)
+                    {
+                        return new BaseResponse<BaseMicrochipItemResponse>
+                        {
+                            Code = 200,
+                            Message = "Thú cưng này đã được cấy microchip!",
+                            Data = null
+                        };
+                    }
+                    microchipItem.PetId = microchipRequestDTO.createMicrochipItemRequest.PetId;
+                }
+                else
+                {
+                    microchipItem.PetId = null;
+                }
+
+                    // Cập nhật MicrochipItem
+                    microchipItem.MicrochipId = existingMicrochip.MicrochipId;
+                microchipItem.Name = microchipRequestDTO.createMicrochipItemRequest.Name;
+                microchipItem.Description = microchipRequestDTO.createMicrochipItemRequest.Description;
+                microchipItem.InstallationDate = microchipRequestDTO.createMicrochipItemRequest.InstallationDate;
+                microchipItem.Location = microchipRequestDTO.createMicrochipItemRequest.Location;
+                microchipItem.ModifiedAt = DateTime.UtcNow;
+                
+
+                var result = await _microchipRepository.UpdateMicrochipAsync(existingMicrochip, cancellationToken);
                 if (result <= 0)
                 {
-                    return new BaseResponse<MicrochipResponseDTO>
+                    return new BaseResponse<BaseMicrochipItemResponse>
                     {
                         Code = 200,
                         Message = "Không thể cập nhật microchip",
                         Data = null
                     };
                 }
-                var microchipResponse = _mapper.Map<MicrochipResponseDTO>(updatedMicrochip);
-                return new BaseResponse<MicrochipResponseDTO>
+                var updatedMicrochipItem = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
+                if (updatedMicrochipItem <= 0)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "Không thể cập nhật microchip item",
+                        Data = null
+                    };
+                }
+                var getMicrochipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(microchipItem.MicrochipItemId, cancellationToken);
+
+                var microchipResponse = _mapper.Map<BaseMicrochipItemResponse>(getMicrochipItem);
+                return new BaseResponse<BaseMicrochipItemResponse>
                 {
                     Code = 200,
                     Success = true,
@@ -339,10 +407,10 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                return new BaseResponse<MicrochipResponseDTO>
+                return new BaseResponse<BaseMicrochipItemResponse>
                 {
                     Code = 500,
-                    Message = $"Lỗi khi cập nhật microchip: {ex.Message}",
+                    Message = $"Lỗi khi cập nhật microchip: {ex.Message} {ex.InnerException}",
                     Data = null
                 };
             }
