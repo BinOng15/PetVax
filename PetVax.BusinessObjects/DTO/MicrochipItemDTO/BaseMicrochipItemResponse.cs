@@ -17,6 +17,8 @@ namespace PetVax.BusinessObjects.DTO.MicrochipItemDTO
         public DateTime InstallationDate { get; set; } 
         public string Status { get; set; } 
         public DateTime CreatedAt { get; set; } 
+
+        public bool? IsUsed { get; set; } = false; // Indicates if the microchip is currently in use
         public string? CreatedBy { get; set; } 
 
         public virtual MicrochipResponseDTO MicrochipResponse { get; set; } // Navigation to Microchip table
