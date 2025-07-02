@@ -17,6 +17,6 @@ namespace PetVax.Services.IService
         Task<DynamicResponse<MicrochipResponseDTO>> GetAllMicrochipsDynamicAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
         //Task<BaseResponse<MicrochipResponseDTO>> CreateMicrochipAsync(MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken);
         Task<BaseResponse<BaseMicrochipItemResponse>> CreateFullMicrochipAsync(MicrochipRequestDTO request, CancellationToken cancellationToken);
-        Task<BaseResponse<MicrochipResponseDTO>> UpdateMicrochipAsync(int microchipId, MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<BaseMicrochipItemResponse>> UpdateMicrochipAsync(int microchipId, MicrochipRequestDTO microchipRequestDTO, CancellationToken cancellationToken);
     }
 }

@@ -60,7 +60,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.PetId == petId && a.AppointmentStatus == status)
+                .Where(a => a.PetId == petId && a.AppointmentStatus == status && a.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
         public async Task<List<Appointment>> GetAppointmentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
@@ -69,7 +69,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Customer)
                 .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.CustomerId == customerId)
+                .Where(a => a.CustomerId == customerId && a.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
         public async Task<List<Appointment>> GetAppointmentsByPetIdAsync(int petId, CancellationToken cancellationToken)
@@ -88,7 +88,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentStatus == status)
+                .Where(a => a.AppointmentStatus == status && a.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
@@ -125,7 +125,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentDate < now && a.CustomerId == customerId)
+                .Where(a => a.AppointmentDate < now && a.CustomerId == customerId && a.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
@@ -135,7 +135,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentDate.Date == today.Date && a.CustomerId == customerId)
+                .Where(a => a.AppointmentDate.Date == today.Date && a.CustomerId == customerId && a.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
@@ -145,7 +145,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentDate > now && a.CustomerId == customerId)
+                .Where(a => a.AppointmentDate > now && a.CustomerId == customerId && a.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 

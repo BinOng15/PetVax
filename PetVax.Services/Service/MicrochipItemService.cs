@@ -495,23 +495,26 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                if(microchipItem.PetId != null && microchipItem.PetId > 0)
+                if (petId > 0 )
                 {
-                    return new BaseResponse<BaseMicrochipItemResponse>
+                    if (microchipItem.PetId != null && microchipItem.PetId > 0)
                     {
-                        Code = 200,
-                        Message = "Microchip đã được cấy vào cho thú cưng khác",
-                        Data = null
-                    };
-                }
-                else
-                {
-                    microchipItem.PetId = petId;
-                    microchipItem.IsUsed = true;
+                        return new BaseResponse<BaseMicrochipItemResponse>
+                        {
+                            Code = 200,
+                            Message = "Microchip đã được cấy vào cho thú cưng khác",
+                            Data = null
+                        };
+                    }
+                    else
+                    {
+                        microchipItem.PetId = petId;
+                        microchipItem.IsUsed = true;
+                    }
                 }
 
-                 //  Check if Pet already has a MicrochipItem installed
-                 var checkInstalled = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(petId, cancellationToken);
+                    //  Check if Pet already has a MicrochipItem installed
+                    var checkInstalled = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(petId, cancellationToken);
                 if (checkInstalled != null)
                 {
                     return new BaseResponse<BaseMicrochipItemResponse>
