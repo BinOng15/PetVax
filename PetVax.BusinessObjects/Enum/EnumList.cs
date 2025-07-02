@@ -46,7 +46,9 @@ namespace PetVax.BusinessObjects.Enum
         {
             Vaccination = 1,
             Microchip = 2,
-            HealthCertificate = 3,
+            HealthCondition = 3,
+            VaccinationCertificate = 4,
+            HealthConditionCertificate = 5,
         }
 
         public enum Location

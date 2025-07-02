@@ -39,5 +39,12 @@ namespace PetVax.Services.IService
         Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> CreateAppointmentMicrochipAsync(CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentMicrochipResponseDTO>> UpdateAppointmentMicrochip( UpdateAppointmentMicrochipDTO updateAppointmentMicrochipDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> UpdateAppointmentMicrochipAsync(int appointmentId, CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken);
+
+        //Vaccination Certificate
+        Task<BaseResponse<AppointmentWithVaccinationCertificateResponseDTO>> CreateAppointmentVaccinationCertificate(CreateAppointmentVaccinationCertificateDTO createAppointmentVaccinationCertificateDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmentResponseDTO>> UpdateAppointmentVaccinationCertificate(int appointmentId, UpdateAppointmentDTO updateAppointmentDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmentVaccinationCertificateResponseDTO>> UpdateAppointmentDetailVaccinationCertificate(int appointmentId, UpdateAppointmentVaccinationCertificateDTO updateAppointmentVaccinationCertificateDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmentWithVaccinationCertificateResponseDTO>> GetAppointmentVaccinationCertificateById(int appointmentId, CancellationToken cancellationToken);
+        Task<DynamicResponse<AppointmentWithVaccinationCertificateResponseDTO>> GetAllAppointmentVaccinationCertificateAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
     }
 }

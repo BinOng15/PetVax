@@ -26,7 +26,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IMembershipRepository, MembershipRepository>();
             services.AddScoped<IMicrochipItemRepository, MicrochipItemRepository>();
             services.AddScoped<IMicrochipRepository, MicrochipRepository>();
-            services.AddScoped<IPetPassportRepository, PetPassportRepository>();
+            services.AddScoped<IVaccinationCertificateRepository, VaccinationCertificateRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IVetRepository, VetRepository>();
             services.AddScoped<IVaccineRepository, VaccineRepository>();

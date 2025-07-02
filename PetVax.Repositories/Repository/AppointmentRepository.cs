@@ -153,7 +153,7 @@ namespace PetVax.Repositories.Repository
         {
             var currentDateTime = DateTime.UtcNow;
             var expiredAppointments = await _context.Appointments
-                .Where(a => a.AppointmentDate < currentDateTime && a.AppointmentStatus == AppointmentStatus.Processing)
+                .Where(a => a.AppointmentDate < currentDateTime && a.AppointmentStatus == AppointmentStatus.Processing && a.AppointmentStatus == AppointmentStatus.Confirmed)
                 .ToListAsync(cancellationToken);
 
             if (expiredAppointments.Count == 0)

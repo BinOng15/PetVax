@@ -2,6 +2,7 @@
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
+using PetVax.BusinessObjects.DTO.VaccinationCertificate;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.Enum;
@@ -98,7 +99,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public AppointmentResponseDTO Appointment { get; set; } // Navigation to Pet table
     }
 
-    public class AppointmentHealthCertificateResponseDTO
+    public class AppointmentHealthConditionResponseDTO
     {
         public int AppointmentDetailId { get; set; }
         public int AppointmentId { get; set; }
@@ -114,5 +115,25 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public string? ModifiedBy { get; set; } // User who last modified the record
         public VetResponseDTO Vet { get; set; } // Navigation to Vet table
         public HealthConditionResponseDTO HealthCondition { get; set; } // Navigation to HealthCondition table
+    }
+
+    public class AppointmentVaccinationCertificateResponseDTO
+    {
+        public int AppointmentDetailId { get; set; }
+        public int AppointmentId { get; set; }
+        public string AppointmentDetailCode { get; set; }
+        public int VetId { get; set; }
+        public EnumList.ServiceType ServiceType { get; set; }
+        public int? VaccinationCertificateId { get; set; }
+        public int? DiseaseId { get; set; }
+        public DateTime AppointmentDate { get; set; } // Date of the appointment
+        public EnumList.AppointmentStatus AppointmentStatus { get; set; }
+        public DateTime CreatedAt { get; set; } // Date when the record was created
+        public string CreatedBy { get; set; } // User who created the record
+        public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
+        public string? ModifiedBy { get; set; } // User who last modified the record
+        public VetResponseDTO Vet { get; set; } // Navigation to Vet table
+        public DiseaseResponseDTO Disease { get; set; } // Navigation to Disease table, if applicable (for vaccinations)
+        public VaccinationCertificateResponseDTO VaccinationCertificate { get; set; } // Navigation to VaccinationCertificate table
     }
 }

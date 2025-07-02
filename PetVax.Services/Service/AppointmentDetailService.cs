@@ -30,7 +30,7 @@ namespace PetVax.Services.Service
         private readonly IVetRepository _vetRepository;
         private readonly IDiseaseRepository _diseaseRepository;
         private readonly IMicrochipItemRepository _microchipItemRepository;
-        private readonly IPetPassportRepository _petPassportRepository;
+        private readonly IVaccinationCertificateRepository _petPassportRepository;
         private readonly IHealthConditionRepository _healthConditionRepository;
         private readonly IVaccineBatchRepository _vaccineBatchRepository;
 
@@ -43,7 +43,7 @@ namespace PetVax.Services.Service
             IVetRepository vetRepository,
             IDiseaseRepository diseaseRepository,
             IMicrochipItemRepository microchipItemRepository,
-            IPetPassportRepository petPassportRepository,
+            IVaccinationCertificateRepository petPassportRepository,
             IHealthConditionRepository healthConditionRepository,
             IVaccineBatchRepository vaccineBatchRepository)
         {

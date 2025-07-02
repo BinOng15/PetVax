@@ -7,6 +7,7 @@ using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
+using PetVax.BusinessObjects.DTO.VaccinationCertificate;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineDTO;
@@ -107,6 +108,10 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<UpdateAppointmentForVaccinationDTO, AppointmentForVaccinationResponseDTO>();
             CreateMap<Appointment, AppointmentWithVaccinationResponseDTO>();
 
+            CreateMap<CreateAppointmentVaccinationCertificateDTO, AppointmentWithVaccinationCertificateResponseDTO>();
+            CreateMap<UpdateAppointmentVaccinationCertificateDTO, AppointmentVaccinationCertificateResponseDTO>();
+            CreateMap<Appointment, AppointmentWithVaccinationCertificateResponseDTO>();
+
             //AppointmentDetail
             CreateMap<CreateAppointmentDetailDTO, AppointmentDetail>();
             CreateMap<UpdateAppointmentDetailDTO, AppointmentDetail>();
@@ -114,7 +119,7 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<AppointmentDetail, AppointmentDetailResponseDTO>()
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
                 .ForMember(dest => dest.MicrochipItem, opt => opt.MapFrom(src => src.MicrochipItem))
-                .ForMember(dest => dest.PetPassport, opt => opt.MapFrom(src => src.PetPassport))
+                .ForMember(dest => dest.PetPassport, opt => opt.MapFrom(src => src.VaccinationCertificate))
                 .ForMember(dest => dest.HealthCondition, opt => opt.MapFrom(src => src.HealthCondition))
                 .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
                 .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease));
@@ -135,6 +140,12 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<AppointmentDetail, AppointmenDetialMicorchipResponseDTO>()
                 .ForMember(dest => dest.Microchip, opt => opt.MapFrom(src => src));
 
+            CreateMap<AppointmentDetail, AppointmentVaccinationCertificateResponseDTO>()
+                .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
+                .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease))
+                .ForMember(dest => dest.VaccinationCertificate, opt => opt.MapFrom(src => src.VaccinationCertificate));
+
+
 
             //Microchip
             CreateMap<Microchip, MicrochipResponseDTO>();
@@ -151,10 +162,18 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<MicrochipItem, MicrochipItemResponse>()
                 .ForMember(dest => dest.Pet, opt => opt.Ignore());
 
-            // VaccineProfile
+            //VaccineProfile
             CreateMap<VaccineProfile, VaccineProfileResponseDTO>()
-                .ForMember(dest => dest.AppointmentDetail,
-                    opt => opt.MapFrom(src => src.AppointmentDetail));
+                .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.AppointmentDetail));
+
+            //VaccinationCertificate
+            CreateMap<CreateVaccinationCertificateDTO, VaccinationCertificate>();
+            CreateMap<UpdateVaccinationCertificateDTO, VaccinationCertificate>();
+            CreateMap<VaccinationCertificate, VaccinationCertificateResponseDTO>()
+                .ForMember(dest => dest.Pet, opt => opt.MapFrom(src => src.Pet))
+                .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
+                .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease))
+                .ForMember(dest => dest.MicrochipItem, opt => opt.MapFrom(src => src.MicrochipItem));
 
         }
     }   

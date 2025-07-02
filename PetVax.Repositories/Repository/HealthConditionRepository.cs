@@ -15,9 +15,11 @@ namespace PetVax.Repositories.Repository
         public HealthConditionRepository() : base()
         {
         }
-        public async Task<int> AddHealthConditionAsync(HealthCondition healthCondition, CancellationToken cancellationToken)
+        public async Task<HealthCondition> AddHealthConditionAsync(HealthCondition healthCondition, CancellationToken cancellationToken)
         {
-            return await CreateAsync(healthCondition, cancellationToken);
+            _context.Add(healthCondition);
+            await _context.SaveChangesAsync(cancellationToken);
+            return healthCondition;
         }
 
         public async Task<bool> DeleteHealthConditionAsync(int id, CancellationToken cancellationToken)
@@ -27,24 +29,37 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<HealthCondition>> GetAllHealthConditionsAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.HealthConditions
+                .Include(hc => hc.Pet)
+                .Include(hc => hc.Vet)
+                .Include(hc => hc.MicrochipItem)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<HealthCondition?> GetHealthConditionByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await GetByIdAsync(id, cancellationToken);
+            return await _context.HealthConditions
+                .Include(hc => hc.Pet)
+                .Include(hc => hc.Vet)
+                .Include(hc => hc.MicrochipItem)
+                .FirstOrDefaultAsync(hc => hc.HealthConditionId == id, cancellationToken);
         }
 
         public Task<List<HealthCondition>> GetHealthConditionsByPetIdAsync(int petId, CancellationToken cancellationToken)
         {
             return _context.HealthConditions
                 .Where(hc => hc.PetId == petId)
+                .Include(hc => hc.Pet)
+                .Include(hc => hc.Vet)
+                .Include(hc => hc.MicrochipItem)
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<int> UpdateHealthConditionAsync(HealthCondition healthCondition, CancellationToken cancellationToken)
+        public async Task<HealthCondition> UpdateHealthConditionAsync(HealthCondition healthCondition, CancellationToken cancellationToken)
         {
-            return await UpdateAsync(healthCondition, cancellationToken);
+            _context.Update(healthCondition);
+            await _context.SaveChangesAsync(cancellationToken);
+            return healthCondition;
         }
     }
 }
