@@ -1343,14 +1343,27 @@ namespace PetVax.Services.Service
             }
             try
             {
-                // Chỉ cập nhật DiseaseId cho appointmentDetail
-                if (updateAppointmentForVaccinationDTO.UpdateDiseaseForAppointmentDTO.DiseaseId > 0)
-                {
-                    appointmentDetail.DiseaseId = updateAppointmentForVaccinationDTO.UpdateDiseaseForAppointmentDTO.DiseaseId;
-                    appointmentDetail.ModifiedAt = DateTime.UtcNow;
-                    appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-                    await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
-                }
+                // Update Appointment fields
+                var updateApp = updateAppointmentForVaccinationDTO.Appointment;
+                if (updateApp.AppointmentDate.HasValue)
+                    appointment.AppointmentDate = updateApp.AppointmentDate.Value;
+                if (updateApp.Location.HasValue)
+                    appointment.Location = updateApp.Location.Value;
+                if (!string.IsNullOrWhiteSpace(updateApp.Address))
+                    appointment.Address = updateApp.Address;
+                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                // Update AppointmentDetail fields
+                var updateDetail = updateAppointmentForVaccinationDTO.UpdateDiseaseForAppointmentDTO;
+                if (updateDetail.DiseaseId > 0)
+                    appointmentDetail.DiseaseId = updateDetail.DiseaseId;
+                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+                await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+
                 // Lấy lại thông tin đã cập nhật
                 var updatedAppointment = await _appointmentRepository.GetAppointmentByIdAsync(appointment.AppointmentId, cancellationToken);
                 var updatedAppointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetail.AppointmentDetailId, cancellationToken);
@@ -1359,7 +1372,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Cập nhật DiseaseId cho chi tiết cuộc hẹn thành công.",
+                    Message = "Cập nhật thông tin cuộc hẹn tiêm phòng thành công.",
                     Data = new AppointmentForVaccinationResponseDTO
                     {
                         Appointment = _mapper.Map<AppointmentResponseDTO>(updatedAppointment),
