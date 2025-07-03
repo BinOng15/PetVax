@@ -36,7 +36,7 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<HealthCondition?> GetHealthConditionByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<HealthCondition> GetHealthConditionByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _context.HealthConditions
                 .Include(hc => hc.Pet)

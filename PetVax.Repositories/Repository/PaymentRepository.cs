@@ -27,25 +27,52 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<Payment>> GetAllPaymentsAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.Payments
+                .Include(p => p.AppointmentDetail)
+                .Include(p => p.Customer)
+                .Include(p => p.VaccineBatch)
+                .Include(p => p.Microchip)
+                .Include(p => p.VaccinationCertificate)
+                .Include(p => p.HealthCondition)
+                .Where(p => p.isDeleted == false)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Payment?> GetPaymentByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await GetByIdAsync(id, cancellationToken);
+            return await _context.Payments
+                .Include(p => p.AppointmentDetail)
+                .Include(p => p.Customer)
+                .Include(p => p.VaccineBatch)
+                .Include(p => p.Microchip)
+                .Include(p => p.VaccinationCertificate)
+                .Include(p => p.HealthCondition)
+                .FirstOrDefaultAsync(p => p.PaymentId == id && p.isDeleted == false, cancellationToken);
         }
 
         public async Task<List<Payment>> GetPaymentsByAccountIdAsync(int customerId, CancellationToken cancellationToken)
         {
             return await _context.Payments
-                .Where(p => p.CustomerId == customerId)
+                .Include(p => p.AppointmentDetail)
+                .Include(p => p.Customer)
+                .Include(p => p.VaccineBatch)
+                .Include(p => p.Microchip)
+                .Include(p => p.VaccinationCertificate)
+                .Include(p => p.HealthCondition)
+                .Where(p => p.CustomerId == customerId && p.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
         public async Task<List<Payment>> GetPaymentsByAppointmentIdAsync(int appointmenDetailtId, CancellationToken cancellationToken)
         {
             return await _context.Payments
-                .Where(p => p.AppointmentDetailId == appointmenDetailtId)
+                .Include(p => p.AppointmentDetail)
+                .Include(p => p.Customer)
+                .Include(p => p.VaccineBatch)
+                .Include(p => p.Microchip)
+                .Include(p => p.VaccinationCertificate)
+                .Include(p => p.HealthCondition)
+                .Where(p => p.AppointmentDetailId == appointmenDetailtId && p.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 

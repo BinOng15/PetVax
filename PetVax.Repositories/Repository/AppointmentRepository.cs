@@ -7,6 +7,7 @@ using PetVax.Repositories.Repository.BaseResponse;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using static PetVax.BusinessObjects.Enum.EnumList;
@@ -35,7 +36,16 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<bool> DeleteAppointmentAsync(int appointmentId, CancellationToken cancellationToken)
         {
-            return await DeleteAppointmentAsync(appointmentId, cancellationToken);
+            var appointment = await _context.Appointments
+                .FirstOrDefaultAsync(a => a.AppointmentId == appointmentId, cancellationToken);
+
+            if (appointment == null)
+                return false;
+
+            appointment.isDeleted = true;
+            _context.Update(appointment);
+            await _context.SaveChangesAsync(cancellationToken);
+            return true;
         }
 
         public async Task<List<Appointment>> GetAllAppointmentsAsync(CancellationToken cancellationToken)
@@ -178,6 +188,29 @@ namespace PetVax.Repositories.Repository
             }
 
             await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task SendMailWhenAppointmentCancelledAsync(CancellationToken cancellationToken)
+        {
+            var cancelledAppointments = await _context.Appointments
+                .Where(a => a.AppointmentStatus == AppointmentStatus.Cancelled && a.isDeleted == false)
+                .ToListAsync(cancellationToken);
+            if (cancelledAppointments.Count == 0)
+                return;
+            foreach (var appointment in cancelledAppointments)
+            {
+                // Logic to send email notification about the cancelled appointment
+                // This could involve using an email service to send the email
+                // For example, you might call an email service method here
+            }
+        }
+
+        private async Task SendNotificationEmail(string toEmail, CancellationToken cancellationToken)
+        {
+            // Logic to send notification email
+            // This could involve using an email service to send the email
+            // For example, you might call an email service method here
+            // await _emailService.SendEmailAsync(toEmail, "Appointment Notification", "Your appointment has been updated.", cancellationToken);
         }
     }
 }

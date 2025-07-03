@@ -6,6 +6,7 @@ using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
+using PetVax.BusinessObjects.DTO.PaymentDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VaccinationCertificate;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
@@ -174,6 +175,11 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
                 .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease))
                 .ForMember(dest => dest.MicrochipItem, opt => opt.MapFrom(src => src.MicrochipItem));
+
+            //Payment
+            CreateMap<CreatePaymentRequestDTO, Payment>();
+            CreateMap<UpdatePaymentRequestDTO, Payment>();
+            CreateMap<Payment, PaymentResponseDTO>();
 
         }
     }   

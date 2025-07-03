@@ -241,11 +241,32 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey(p => p.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Payment - Vaccine (N-1)
+            // Payment - VaccineBatch (N-1)
             modelBuilder.Entity<Payment>()
-                .HasOne(p => p.Vaccine)
-                .WithMany(v => v.Payments) // Nếu Vaccine có ICollection<Payment>
-                .HasForeignKey(p => p.VaccineId)
+                .HasOne(p => p.VaccineBatch)
+                .WithMany()
+                .HasForeignKey(p => p.VaccineBatchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payment - Microchip (N-1)
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Microchip)
+                .WithMany()
+                .HasForeignKey(p => p.MicrochipId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payment - VaccinationCertificate (N-1)
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.VaccinationCertificate)
+                .WithMany()
+                .HasForeignKey(p => p.VaccinationCertificateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payment - HealthCondition (N-1)
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.HealthCondition)
+                .WithMany()
+                .HasForeignKey(p => p.HealthConditionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // PointTransaction - Customer (N-1)
@@ -406,6 +427,9 @@ namespace PediVax.BusinessObjects.DBContext
 
             modelBuilder.Entity<Vaccine>()
                 .Property(v => v.Price)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<HealthCondition>()
+                .Property(hc => hc.Price)
                 .HasColumnType("decimal(18,2)");
 
             SeedData.Seed(modelBuilder);

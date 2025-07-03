@@ -113,6 +113,7 @@ public class Program
 
         builder.Services.AddHostedService<VetScheduleBackgroundService>();
         builder.Services.AddHostedService<AppointmentBackgroundService>();
+        builder.Services.AddHostedService<AppointmentReminderBackgroundService>();
 
         var app = builder.Build();
 

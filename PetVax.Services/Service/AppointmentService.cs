@@ -15,11 +15,14 @@ using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static PetVax.BusinessObjects.DTO.ResponseModel;
 using static PetVax.BusinessObjects.Enum.EnumList;
+using Microsoft.Extensions.Configuration;
 
 namespace PetVax.Services.Service
 {
@@ -35,11 +38,11 @@ namespace PetVax.Services.Service
         private readonly IVaccinationScheduleRepository _vaccinationScheduleRepository;
         private readonly IVetScheduleRepository _vetScheduleRepository;
         private readonly IVaccinationCertificateRepository _vaccinationCertificateRepository;
+        private readonly IConfiguration _configuration;
         private readonly ILogger<AppointmentService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMicrochipItemRepository _microchipItemRepository;
-        private readonly IMicrochipRepository _microchipRepository;
 
         public AppointmentService(
             IAppointmentRepository appointmentRepository,
@@ -52,11 +55,11 @@ namespace PetVax.Services.Service
             IVaccinationScheduleRepository vaccinationScheduleRepository,
             IVetScheduleRepository vetScheduleRepository,
             IVaccinationCertificateRepository vaccinationCertificateRepository,
+            IConfiguration configuration,
             ILogger<AppointmentService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IMicrochipItemRepository microchipItemRepository,
-            IMicrochipRepository microchipRepository)
+            IMicrochipItemRepository microchipItemRepository)
         {
             _appointmentRepository = appointmentRepository;
             _petRepository = petRepository;
@@ -68,11 +71,11 @@ namespace PetVax.Services.Service
             _vaccinationScheduleRepository = vaccinationScheduleRepository;
             _vetScheduleRepository = vetScheduleRepository;
             _vaccinationCertificateRepository = vaccinationCertificateRepository;
+            _configuration = configuration;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _microchipItemRepository = microchipItemRepository;
-            _microchipRepository = microchipRepository;
         }
 
         private int GetSlotNumberFromAppointmentDate(DateTime appointmenDate)
@@ -1161,9 +1164,9 @@ namespace PetVax.Services.Service
                     }
                 }
 
-                // Cập nhật thông tin tiêm phòng
-                appointmentDetail.DiseaseId = updateAppointmentVaccinationDTO.DiseaseId;
-                appointmentDetail.VaccineBatchId = updateAppointmentVaccinationDTO.VaccineBatchId;
+                // Cập nhật thông tin tiêm phòng, giữ giá trị cũ nếu không truyền mới
+                appointmentDetail.DiseaseId = updateAppointmentVaccinationDTO.DiseaseId ?? appointmentDetail.DiseaseId;
+                appointmentDetail.VaccineBatchId = updateAppointmentVaccinationDTO.VaccineBatchId ?? appointmentDetail.VaccineBatchId;
                 if (appointmentDetail.VaccineBatchId.HasValue)
                 {
                     var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(appointmentDetail.VaccineBatchId.Value, cancellationToken);
@@ -1178,15 +1181,14 @@ namespace PetVax.Services.Service
                         };
                     }
                 }
-                appointmentDetail.VetId = updateAppointmentVaccinationDTO.VetId;
-                appointmentDetail.Reaction = updateAppointmentVaccinationDTO.Reaction;
-                appointmentDetail.Temperature = updateAppointmentVaccinationDTO.Temperature;
-                appointmentDetail.HeartRate = updateAppointmentVaccinationDTO.HeartRate;
-                appointmentDetail.Others = updateAppointmentVaccinationDTO.Others;
-                appointmentDetail.GeneralCondition = updateAppointmentVaccinationDTO.GeneralCondition;
-                appointmentDetail.Notes = updateAppointmentVaccinationDTO.Notes;
+                appointmentDetail.VetId = updateAppointmentVaccinationDTO.VetId ?? appointmentDetail.VetId;
+                appointmentDetail.Reaction = updateAppointmentVaccinationDTO.Reaction ?? appointmentDetail.Reaction;
+                appointmentDetail.Temperature = updateAppointmentVaccinationDTO.Temperature ?? appointmentDetail.Temperature;
+                appointmentDetail.HeartRate = updateAppointmentVaccinationDTO.HeartRate ?? appointmentDetail.HeartRate;
+                appointmentDetail.Others = updateAppointmentVaccinationDTO.Others ?? appointmentDetail.Others;
+                appointmentDetail.GeneralCondition = updateAppointmentVaccinationDTO.GeneralCondition ?? appointmentDetail.GeneralCondition;
+                appointmentDetail.Notes = updateAppointmentVaccinationDTO.Notes ?? appointmentDetail.Notes;
                 appointmentDetail.AppointmentStatus = newStatus;
-                appointmentDetail.NextVaccinationInfo = updateAppointmentVaccinationDTO.NextVaccinationInfo;
                 appointmentDetail.ModifiedAt = DateTimeHelper.Now();
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
@@ -1273,9 +1275,12 @@ namespace PetVax.Services.Service
                                         await _vaccineProfileRepository.UpdateVaccineProfileAsync(profileToUpdate, cancellationToken);
                                     }
                                     // Không tạo mới profile nếu không tìm thấy
+                                    await UpdateNextVaccinationInfo(appointmentDetail, appointment.PetId, cancellationToken);
+
                                 }
                             }
                         }
+                        await NotifyCustomerIfCancelledOrRejectedAsync(appointment, cancellationToken);
 
                         await transaction.CommitAsync();
                         var appointmentVaccinationDetailResponse = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(appointmentDetail);
@@ -1358,7 +1363,8 @@ namespace PetVax.Services.Service
                 var updateDetail = updateAppointmentForVaccinationDTO.UpdateDiseaseForAppointmentDTO;
                 if (updateDetail.DiseaseId > 0)
                     appointmentDetail.DiseaseId = updateDetail.DiseaseId;
-                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.AppointmentDate = updateApp.AppointmentDate ?? appointmentDetail.AppointmentDate;
+                appointmentDetail.ModifiedAt = DateTimeHelper.Now();
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
                 await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
@@ -1925,6 +1931,9 @@ namespace PetVax.Services.Service
                 };
             }
         }
+        #endregion
+
+        #region Vaccination Certificate Appointment Service
         public async Task<BaseResponse<AppointmentWithVaccinationCertificateResponseDTO>> CreateAppointmentVaccinationCertificate(CreateAppointmentVaccinationCertificateDTO createAppointmentVaccinationCertificateDTO, CancellationToken cancellationToken)
         {
             if (createAppointmentVaccinationCertificateDTO == null)
@@ -2498,9 +2507,102 @@ namespace PetVax.Services.Service
             }
 
         }
+        private async Task UpdateNextVaccinationInfo(AppointmentDetail appointmentDetail, int petId, CancellationToken cancellationToken)
+        {
+            var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(petId, cancellationToken);
+            var profilesForDisease = vaccineProfiles?
+                .Where(p => p.DiseaseId == appointmentDetail.DiseaseId)
+                .OrderBy(p => p.Dose ?? 0)
+                .ToList() ?? new List<VaccineProfile>();
+
+            var nextProfile = profilesForDisease.FirstOrDefault(p => !(p.IsCompleted ?? false));
+            if (nextProfile != null && nextProfile.PreferedDate.HasValue)
+            {
+                appointmentDetail.NextVaccinationInfo = $"Dự kiến mũi tiếp theo vào ngày {nextProfile.PreferedDate.Value:dd/MM/yyyy}";
+            }
+            else
+            {
+                appointmentDetail.NextVaccinationInfo = null; // Không còn mũi tiếp theo
+            }
+        }
 
         #endregion
+        public async Task NotifyCustomerIfCancelledOrRejectedAsync(Appointment appointment, CancellationToken cancellationToken)
+        {
+            if (appointment.AppointmentStatus == AppointmentStatus.Cancelled || appointment.AppointmentStatus == AppointmentStatus.Rejected)
+            {
+                try
+                {
+                    var pet = await _petRepository.GetPetByIdAsync(appointment.PetId, cancellationToken);
+                    var customerEmail = pet?.Customer?.Account?.Email;
+                    var customerName = pet?.Customer?.FullName ?? "Quý khách hàng";
+                    var petName = pet?.Name ?? "thú cưng của bạn";
 
+                    if (!string.IsNullOrEmpty(customerEmail))
+                    {
+                        // Prepare SMTP configuration
+                        var smtpHost = _configuration["Smtp:Host"];
+                        var smtpPort = int.Parse(_configuration["Smtp:Port"]);
+                        var smtpUser = _configuration["Smtp:User"];
+                        var smtpPass = _configuration["Smtp:Pass"];
+                        var fromEmail = _configuration["Smtp:From"];
+
+                        using var client = new SmtpClient(smtpHost, smtpPort)
+                        {
+                            Credentials = new NetworkCredential(smtpUser, smtpPass),
+                            EnableSsl = true
+                        };
+
+                        var statusText = appointment.AppointmentStatus == AppointmentStatus.Cancelled ? "hủy" : "từ chối";
+                        var mail = new MailMessage(fromEmail, customerEmail)
+                        {
+                            Subject = "Thông báo hủy/từ chối cuộc hẹn",
+                            Body = $@"
+                        <html>
+                        <body style='font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 30px;'>
+                        <div style='max-width: 500px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 32px;'>
+                        <h2 style='color: #2d8cf0; text-align: center;'>Thông báo cập nhật lịch hẹn</h2>
+                        <p style='font-size: 16px; color: #333;'>Gửi {customerName},</p>
+                        <p style='font-size: 16px; color: #333;'>Chúng tôi rất tiếc phải thông báo với bạn rằng cuộc hẹn của bạn với {petName} đã bị {statusText}:</p>
+                        <div style='text-align: center; margin: 24px 0;'>
+                        <span style='display: inline-block; font-size: 24px; color: #2d8cf0; font-weight: bold; background: #f0f7ff; padding: 16px 32px; border-radius: 6px;'>
+                            Mã lịch hẹn: {appointment.AppointmentCode}
+                        </span>
+                        </div>
+                        <p style='font-size: 16px; color: #333;'>
+                            <b>Ngày giờ:</b> {appointment.AppointmentDate:dd/MM/yyyy HH:mm}<br/>
+                            <b>Trạng thái:</b> {appointment.AppointmentStatus.ToString()}
+                        </p>
+                        <p style='font-size: 15px; color: #555;'>
+                            Vui lòng liên hệ với chúng tôi để sắp xếp lại cuộc hẹn mới hoặc để được hỗ trợ thêm.
+                        </p>
+                        <p style='font-size: 14px; color: #aaa; margin-top: 32px;'>
+                            Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua <a href='mailto:support@petvax.com' style='color: #2d8cf0;'>support@petvax.com</a> hoặc gọi cho chúng tôi theo số 0987654321.
+                        </p>
+                        <p style='font-size: 14px; color: #aaa;'>Xin cảm ơn,<br/>PetVax</p>
+                        </div>
+                        </body>
+                        </html>",
+                            IsBodyHtml = true
+                        };
+
+                        // Send email
+                        await client.SendMailAsync(mail, cancellationToken);
+                        _logger.LogInformation("Sent {status} notification email to {email} for appointment {code}",
+                            statusText, customerEmail, appointment.AppointmentCode);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No valid email found for appointment {code}", appointment.AppointmentCode);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send {status} notification email for appointment {code}",
+                        appointment.AppointmentStatus.ToString().ToLower(), appointment.AppointmentCode);
+                }
+            }
+        }
         #region Comment
         //public async Task<BaseResponse<AppointmentResponseDTO>> CreateAppointmentAsync(CreateAppointmentDTO createAppointmentDTO, CancellationToken cancellationToken)
         //{

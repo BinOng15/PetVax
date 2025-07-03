@@ -31,6 +31,7 @@ namespace PetVax.BusinessObjects.Models
         public string Psycho { get; set; } //Tâm lý
         public string Different { get; set; } //Những điều khác
         public string Conclusion { get; set; } // Kết luận
+        public decimal Price { get; set; }
         public DateTime CheckDate { get; set; }
         public string Status { get; set; }
         public DateTime CreatedAt { get; set; }
