@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PediVax.BusinessObjects.DBContext;
 
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250702164010_update_database")]
+    partial class update_database
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,6 +218,9 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<string>("Others")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PassportId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Reaction")
                         .HasColumnType("nvarchar(max)");
 
@@ -226,9 +232,6 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Property<string>("Temperature")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("VaccinationCertificateId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("VaccineBatchId")
                         .HasColumnType("int");
@@ -254,11 +257,11 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsUnique()
                         .HasFilter("[MicrochipItemId] IS NOT NULL");
 
-                    b.HasIndex("ServiceHistoryId");
-
-                    b.HasIndex("VaccinationCertificateId")
+                    b.HasIndex("PassportId")
                         .IsUnique()
-                        .HasFilter("[VaccinationCertificateId] IS NOT NULL");
+                        .HasFilter("[PassportId] IS NOT NULL");
+
+                    b.HasIndex("ServiceHistoryId");
 
                     b.HasIndex("VaccineBatchId");
 
@@ -442,9 +445,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MicrochipItemId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
@@ -474,9 +474,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("VetId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Weight")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -486,52 +483,9 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.HasKey("HealthConditionId");
 
-                    b.HasIndex("MicrochipItemId");
-
                     b.HasIndex("PetId");
 
-                    b.HasIndex("VetId");
-
                     b.ToTable("HealthCondition");
-                });
-
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.HealthConditionVaccinationCertificate", b =>
-                {
-                    b.Property<int>("HealthConditionVaccinationCertificateId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HealthConditionVaccinationCertificateId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("HealthConditionId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("VaccinationCertificateId")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("HealthConditionVaccinationCertificateId");
-
-                    b.HasIndex("HealthConditionId");
-
-                    b.HasIndex("VaccinationCertificateId");
-
-                    b.ToTable("HealthConditionVaccinationCertificate");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Membership", b =>
@@ -835,6 +789,89 @@ namespace PetVax.BusinessObjects.Migrations
                     b.ToTable("Pet");
                 });
 
+            modelBuilder.Entity("PetVax.BusinessObjects.Models.PetPassport", b =>
+                {
+                    b.Property<int>("PassportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PassportId"));
+
+                    b.Property<DateTime>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ApprovedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HealthCheckDetails")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HealthConditionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("IssuedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MicrochipItemId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PassportCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PassportImage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PetId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VaccinationDetails")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isRabiesVaccinated")
+                        .HasColumnType("bit");
+
+                    b.HasKey("PassportId");
+
+                    b.HasIndex("HealthConditionId");
+
+                    b.HasIndex("MicrochipItemId");
+
+                    b.HasIndex("PetId");
+
+                    b.ToTable("PetPassport");
+                });
+
             modelBuilder.Entity("PetVax.BusinessObjects.Models.PointTransaction", b =>
                 {
                     b.Property<int>("TransactionId")
@@ -922,93 +959,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.HasKey("ServiceHistoryId");
 
                     b.ToTable("ServiceHistory");
-                });
-
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccinationCertificate", b =>
-                {
-                    b.Property<int>("CertificateId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CertificateId"));
-
-                    b.Property<string>("CertificateCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClinicAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClinicName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DiseaseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DoseNumber")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("IssueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("MicrochipItemId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PetId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Purpose")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("VaccinationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ValidUntil")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("VetId")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("CertificateId");
-
-                    b.HasIndex("DiseaseId");
-
-                    b.HasIndex("MicrochipItemId");
-
-                    b.HasIndex("PetId");
-
-                    b.HasIndex("VetId");
-
-                    b.ToTable("VaccinationCertificate");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccinationSchedule", b =>
@@ -1601,14 +1551,14 @@ namespace PetVax.BusinessObjects.Migrations
                         .HasForeignKey("PetVax.BusinessObjects.Models.AppointmentDetail", "MicrochipItemId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PetVax.BusinessObjects.Models.PetPassport", "PetPassport")
+                        .WithOne()
+                        .HasForeignKey("PetVax.BusinessObjects.Models.AppointmentDetail", "PassportId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PetVax.BusinessObjects.Models.ServiceHistory", null)
                         .WithMany("AppointmentDetails")
                         .HasForeignKey("ServiceHistoryId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("PetVax.BusinessObjects.Models.VaccinationCertificate", "VaccinationCertificate")
-                        .WithOne()
-                        .HasForeignKey("PetVax.BusinessObjects.Models.AppointmentDetail", "VaccinationCertificateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PetVax.BusinessObjects.Models.VaccineBatch", "VaccineBatch")
@@ -1629,7 +1579,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Navigation("MicrochipItem");
 
-                    b.Navigation("VaccinationCertificate");
+                    b.Navigation("PetPassport");
 
                     b.Navigation("VaccineBatch");
 
@@ -1656,48 +1606,13 @@ namespace PetVax.BusinessObjects.Migrations
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.HealthCondition", b =>
                 {
-                    b.HasOne("PetVax.BusinessObjects.Models.MicrochipItem", "MicrochipItem")
-                        .WithMany()
-                        .HasForeignKey("MicrochipItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("PetVax.BusinessObjects.Models.Pet", "Pet")
                         .WithMany("HealthConditions")
                         .HasForeignKey("PetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PetVax.BusinessObjects.Models.Vet", "Vet")
-                        .WithMany("HealthConditions")
-                        .HasForeignKey("VetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("MicrochipItem");
-
                     b.Navigation("Pet");
-
-                    b.Navigation("Vet");
-                });
-
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.HealthConditionVaccinationCertificate", b =>
-                {
-                    b.HasOne("PetVax.BusinessObjects.Models.HealthCondition", "HealthCondition")
-                        .WithMany("HealthConditionVaccinationCertificates")
-                        .HasForeignKey("HealthConditionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("PetVax.BusinessObjects.Models.VaccinationCertificate", "VaccinationCertificate")
-                        .WithMany("HealthConditionVaccinationCertificates")
-                        .HasForeignKey("VaccinationCertificateId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("HealthCondition");
-
-                    b.Navigation("VaccinationCertificate");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.MicrochipItem", b =>
@@ -1754,6 +1669,33 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("PetVax.BusinessObjects.Models.PetPassport", b =>
+                {
+                    b.HasOne("PetVax.BusinessObjects.Models.HealthCondition", "HealthCondition")
+                        .WithMany()
+                        .HasForeignKey("HealthConditionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PetVax.BusinessObjects.Models.MicrochipItem", "MicrochipItem")
+                        .WithMany()
+                        .HasForeignKey("MicrochipItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PetVax.BusinessObjects.Models.Pet", "Pet")
+                        .WithMany("PetPassports")
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("HealthCondition");
+
+                    b.Navigation("MicrochipItem");
+
+                    b.Navigation("Pet");
+                });
+
             modelBuilder.Entity("PetVax.BusinessObjects.Models.PointTransaction", b =>
                 {
                     b.HasOne("PetVax.BusinessObjects.Models.Customer", "Customer")
@@ -1763,40 +1705,6 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccinationCertificate", b =>
-                {
-                    b.HasOne("PetVax.BusinessObjects.Models.Disease", "Disease")
-                        .WithMany("VaccinationCertificates")
-                        .HasForeignKey("DiseaseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("PetVax.BusinessObjects.Models.MicrochipItem", "MicrochipItem")
-                        .WithMany()
-                        .HasForeignKey("MicrochipItemId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("PetVax.BusinessObjects.Models.Pet", "Pet")
-                        .WithMany("VaccinationCertificates")
-                        .HasForeignKey("PetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("PetVax.BusinessObjects.Models.Vet", "Vet")
-                        .WithMany("VaccinationCertificates")
-                        .HasForeignKey("VetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Disease");
-
-                    b.Navigation("MicrochipItem");
-
-                    b.Navigation("Pet");
-
-                    b.Navigation("Vet");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccinationSchedule", b =>
@@ -1965,18 +1873,11 @@ namespace PetVax.BusinessObjects.Migrations
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Disease", b =>
                 {
-                    b.Navigation("VaccinationCertificates");
-
                     b.Navigation("VaccinationSchedules");
 
                     b.Navigation("VaccineDiseases");
 
                     b.Navigation("VaccineProfiles");
-                });
-
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.HealthCondition", b =>
-                {
-                    b.Navigation("HealthConditionVaccinationCertificates");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Membership", b =>
@@ -1993,7 +1894,7 @@ namespace PetVax.BusinessObjects.Migrations
 
                     b.Navigation("MicrochipItems");
 
-                    b.Navigation("VaccinationCertificates");
+                    b.Navigation("PetPassports");
 
                     b.Navigation("VaccineProfiles");
                 });
@@ -2001,11 +1902,6 @@ namespace PetVax.BusinessObjects.Migrations
             modelBuilder.Entity("PetVax.BusinessObjects.Models.ServiceHistory", b =>
                 {
                     b.Navigation("AppointmentDetails");
-                });
-
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccinationCertificate", b =>
-                {
-                    b.Navigation("HealthConditionVaccinationCertificates");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccinationSchedule", b =>
@@ -2044,10 +1940,6 @@ namespace PetVax.BusinessObjects.Migrations
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Vet", b =>
                 {
                     b.Navigation("AppointmentDetails");
-
-                    b.Navigation("HealthConditions");
-
-                    b.Navigation("VaccinationCertificates");
 
                     b.Navigation("VetSchedules");
                 });

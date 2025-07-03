@@ -15,7 +15,7 @@ namespace PetVax.Services.IService
         //Task<BaseResponse<BaseMicrochipItemResponse>> CreateMicrochipItemAsync(CreateMicrochipItemRequest request, CancellationToken cancellationToken);
         Task<BaseResponse<BaseMicrochipItemResponse>> UpdateMicrochipItemAsync(int microchipItemId, UpdateMicrochipItemRequest request, CancellationToken cancellationToken);
         Task<BaseResponse<BaseMicrochipItemResponse>> GetMicrochipItemByIdAsync(int id, CancellationToken cancellationToken);
-        Task<BaseResponse<MegaData<BaseMicrochipItemResponse>>> GetAllMicrochipItemsPagingAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<MegaData<BaseMicrochipItemResponse>>> GetAllMicrochipItemsPagingAsync(bool isUsed, GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
         Task<BaseResponse<BaseMicrochipItemResponse>> DeleteMicrochipItemAsync(int microchipItemId, CancellationToken cancellationToken);
 
         Task<BaseResponse<BaseMicrochipItemResponse>> AssignChipForPet(int id, int petId, CancellationToken cancellationToken);

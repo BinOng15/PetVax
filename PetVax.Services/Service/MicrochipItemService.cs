@@ -345,13 +345,24 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<MegaData<BaseMicrochipItemResponse>>> GetAllMicrochipItemsPagingAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<MegaData<BaseMicrochipItemResponse>>> GetAllMicrochipItemsPagingAsync(bool isUsed, GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
         {
             try
             {
                 var microchipItems = await _microchipItemRepository.GetAllMicrochipItemsAsync(cancellationToken);
 
-                // Filter by keyword if provided (search by Name or Description)
+                // Lọc theo trạng thái isUsed trước
+                microchipItems = microchipItems
+                    .Where(m => m.IsUsed == isUsed)
+                    .ToList();
+
+                // Lọc theo từ khóa nếu có
+                // Lọc theo trạng thái isUsed trước
+                microchipItems = microchipItems
+                    .Where(m => m.IsUsed == isUsed)
+                    .ToList();
+
+                // Lọc theo từ khóa nếu có
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
                     var lowerKeyword = getAllItemsDTO.KeyWord.Trim().ToLower();
