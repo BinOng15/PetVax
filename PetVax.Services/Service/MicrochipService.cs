@@ -364,12 +364,12 @@ namespace PetVax.Services.Service
                 {
                     microchipItem.PetId = null;
                 }
-
+                
                     // Cập nhật MicrochipItem
                     microchipItem.MicrochipId = existingMicrochip.MicrochipId;
                 microchipItem.Name = microchipRequestDTO.createMicrochipItemRequest.Name;
                 microchipItem.Description = microchipRequestDTO.createMicrochipItemRequest.Description;
-                microchipItem.InstallationDate = microchipRequestDTO.createMicrochipItemRequest.InstallationDate;
+                microchipItem.InstallationDate = microchipRequestDTO.createMicrochipItemRequest.InstallationDate ?? null;
                 microchipItem.Location = microchipRequestDTO.createMicrochipItemRequest.Location;
                 microchipItem.ModifiedAt = DateTime.UtcNow;
                 
