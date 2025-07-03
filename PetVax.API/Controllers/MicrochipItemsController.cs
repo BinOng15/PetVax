@@ -59,7 +59,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-all-microchip-items")]
-        public async Task<IActionResult> GetAllMicrochipItemsPaging([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = null, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllMicrochipItemsPaging(bool isUsed, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = null, CancellationToken cancellationToken = default)
         {
             var request = new GetAllItemsDTO
             {
@@ -68,7 +68,7 @@ namespace PediVax.Controllers
                 KeyWord = keyWord,
                 Status = status
             };
-            var response = await _microchipItemService.GetAllMicrochipItemsPagingAsync(request, cancellationToken);
+            var response = await _microchipItemService.GetAllMicrochipItemsPagingAsync(isUsed, request, cancellationToken);
             return StatusCode(response.Code, response);
         }
 
