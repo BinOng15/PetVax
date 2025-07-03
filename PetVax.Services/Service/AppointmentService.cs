@@ -2150,8 +2150,8 @@ namespace PetVax.Services.Service
                         };
                     }
                     else
-                    {
-                        microchipItem.IsUsed = true;
+                    {   
+
                         microchipItem.Location = updateAppointmentMicrochipDTO.Description;
                         int rowEffected = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
 
