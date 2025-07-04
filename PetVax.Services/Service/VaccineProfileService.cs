@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.VaccineDTO;
 using PetVax.BusinessObjects.DTO.VaccineProfileDTO;
 using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
@@ -375,11 +376,13 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<List<VaccineProfileResponseDTO>>> GetListVaccineProfileByPetIdAsync(int petId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<VaccineProfileGroupByDiseaseResponseDTO>>> GetGroupedVaccineProfilesByPetIdAsync(int petId, CancellationToken cancellationToken)
         {
             try
             {
                 var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(petId, cancellationToken);
+
+                // Map sang DTO như cũ
                 var data = vaccineProfiles?.Select(vp => new VaccineProfileResponseDTO
                 {
                     VaccineProfileId = vp.VaccineProfileId,
@@ -395,16 +398,10 @@ namespace PetVax.Services.Service
                     IsActive = vp.IsActive,
                     IsCompleted = vp.IsCompleted,
                     CreatedAt = vp.CreatedAt,
-                    AppointmentDetail = vp.AppointmentDetail != null ? new AppointmentVaccinationDetailResponseDTO
+                    AppointmentDetail = vp.AppointmentDetail != null ? new AppointmentVaccinationForProfileResponseDTO
                     {
-                        AppointmentDetailId = vp.AppointmentDetail.AppointmentDetailId,
-                        AppointmentId = vp.AppointmentDetail.AppointmentId,
                         AppointmentDetailCode = vp.AppointmentDetail.AppointmentDetailCode,
                         VetId = vp.AppointmentDetail.VetId ?? 0,
-                        DiseaseId = vp.AppointmentDetail.DiseaseId,
-                        Dose = vp.AppointmentDetail.Dose.ToString(),
-                        Reaction = vp.AppointmentDetail.Reaction,
-                        NextVaccinationInfo = vp.AppointmentDetail.NextVaccinationInfo,
                         ServiceType = vp.AppointmentDetail.ServiceType,
                         VaccineBatchId = vp.AppointmentDetail.VaccineBatchId,
                         Temperature = vp.AppointmentDetail.Temperature,
@@ -414,43 +411,69 @@ namespace PetVax.Services.Service
                         Notes = vp.AppointmentDetail.Notes,
                         AppointmentDate = vp.AppointmentDetail.AppointmentDate,
                         AppointmentStatus = vp.AppointmentDetail.AppointmentStatus,
-                        CreatedAt = vp.AppointmentDetail.CreatedAt,
-                        ModifiedAt = vp.AppointmentDetail.ModifiedAt,
+                        Vet = vp.AppointmentDetail.Vet != null ? new VetVaccineProfileResponseDTO
+                        {
+                            VetCode = vp.AppointmentDetail.Vet.VetCode,
+                            Name = vp.AppointmentDetail.Vet.Name,
+                            Specialization = vp.AppointmentDetail.Vet.Specialization,
+                        } : null,
+                        VaccineBatch = vp.AppointmentDetail.VaccineBatch != null ? new VaccineBatchVaccineProfileResponseDTO
+                        {
+                            BatchNumber = vp.AppointmentDetail.VaccineBatch.BatchNumber,
+                            ManufactureDate = vp.AppointmentDetail.VaccineBatch.ManufactureDate,
+                            ExpiryDate = vp.AppointmentDetail.VaccineBatch.ExpiryDate,
+                            Quantity = vp.AppointmentDetail.VaccineBatch.Quantity,
+                            VaccineId = vp.AppointmentDetail.VaccineBatch.VaccineId,
+                            Vaccine = vp.AppointmentDetail.VaccineBatch.Vaccine != null ? new VaccineForBatchVaccineProfileResponseDTO
+                            {
+                                VaccineCode = vp.AppointmentDetail.VaccineBatch.Vaccine.VaccineCode,
+                                Name = vp.AppointmentDetail.VaccineBatch.Vaccine.Name,
+                                Description = vp.AppointmentDetail.VaccineBatch.Vaccine.Description,
+                                Price = vp.AppointmentDetail.VaccineBatch.Vaccine.Price,
+                                Image = vp.AppointmentDetail.VaccineBatch.Vaccine.Image,
+                                Notes = vp.AppointmentDetail.VaccineBatch.Vaccine.Notes,
+                                // ... các trường khác của Vaccine
+                            } : null,
+                            // ... các trường khác của VaccineBatch
+                        } : null
                     } : null,
-                    Disease = vp.Disease != null ? new DiseaseResponseDTO
+                    Disease = vp.Disease != null ? new DiseaseVaccineProfileResponseDTO
                     {
-                        DiseaseId = vp.Disease.DiseaseId,
-                        Name = vp.Disease.Name,
-                        Description = vp.Disease.Description,
-                        Species = vp.Disease.Species,
-                        Symptoms = vp.Disease.Symptoms,
-                        Treatment = vp.Disease.Treatment,
-                        CreatedAt = vp.Disease.CreatedAt,
-                        CreatedBy = vp.Disease.CreatedBy,
-                        ModifiedAt = vp.Disease.ModifiedAt,
-                        ModifiedBy = vp.Disease.ModifiedBy,
+                        DiseaseName = vp.Disease.Name,
                     } : null
                 }).ToList() ?? new List<VaccineProfileResponseDTO>();
 
-                return new BaseResponse<List<VaccineProfileResponseDTO>>
+                // Group by DiseaseId
+                var grouped = data
+                    .GroupBy(x => new { x.DiseaseId, x.Disease?.DiseaseName })
+                    .Select(g => new VaccineProfileGroupByDiseaseResponseDTO
+                    {
+                        DiseaseId = g.Key.DiseaseId,
+                        DiseaseName = g.Key.DiseaseName,
+                        Doses = g.OrderBy(x => x.Dose).ToList()
+                    })
+                    .ToList();
+
+                return new BaseResponse<List<VaccineProfileGroupByDiseaseResponseDTO>>
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Lấy danh sách hồ sơ tiêm chủng cho thú cưng thành công.",
-                    Data = data
+                    Message = "Lấy danh sách hồ sơ tiêm chủng đã nhóm theo bệnh thành công.",
+                    Data = grouped
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<VaccineProfileResponseDTO>>
+                return new BaseResponse<List<VaccineProfileGroupByDiseaseResponseDTO>>
                 {
                     Code = 500,
                     Success = false,
-                    Message = $"Có lỗi khi lấy danh sách hồ sơ tiêm chủng cho thú cưng: {ex.Message}",
-                    Data = new List<VaccineProfileResponseDTO>()
+                    Message = $"Có lỗi khi lấy danh sách hồ sơ tiêm chủng: {ex.Message}",
+                    Data = new List<VaccineProfileGroupByDiseaseResponseDTO>()
                 };
             }
         }
+
     }
 }
                 

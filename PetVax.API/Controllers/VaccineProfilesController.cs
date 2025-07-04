@@ -60,7 +60,7 @@ namespace PediVax.Controllers
             {
                 return BadRequest("Invalid pet ID.");
             }
-            var response = await _vaccineProfileService.GetListVaccineProfileByPetIdAsync(petId, cancellationToken);
+            var response = await _vaccineProfileService.GetGroupedVaccineProfilesByPetIdAsync(petId, cancellationToken);
             return Ok(response);
         }
 
