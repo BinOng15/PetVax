@@ -419,7 +419,6 @@ namespace PetVax.Services.Service
                         } : null,
                         VaccineBatch = vp.AppointmentDetail.VaccineBatch != null ? new VaccineBatchVaccineProfileResponseDTO
                         {
-                            BatchId = vp.AppointmentDetail.VaccineBatch.VaccineBatchId,
                             BatchNumber = vp.AppointmentDetail.VaccineBatch.BatchNumber,
                             ManufactureDate = vp.AppointmentDetail.VaccineBatch.ManufactureDate,
                             ExpiryDate = vp.AppointmentDetail.VaccineBatch.ExpiryDate,
