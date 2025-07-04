@@ -28,13 +28,16 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<Customer>> GetAllCustomersAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.Customers
+                .Include(c => c.Account)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Customer> GetCustomerByAccountId(int accountId, CancellationToken cancellationToken)
         {
             
             var customer = await _context.Customers
+                .Include(c => c.Account)
                 .FirstOrDefaultAsync(c => c.AccountId == accountId, cancellationToken);           
             return customer;
         }
@@ -42,6 +45,7 @@ namespace PetVax.Repositories.Repository
         public async Task<Customer> GetCustomerByIdAsync(int customerId, CancellationToken cancellationToken)
         {
             return await _context.Customers
+                .Include(c => c.Account)
                 .FirstOrDefaultAsync(c => c.CustomerId == customerId, cancellationToken);
         }
 

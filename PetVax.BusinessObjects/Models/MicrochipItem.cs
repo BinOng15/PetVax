@@ -8,22 +8,26 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("MicrochipItem", Schema = "dbo")]
+    [Table("MicrochipItem")]
     public class MicrochipItem
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MicrochipItemId { get; set; }
         public int MicrochipId { get; set; } // Foreign key to Microchip table
-        public int PetId { get; set; } // Foreign key to Pet table
-        public string Name { get; set; } // e.g., "Microchip A", "Microchip B"
-        public string Description { get; set; } // e.g., "Microchip for pet identification"
-        public DateTime InstallationDate { get; set; } // Date when the microchip was installed
+        public int? PetId { get; set; } // Foreign key to Pet table
+        public string? Name { get; set; } // e.g., "Microchip A", "Microchip B"
+        public string? Description { get; set; } // e.g., "Microchip for pet identification"
+        public DateTime? InstallationDate { get; set; } // Date when the microchip was installed
+        public string? Location { get; set; }
         public string Status { get; set; } // e.g., "Active", "Inactive", "Lost"
         public DateTime CreatedAt { get; set; } // Date when the record was created
-        public string CreatedBy { get; set; } // User who created the record
+        public string? CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
+        public bool? isDeleted { get; set; } = false;
+
+        public bool? IsUsed { get; set; } = false; // Indicates if the microchip is currently in use
 
         // Navigation properties
         public virtual Microchip Microchip { get; set; } // Navigation to Microchip table

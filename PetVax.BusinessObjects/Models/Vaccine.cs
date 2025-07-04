@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("Vaccine", Schema = "dbo")]
+    [Table("Vaccine")]
     public class Vaccine
     {
         [Key]
@@ -25,10 +25,10 @@ namespace PetVax.BusinessObjects.Models
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
+        public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual ICollection<VaccineBatch> VaccineBatches { get; set; } // Collection of vaccine batches associated with this vaccine
         public virtual ICollection<VaccineDisease> VaccineDiseases { get; set; } // Collection of diseases associated with this vaccine
-        public virtual ICollection<Payment> Payments { get; set; } // Collection of payments associated with this vaccine
     }
 }

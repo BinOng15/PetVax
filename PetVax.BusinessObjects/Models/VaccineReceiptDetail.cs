@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("VaccineReceiptDetail", Schema = "dbo")]
+    [Table("VaccineReceiptDetail")]
     public class VaccineReceiptDetail
     {
         [Key]
@@ -32,6 +32,7 @@ namespace PetVax.BusinessObjects.Models
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
 
         public string? ModifiedBy { get; set; } // User who last modified the record
+        public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual VaccineReceipt VaccineReceipt { get; set; } = null!; // Navigation to VaccineReceipt table

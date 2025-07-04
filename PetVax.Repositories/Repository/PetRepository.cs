@@ -27,12 +27,28 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<Pet>> GetAllPetsAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.Pets
+                .Include(p => p.Customer).ThenInclude(c => c.Account)
+                .Include(p => p.MicrochipItems)
+                .Where(p => p.isDeleted == false)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<Pet> GetPetAndAppointmentByIdAsync(int? petId, CancellationToken cancellationToken)
+        {
+            return await _context.Pets
+                .Include(p => p.Appointments)
+                .Include(p => p.Customer).ThenInclude(c => c.Account)
+                .Include(p => p.MicrochipItems)
+                .FirstOrDefaultAsync(p => p.PetId == petId, cancellationToken);
         }
 
         public async Task<Pet> GetPetByIdAsync(int petId, CancellationToken cancellationToken)
         {
-            return await GetByIdAsync(petId, cancellationToken);
+            return await _context.Pets
+                .Include(p => p.Customer).ThenInclude(c => c.Account)
+                .Include(p => p.MicrochipItems)
+                .FirstOrDefaultAsync(p => p.PetId == petId, cancellationToken);
         }
 
         public async Task<Pet> GetPetByNameAsync(string petName, CancellationToken cancellationToken)
@@ -43,7 +59,9 @@ namespace PetVax.Repositories.Repository
         public async Task<List<Pet>> GetPetsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
             return await _context.Pets
-                .Where(p => p.CustomerId == customerId)
+                .Include(p => p.Customer).ThenInclude(c => c.Account)
+                .Include(p => p.MicrochipItems)
+                .Where(p => p.CustomerId == customerId && p.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
@@ -51,5 +69,6 @@ namespace PetVax.Repositories.Repository
         {
             return await UpdateAsync(pet, cancellationToken);
         }
+
     }
 }

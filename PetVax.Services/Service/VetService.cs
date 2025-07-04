@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository;
+using PetVax.Services.ExternalService;
 using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
@@ -22,15 +24,19 @@ namespace PetVax.Services.Service
         private readonly IMapper _mapper;
         private readonly ILogger<VetService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICloudinariService _cloudinariService;
+        private readonly IVetScheduleRepository _vetScheduleRepository;
 
-        public VetService(IVetRepository vetRepository, IMapper mapper, ILogger<VetService> logger, IHttpContextAccessor httpContextAccessor)
+        public VetService(IVetRepository vetRepository, IMapper mapper, ILogger<VetService> logger,
+            IHttpContextAccessor httpContextAccessor, ICloudinariService cloudinariService, IVetScheduleRepository vetScheduleRepository)
         {
             _vetRepository = vetRepository;
             _mapper = mapper;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
+            _cloudinariService = cloudinariService;
+            _vetScheduleRepository = vetScheduleRepository;
         }
-
         public async Task<DynamicResponse<VetResponseDTO>> GetAllVetsAsync(GetAllVetRequestDTO getAllVetRequest, CancellationToken cancellationToken)
         {
             try
@@ -72,17 +78,9 @@ namespace PetVax.Services.Service
                     SearchInfo = new SearchCondition
                     {
                         keyWord = getAllVetRequest?.KeyWord,
+                        status = getAllVetRequest?.Status,
                     },
-                    PageData = pateVets.Select(v => new VetResponseDTO
-                    {
-                        VetId = v.VetId,
-                        AccountId = v.AccountId,
-                        VetCode = v.VetCode,
-                        Name = v.Name,
-                        Specialization = v.Specialization,
-                        DateOfBirth = v.DateOfBirth,
-                        PhoneNumber = v.PhoneNumber
-                    }).ToList()
+                    PageData = pateVets.Select(v => _mapper.Map<VetResponseDTO>(v)).ToList()
                 };
 
                 if (!pateVets.Any())
@@ -90,7 +88,7 @@ namespace PetVax.Services.Service
                     _logger.LogInformation("No vets found for the given criteria");
                     return new DynamicResponse<VetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "No vets found",
                         Data = responseData
@@ -128,7 +126,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Invalid update request for Vet with ID {VetId}", updateVetRequest?.VetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 400,
+                        Code = 200,
                         Success = false,
                         Message = "Invalid request data",
                         Data = null
@@ -140,30 +138,32 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Vet with ID {VetId} not found", updateVetRequest.VetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Vet not found",
                         Data = null
                     };
                 }
-                // Map updated properties
-                existingVet.VetCode = updateVetRequest.VetCode ?? existingVet.VetCode;
-                existingVet.Name = updateVetRequest.Name ?? existingVet.Name;
+
+                if (updateVetRequest.Image != null)
+                {
+                    existingVet.image = await _cloudinariService.UploadImage(updateVetRequest.Image);
+                }
+                else
+                {
+                    existingVet.image = null;
+                }
+                    // Map updated properties
+                    existingVet.Name = updateVetRequest.Name ?? existingVet.Name;
                 existingVet.PhoneNumber = updateVetRequest.PhoneNumber ?? existingVet.PhoneNumber;
                 existingVet.Specialization = updateVetRequest.Specialization ?? existingVet.Specialization;
                 existingVet.DateOfBirth = updateVetRequest.DateOfBirth ?? existingVet.DateOfBirth;
+
                 int result = await _vetRepository.UpdateVetAsync(existingVet, cancellationToken);
 
                 if (result > 0)
                 {
-                    var responseData = new VetResponseDTO();
-                    responseData.VetId = existingVet.VetId;
-                    responseData.AccountId = existingVet.AccountId;
-                    responseData.VetCode = existingVet.VetCode;
-                    responseData.Name = existingVet.Name;
-                    responseData.PhoneNumber = existingVet.PhoneNumber;
-                    responseData.Specialization = existingVet.Specialization;
-                    responseData.DateOfBirth = existingVet.DateOfBirth; ;
+                    var responseData = _mapper.Map<VetResponseDTO>(existingVet);
                     _logger.LogInformation("Updated Vet with ID {VetId} successfully", updateVetRequest.VetId);
                     return new BaseResponse<VetResponseDTO>
                     {
@@ -192,7 +192,6 @@ namespace PetVax.Services.Service
                     Success = false,
                     Message = "Error while updating veterinarian: " + (ex.InnerException?.Message ?? ex.Message),
                     Data = null
-
                 };
             }
         }
@@ -206,7 +205,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Invalid Vet ID: {VetId}", vetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 400,
+                        Code = 200,
                         Success = false,
                         Message = "Invalid Vet ID",
                         Data = null
@@ -218,20 +217,13 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Vet with ID {VetId} not found", vetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Vet not found",
                         Data = null
                     };
                 }
-                var responseData = new VetResponseDTO();
-                responseData.VetId = vet.VetId;
-                responseData.AccountId = vet.AccountId;
-                responseData.VetCode = vet.VetCode;
-                responseData.Name = vet.Name;
-                responseData.PhoneNumber = vet.PhoneNumber;
-                responseData.Specialization = vet.Specialization;
-                responseData.DateOfBirth = vet.DateOfBirth;
+                var responseData = _mapper.Map<VetResponseDTO>(vet);
                 _logger.LogInformation("Retrieved Vet with ID {VetId} successfully", vetId);
                 return new BaseResponse<VetResponseDTO>
                 {
@@ -260,10 +252,9 @@ namespace PetVax.Services.Service
             {
                 if (vetId <= 0)
                 {
-                    _logger.LogWarning("Invalid Vet ID: {VetId}", vetId);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 400,
+                        Code = 200,
                         Success = false,
                         Message = "Invalid Vet ID",
                         Data = null
@@ -272,33 +263,43 @@ namespace PetVax.Services.Service
                 var existingVet = await _vetRepository.GetVetByIdAsync(vetId, cancellationToken);
                 if (existingVet == null)
                 {
-                    _logger.LogWarning("Vet with ID {VetId} not found", vetId);
+
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "Vet not found",
+                        Message = "Không tìm thấy vet",
                         Data = null
                     };
                 }
-                bool isDeleted = await _vetRepository.DeleteVetAsync(vetId, cancellationToken);
-                if (isDeleted)
+                existingVet.isDeleted = true;
+                int isDeleted = await _vetRepository.UpdateVetAsync(existingVet, cancellationToken);
+
+                var vetSchedules = await _vetScheduleRepository.GetVetSchedulesByVetIdAsync(vetId, cancellationToken);
+                if (vetSchedules != null && vetSchedules.Any())
                 {
-                    _logger.LogInformation("Deleted Vet with ID {VetId} successfully", vetId);
+                    foreach (var schedule in vetSchedules)
+                    {
+                        schedule.isDeleted = true;
+                        await _vetScheduleRepository.UpdateVetScheduleAsync(schedule, cancellationToken);
+                    }
+                }
+                if (isDeleted > 0)
+                {
                     return new BaseResponse<VetResponseDTO>
                     {
                         Code = 200,
                         Success = true,
-                        Message = "Veterinarian deleted successfully",
+                        Message = "Xóa thành công",
                         Data = null
                     };
                 }
-                _logger.LogWarning("Failed to delete Vet with ID {VetId}", vetId);
+
                 return new BaseResponse<VetResponseDTO>
                 {
-                    Code = 500,
+                    Code = 200,
                     Success = false,
-                    Message = "Failed to delete veterinarian",
+                    Message = "Xóa không thành công",
                     Data = null
                 };
             }
@@ -322,7 +323,7 @@ namespace PetVax.Services.Service
                 _logger.LogWarning("CreateVetAsync called with null request");
                 return new BaseResponse<VetResponseDTO>
                 {
-                    Code = 400,
+                    Code = 200,
                     Success = false,
                     Message = "Dữ liệu tạo bác sĩ thú y không được để trống",
                     Data = null
@@ -333,12 +334,22 @@ namespace PetVax.Services.Service
                 var vets = _mapper.Map<Vet>(createVetDTO);
                 var random = new Random();
 
+                if(createVetDTO.Image != null)
+                {
+                    
+                    vets.image = await _cloudinariService.UploadImage(createVetDTO.Image);
+                }
+                else
+                {
+                    vets.image = null;
+                }
+
                 vets.VetCode = "V" + random.Next(0, 1000000).ToString("D6");
                 vets.Name = createVetDTO.Name?.Trim();
                 vets.Specialization = createVetDTO.Specialization?.Trim();
                 vets.PhoneNumber = createVetDTO.PhoneNumber?.Trim();
                 vets.DateOfBirth = createVetDTO.DateOfBirth;
-                vets.CreateAt = DateTime.UtcNow;
+                vets.CreateAt = DateTimeHelper.Now();
                 vets.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
                 var result = await _vetRepository.CreateVetAsync(vets, cancellationToken);
@@ -347,7 +358,7 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Failed to create Vet with data: {@VetData}", createVetDTO);
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 500,
+                        Code = 200,
                         Success = false,
                         Message = "Không thể tạo Vet",
                         Data = null
