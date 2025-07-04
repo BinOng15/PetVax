@@ -165,7 +165,8 @@ namespace PetVax.Services.Configurations.Mapper
 
             //VaccineProfile
             CreateMap<VaccineProfile, VaccineProfileResponseDTO>()
-                .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.AppointmentDetail));
+                .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.AppointmentDetail))
+                .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease));
 
             //VaccinationCertificate
             CreateMap<CreateVaccinationCertificateDTO, VaccinationCertificate>();

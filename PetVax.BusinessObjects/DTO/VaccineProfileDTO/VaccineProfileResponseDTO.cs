@@ -25,5 +25,6 @@ namespace PetVax.BusinessObjects.DTO.VaccineProfileDTO
         public DateTime CreatedAt { get; set; } 
 
         public virtual AppointmentVaccinationDetailResponseDTO? AppointmentDetail { get; set; }
+        public virtual DiseaseResponseDTO? Disease { get; set; }
     }
 }
