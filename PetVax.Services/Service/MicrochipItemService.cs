@@ -507,7 +507,7 @@ namespace PetVax.Services.Service
 
                 if (petId > 0 )
                 {
-                    if (microchipItem.PetId != null && microchipItem.PetId > 0)
+                    if (microchipItem.PetId != null || microchipItem.PetId > 0)
                     {
                         return new BaseResponse<BaseMicrochipItemResponse>
                         {
