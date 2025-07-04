@@ -40,6 +40,10 @@ namespace PetVax.Repositories.Repository
                 .Where(vp => vp.PetId == petId)
                 .Include(vp => vp.Disease)
                 .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.Vet)
+                .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.VaccineBatch)
+                        .ThenInclude(vb => vb.Vaccine)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }

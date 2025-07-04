@@ -69,6 +69,9 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<Vaccine, VaccineResponseDTO>()
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image));
 
+            CreateMap<Vaccine, VaccineForBatchVaccineProfileResponseDTO>()
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image));
+
             //VaccineDisease
             CreateMap<CreateVaccineDiseaseDTO, VaccineDisease>();
             CreateMap<UpdateVaccineDiseaseDTO, VaccineDisease>();
@@ -83,6 +86,9 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<VaccineBatch, VaccineBatchResponseDTO>()
                 .ForMember(dest => dest.VaccineResponseDTO, opt => opt.MapFrom(src => src.Vaccine))
                 .ReverseMap();
+
+            CreateMap<VaccineBatch, VaccineBatchVaccineProfileResponseDTO>()
+                .ForMember(dest => dest.Vaccine, opt => opt.MapFrom(src => src.Vaccine));
 
             //Disease
             CreateMap<CreateDiseaseDTO, Disease>();
@@ -146,7 +152,9 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease))
                 .ForMember(dest => dest.VaccinationCertificate, opt => opt.MapFrom(src => src.VaccinationCertificate));
 
-
+            CreateMap<AppointmentDetail, AppointmentVaccinationForProfileResponseDTO>()
+                .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
+                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch));
 
             //Microchip
             CreateMap<Microchip, MicrochipResponseDTO>();
@@ -165,8 +173,7 @@ namespace PetVax.Services.Configurations.Mapper
 
             //VaccineProfile
             CreateMap<VaccineProfile, VaccineProfileResponseDTO>()
-                .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.AppointmentDetail))
-                .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease));
+                .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.AppointmentDetail));
 
             //VaccinationCertificate
             CreateMap<CreateVaccinationCertificateDTO, VaccinationCertificate>();
