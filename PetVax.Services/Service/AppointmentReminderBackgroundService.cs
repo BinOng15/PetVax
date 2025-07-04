@@ -32,47 +32,49 @@ namespace PetVax.Services.Service
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                try
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    var now = DateTimeHelper.Now();
-                    var nextDay = now.AddDays(1);
-
-                    var _appointmentRepository = _serviceProvider.GetRequiredService<IAppointmentRepository>();
-                    var _petRepository = _serviceProvider.GetRequiredService<IPetRepository>();
-                    var _configuration = _serviceProvider.GetRequiredService<IConfiguration>();
-
-                    // Lấy các cuộc hẹn sẽ diễn ra trong 24h tới
-                    var upcomingAppointments = await _appointmentRepository.GetAppointmentsByDateRangeAsync(now, nextDay, stoppingToken);
-                    _logger.LogInformation("Found {count} upcoming appointments for reminder", upcomingAppointments?.Count ?? 0);
-
-                    foreach (var appointment in upcomingAppointments)
+                    try
                     {
-                        try
+                        var now = DateTimeHelper.Now();
+                        var nextDay = now.AddDays(1);
+
+                        var _appointmentRepository = scope.ServiceProvider.GetRequiredService<IAppointmentRepository>();
+                        var _petRepository = scope.ServiceProvider.GetRequiredService<IPetRepository>();
+                        var _configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+                        // Lấy các cuộc hẹn sẽ diễn ra trong 24h tới
+                        var upcomingAppointments = await _appointmentRepository.GetAppointmentsByDateRangeAsync(now, nextDay, stoppingToken);
+                        _logger.LogInformation("Found {count} upcoming appointments for reminder", upcomingAppointments?.Count ?? 0);
+
+                        foreach (var appointment in upcomingAppointments)
                         {
-                            var pet = await _petRepository.GetPetByIdAsync(appointment.PetId, stoppingToken);
-                            var customerEmail = pet?.Customer?.Account?.Email;
-                            var customerName = pet?.Customer?.FullName ?? "Quý khách hàng";
-                            var petName = pet?.Name ?? "thú cưng của bạn";
-
-                            if (!string.IsNullOrEmpty(customerEmail))
+                            try
                             {
-                                // Prepare SMTP configuration
-                                var smtpHost = _configuration["Smtp:Host"];
-                                var smtpPort = int.Parse(_configuration["Smtp:Port"]);
-                                var smtpUser = _configuration["Smtp:User"];
-                                var smtpPass = _configuration["Smtp:Pass"];
-                                var fromEmail = _configuration["Smtp:From"];
+                                var pet = await _petRepository.GetPetByIdAsync(appointment.PetId, stoppingToken);
+                                var customerEmail = pet?.Customer?.Account?.Email;
+                                var customerName = pet?.Customer?.FullName ?? "Quý khách hàng";
+                                var petName = pet?.Name ?? "thú cưng của bạn";
 
-                                using var client = new SmtpClient(smtpHost, smtpPort)
+                                if (!string.IsNullOrEmpty(customerEmail))
                                 {
-                                    Credentials = new NetworkCredential(smtpUser, smtpPass),
-                                    EnableSsl = true
-                                };
+                                    // Prepare SMTP configuration
+                                    var smtpHost = _configuration["Smtp:Host"];
+                                    var smtpPort = int.Parse(_configuration["Smtp:Port"]);
+                                    var smtpUser = _configuration["Smtp:User"];
+                                    var smtpPass = _configuration["Smtp:Pass"];
+                                    var fromEmail = _configuration["Smtp:From"];
 
-                                var mail = new MailMessage(fromEmail, customerEmail)
-                                {
-                                    Subject = "Nhắc lịch hẹn tiêm phòng/thú cưng",
-                                    Body = $@"
+                                    using var client = new SmtpClient(smtpHost, smtpPort)
+                                    {
+                                        Credentials = new NetworkCredential(smtpUser, smtpPass),
+                                        EnableSsl = true
+                                    };
+
+                                    var mail = new MailMessage(fromEmail, customerEmail)
+                                    {
+                                        Subject = "Nhắc lịch hẹn tiêm phòng/thú cưng",
+                                        Body = $@"
                                         <html>
                                         <body style='font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 30px;'>
                                         <div style='max-width: 500px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 32px;'>
@@ -98,27 +100,28 @@ namespace PetVax.Services.Service
                                         </div>
                                         </body>
                                         </html>",
-                                    IsBodyHtml = true
-                                };
+                                        IsBodyHtml = true
+                                    };
 
-                                // Send email
-                                await client.SendMailAsync(mail, stoppingToken);
-                                _logger.LogInformation("Sent reminder email to {email} for appointment {code}", customerEmail, appointment.AppointmentCode);
+                                    // Send email
+                                    await client.SendMailAsync(mail, stoppingToken);
+                                    _logger.LogInformation("Sent reminder email to {email} for appointment {code}", customerEmail, appointment.AppointmentCode);
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("No valid email found for appointment {code}", appointment.AppointmentCode);
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                _logger.LogWarning("No valid email found for appointment {code}", appointment.AppointmentCode);
+                                _logger.LogError(ex, "Failed to send reminder email for appointment {code}", appointment.AppointmentCode);
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Failed to send reminder email for appointment {code}", appointment.AppointmentCode);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Lỗi khi gửi email nhắc lịch hẹn.");
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Lỗi khi gửi email nhắc lịch hẹn.");
+                    }
                 }
 
                 // Chờ 1 ngày (hoặc 1 giờ nếu muốn kiểm tra thường xuyên hơn)

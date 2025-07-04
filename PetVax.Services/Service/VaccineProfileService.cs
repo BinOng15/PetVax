@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineProfileDTO;
 using PetVax.BusinessObjects.Helpers;
@@ -394,6 +395,41 @@ namespace PetVax.Services.Service
                     IsActive = vp.IsActive,
                     IsCompleted = vp.IsCompleted,
                     CreatedAt = vp.CreatedAt,
+                    AppointmentDetail = vp.AppointmentDetail != null ? new AppointmentVaccinationDetailResponseDTO
+                    {
+                        AppointmentDetailId = vp.AppointmentDetail.AppointmentDetailId,
+                        AppointmentId = vp.AppointmentDetail.AppointmentId,
+                        AppointmentDetailCode = vp.AppointmentDetail.AppointmentDetailCode,
+                        VetId = vp.AppointmentDetail.VetId ?? 0,
+                        DiseaseId = vp.AppointmentDetail.DiseaseId,
+                        Dose = vp.AppointmentDetail.Dose.ToString(),
+                        Reaction = vp.AppointmentDetail.Reaction,
+                        NextVaccinationInfo = vp.AppointmentDetail.NextVaccinationInfo,
+                        ServiceType = vp.AppointmentDetail.ServiceType,
+                        VaccineBatchId = vp.AppointmentDetail.VaccineBatchId,
+                        Temperature = vp.AppointmentDetail.Temperature,
+                        HeartRate = vp.AppointmentDetail.HeartRate,
+                        GeneralCondition = vp.AppointmentDetail.GeneralCondition,
+                        Others = vp.AppointmentDetail.Others,
+                        Notes = vp.AppointmentDetail.Notes,
+                        AppointmentDate = vp.AppointmentDetail.AppointmentDate,
+                        AppointmentStatus = vp.AppointmentDetail.AppointmentStatus,
+                        CreatedAt = vp.AppointmentDetail.CreatedAt,
+                        ModifiedAt = vp.AppointmentDetail.ModifiedAt,
+                    } : null,
+                    Disease = vp.Disease != null ? new DiseaseResponseDTO
+                    {
+                        DiseaseId = vp.Disease.DiseaseId,
+                        Name = vp.Disease.Name,
+                        Description = vp.Disease.Description,
+                        Species = vp.Disease.Species,
+                        Symptoms = vp.Disease.Symptoms,
+                        Treatment = vp.Disease.Treatment,
+                        CreatedAt = vp.Disease.CreatedAt,
+                        CreatedBy = vp.Disease.CreatedBy,
+                        ModifiedAt = vp.Disease.ModifiedAt,
+                        ModifiedBy = vp.Disease.ModifiedBy,
+                    } : null
                 }).ToList() ?? new List<VaccineProfileResponseDTO>();
 
                 return new BaseResponse<List<VaccineProfileResponseDTO>>
