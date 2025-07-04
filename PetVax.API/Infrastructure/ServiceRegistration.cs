@@ -26,7 +26,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IMembershipRepository, MembershipRepository>();
             services.AddScoped<IMicrochipItemRepository, MicrochipItemRepository>();
             services.AddScoped<IMicrochipRepository, MicrochipRepository>();
-            services.AddScoped<IPetPassportRepository, PetPassportRepository>();
+            services.AddScoped<IVaccinationCertificateRepository, VaccinationCertificateRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IVetRepository, VetRepository>();
             services.AddScoped<IVaccineRepository, VaccineRepository>();
@@ -39,6 +39,8 @@ namespace PetVax.Infrastructure
             services.AddScoped<IMicrochipRepository, MicrochipRepository>();
             services.AddScoped<IMicrochipItemRepository, MicrochipItemRepository>();
             services.AddScoped<IVaccinationScheduleRepository, VaccinationScheduleRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IVaccinationCertificateRepository, VaccinationCertificateRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -60,8 +62,14 @@ namespace PetVax.Infrastructure
             services.AddScoped<IMicrochipService, MicrochipService>();
             services.AddScoped<IMicrochipItemService, MicrochipItemService>();
             services.AddScoped<IVaccineBatchService, VaccineBatchService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IEmailService, EmailService>();
+
+            services.AddScoped<PayOsService>();
 
             services.AddHostedService<VetScheduleBackgroundService>();
+            services.AddHostedService<AppointmentBackgroundService>();
+            services.AddHostedService<AppointmentReminderBackgroundService>();
 
             #endregion
 

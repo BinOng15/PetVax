@@ -29,5 +29,7 @@ namespace PetVax.Repositories.IRepository
         Task<List<Appointment>> GetPastAppointmentsByCustomerIdAsync(DateTime now, int customerId, CancellationToken cancellationToken);
         Task<List<Appointment>> GetTodayAppointmentsByCustomerIdAsync(DateTime today, int customerId, CancellationToken cancellationToken);
         Task<List<Appointment>> GetFutureAppointmentsByCustomerIdAsync(DateTime now, int customerId, CancellationToken cancellationToken);
+        Task UpdateExpiredAppointmentsAsync(CancellationToken cancellationToken);
+        Task SendMailWhenAppointmentCancelledAsync(CancellationToken cancellationToken);
     }
 }

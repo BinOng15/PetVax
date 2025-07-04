@@ -19,7 +19,7 @@ namespace PetVax.BusinessObjects.Models
         public int? VetId { get; set; } // Foreign key to Vet table
         public EnumList.ServiceType ServiceType { get; set; } // e.g., "Vaccination", "Microchip", "Passport", "Health Check"
         public int? MicrochipItemId { get; set; } // Foreign key to MicrochipItem table
-        public int? PassportId { get; set; } // Foreign key to PetPassport table
+        public int? VaccinationCertificateId { get; set; }
         public int? HealthConditionId { get; set; } // Foreign key to HealthCondition table
         public int? VaccineBatchId { get; set; } // Foreign key to VaccineBatch table
         public int? DiseaseId { get; set; } // Foreign key to Disease table, if applicable (for vaccinations)
@@ -44,7 +44,7 @@ namespace PetVax.BusinessObjects.Models
         public virtual Appointment Appointment { get; set; } // Navigation to Appointment table
         public virtual Vet Vet { get; set; } // Navigation to Vet table
         public virtual MicrochipItem MicrochipItem { get; set; } // Navigation to MicrochipItem table
-        public virtual PetPassport PetPassport { get; set; } // Navigation to PetPassport table
+        public virtual VaccinationCertificate VaccinationCertificate { get; set; } // Navigation to PetPassport table
         public virtual HealthCondition HealthCondition { get; set; } // Navigation to HealthCondition table
         public virtual VaccineBatch VaccineBatch { get; set; } // Navigation to VaccineBatch table
         public virtual Disease Disease { get; set; } // Navigation to Disease table, if applicable (for vaccinations)

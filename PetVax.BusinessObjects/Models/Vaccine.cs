@@ -30,6 +30,5 @@ namespace PetVax.BusinessObjects.Models
         // Navigation properties
         public virtual ICollection<VaccineBatch> VaccineBatches { get; set; } // Collection of vaccine batches associated with this vaccine
         public virtual ICollection<VaccineDisease> VaccineDiseases { get; set; } // Collection of diseases associated with this vaccine
-        public virtual ICollection<Payment> Payments { get; set; } // Collection of payments associated with this vaccine
     }
 }

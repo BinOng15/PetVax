@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -114,7 +115,7 @@ namespace PetVax.Services.Service
                     Price = request.Price,
                     Notes = request.Notes,
                     Status = "Active",
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTimeHelper.Now()
                 };
 
                 var created = await _microchipRepository.CreateMicrochipAsync(microchip, cancellationToken);
@@ -170,7 +171,7 @@ namespace PetVax.Services.Service
                 microchipItem.Name = request.createMicrochipItemRequest.Name;
                 microchipItem.Description = request.createMicrochipItemRequest.Description;
                 microchipItem.InstallationDate = request.createMicrochipItemRequest.InstallationDate;
-                microchipItem.CreatedAt = DateTime.UtcNow;
+                microchipItem.CreatedAt = DateTimeHelper.Now();
                 microchipItem.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 microchipItem.Status = "Active";
               

@@ -5,6 +5,7 @@ using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -286,7 +287,7 @@ namespace PetVax.Services.Service
                 }
                 //  Map request to MicrochipItem entity
                 _mapper.Map(request, microchipItem);
-                microchipItem.ModifiedAt = DateTime.UtcNow;
+                microchipItem.ModifiedAt = DateTimeHelper.Now();
                 microchipItem.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 //  Save to repository
                 var result = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);

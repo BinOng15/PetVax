@@ -72,7 +72,7 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<Microchip> Microchips { get; set; }
         public DbSet<Pet> Pets { get; set; }
-        public DbSet<PetPassport> PetPassports { get; set; }
+        public DbSet<VaccinationCertificate> VaccinationCertificates { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<PointTransaction> PointTransactions { get; set; }
         public DbSet<ServiceHistory> ServiceHistories { get; set; }
@@ -130,7 +130,7 @@ namespace PediVax.BusinessObjects.DBContext
 
             // Pet - PetPassport (1-N)
             modelBuilder.Entity<Pet>()
-                .HasMany(p => p.PetPassports)
+                .HasMany(p => p.VaccinationCertificates)
                 .WithOne(pp => pp.Pet)
                 .HasForeignKey(pp => pp.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -138,9 +138,24 @@ namespace PediVax.BusinessObjects.DBContext
             // HealthCondition - Pet (N-1)
             modelBuilder.Entity<HealthCondition>()
                 .HasOne(hc => hc.Pet)
-                .WithMany(p => p.HealthConditions) // Thêm ICollection<HealthCondition> HealthConditions vào Pet nếu cần
+                .WithMany(p => p.HealthConditions)
                 .HasForeignKey(hc => hc.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // HealthCondition - Vet (N-1, optional)
+            modelBuilder.Entity<HealthCondition>()
+                .HasOne(hc => hc.Vet)
+                .WithMany(v => v.HealthConditions)
+                .HasForeignKey(hc => hc.VetId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // HealthCondition - MicrochipItem (N-1, optional)
+            modelBuilder.Entity<HealthCondition>()
+                .HasOne(hc => hc.MicrochipItem)
+                .WithMany()
+                .HasForeignKey(hc => hc.MicrochipItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             // Appointment - Customer (N-1)
             modelBuilder.Entity<Appointment>()
@@ -179,9 +194,9 @@ namespace PediVax.BusinessObjects.DBContext
 
             // AppointmentDetail - PetPassport (1-1)
             modelBuilder.Entity<AppointmentDetail>()
-                .HasOne(ad => ad.PetPassport)
+                .HasOne(ad => ad.VaccinationCertificate)
                 .WithOne()
-                .HasForeignKey<AppointmentDetail>(ad => ad.PassportId)
+                .HasForeignKey<AppointmentDetail>(ad => ad.VaccinationCertificateId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // AppointmentDetail - HealthCondition (1-1)
@@ -226,11 +241,32 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey(p => p.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Payment - Vaccine (N-1)
+            // Payment - VaccineBatch (N-1)
             modelBuilder.Entity<Payment>()
-                .HasOne(p => p.Vaccine)
-                .WithMany(v => v.Payments) // Nếu Vaccine có ICollection<Payment>
-                .HasForeignKey(p => p.VaccineId)
+                .HasOne(p => p.VaccineBatch)
+                .WithMany()
+                .HasForeignKey(p => p.VaccineBatchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payment - Microchip (N-1)
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Microchip)
+                .WithMany()
+                .HasForeignKey(p => p.MicrochipId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payment - VaccinationCertificate (N-1)
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.VaccinationCertificate)
+                .WithMany()
+                .HasForeignKey(p => p.VaccinationCertificateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payment - HealthCondition (N-1)
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.HealthCondition)
+                .WithMany()
+                .HasForeignKey(p => p.HealthConditionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // PointTransaction - Customer (N-1)
@@ -343,19 +379,41 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey(vs => vs.VetId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // PetPassport - MicrochipItem (N-1, optional)
-            modelBuilder.Entity<PetPassport>()
+            // VaccinationCertificate - MicrochipItem (N-1, optional)
+            modelBuilder.Entity<VaccinationCertificate>()
                 .HasOne(pp => pp.MicrochipItem)
                 .WithMany()
                 .HasForeignKey("MicrochipItemId")
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // PetPassport - HealthCondition (N-1, optional)
-            modelBuilder.Entity<PetPassport>()
-                .HasOne(pp => pp.HealthCondition)
-                .WithMany()
-                .HasForeignKey("HealthConditionId")
+            // VaccinationCertificate - Vet (N-1, optional)
+            modelBuilder.Entity<VaccinationCertificate>()
+                .HasOne(pp => pp.Vet)
+                .WithMany(v => v.VaccinationCertificates)
+                .HasForeignKey(pp => pp.VetId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // VaccinationCertificate - Disease (N-1, optional)
+            modelBuilder.Entity<VaccinationCertificate>()
+                .HasOne(pp => pp.Disease)
+                .WithMany(d => d.VaccinationCertificates)
+                .HasForeignKey(pp => pp.DiseaseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //HealthConditionVaccinationCertificate - HealthCondition (N-1)
+            modelBuilder.Entity<HealthConditionVaccinationCertificate>()
+                .HasOne(hcvc => hcvc.HealthCondition)
+                .WithMany(hc => hc.HealthConditionVaccinationCertificates)
+                .HasForeignKey(hcvc => hcvc.HealthConditionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //HealthConditionVaccinationCertificate - VaccinationCertificate (N-1)
+            modelBuilder.Entity<HealthConditionVaccinationCertificate>()
+                .HasOne(hcvc => hcvc.VaccinationCertificate)
+                .WithMany(vc => vc.HealthConditionVaccinationCertificates)
+                .HasForeignKey(hcvc => hcvc.VaccinationCertificateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Microchip>()
                 .Property(m => m.Price)
                 .HasColumnType("decimal(18,2)");
@@ -363,12 +421,15 @@ namespace PediVax.BusinessObjects.DBContext
             modelBuilder.Entity<Payment>()
                 .Property(p => p.Amount)
                 .HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<PetPassport>()
+            modelBuilder.Entity<VaccinationCertificate>()
                 .Property(p => p.Price)
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<Vaccine>()
                 .Property(v => v.Price)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<HealthCondition>()
+                .Property(hc => hc.Price)
                 .HasColumnType("decimal(18,2)");
 
             SeedData.Seed(modelBuilder);

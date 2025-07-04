@@ -66,7 +66,7 @@ namespace PetVax.Services.Service
 
                 // Generate OTP and send email
                 var otp = GenerateOtp();
-                var expiration = DateTime.UtcNow.AddMinutes(5);
+                var expiration = DateTimeHelper.Now().AddMinutes(5);
                 _otpStore[loginRequest.Email] = (otp, expiration);
                 await SendOtpEmailAsync(loginRequest.Email, otp, cancellationToken);
 
@@ -107,7 +107,7 @@ namespace PetVax.Services.Service
         {
             try
             {
-                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTime.UtcNow || otpInfo.Otp != otp)
+                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
                 {
                     return new BaseResponse<AuthResponseDTO>
                     {
@@ -141,8 +141,8 @@ namespace PetVax.Services.Service
                     Role = account.Role,
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
-                    AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
-                    RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+                    AccessTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
                 };
                 return new BaseResponse<AuthResponseDTO>
                 {
@@ -191,7 +191,7 @@ namespace PetVax.Services.Service
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                expires: DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
                 signingCredentials: credentials
             );
 
@@ -279,8 +279,8 @@ namespace PetVax.Services.Service
                     RefreshToken = refreshToken,
                     Email = account.Email,
                     Role = account.Role,
-                    AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
-                    RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+                    AccessTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
                 };
                 return new BaseResponse<AuthResponseDTO>
                 {
@@ -320,7 +320,7 @@ namespace PetVax.Services.Service
 
                 // Generate OTP and send email
                 var otp = GenerateOtp();
-                var expiration = DateTime.UtcNow.AddMinutes(5);
+                var expiration = DateTimeHelper.Now().AddMinutes(5);
                 _otpStore[regisRequestDTO.Email] = (otp, expiration);
                 await SendOtpEmailAsync(regisRequestDTO.Email, otp, cancellationToken);
 
@@ -334,7 +334,7 @@ namespace PetVax.Services.Service
                     PasswordHash = passwordHash,
                     PasswordSalt = passwordSalt,
                     Role = EnumList.Role.Customer,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.Now(),
                     isVerify = false
                 };
 
@@ -371,7 +371,7 @@ namespace PetVax.Services.Service
         {
             try
             {
-                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTime.UtcNow || otpInfo.Otp != otp)
+                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
                 {
                     return new BaseResponse
                     {
@@ -402,7 +402,7 @@ namespace PetVax.Services.Service
                     Customer customer = new Customer
                     {
                         AccountId = account.AccountId,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTimeHelper.Now(),
                         CustomerCode = customerCode
                     };
                     await _customerRepository.CreateCustomerAsync(customer);
@@ -439,7 +439,7 @@ namespace PetVax.Services.Service
                 {
                     // Generate email verification token
                     var verificationToken = Guid.NewGuid().ToString();
-                    var tokenExpiration = DateTime.UtcNow.AddMinutes(30);
+                    var tokenExpiration = DateTimeHelper.Now().AddMinutes(30);
 
                     // Store token in-memory (for demo; use persistent store in production)
                     _otpStore[email] = (verificationToken, tokenExpiration);
@@ -482,8 +482,8 @@ namespace PetVax.Services.Service
                         Role = account.Role,
                         AccessToken = accessToken,
                         RefreshToken = refreshToken,
-                        AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
-                        RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+                        AccessTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                        RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
                     }
                 };
             }
@@ -504,7 +504,7 @@ namespace PetVax.Services.Service
         {
             try
             {
-                if (!_otpStore.TryGetValue(email, out var tokenInfo) || tokenInfo.Expiration < DateTime.UtcNow || tokenInfo.Otp != token)
+                if (!_otpStore.TryGetValue(email, out var tokenInfo) || tokenInfo.Expiration < DateTimeHelper.Now() || tokenInfo.Otp != token)
                 {
                     return new BaseResponse<AuthResponseDTO>
                     {
@@ -523,7 +523,7 @@ namespace PetVax.Services.Service
                     {
                         Email = email,
                         Role = EnumList.Role.Customer,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTimeHelper.Now()
                     };
                     await _accountRepository.CreateAccountAsync(account, cancellationToken);
                 }
@@ -545,8 +545,8 @@ namespace PetVax.Services.Service
                         Role = account.Role,
                         AccessToken = accessToken,
                         RefreshToken = refreshToken,
-                        AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
-                        RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+                        AccessTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                        RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
                     }
                 };
             }

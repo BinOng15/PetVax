@@ -74,7 +74,7 @@ namespace PetVax.Services.Service
                     Role = EnumList.Role.Staff,
                     AccessToken = string.Empty,
                     RefereshToken = string.Empty,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.Now(),
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system",
                     isVerify = true
                 };
@@ -145,7 +145,7 @@ namespace PetVax.Services.Service
                     Role = EnumList.Role.Vet,
                     AccessToken = string.Empty,
                     RefereshToken = string.Empty,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.Now(),
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system",
                     isVerify = true
                 };
@@ -178,7 +178,7 @@ namespace PetVax.Services.Service
                 {
                     AccountId = createdAccount.AccountId,
                     VetCode = "V" + random.Next(0, 1000000).ToString("D6"),
-                    CreateAt = DateTime.UtcNow,
+                    CreateAt = DateTimeHelper.Now(),
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system",
                 };
                 var vetResult = await _vetRepository.CreateVetAsync(vet, cancellationToken);

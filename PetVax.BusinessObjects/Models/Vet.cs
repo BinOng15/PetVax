@@ -31,5 +31,7 @@ namespace PetVax.BusinessObjects.Models
         public virtual Account Account { get; set; } // Navigation to Account table
         public virtual ICollection<VetSchedule> VetSchedules { get; set; } // Navigation to VetSchedule table
         public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; } // Navigation to AppointmentDetail table
+        public virtual ICollection<VaccinationCertificate> VaccinationCertificates { get; set; } // Navigation to VaccinationCertificate table
+        public virtual ICollection<HealthCondition> HealthConditions { get; set; } // Navigation to HealthCondition table
     }
 }

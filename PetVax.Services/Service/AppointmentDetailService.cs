@@ -5,6 +5,7 @@ using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.Enum;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -29,7 +30,7 @@ namespace PetVax.Services.Service
         private readonly IVetRepository _vetRepository;
         private readonly IDiseaseRepository _diseaseRepository;
         private readonly IMicrochipItemRepository _microchipItemRepository;
-        private readonly IPetPassportRepository _petPassportRepository;
+        private readonly IVaccinationCertificateRepository _petPassportRepository;
         private readonly IHealthConditionRepository _healthConditionRepository;
         private readonly IVaccineBatchRepository _vaccineBatchRepository;
 
@@ -42,7 +43,7 @@ namespace PetVax.Services.Service
             IVetRepository vetRepository,
             IDiseaseRepository diseaseRepository,
             IMicrochipItemRepository microchipItemRepository,
-            IPetPassportRepository petPassportRepository,
+            IVaccinationCertificateRepository petPassportRepository,
             IHealthConditionRepository healthConditionRepository,
             IVaccineBatchRepository vaccineBatchRepository)
         {
@@ -206,7 +207,7 @@ namespace PetVax.Services.Service
                 }
 
                 appointmentDetail.isDeleted = true;
-                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.ModifiedAt = DateTimeHelper.Now();
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
                 var updateResult = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);

@@ -4,6 +4,7 @@ using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
 using PetVax.BusinessObjects.Enum;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -161,7 +162,7 @@ namespace PetVax.Services.Service
                 {
                     var date = schedule.ScheduleDate.Date;
 
-                    if (date < DateTime.UtcNow.Date)
+                    if (date < DateTimeHelper.Now().Date)
                     {
                         return new BaseResponse<List<VetScheduleDTO>>
                         {
@@ -179,7 +180,7 @@ namespace PetVax.Services.Service
                             ScheduleDate = date,
                             SlotNumber = slot,
                             Status = EnumList.VetScheduleStatus.Available,
-                            CreatedAt = DateTime.UtcNow,
+                            CreatedAt = DateTimeHelper.Now(),
                             CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system"
                         };
 
@@ -252,7 +253,7 @@ namespace PetVax.Services.Service
                 vetSchedule.ScheduleDate = request.ScheduleDate;
                 vetSchedule.SlotNumber = request.SlotNumber;
                 vetSchedule.Status = EnumList.VetScheduleStatus.Available;
-                vetSchedule.ModifiedAt = DateTime.UtcNow;
+                vetSchedule.ModifiedAt = DateTimeHelper.Now();
                 var updatedVetScheduleId = await _vetScheduleRepository.UpdateVetScheduleAsync(vetSchedule, cancellationToken);
                 if (updatedVetScheduleId <= 0)
                 {

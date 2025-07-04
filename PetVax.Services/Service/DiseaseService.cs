@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -61,7 +62,7 @@ namespace PetVax.Services.Service
 
                 var disease = _mapper.Map<Disease>(createDiseaseDTO);
                 disease.Status = "Active";
-                disease.CreatedAt = DateTime.UtcNow;
+                disease.CreatedAt = DateTimeHelper.Now();
                 disease.CreatedBy = GetCurrentUserName();
 
                 var diseaseId = await _diseaseRepository.CreateDiseaseAsync(disease, cancellationToken);
@@ -411,7 +412,7 @@ namespace PetVax.Services.Service
                     existingDisease.Symptoms = updateDiseaseDTO.Symptoms;
                 if (!string.IsNullOrWhiteSpace(updateDiseaseDTO.Species))
                     existingDisease.Species = updateDiseaseDTO.Species;
-                existingDisease.ModifiedAt = DateTime.UtcNow;
+                existingDisease.ModifiedAt = DateTimeHelper.Now();
                 existingDisease.ModifiedBy = GetCurrentUserName();
                 var result = await _diseaseRepository.UpdateDiseaseAsync(existingDisease, cancellationToken);
                 if (result <= 0)

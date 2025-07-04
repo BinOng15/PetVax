@@ -46,7 +46,9 @@ namespace PetVax.BusinessObjects.Enum
         {
             Vaccination = 1,
             Microchip = 2,
-            HealthCertificate = 3,
+            HealthCondition = 3,
+            VaccinationCertificate = 4,
+            HealthConditionCertificate = 5,
         }
 
         public enum Location
@@ -59,6 +61,20 @@ namespace PetVax.BusinessObjects.Enum
         {
             Available = 1,
             Unavailable = 2,
+        }
+
+        public enum PaymentStatus
+        {
+            Pending = 1,
+            Completed = 2,
+            Failed = 3,
+            Refunded = 4,
+        }
+
+        public enum PaymentMethod
+        {
+            Cash = 1,
+            BankTransfer = 2,
         }
     }
 }

@@ -30,6 +30,7 @@ namespace PetVax.BusinessObjects.Models
         public virtual ICollection<VaccineProfile> VaccineProfiles { get; set; }
         public virtual ICollection<VaccineDisease> VaccineDiseases { get; set; }
         public virtual ICollection<VaccinationSchedule> VaccinationSchedules { get; set; }
+        public virtual ICollection<VaccinationCertificate> VaccinationCertificates { get; set; }
 
     }
 }

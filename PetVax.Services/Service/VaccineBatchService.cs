@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -47,7 +48,7 @@ namespace PetVax.Services.Service
                 }
                 var vaccineBatch = _mapper.Map<VaccineBatch>(createVaccineBatchDTO);
                 vaccineBatch.BatchNumber = "BATCH" + new Random().Next(100000, 1000000).ToString();
-                vaccineBatch.CreateAt = DateTime.UtcNow;
+                vaccineBatch.CreateAt = DateTimeHelper.Now();
                 vaccineBatch.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 int batchId = await _vaccineBatchRepository.CreateVaccineBatchAsync(vaccineBatch, cancellationToken);
                 var response = _mapper.Map<VaccineBatchResponseDTO>(vaccineBatch);
@@ -90,7 +91,7 @@ namespace PetVax.Services.Service
                 }
 
                 vaccineBatch.isDeleted = true;
-                vaccineBatch.ModifiedAt = DateTime.UtcNow;
+                vaccineBatch.ModifiedAt = DateTimeHelper.Now();
                 vaccineBatch.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
 
                 await _vaccineBatchRepository.UpdateVaccineBatchAsync(vaccineBatch, cancellationToken);
@@ -320,7 +321,7 @@ namespace PetVax.Services.Service
                 // Update properties
                 existingBatch.ExpiryDate = updateVaccineBatchDTO.ExpiryDate ?? existingBatch.ExpiryDate;
                 existingBatch.Quantity = updateVaccineBatchDTO.Quantity ?? existingBatch.Quantity;
-                existingBatch.ModifiedAt = DateTime.UtcNow;
+                existingBatch.ModifiedAt = DateTimeHelper.Now();
                 existingBatch.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 await _vaccineBatchRepository.UpdateVaccineBatchAsync(existingBatch, cancellationToken);
                 var response = _mapper.Map<VaccineBatchResponseDTO>(existingBatch);

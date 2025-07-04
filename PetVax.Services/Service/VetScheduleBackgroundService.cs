@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
 using System;
@@ -30,7 +31,7 @@ namespace PetVax.Services.Service
 
             while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
             {
-                _logger.LogInformation("Running vet schedule update at {time}", DateTime.Now);
+                _logger.LogInformation("Running vet schedule update at {time}", DateTimeHelper.Now());
                 using var scope = _serviceProvider.CreateScope();
                 var vetScheduleService = scope.ServiceProvider.GetRequiredService<IVetScheduleRepository>();
 
