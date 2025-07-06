@@ -2522,9 +2522,16 @@ namespace PetVax.Services.Service
             }
             else
             {
-                appointmentDetail.NextVaccinationInfo = null; // Không còn mũi tiếp theo
+                appointmentDetail.NextVaccinationInfo = null;
+            }
+
+            // Nếu profile tiếp theo có NextVaccinationInfo thì cũng cập nhật vào appointmentDetail
+            if (nextProfile != null && !string.IsNullOrWhiteSpace(nextProfile.NextVaccinationInfo))
+            {
+                appointmentDetail.NextVaccinationInfo = nextProfile.NextVaccinationInfo;
             }
         }
+
 
         #endregion
         public async Task NotifyCustomerIfCancelledOrRejectedAsync(Appointment appointment, CancellationToken cancellationToken)
