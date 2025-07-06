@@ -3133,5 +3133,325 @@ namespace PetVax.Services.Service
         //    }
         //}
         #endregion
+
+
+        public async Task<BaseResponse<AppointmenWithHealthConditionResponseDTO>> CreateAppointmentHealConditionAsync(CreateAppointmentHealthConditionDTO createAppointmentHealConditionDTO, CancellationToken cancellationToken)
+        {
+            if (createAppointmentHealConditionDTO == null)
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Dữ liệu tạo cuộc hẹn khám bệnh không hợp lệ.",
+                    Data = null
+                };
+            }
+
+            if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.HomeVisit &&
+                string.IsNullOrWhiteSpace(createAppointmentHealConditionDTO.Appointment.Address))
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                    Data = null
+                };
+            }
+
+            if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.Clinic)
+            {
+                createAppointmentHealConditionDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
+            }
+
+            var pet = await _petRepository.GetPetByIdAsync(createAppointmentHealConditionDTO.Appointment.PetId, cancellationToken);
+            if (pet == null || pet.CustomerId != createAppointmentHealConditionDTO.Appointment.CustomerId)
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Thú cưng này không thuộc quyền sở hữu của chủ nuôi này.",
+                    Data = null
+                };
+            }
+
+            try
+            {
+                var random = new Random();
+                var appointment = _mapper.Map<Appointment>(createAppointmentHealConditionDTO.Appointment);
+
+                appointment.AppointmentCode = "AP" + random.Next(0, 1000000).ToString("D6");
+                appointment.AppointmentDate = createAppointmentHealConditionDTO.Appointment.AppointmentDate;
+                appointment.ServiceType = createAppointmentHealConditionDTO.Appointment.ServiceType;
+                appointment.Location = createAppointmentHealConditionDTO.Appointment.Location;
+                appointment.Address = createAppointmentHealConditionDTO.Appointment.Address;
+                appointment.AppointmentStatus = EnumList.AppointmentStatus.Processing;
+                appointment.CreatedAt = DateTime.UtcNow;
+                appointment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                var createdAppointment = await _appointmentRepository.CreateAppointmentAsync(appointment, cancellationToken);
+                if (createdAppointment == null)
+                {
+                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không thể tạo cuộc hẹn khám bệnh.",
+                        Data = null
+                    };
+                }
+
+                var createdAppointmentId = await _appointmentRepository.GetAppointmentByIdAsync(createdAppointment.AppointmentId, cancellationToken);
+
+                var appointmentDetail = new AppointmentDetail
+                {
+                    AppointmentId = createdAppointment.AppointmentId,
+                    AppointmentDate = createdAppointment.AppointmentDate,
+                    ServiceType = createdAppointment.ServiceType,
+                    AppointmentStatus = createdAppointment.AppointmentStatus,
+                    AppointmentDetailCode = "AD" + random.Next(0, 1000000).ToString("D6"),
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                };
+
+                var createdAppointmentDetail = await _appointmentDetailRepository.AddAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                if (createdAppointmentDetail == null)
+                {
+                    await _appointmentRepository.DeleteAppointmentAsync(createdAppointment.AppointmentId, cancellationToken);
+                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không thể tạo chi tiết cuộc hẹn khám bệnh.",
+                        Data = null
+                    };
+                }
+
+                var createdAppointmentDetailId = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(createdAppointmentDetail.AppointmentDetailId, cancellationToken);
+                if (createdAppointmentId == null || createdAppointmentDetailId == null)
+                {
+                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Lỗi khi lấy thông tin cuộc hẹn đã tạo.",
+                        Data = null
+                    };
+                }
+
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 201,
+                    Success = true,
+                    Message = "Tạo cuộc hẹn khám bệnh thành công.",
+                    Data = new AppointmenWithHealthConditionResponseDTO
+                    {
+                        Appointment = _mapper.Map<AppointmentResponseDTO>(createdAppointmentId),
+                        HealthCondition = _mapper.Map<AppointmentHealthConditionResponseDTO>(createdAppointmentDetailId)
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi tạo cuộc hẹn khám bệnh. " + ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<AppointmentHealthConditionResponseDTO>> UpdateAppointmentHealthConditionAsync(UpdateAppointmentHealthConditionDTO updateDTO, CancellationToken cancellationToken)
+        {
+            if (updateDTO == null)
+            {
+                return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Dữ liệu cập nhật không hợp lệ.",
+                    Data = null
+                };
+            }
+
+            try
+            {
+                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(updateDTO.AppointmentId, cancellationToken);
+                if (appointment == null)
+                {
+                    return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Cuộc hẹn không tồn tại.",
+                        Data = null
+                    };
+                }
+
+                if (appointment.ServiceType != EnumList.ServiceType.HealthCondition)
+                {
+                    return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Cuộc hẹn này không phải là dịch vụ khám bệnh.",
+                        Data = null
+                    };
+                }
+
+                // Validate allowed status transitions
+                var currentStatus = appointment.AppointmentStatus;
+                var newStatus = updateDTO.AppointmentStatus ?? currentStatus;
+                bool isValidTransition = false;
+                switch (currentStatus)
+                {
+                    case EnumList.AppointmentStatus.Processing:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Confirmed || newStatus == EnumList.AppointmentStatus.Cancelled;
+                        break;
+                    case EnumList.AppointmentStatus.Confirmed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.CheckedIn || newStatus == EnumList.AppointmentStatus.Rejected;
+                        break;
+                    case EnumList.AppointmentStatus.CheckedIn:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Processed;
+                        break;
+                    case EnumList.AppointmentStatus.Processed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Completed;
+                        break;
+                    default:
+                        isValidTransition = false;
+                        break;
+                }
+                if (newStatus != currentStatus && !isValidTransition)
+                {
+                    return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = $"Không thể chuyển trạng thái từ {currentStatus} sang {newStatus}.",
+                        Data = null
+                    };
+                }
+
+                bool isStatusChangeToProcessed = updateDTO.AppointmentStatus.HasValue &&
+                                                 updateDTO.AppointmentStatus.Value == EnumList.AppointmentStatus.Processed &&
+                                                 appointment.AppointmentStatus != EnumList.AppointmentStatus.Processed;
+
+                if (appointment.ServiceType != EnumList.ServiceType.HealthCondition)
+                {
+                    return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Cuộc hẹn này không phải là dịch vụ khám sức khỏe.",
+                        Data = null
+                    };
+                }
+
+
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(updateDTO.AppointmentId, cancellationToken);
+                if (appointmentDetail == null)
+                {
+                    return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Chi tiết cuộc hẹn không tồn tại.",
+                        Data = null
+                    };
+                }
+
+                if (updateDTO.VetId.HasValue)
+                {
+                    var appointmentDate = appointmentDetail.AppointmentDate;
+                    var slotNumber = GetSlotNumberFromAppointmentDate(appointmentDate);
+
+                    var vetSchedules = await _vetScheduleRepository.GetVetSchedulesByVetIdAsync(updateDTO.VetId.Value, cancellationToken);
+
+                    var isValidSchedule = vetSchedules.Any(s =>
+                        s.ScheduleDate.Date == appointmentDate.Date &&
+                        s.SlotNumber == slotNumber &&
+                        s.Status == EnumList.VetScheduleStatus.Available);
+
+                    if (!isValidSchedule)
+                    {
+                        return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Bác sĩ không có lịch làm việc vào thời gian này.",
+                            Data = null
+                        };
+                    }
+                }
+           
+
+                appointmentDetail.VetId = updateDTO.VetId ?? appointmentDetail.VetId;
+                appointmentDetail.HealthConditionId = updateDTO.HealthConditionId ?? appointmentDetail.HealthConditionId;
+                appointmentDetail.Notes = updateDTO.Note;
+                appointmentDetail.AppointmentStatus = newStatus;
+                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                appointment.AppointmentStatus = newStatus;
+                appointment.AppointmentDate = updateDTO.AppointmentDate ?? appointment.AppointmentDate;
+                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                using (var transaction = await _appointmentRepository.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        var updatedDetail = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                        var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+
+                        if (updatedAppointment == null)
+                        {
+                            await transaction.RollbackAsync();
+                            return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                            {
+                                Code = 500,
+                                Success = false,
+                                Message = "Không thể cập nhật cuộc hẹn khám bệnh.",
+                                Data = null
+                            };
+                        }
+
+                        await transaction.CommitAsync();
+
+                        var responseDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetail.AppointmentDetailId, cancellationToken);
+
+                        return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                        {
+                            Code = 200,
+                            Success = true,
+                            Message = "Cập nhật cuộc hẹn khám bệnh thành công.",
+                            Data = _mapper.Map<AppointmentHealthConditionResponseDTO>(responseDetail)
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        _logger.LogError(ex, "Lỗi khi cập nhật cuộc hẹn khám bệnh.");
+                        throw;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi cập nhật cuộc hẹn khám bệnh: " + ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+
     }
 }

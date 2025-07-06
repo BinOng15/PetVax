@@ -4,6 +4,7 @@ using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.HealthConditionDTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PaymentDTO;
@@ -189,6 +190,16 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<UpdatePaymentRequestDTO, Payment>();
             CreateMap<Payment, PaymentResponseDTO>();
 
+            //HealthCondition
+            CreateMap<CreateHealthConditionDTO, HealthCondition>();
+            CreateMap<HealthCondition, BaseHealthConditionResponseDTO>()
+                .ForMember(dest => dest.Pet, opt => opt.MapFrom(src => src.Pet))
+                .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet));
+            CreateMap<HealthCondition, HealthConditionResponse>();
+            CreateMap<AppointmentDetail, AppointmentHealthConditionResponseDTO>()
+                .ForMember(dest => dest.HealthCondition, opt => opt.MapFrom(src => src.HealthCondition))
+                .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
+                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment));
         }
     }   
 }

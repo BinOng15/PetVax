@@ -4,6 +4,7 @@ using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.Services.IService;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PediVax.Controllers
 {
@@ -59,6 +60,13 @@ namespace PediVax.Controllers
         {
             var response = await _appointmentDetailService.GetAllAppointmemtMicrochipAsync(getAllItemsDTO, cancellationToken);
             return StatusCode(response.Code, response);
+        }
+
+        [HttpGet("get-appointment-microchip-by-pet-id-and-status/{petId}/{status}")]
+        public async Task<IActionResult> GetAppointmentMicrochipByPetIdAndStatus(int petId, AppointmentStatus status, CancellationToken cancellationToken = default)
+        {
+            var response = await _appointmentDetailService.GetAppointmentMicrochipByPetIdAndStatus(petId, status, cancellationToken);
+            return Ok(response);
         }
     }
 }

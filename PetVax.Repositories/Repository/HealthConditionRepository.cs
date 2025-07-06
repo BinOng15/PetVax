@@ -31,7 +31,10 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.HealthConditions
                 .Include(hc => hc.Pet)
+                    .ThenInclude(p => p.Customer)
+                    .ThenInclude(c => c.Account)
                 .Include(hc => hc.Vet)
+                    .ThenInclude(hc => hc.Account)
                 .Include(hc => hc.MicrochipItem)
                 .ToListAsync(cancellationToken);
         }
@@ -40,7 +43,10 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.HealthConditions
                 .Include(hc => hc.Pet)
+                    .ThenInclude(p => p.Customer)
+                    .ThenInclude(c => c.Account)
                 .Include(hc => hc.Vet)
+                    .ThenInclude(hc => hc.Account)
                 .Include(hc => hc.MicrochipItem)
                 .FirstOrDefaultAsync(hc => hc.HealthConditionId == id, cancellationToken);
         }
@@ -50,7 +56,10 @@ namespace PetVax.Repositories.Repository
             return _context.HealthConditions
                 .Where(hc => hc.PetId == petId)
                 .Include(hc => hc.Pet)
+                    .ThenInclude(p => p.Customer)
+                    .ThenInclude(c => c.Account)
                 .Include(hc => hc.Vet)
+                    .ThenInclude(hc => hc.Account)
                 .Include(hc => hc.MicrochipItem)
                 .ToListAsync(cancellationToken);
         }
