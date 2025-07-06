@@ -63,9 +63,20 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
         public AppointmentMicrochipResponseDTO Microchip { get; set; }
     }
 
+    public class AppointmenWithHealthConditionResponseDTO
+    {
+        public AppointmentResponseDTO Appointment { get; set; }
+        public AppointmentHealthConditionResponseDTO HealthCondition { get; set; }
+    }
+
     public class AppointmenDetialMicorchipResponseDTO
     {
         public AppointmentMicrochipResponseDTO Microchip { get; set; }
+    }
+
+    public class AppointmentDetailHealthConditionResponseDTO
+    {
+        public AppointmentHealthConditionResponseDTO HealthCondition { get; set; }
     }
 
     public class AppointmentWithVaccinationCertificateResponseDTO
