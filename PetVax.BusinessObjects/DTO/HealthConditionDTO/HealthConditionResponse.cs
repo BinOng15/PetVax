@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PetVax.BusinessObjects.DTO.HealthConditionDTO
 {
-    public class CreateHealthConditionDTO
+    public class HealthConditionResponse
     {
         public int HealthConditionId { get; set; }
         public int PetId { get; set; }
@@ -34,6 +34,5 @@ namespace PetVax.BusinessObjects.DTO.HealthConditionDTO
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
         public bool? isDeleted { get; set; } = false;
-
     }
 }

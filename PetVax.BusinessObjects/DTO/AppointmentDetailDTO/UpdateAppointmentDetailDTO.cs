@@ -52,14 +52,16 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public EnumList.AppointmentStatus? AppointmentStatus { get; set; }
     }
 
-    public class UpdateAppointmentHealthCertificateDTO
+    public class UpdateAppointmentHealthConditionDTO
     {
-        public int? AppointmentId { get; set; }
+        public int AppointmentId { get; set; }
         public int? VetId { get; set; }
         public int? HealthConditionId { get; set; }
+        public string? Note { get; set; }
         public DateTime? AppointmentDate { get; set; }
         public EnumList.AppointmentStatus? AppointmentStatus { get; set; }
     }
+
 
     public class UpdateAppointmentVaccinationCertificateDTO
     {

@@ -170,11 +170,7 @@ namespace PetVax.Services.Service
                 {
                     pet.Image = await _cloudinariService.UploadImage(updatePetRequest.Image);
                 }
-                else
-                {
-                    pet.Image = null;
-                }
-                // else keep existing image
+
 
                 pet.Weight = updatePetRequest?.Weight ?? pet.Weight;
                 pet.Color = updatePetRequest?.Color ?? pet.Color;

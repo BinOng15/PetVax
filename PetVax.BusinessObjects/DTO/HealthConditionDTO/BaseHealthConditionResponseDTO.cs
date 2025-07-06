@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PetVax.BusinessObjects.DTO.PetDTO;
+using PetVax.BusinessObjects.DTO.VetDTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PetVax.BusinessObjects.DTO.HealthConditionDTO
 {
-    public class CreateHealthConditionDTO
+    public class BaseHealthConditionResponseDTO
     {
         public int HealthConditionId { get; set; }
         public int PetId { get; set; }
@@ -33,7 +35,9 @@ namespace PetVax.BusinessObjects.DTO.HealthConditionDTO
         public string CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
-        public bool? isDeleted { get; set; } = false;
+        public bool? isDeleted { get; set; } 
 
+        public PetResponseDTO Pet { get; set; }
+        public VetResponseDTO Vet { get; set; }
     }
 }

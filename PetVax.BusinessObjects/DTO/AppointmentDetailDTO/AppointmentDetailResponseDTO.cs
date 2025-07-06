@@ -1,5 +1,6 @@
 ﻿using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.HealthConditionDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VaccinationCertificate;
@@ -114,7 +115,10 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
         public VetResponseDTO Vet { get; set; } // Navigation to Vet table
-        public HealthConditionResponseDTO HealthCondition { get; set; } // Navigation to HealthCondition table
+        public HealthConditionResponse HealthCondition { get; set; }
+
+        public AppointmentResponseDTO Appointment { get; set; } // Navigation to Appointment table
+
     }
 
     public class AppointmentVaccinationCertificateResponseDTO
