@@ -271,6 +271,8 @@ namespace PetVax.Repositories.Repository
                 .Include(ad => ad.VaccineBatch)
                 .Include(ad => ad.Disease)
                 .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Pet)
+                    .ThenInclude(a => a.Customer)
                 .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
         }
 
