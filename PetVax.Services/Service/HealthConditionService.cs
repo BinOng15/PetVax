@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Http;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.HealthConditionDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
+using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
+using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +15,7 @@ using static PetVax.BusinessObjects.DTO.ResponseModel;
 
 namespace PetVax.Services.Service
 {
-    public class HealthConditionService
+    public class HealthConditionService : IHealthConditionService
     {
         private readonly IHealthConditionRepository _healthConditionRepository;
         private readonly IMapper _mapper;
@@ -103,5 +105,83 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<BaseResponse<HealthConditionResponse>> CreateHealthConditionAsync(CreateHealthConditionDTO healthConditionDto, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var healthIssues = new List<string>();
+
+                // Validate temperture (°C)
+                if (!string.IsNullOrEmpty(healthConditionDto.Temperature) &&
+                    decimal.TryParse(healthConditionDto.Temperature.Replace("°C", "").Trim(), out decimal temperatureC))
+                {
+                    if (temperatureC < 37.5m || temperatureC > 39.2m)
+                        healthIssues.Add($"Nhiệt độ bất thường: {temperatureC} °C");
+                }
+
+                // Validate heart rate (bpm)
+                if (!string.IsNullOrEmpty(healthConditionDto.HeartRate) &&
+                    int.TryParse(healthConditionDto.HeartRate.Trim(), out int heartRate))
+                {
+                    if (heartRate < 60 || heartRate > 140)
+                        healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                }
+
+                // Validate Breathing rate (breaths/min)
+                if (!string.IsNullOrEmpty(healthConditionDto.BreathingRate) &&
+                    int.TryParse(healthConditionDto.BreathingRate.Trim(), out int breathingRate))
+                {
+                    if (breathingRate < 10 || breathingRate > 30)
+                        healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                }
+
+                // Validate weight (kg)
+                if (!string.IsNullOrEmpty(healthConditionDto.Weight) &&
+                    !decimal.TryParse(healthConditionDto.Weight.Trim(), out _))
+                {
+                    healthIssues.Add("Cân nặng không hợp lệ.");
+                }
+
+
+                if (healthIssues.Any())
+                {
+                    healthConditionDto.Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}";
+                    healthConditionDto.Status = "FAIL";
+                }
+                else
+                {
+                    healthConditionDto.Conclusion = "✅ Đạt: Tình trạng sức khỏe trong ngưỡng bình thường.";
+                    healthConditionDto.Status = "PASS";
+                }
+
+                // Mapping & lưu DB
+                var healthCondition = _mapper.Map<HealthCondition>(healthConditionDto);
+                healthCondition.CreatedAt = DateTime.UtcNow;
+                healthCondition.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+
+                var createdHealthCondition = await _healthConditionRepository.AddHealthConditionAsync(healthCondition, cancellationToken);
+                var responseData = _mapper.Map<HealthConditionResponse>(createdHealthCondition);
+
+                return new BaseResponse<HealthConditionResponse>
+                {
+                    Code = 201,
+                    Success = true,
+                    Message = "✅ Khám sức khỏe hoàn tất.",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<HealthConditionResponse>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "❌ Đã xảy ra lỗi khi tạo điều kiện sức khỏe.",
+                    Data = null
+                };
+            }
+        }
+
     }
 }

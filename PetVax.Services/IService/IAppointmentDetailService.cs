@@ -33,5 +33,7 @@ namespace PetVax.Services.IService
         Task<DynamicResponse<AppointmenDetialMicorchipResponseDTO>> GetAllAppointmemtMicrochipAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentHealthConditionResponseDTO>> GetAppointmentDetailHealthConditionByAppointmentDetailIdAsync(int id, CancellationToken cancellationToken);
         Task<List<BaseResponse<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetIdAndStatus(int petId, AppointmentStatus status, CancellationToken cancellationToken);
+
+        Task<BaseResponse<List<AppointmentHealthConditionResponseDTO>>> GetAppointmentDetailHealthConditionByPetIdAsync(int petId, CancellationToken cancellationToken);
     }
 }

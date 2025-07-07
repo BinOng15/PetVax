@@ -116,7 +116,8 @@ namespace PetVax.Repositories.Repository
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(a => a.Appointment)
                     .ThenInclude(a => a.Pet)
-                .Include(a => a.Vet)
+                .Include(a => a.Vet).ThenInclude(v => v.Account)
+                .Include(a => a.Vet).ThenInclude(v => v.VetSchedules)
                 .Include(a => a.MicrochipItem).ThenInclude(m => m.Microchip)
                 .FirstOrDefaultAsync(ad => ad.MicrochipItemId == microchipItemId, cancellationToken);
         }
@@ -126,6 +127,7 @@ namespace PetVax.Repositories.Repository
             return await _context.AppointmentDetails
                 .Include(ad => ad.MicrochipItem).ThenInclude(mi => mi.Microchip)
                 .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+                .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
@@ -157,6 +159,7 @@ namespace PetVax.Repositories.Repository
             return await _context.AppointmentDetails
            .Include(ad => ad.MicrochipItem).ThenInclude(mi => mi.Microchip)
            .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+           .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
            .Include(ad => ad.Appointment)
                .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
            .Include(ad => ad.Appointment)
@@ -239,6 +242,9 @@ namespace PetVax.Repositories.Repository
                             ad.ServiceType == EnumList.ServiceType.Vaccination &&
                             ad.AppointmentStatus == status)
                 .Include(ad => ad.Vet)
+                    .ThenInclude(v => v.Account)
+                .Include(ad => ad.Vet)
+                    .ThenInclude(v => v.VetSchedules)
                 .Include(ad => ad.VaccineBatch)
                     .ThenInclude(vb => vb.Vaccine)
                 .Include(ad => ad.Disease)
@@ -267,13 +273,17 @@ namespace PetVax.Repositories.Repository
         public async Task<AppointmentDetail> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-                .Include(ad => ad.Vet)
-                .Include(ad => ad.VaccineBatch)
-                .Include(ad => ad.Disease)
-                .Include(ad => ad.Appointment)
-                    .ThenInclude(a => a.Pet)
-                    .ThenInclude(a => a.Customer)
-                .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
+       .Include(ad => ad.Vet)
+           .ThenInclude(v => v.VetSchedules) 
+       .Include(ad => ad.Vet)
+           .ThenInclude(v => v.Account)
+       .Include(ad => ad.VaccineBatch)
+       .Include(ad => ad.Disease)
+       .Include(ad => ad.Appointment)
+           .ThenInclude(a => a.Pet)
+               .ThenInclude(p => p.Customer)
+                    .ThenInclude(a => a.Account)
+       .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
         }
 
         public async Task<List<AppointmentDetail>> GetAllAppointmentDetailsForVaccinationAsync(CancellationToken cancellationToken)
@@ -353,6 +363,7 @@ namespace PetVax.Repositories.Repository
             return await _context.AppointmentDetails
                 .Include (ad => ad.HealthCondition)
                 .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+                .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
@@ -366,6 +377,7 @@ namespace PetVax.Repositories.Repository
             return await _context.AppointmentDetails
                 .Include(ad => ad.HealthCondition)
                 .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+                .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
@@ -378,6 +390,7 @@ namespace PetVax.Repositories.Repository
             return await _context.AppointmentDetails
                 .Include(ad => ad.HealthCondition)
                 .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+                .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
@@ -390,6 +403,7 @@ namespace PetVax.Repositories.Repository
             return await _context.AppointmentDetails
                 .Include(ad => ad.HealthCondition)
                 .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+                .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
@@ -402,6 +416,7 @@ namespace PetVax.Repositories.Repository
             return await _context.AppointmentDetails
                    .Include(ad => ad.HealthCondition)
                    .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+                     .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
                    .Include(ad => ad.Appointment)
                        .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                    .Include(ad => ad.Appointment)
