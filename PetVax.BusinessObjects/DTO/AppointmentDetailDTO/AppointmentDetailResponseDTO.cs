@@ -46,7 +46,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public VetResponseDTO Vet { get; set; } // Navigation to Vet table
         public BaseMicrochipItemResponse MicrochipItem { get; set; } // Navigation to MicrochipItem table
         public PetPassportResponseDTO PetPassport { get; set; } // Navigation to PetPassport table
-        public HealthConditionResponseDTO HealthCondition { get; set; } // Navigation to HealthCondition table
+        public HealthConditionResponse HealthCondition { get; set; } // Navigation to HealthCondition table
         public VaccineBatchResponseDTO VaccineBatch { get; set; } // Navigation to VaccineBatch table
         public DiseaseResponseDTO Disease { get; set; } // Navigation to Disease table, if applicable (for vaccinations)
     }
