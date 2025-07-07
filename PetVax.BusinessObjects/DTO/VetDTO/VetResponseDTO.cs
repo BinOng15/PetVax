@@ -1,4 +1,5 @@
 ﻿using PetVax.BusinessObjects.DTO.AccountDTO;
+using PetVax.BusinessObjects.DTO.VetScheduleDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,7 @@ namespace PetVax.BusinessObjects.DTO.VetDTO
         public string? PhoneNumber { get; set; }  
 
         public AccountResponseDTO Account {  get; set; }
+
+        public List<ScheduleResponse> ScheduleResponse { get; set; } 
     }
 }

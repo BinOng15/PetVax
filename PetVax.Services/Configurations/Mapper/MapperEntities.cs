@@ -62,6 +62,9 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<UpdateVetScheduleRequestDTO, VetSchedule>();
             CreateMap<VetSchedule, VetScheduleDTO>()
                 .ForMember(dest => dest.VetResponse, opt => opt.MapFrom(src => src.Vet)).ReverseMap();
+            CreateMap<VetSchedule, ScheduleResponse>();
+            CreateMap<Vet, VetResponseDTO>()
+                .ForMember(dest => dest.ScheduleResponse, opt => opt.MapFrom(src => src.VetSchedules));
 
 
             //Vaccine
