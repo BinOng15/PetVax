@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.Enum;
+﻿using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
+using PetVax.BusinessObjects.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,4 +18,14 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
         public EnumList.Location? Location { get; set; }
         public string? Address { get; set; }
     }
+    public class UpdateAppointmentForVaccinationDTO
+    {
+        public UpdateAppointmentDTO Appointment { get; set; }
+        public UpdateDiseaseForAppointmentDTO UpdateDiseaseForAppointmentDTO { get; set; }
+    }
+    public class UpdateDiseaseForAppointmentDTO
+    {
+        public int? DiseaseId { get; set; }
+    }
+
 }

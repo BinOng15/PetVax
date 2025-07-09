@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AccountDTO;
@@ -32,17 +33,19 @@ namespace PetVax.Services.Service
         private readonly IAccountRepository _accountRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICustomerRepository _customerRepository;
+        private readonly ILogger<AuthService> _logger;
 
         // In-memory OTP store: Email -> (OTP, Expiration)
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otpStore = new();
 
         public AuthService(IConfiguration configuration, IAccountRepository accountRepository, IHttpContextAccessor httpContextAccessor,
-            ICustomerRepository customerRepository)
+            ICustomerRepository customerRepository, ILogger<AuthService> logger)
         {
             _configuration = configuration;
             _accountRepository = accountRepository;
             _httpContextAccessor = httpContextAccessor;
             _customerRepository = customerRepository;
+            _logger = logger;
         }
 
         public async Task<BaseResponse<AuthResponseDTO>> LoginAsync(LoginRequestDTO loginRequest, CancellationToken cancellationToken)
@@ -56,14 +59,14 @@ namespace PetVax.Services.Service
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid email or password.",
+                        Message = "Email và mật khẩu không hợp lệ.",
                         Data = null
                     };
                 }
 
                 // Generate OTP and send email
                 var otp = GenerateOtp();
-                var expiration = DateTime.UtcNow.AddMinutes(5);
+                var expiration = DateTimeHelper.Now().AddMinutes(5);
                 _otpStore[loginRequest.Email] = (otp, expiration);
                 await SendOtpEmailAsync(loginRequest.Email, otp, cancellationToken);
 
@@ -84,7 +87,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "OTP sent to email.",
+                    Message = "Đăng nhập thành công. Vui lòng kiểm tra email để nhận mã OTP.",
                     Data = response
                 };
             }
@@ -104,13 +107,13 @@ namespace PetVax.Services.Service
         {
             try
             {
-                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTime.UtcNow || otpInfo.Otp != otp)
+                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
                 {
                     return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid or expired OTP.",
+                        Message = "OTP không hợp lệ hoặc đã hết hạn.",
                         Data = null
                     };
                 }
@@ -122,7 +125,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Account not found.",
+                        Message = "Tài khoản không tồn tại.",
                         Data = null
                     };
                 }
@@ -138,14 +141,14 @@ namespace PetVax.Services.Service
                     Role = account.Role,
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
-                    AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
-                    RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+                    AccessTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
                 };
                 return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 200,
                     Success = true,
-                    Message = "OTP verified successfully.",
+                    Message = "Xác thực OTP thành công.",
                     Data = response
                 };
             }
@@ -188,7 +191,7 @@ namespace PetVax.Services.Service
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                expires: DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
                 signingCredentials: credentials
             );
 
@@ -261,7 +264,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid email or password.",
+                        Message = "Email và mật khẩu không hợp lệ.",
                         Data = null
                     };
                 }
@@ -276,8 +279,8 @@ namespace PetVax.Services.Service
                     RefreshToken = refreshToken,
                     Email = account.Email,
                     Role = account.Role,
-                    AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
-                    RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+                    AccessTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
                 };
                 return new BaseResponse<AuthResponseDTO>
                 {
@@ -289,6 +292,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error login!");
                 return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 500,
@@ -310,13 +314,13 @@ namespace PetVax.Services.Service
                     {
                         Code = 409,
                         Success = false,
-                        Message = "The account already exists!"
+                        Message = "Email dã được sử dụng. Vui lòng sử dụng email khác."
                     };
                 }
 
                 // Generate OTP and send email
                 var otp = GenerateOtp();
-                var expiration = DateTime.UtcNow.AddMinutes(5);
+                var expiration = DateTimeHelper.Now().AddMinutes(5);
                 _otpStore[regisRequestDTO.Email] = (otp, expiration);
                 await SendOtpEmailAsync(regisRequestDTO.Email, otp, cancellationToken);
 
@@ -330,7 +334,7 @@ namespace PetVax.Services.Service
                     PasswordHash = passwordHash,
                     PasswordSalt = passwordSalt,
                     Role = EnumList.Role.Customer,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTimeHelper.Now(),
                     isVerify = false
                 };
 
@@ -340,7 +344,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Register successfully. Please check your email to verify OTP!"
+                    Message = "Đăng ký thành công. Vui lòng kiểm tra email để nhận mã OTP xác thực.",
                 };
             }
             catch (ErrorException ex)
@@ -358,7 +362,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Can not save to database: " + ex.Message
+                    Message = "Không thể đăng ký tài khoản. Vui lòng thử lại sau.",
                 };
             }
         }
@@ -367,13 +371,13 @@ namespace PetVax.Services.Service
         {
             try
             {
-                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTime.UtcNow || otpInfo.Otp != otp)
+                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
                 {
                     return new BaseResponse
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid or expired OTP."
+                        Message = "Mã OTP không hợp lệ hoặc đã hết hạn."
                     };
                 }
 
@@ -384,7 +388,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Account not found."
+                        Message = "Tài khoản không tồn tại."
                     };
                 }
 
@@ -398,7 +402,7 @@ namespace PetVax.Services.Service
                     Customer customer = new Customer
                     {
                         AccountId = account.AccountId,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTimeHelper.Now(),
                         CustomerCode = customerCode
                     };
                     await _customerRepository.CreateCustomerAsync(customer);
@@ -410,7 +414,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Email verified successfully!"
+                    Message = "Xác thực email thành công. Bạn có thể đăng nhập ngay bây giờ."
                 };
             }
             catch (ErrorException ex)
@@ -435,7 +439,7 @@ namespace PetVax.Services.Service
                 {
                     // Generate email verification token
                     var verificationToken = Guid.NewGuid().ToString();
-                    var tokenExpiration = DateTime.UtcNow.AddMinutes(30);
+                    var tokenExpiration = DateTimeHelper.Now().AddMinutes(30);
 
                     // Store token in-memory (for demo; use persistent store in production)
                     _otpStore[email] = (verificationToken, tokenExpiration);
@@ -448,7 +452,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 202,
                         Success = true,
-                        Message = "Verification email sent.",
+                        Message = "Đã xác thực",
                         Data = new AuthResponseDTO
                         {
                             AccountId = 0,
@@ -470,7 +474,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Login with Google successful.",
+                    Message = "Đăng nhập thành công.",
                     Data = new AuthResponseDTO
                     {
                         AccountId = account.AccountId,
@@ -478,8 +482,8 @@ namespace PetVax.Services.Service
                         Role = account.Role,
                         AccessToken = accessToken,
                         RefreshToken = refreshToken,
-                        AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
-                        RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+                        AccessTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                        RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
                     }
                 };
             }
@@ -500,13 +504,13 @@ namespace PetVax.Services.Service
         {
             try
             {
-                if (!_otpStore.TryGetValue(email, out var tokenInfo) || tokenInfo.Expiration < DateTime.UtcNow || tokenInfo.Otp != token)
+                if (!_otpStore.TryGetValue(email, out var tokenInfo) || tokenInfo.Expiration < DateTimeHelper.Now() || tokenInfo.Otp != token)
                 {
                     return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Invalid or expired verification link.",
+                        Message = "Mã xác thực không hợp lệ hoặc đã hết hạn.",
                         Data = null
                     };
                 }
@@ -519,7 +523,7 @@ namespace PetVax.Services.Service
                     {
                         Email = email,
                         Role = EnumList.Role.Customer,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTimeHelper.Now()
                     };
                     await _accountRepository.CreateAccountAsync(account, cancellationToken);
                 }
@@ -533,7 +537,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Email verified and account created.",
+                    Message = "Xác thực email thành công.",
                     Data = new AuthResponseDTO
                     {
                         AccountId = account.AccountId,
@@ -541,8 +545,8 @@ namespace PetVax.Services.Service
                         Role = account.Role,
                         AccessToken = accessToken,
                         RefreshToken = refreshToken,
-                        AccessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
-                        RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+                        AccessTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                        RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
                     }
                 };
             }
@@ -609,7 +613,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Account not found.",
+                        Message = "Tài khoản không tồn tại.",
                         Data = null
                     };
                 }
@@ -621,7 +625,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 401,
                         Success = false,
-                        Message = "Old password is incorrect.",
+                        Message = "Mật khẩu cũ không đúng.",
                         Data = null
                     };
                 }
@@ -639,10 +643,10 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Password reset successfully.",
+                    Message = "Đặt lại mật khẩu thành công.",
                     Data = new ForgetPasswordResponseDTO
                     {
-                        Message = "Password reset successfully.",
+                        Message = "Mật khẩu đã được đặt lại thành công.",
                         IsSuccess = true
                     }
                 };

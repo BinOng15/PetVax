@@ -1,5 +1,10 @@
-﻿using PetVax.BusinessObjects.DTO.VetDTO;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using PetVax.BusinessObjects.DTO;
+using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
+using PetVax.BusinessObjects.Enum;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
@@ -16,58 +21,84 @@ namespace PetVax.Services.Service
     {
         private readonly IVetScheduleRepository _vetScheduleRepository;
         private readonly IVetRepository _vetRepository;
-        public VetScheduleService(IVetScheduleRepository vetScheduleRepository, IVetRepository vetRepository)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        private readonly IMapper _mapper;
+        public VetScheduleService(IVetScheduleRepository vetScheduleRepository, IVetRepository vetRepository, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _vetScheduleRepository = vetScheduleRepository;
             _vetRepository = vetRepository;
+            _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
-        public async Task<List<BaseResponse<VetScheduleDTO>>> GetAllVetSchedulesAsync(CancellationToken cancellationToken)
+        public async Task<DynamicResponse<VetScheduleDTO>> GetAllVetSchedulesAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
         {
             try
             {
                 var vetSchedules = await _vetScheduleRepository.GetAllVetSchedulesAsync(cancellationToken);
-                if (vetSchedules == null || !vetSchedules.Any())
+
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
-                    return new List<BaseResponse<VetScheduleDTO>>()
+                    vetSchedules = vetSchedules
+                        .Where(vs => vs.VetId.ToString().Contains(getAllItemsDTO.KeyWord, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
+
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = vetSchedules.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+
+                var pagedSchedules = vetSchedules
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+
+                var responseData = new MegaData<VetScheduleDTO>
+                {
+                    PageInfo = new PagingMetaData
                     {
-                        new BaseResponse<VetScheduleDTO>
-                        {
-                            Success = false,
-                            Message = "No vet schedules found",
-                            Code = 200,
-                            Data = default! // Use default! to explicitly indicate a nullable value
-                        }
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                        status = getAllItemsDTO?.Status
+                    },
+                    PageData = pagedSchedules.Select(vs => _mapper.Map<VetScheduleDTO>(vs)).ToList()
+                };
+
+                if (!pagedSchedules.Any())
+                {
+                    return new DynamicResponse<VetScheduleDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy lịch làm việc của vet.",
+                        Data = responseData
                     };
                 }
-                return vetSchedules.Select(vs => new BaseResponse<VetScheduleDTO>
+                return new DynamicResponse<VetScheduleDTO>
                 {
-                    Success = true,
-                    Message = "Vet schedules retrieved successfully",
                     Code = 200,
-                    Data = new VetScheduleDTO
-                    {
-                        VetScheduleId = vs.VetScheduleId,
-                        VetId = vs.VetId,
-                        ScheduleDate = vs.ScheduleDate,
-                        SlotNumber = vs.SlotNumber,
-                        Status = vs.Status,
-                        CreatedAt = vs.CreatedAt,
-                        CreatedBy = vs.CreatedBy
-                    }
-                }).ToList();
+                    Success = true,
+                    Message = "Lấy lịch làm việc của vet thành công.",
+                    Data = responseData
+                };
             }
             catch (Exception ex)
             {
-                return new List<BaseResponse<VetScheduleDTO>>()
+                return new DynamicResponse<VetScheduleDTO>
                 {
-                    new BaseResponse<VetScheduleDTO>
-                    {
-                        Success = false,
-                        Message = $"An error occurred while retrieving vet schedules: {ex.Message}",
-                        Code = 500,
-                        Data = null
-                    }
+                    Code = 500,
+                    Success = false,
+                    Message = $"An error occurred while retrieving vet schedules: {ex.Message}",
+                    Data = null
                 };
             }
         }
@@ -87,21 +118,15 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
+
+                var vetScheduleDto = _mapper.Map<VetScheduleDTO>(vetSchedule);
+
                 return new BaseResponse<VetScheduleDTO>
                 {
                     Success = true,
                     Message = "Vet schedule retrieved successfully",
                     Code = 200,
-                    Data = new VetScheduleDTO
-                    {
-                        VetScheduleId = vetSchedule.VetScheduleId,
-                        VetId = vetSchedule.VetId,
-                        ScheduleDate = vetSchedule.ScheduleDate,
-                        SlotNumber = vetSchedule.SlotNumber,
-                        Status = vetSchedule.Status,
-                        CreatedAt = vetSchedule.CreatedAt,
-                        CreatedBy = vetSchedule.CreatedBy
-                    }
+                    Data = vetScheduleDto
                 };
             }
             catch (Exception ex)
@@ -115,14 +140,14 @@ namespace PetVax.Services.Service
                 };
             }
         }
-        public async Task<BaseResponse<VetScheduleDTO>> CreateVetScheduleAsync(CreateVetScheduleRequestDTO request, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<VetScheduleDTO>>> CreateVetScheduleAsync(CreateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
             try
             {
                 var vet = await _vetRepository.GetVetByIdAsync(request.VetId, cancellationToken);
                 if (vet == null)
                 {
-                    return new BaseResponse<VetScheduleDTO>
+                    return new BaseResponse<List<VetScheduleDTO>>
                     {
                         Success = false,
                         Message = "Vet not found",
@@ -130,54 +155,83 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                var vetSchedule = new VetSchedule
+
+                var createdSchedules = new List<VetScheduleDTO>();
+
+                foreach (var schedule in request.Schedules)
                 {
-                    VetId = request.VetId,
-                    ScheduleDate = request.ScheduleDate,
-                    SlotNumber = request.SlotNumber,
-                    Status = request.Status,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = "admin"
-                };
-                var createdVetScheduleId = await _vetScheduleRepository.CreateVetScheduleAsync(vetSchedule, cancellationToken);
-                if (createdVetScheduleId <= 0)
+                    var date = schedule.ScheduleDate.Date;
+
+                    if (date < DateTimeHelper.Now().Date)
+                    {
+                        return new BaseResponse<List<VetScheduleDTO>>
+                        {
+                            Success = false,
+                            Message = $"Không thể tạo lịch cho ngày trong quá khứ: {date}",
+                            Code = 200,
+                            Data = null
+                        };
+                    }
+                    foreach (var slot in schedule.SlotNumbers)
+                    {
+                        var vetSchedule = new VetSchedule
+                        {
+                            VetId = request.VetId,
+                            ScheduleDate = date,
+                            SlotNumber = slot,
+                            Status = EnumList.VetScheduleStatus.Available,
+                            CreatedAt = DateTimeHelper.Now(),
+                            CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system"
+                        };
+
+                        var createdId = await _vetScheduleRepository.CreateVetScheduleAsync(vetSchedule, cancellationToken);
+                        if (createdId > 0)
+                        {
+                            createdSchedules.Add(new VetScheduleDTO
+                            {
+                                VetScheduleId = vetSchedule.VetScheduleId,
+                                VetId = vetSchedule.VetId,
+                                ScheduleDate = vetSchedule.ScheduleDate,
+                                SlotNumber = vetSchedule.SlotNumber,
+                                Status = EnumList.VetScheduleStatus.Available,
+                                CreatedAt = vetSchedule.CreatedAt,
+                                CreatedBy = vetSchedule.CreatedBy
+                            });
+                        }
+                    }
+                }
+
+                if (!createdSchedules.Any())
                 {
-                    return new BaseResponse<VetScheduleDTO>
+                    return new BaseResponse<List<VetScheduleDTO>>
                     {
                         Success = false,
-                        Message = "Failed to create vet schedule",
-                        Code = 500,
+                        Message = "Không tạo được lịch hẹn nào.",
+                        Code = 200,
                         Data = null
                     };
                 }
-                return new BaseResponse<VetScheduleDTO>
+
+                return new BaseResponse<List<VetScheduleDTO>>
                 {
                     Success = true,
-                    Message = "Vet schedule created successfully",
+                    Message = "Tạo lịch hẹn thành công.",
                     Code = 201,
-                    Data = new VetScheduleDTO
-                    {
-                        VetScheduleId = createdVetScheduleId,
-                        VetId = vetSchedule.VetId,
-                        ScheduleDate = vetSchedule.ScheduleDate,
-                        SlotNumber = vetSchedule.SlotNumber,
-                        Status = vetSchedule.Status,
-                        CreatedAt = vetSchedule.CreatedAt,
-                        CreatedBy = vetSchedule.CreatedBy
-                    }
+                    Data = createdSchedules
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<VetScheduleDTO>
+                return new BaseResponse<List<VetScheduleDTO>>
                 {
                     Success = false,
-                    Message = $"An error occurred while creating the vet schedule: {ex.Message}",
+                    Message = $"Lỗi khi tạo lịch hẹn: {ex.Message} - {ex.InnerException}",
                     Code = 500,
                     Data = null
                 };
             }
         }
+
 
         public async Task<BaseResponse<VetScheduleDTO>> UpdateVetScheduleAsync(UpdateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
@@ -198,8 +252,8 @@ namespace PetVax.Services.Service
                 vetSchedule.VetId = request.VetId;
                 vetSchedule.ScheduleDate = request.ScheduleDate;
                 vetSchedule.SlotNumber = request.SlotNumber;
-                vetSchedule.Status = request.Status;
-                vetSchedule.ModifiedAt = DateTime.UtcNow;
+                vetSchedule.Status = EnumList.VetScheduleStatus.Available;
+                vetSchedule.ModifiedAt = DateTimeHelper.Now();
                 var updatedVetScheduleId = await _vetScheduleRepository.UpdateVetScheduleAsync(vetSchedule, cancellationToken);
                 if (updatedVetScheduleId <= 0)
                 {
@@ -207,7 +261,7 @@ namespace PetVax.Services.Service
                     {
                         Success = false,
                         Message = "Failed to update vet schedule",
-                        Code = 500,
+                        Code = 200,
                         Data = null
                     };
                 }
@@ -263,16 +317,7 @@ namespace PetVax.Services.Service
                     Success = true,
                     Message = "Vet schedules retrieved successfully",
                     Code = 200,
-                    Data = new VetScheduleDTO
-                    {
-                        VetScheduleId = vs.VetScheduleId,
-                        VetId = vs.VetId,
-                        ScheduleDate = vs.ScheduleDate,
-                        SlotNumber = vs.SlotNumber,
-                        Status = vs.Status,
-                        CreatedAt = vs.CreatedAt,
-                        CreatedBy = vs.CreatedBy
-                    }
+                    Data = _mapper.Map<VetScheduleDTO>(vs)
                 }).ToList();
             }
             catch (Exception ex)
@@ -305,7 +350,7 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                
+
                 var isDeleted = await _vetScheduleRepository.DeleteVetScheduleAsync(vetScheduleId, cancellationToken);
                 if (!isDeleted)
                 {
@@ -313,7 +358,7 @@ namespace PetVax.Services.Service
                     {
                         Success = false,
                         Message = "Failed to delete vet schedule",
-                        Code = 500,
+                        Code = 200,
                         Data = null
                     };
                 }
@@ -337,6 +382,111 @@ namespace PetVax.Services.Service
             catch (Exception ex)
             {
                 throw new Exception($"An error occurred while deleting the vet schedule: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<List<BaseResponse<VetScheduleDTO>>> GetAllVetSchedulesByDateAndSlotAsync(DateTime? date, int? slot, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var vetSchedules = await _vetScheduleRepository.GetVetSchedulesByDateAndSlotAsync(date, slot, cancellationToken);
+
+                if (date != null && slot <= 0)
+                {
+                    vetSchedules = await _vetScheduleRepository.GetVetSchedulesByDateAsync(date, cancellationToken);
+                    if (vetSchedules == null || !vetSchedules.Any())
+                    {
+                        return new List<BaseResponse<VetScheduleDTO>>()
+                        {
+                            new BaseResponse<VetScheduleDTO>
+                            {
+                                Success = false,
+                                Message = "Không có lịch làm theo ngày đã chọn",
+                                Code = 200,
+                                Data = null
+                            }
+                        };
+                    }
+                }
+                else if (slot > 0 && date == null)
+                {
+                    vetSchedules = await _vetScheduleRepository.GetVetSchedulesBySlotAsync(slot, cancellationToken);
+                    if (vetSchedules == null || !vetSchedules.Any())
+                    {
+                        return new List<BaseResponse<VetScheduleDTO>>()
+                        {
+                            new BaseResponse<VetScheduleDTO>
+                            {
+                                Success = false,
+                                Message = "Không có lịch làm theo slot đã chọn",
+                                Code = 200,
+                                Data = null
+                            }
+                        };
+                    }
+                }
+
+                return vetSchedules.Select(vs => new BaseResponse<VetScheduleDTO>
+                {
+                    Success = true,
+                    Message = "Vet schedules retrieved successfully",
+                    Code = 200,
+                    Data = _mapper.Map<VetScheduleDTO>(vs)
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                return new List<BaseResponse<VetScheduleDTO>>()
+                {
+                    new BaseResponse<VetScheduleDTO>
+                    {
+                        Success = false,
+                        Message = $"An error occurred while retrieving vet schedules: {ex.Message}",
+                        Code = 500,
+                        Data = null
+                    }
+                };
+            }
+        }
+
+        public async Task<List<BaseResponse<VetScheduleDTO>>> GetVetScheduleFromDateToDate(DateTime? fromDate, DateTime? toDate, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var vetSchedules = await _vetScheduleRepository.GetVetSchedulesFromDateToDateAsync(fromDate, toDate, cancellationToken);
+                if (vetSchedules == null || !vetSchedules.Any())
+                {
+                    return new List<BaseResponse<VetScheduleDTO>>()
+                    {
+                        new BaseResponse<VetScheduleDTO>
+                        {
+                            Success = false,
+                            Message = "Không tìm thấy lịch làm việc trong khoảng thời gian này",
+                            Code = 200,
+                            Data = null
+                        }
+                    };
+                }
+                return vetSchedules.Select(vs => new BaseResponse<VetScheduleDTO>
+                {
+                    Success = true,
+                    Message = "Lấy lịch làm việc thành công",
+                    Code = 200,
+                    Data = _mapper.Map<VetScheduleDTO>(vs)
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                return new List<BaseResponse<VetScheduleDTO>>()
+                {
+                    new BaseResponse<VetScheduleDTO>
+                    {
+                        Success = false,
+                        Message = $"An error occurred while retrieving vet schedules: {ex.Message}",
+                        Code = 500,
+                        Data = null
+                    }
+                };
             }
         }
     }

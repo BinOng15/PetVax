@@ -30,19 +30,26 @@ namespace PetVax.Repositories.Repository
 
         public Task<List<Vet>> GetAllVetsAsync(CancellationToken cancellationToken)
         {
-            return GetAllAsync(cancellationToken);
+            return _context.Vets
+                .Include(v => v.Account)
+                .Where(v => v.isDeleted != true)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Vet> GetVetByIdAsync(int vetId, CancellationToken cancellationToken)
         {
-         
-            return await GetByIdAsync(vetId, cancellationToken);
+
+            return await _context.Vets
+                .Include(v => v.Account)
+                .FirstOrDefaultAsync(v => v.VetId == vetId, cancellationToken);
         }
 
         public async Task<Vet> GetVetByVetCodeAsync(string vetCode, CancellationToken cancellationToken)
         {
             
-            return await _context.Vets.FirstOrDefaultAsync(v => v.VetCode == vetCode, cancellationToken);
+            return await _context.Vets
+                .Include(v => v.Account)
+                .FirstOrDefaultAsync(v => v.VetCode == vetCode, cancellationToken);
         }
 
         public Task<int> UpdateVetAsync(Vet vet, CancellationToken cancellationToken)

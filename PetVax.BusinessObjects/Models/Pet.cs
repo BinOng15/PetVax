@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("Pet", Schema = "dbo")]
+    [Table("Pet")]
     public class Pet
     {
         [Key]
@@ -32,12 +32,14 @@ namespace PetVax.BusinessObjects.Models
         public string CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
+        public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual Customer Customer { get; set; } // Navigation to Customer table
         public virtual ICollection<MicrochipItem> MicrochipItems { get; set; } // Navigation to MicrochipItem table
-        public virtual ICollection<PetPassport> PetPassports { get; set; } // Navigation to PetPassport table
+        public virtual ICollection<VaccinationCertificate> VaccinationCertificates { get; set; } // Navigation to PetPassport table
         public virtual ICollection<Appointment> Appointments { get; set; } // Navigation to Appointment table
         public virtual ICollection<HealthCondition> HealthConditions { get; set; } // Navigation to HealthCondition table
+        public virtual ICollection<VaccineProfile> VaccineProfiles { get; set; }
     }
 }

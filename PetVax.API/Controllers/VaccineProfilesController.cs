@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("GetAllVaccineProfiles")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
         public async Task<IActionResult> GetAllVaccineProfiles(CancellationToken cancellationToken)
         {
             var response = await _vaccineProfileService.GetAllVaccineProfilesAsync(cancellationToken);
@@ -41,14 +43,24 @@ namespace PediVax.Controllers
             return Ok(response);
         }
 
+        //[HttpGet("GetVaccineProfileByPetId/{petId}")]
+        //public async Task<IActionResult> GetVaccineProfileByPetId(int petId, CancellationToken cancellationToken)
+        //{
+        //    if (petId <= 0)
+        //    {
+        //        return BadRequest("Invalid pet ID.");
+        //    }
+        //    var response = await _vaccineProfileService.GetVaccineProfileByPetIdAsync(petId, cancellationToken);
+        //    return Ok(response);
+        //}
         [HttpGet("GetVaccineProfileByPetId/{petId}")]
-        public async Task<IActionResult> GetVaccineProfileByPetId(int petId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetListVaccineProfileByPetId(int petId, CancellationToken cancellationToken)
         {
             if (petId <= 0)
             {
                 return BadRequest("Invalid pet ID.");
             }
-            var response = await _vaccineProfileService.GetVaccineProfileByPetIdAsync(petId, cancellationToken);
+            var response = await _vaccineProfileService.GetGroupedVaccineProfilesByPetIdAsync(petId, cancellationToken);
             return Ok(response);
         }
 

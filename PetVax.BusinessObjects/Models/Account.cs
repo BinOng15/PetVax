@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("Account", Schema = "dbo")]
+    [Table("Account")]
     public class Account
     {
         [Key]
@@ -23,6 +23,7 @@ namespace PetVax.BusinessObjects.Models
         public bool isVerify { get; set; } = false; // Default to false, indicating the account is not verified
         public DateTime CreatedAt { get; set; }
         public string? CreatedBy { get; set; }
+        public bool? isDeleted { get; set; } = false; // Default to false, indicating the account is not deleted
 
 
         // Navigation properties

@@ -10,10 +10,14 @@ namespace PetVax.Repositories.IRepository
     public interface IMicrochipItemRepository
     {
         Task<List<MicrochipItem>> GetAllMicrochipItemsAsync(CancellationToken cancellationToken);
-        Task<MicrochipItem> GetMicrochipItemByIdAsync(int microchipItemId, CancellationToken cancellationToken);
+        Task<MicrochipItem> GetMicrochipItemByIdAsync(int?  microchipItemId, CancellationToken cancellationToken);
         Task<MicrochipItem> GetMicrochipItemByMicrochipIdAsync(int microchipId, CancellationToken cancellationToken);
         Task<int> CreateMicrochipItemAsync(MicrochipItem microchipItem, CancellationToken cancellationToken);
         Task<int> UpdateMicrochipItemAsync(MicrochipItem microchipItem, CancellationToken cancellationToken);
         Task<bool> DeleteMicrochipItemAsync(int microchipItemId, CancellationToken cancellationToken);
+
+        Task<MicrochipItem> GetMicrochipItemByMicrochipCodedAsync(string microchipCode, CancellationToken cancellationToken);
+
+        Task<MicrochipItem> GetMicrochipItemByPetIdAsync(int? petId, CancellationToken cancellationToken);
     }
 }

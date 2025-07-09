@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("ServiceHistory", Schema = "dbo")]
+    [Table("ServiceHistory")]
     public class ServiceHistory
     {
         [Key]
@@ -21,6 +21,7 @@ namespace PetVax.BusinessObjects.Models
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
+        public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; } // Navigation to AppointmentDetail table

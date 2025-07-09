@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("Customer", Schema = "dbo")]
+    [Table("Customer")]
     public class Customer
     {
         [Key]
@@ -29,6 +29,7 @@ namespace PetVax.BusinessObjects.Models
         public string? CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
+        public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual Account Account { get; set; }

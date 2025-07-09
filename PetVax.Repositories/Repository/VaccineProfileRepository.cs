@@ -30,16 +30,28 @@ namespace PetVax.Repositories.Repository
         public async Task<List<VaccineProfile>> GetAllVaccineProfilesAsync(CancellationToken cancellationToken)
         {
             return await _context.VaccineProfiles
-                .Include(vp => vp.Disease) 
+                .Include(vp => vp.Disease)
     .           ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<VaccineProfile>> GetListVaccineProfileByPetIdAsync(int petId, CancellationToken cancellationToken)
+        {
+            return await _context.VaccineProfiles
+                .Where(vp => vp.PetId == petId)
+                .Include(vp => vp.Disease)
+                .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.Vet)
+                .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.VaccineBatch)
+                        .ThenInclude(vb => vb.Vaccine)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<VaccineProfile> GetVaccineProfileByIdAsync(int vaccineProfileId, CancellationToken cancellationToken)
         {
             return await _context.VaccineProfiles
-                .Where(vp => vp.VaccineProfileId == vaccineProfileId)
-                .Include(vp => vp.Disease)
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(vp => vp.VaccineProfileId == vaccineProfileId, cancellationToken);
         }
 
         public async Task<VaccineProfile> GetVaccineProfileByPetIdAsync(int petId, CancellationToken cancellationToken)
@@ -47,7 +59,13 @@ namespace PetVax.Repositories.Repository
             return await _context.VaccineProfiles
                 .Where(vp => vp.PetId == petId)
                 .Include(vp => vp.Disease)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<List<VaccineProfile>> GetVaccineProfilesByDiseaseId(int diseaseId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<int> UpdateVaccineProfileAsync(VaccineProfile vaccineProfile, CancellationToken cancellationToken)

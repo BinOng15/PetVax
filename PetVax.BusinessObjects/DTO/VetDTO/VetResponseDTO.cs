@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PetVax.BusinessObjects.DTO.AccountDTO;
+using PetVax.BusinessObjects.DTO.VetScheduleDTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +14,14 @@ namespace PetVax.BusinessObjects.DTO.VetDTO
         public int AccountId { get; set; } 
         public string VetCode { get; set; } 
         public string? Name { get; set; } 
+
+        public string image { get; set; } // Base64 string representation of the image
         public string? Specialization { get; set; } 
         public DateTime? DateOfBirth { get; set; } 
         public string? PhoneNumber { get; set; }  
 
+        public AccountResponseDTO Account {  get; set; }
+
+        public List<ScheduleResponse> ScheduleResponse { get; set; } 
     }
 }

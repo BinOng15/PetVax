@@ -8,35 +8,42 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("HealthCondition", Schema = "dbo")]
+    [Table("HealthCondition")]
     public class HealthCondition
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int HealthConditionId { get; set; }
-        public int PetId { get; set; } // Foreign key to Pet table
-        public string ConditionCode { get; set; } // e.g., "HC123456", unique identifier for the health condition
-        public string HeartRate { get; set; }
-        public string BreathingRate { get; set; }
-        public string Weight { get; set; } 
-        public string Temperature { get; set; } // e.g., "38.5 °C", "101.5 °F"
-        public string EHNM { get; set; }
-        public string SkinAFur { get; set; } // e.g., "Normal", "Dry", "Itchy"
-        public string Digestion { get; set; } // e.g., "Normal", "Vomiting", "Diarrhea"
-        public string Respiratory { get; set; } // e.g., "Normal", "Coughing", "Sneezing"
-        public string Excrete { get; set; } // e.g., "Normal", "Blood in stool", "Urinary issues"
-        public string Behavior { get; set; } // e.g., "Normal", "Aggressive", "Lethargic"
-        public string Psycho { get; set; } // e.g., "Normal", "Anxious", "Depressed"
-        public string Different { get; set; } // e.g., "Normal", "Abnormal", "Unusual"
-        public string Conclusion { get; set; } // e.g., "Healthy", "Needs further investigation", "Requires treatment"
-        public DateTime CheckDate { get; set; }
-        public string Status { get; set; } // e.g., "Active", "Resolved", "Pending Review"
+        public int? PetId { get; set; }
+        public int? VetId { get; set; }
+        public int? MicrochipItemId { get; set; }
+        public string? ConditionCode { get; set; }
+        public string? HeartRate { get; set; }
+        public string? BreathingRate { get; set; }
+        public string? Weight { get; set; } 
+        public string? Temperature { get; set; } // "38.5 °C", "101.5 °F"
+        public string? EHNM { get; set; } //Mắt tai mũi họng
+        public string? SkinAFur { get; set; } //Da và lông
+        public string? Digestion { get; set; } //Tiêu hóa
+        public string? Respiratory { get; set; } //Hô hấp
+        public string? Excrete { get; set; } //Bài tiết
+        public string? Behavior { get; set; } //Hành vi
+        public string? Psycho { get; set; } //Tâm lý
+        public string? Different { get; set; } //Những điều khác
+        public string? Conclusion { get; set; } // Kết luận
+        public decimal Price { get; set; }
+        public DateTime? CheckDate { get; set; }
+        public string? Status { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
+        public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
         public virtual Pet Pet { get; set; }
+        public virtual Vet Vet { get; set; }
+        public virtual MicrochipItem MicrochipItem { get; set; }
+        public virtual ICollection<HealthConditionVaccinationCertificate> HealthConditionVaccinationCertificates { get; set; }
     }
 }

@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,15 +42,27 @@ namespace PetVax.Services.Service
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 400,
-                    Message = "Invalid request data",
+                    Message = "Dữ liệu không hợp lệ",
                     Data = null
                 };
             }
             try
             {
+                var existingDisease = await _diseaseRepository.GetDiseaseByName(createDiseaseDTO.Name, cancellationToken);
+                if (existingDisease != null)
+                {
+                    _logger.LogError($"CreateDiseaseAsync: Disease with name {createDiseaseDTO.Name} already exists");
+                    return new BaseResponse<DiseaseResponseDTO>
+                    {
+                        Code = 409,
+                        Message = $"Bệnh với tên '{createDiseaseDTO.Name}' đã tồn tại trong hệ thống",
+                        Data = null
+                    };
+                }
+
                 var disease = _mapper.Map<Disease>(createDiseaseDTO);
                 disease.Status = "Active";
-                disease.CreatedAt = DateTime.UtcNow;
+                disease.CreatedAt = DateTimeHelper.Now();
                 disease.CreatedBy = GetCurrentUserName();
 
                 var diseaseId = await _diseaseRepository.CreateDiseaseAsync(disease, cancellationToken);
@@ -58,17 +72,18 @@ namespace PetVax.Services.Service
                     return new BaseResponse<DiseaseResponseDTO>
                     {
                         Code = 500,
-                        Message = "Failed to create disease",
+                        Message = "Lỗi khi tạo bệnh mới",
                         Data = null
                     };
                 }
-                var diseaseResponse = _mapper.Map<DiseaseResponseDTO>(disease);
-                diseaseResponse.DiseaseId = diseaseId;
+
+                var createdDisease = await _diseaseRepository.GetDiseaseByIdAsync(disease.DiseaseId != 0 ? disease.DiseaseId : diseaseId, cancellationToken);
+                var diseaseResponse = _mapper.Map<DiseaseResponseDTO>(createdDisease ?? disease);
                 _logger.LogInformation($"CreateDiseaseAsync: Disease created successfully with ID {diseaseId} by {GetCurrentUserName()}");
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 201,
-                    Message = "Disease created successfully",
+                    Message = "Bệnh đã được tạo thành công",
                     Data = diseaseResponse
                 };
             }
@@ -78,7 +93,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 500,
-                    Message = "An error occurred while creating disease",
+                    Message = "Lỗi khi tạo bệnh mới",
                     Data = null
                 };
             }
@@ -95,7 +110,7 @@ namespace PetVax.Services.Service
                     return new BaseResponse<bool>
                     {
                         Code = 404,
-                        Message = "Disease not found",
+                        Message = "Bệnh không tồn tại",
                         Success = false
                     };
                 }
@@ -106,7 +121,7 @@ namespace PetVax.Services.Service
                     return new BaseResponse<bool>
                     {
                         Code = 500,
-                        Message = "Failed to delete disease",
+                        Message = "Lỗi khi xóa bệnh",
                         Success = false
                     };
                 }
@@ -114,7 +129,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<bool>
                 {
                     Code = 200,
-                    Message = "Disease deleted successfully",
+                    Message = "Bệnh đã được xóa thành công",
                     Success = true
                 };
             }
@@ -124,7 +139,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<bool>
                 {
                     Code = 500,
-                    Message = "An error occurred while deleting disease",
+                    Message = "Lỗi khi xóa bệnh",
                     Success = false
                 };
             }
@@ -147,7 +162,7 @@ namespace PetVax.Services.Service
                 int totalItem = diseases.Count;
                 int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
 
-                var pagedVaccines = diseases
+                var pagedVDiseases = diseases
                     .Skip(skip)
                     .Take(pageSize)
                     .ToList();
@@ -164,26 +179,27 @@ namespace PetVax.Services.Service
                     SearchInfo = new SearchCondition
                     {
                         keyWord = getAllItemsDTO?.KeyWord,
+                        status = getAllItemsDTO?.Status
                     },
-                    PageData = _mapper.Map<List<DiseaseResponseDTO>>(pagedVaccines)
+                    PageData = _mapper.Map<List<DiseaseResponseDTO>>(pagedVDiseases)
                 };
-                if (!pagedVaccines.Any())
+                if (!pagedVDiseases.Any())
                 {
                     _logger.LogInformation("GetAllDiseaseAsync: No diseases found");
                     return new DynamicResponse<DiseaseResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "No diseases found",
+                        Message = "Không tìm thấy bệnh nào",
                         Data = responseData
                     };
                 }
-                _logger.LogInformation($"GetAllDiseaseAsync: Retrieved {pagedVaccines.Count} diseases successfully");
+                _logger.LogInformation($"GetAllDiseaseAsync: Retrieved {pagedVDiseases.Count} diseases successfully");
                 return new DynamicResponse<DiseaseResponseDTO>
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Diseases retrieved successfully",
+                    Message = "Lấy danh sách bệnh thành công",
                     Data = responseData
                 };
             }
@@ -194,7 +210,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "An error occurred while retrieving diseases",
+                    Message = "Lỗi khi lấy danh sách bệnh",
                     Data = null
                 };
             }
@@ -210,8 +226,8 @@ namespace PetVax.Services.Service
                     _logger.LogError($"GetDiseaseByIdAsync: Disease with ID {diseaseId} not found");
                     return new BaseResponse<DiseaseResponseDTO>
                     {
-                        Code = 404,
-                        Message = "Disease not found",
+                        Code = 200,
+                        Message = "Bệnh không tồn tại",
                         Data = null
                     };
                 }
@@ -219,7 +235,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 200,
-                    Message = "Disease retrieved successfully",
+                    Message = "Bệnh đã được lấy thành công",
                     Data = diseaseResponse
                 };
             }
@@ -229,7 +245,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 500,
-                    Message = "An error occurred while retrieving disease",
+                    Message = "Lỗi khi lấy bệnh",
                     Data = null
                 };
             }
@@ -245,8 +261,8 @@ namespace PetVax.Services.Service
                     _logger.LogError($"GetDiseaseByNameAsync: Disease with name {name} not found");
                     return new BaseResponse<DiseaseResponseDTO>
                     {
-                        Code = 404,
-                        Message = "Disease not found",
+                        Code = 200,
+                        Message = "Bệnh không tồn tại",
                         Data = null
                     };
                 }
@@ -254,7 +270,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 200,
-                    Message = "Disease retrieved successfully",
+                    Message = "Bệnh đã được lấy thành công",
                     Data = diseaseResponse
                 };
             }
@@ -264,64 +280,98 @@ namespace PetVax.Services.Service
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 500,
-                    Message = "An error occurred while retrieving disease by name",
+                    Message = "Lỗi khi lấy bệnh theo tên",
                     Data = null
                 };
             }
         }
 
-        public async Task<BaseResponse<DiseaseResponseDTO>> GetDiseaseByVaccineIdAsync(int vaccineId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<DiseaseResponseDTO>>> GetDiseaseBySpeciesAsync(string species, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (species.ToLower() != "dog" && species.ToLower() != "cat")
+                {
+                    _logger.LogError($"GetDiseaseBySpeciesAsync: Invalid species {species}");
+                    return new BaseResponse<List<DiseaseResponseDTO>>
+                    {
+                        Code = 400,
+                        Message = "Loài không hợp lệ, vui lòng thử lại với loài 'Chó' hoặc 'Mèo'",
+                        Data = null
+                    };
+                }
+                var disease = await _diseaseRepository.GetDiseaseBySpecies(species, cancellationToken);
+                if (disease == null)
+                {
+                    _logger.LogError($"GetDiseaseBySpeciesAsync: Disease with species {species} not found");
+                    return new BaseResponse<List<DiseaseResponseDTO>>
+                    {
+                        Code = 200,
+                        Message = "Bệnh không tồn tại",
+                        Data = null
+                    };
+                }
+                var diseaseResponse = _mapper.Map<List<DiseaseResponseDTO>>(disease);
+                return new BaseResponse<List<DiseaseResponseDTO>>
+                {
+                    Code = 200,
+                    Message = "Bệnh đã được lấy thành công",
+                    Data = diseaseResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetDiseaseBySpeciesAsync: An error occurred while retrieving disease by species");
+                return new BaseResponse<List<DiseaseResponseDTO>>
+                {
+                    Code = 500,
+                    Message = "Lỗi khi lấy bệnh theo loài",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<DiseaseResponseDTO>>> GetDiseaseByVaccineIdAsync(int vaccineId, CancellationToken cancellationToken)
         {
             if (vaccineId <= 0)
             {
                 _logger.LogError("GetDiseaseByVaccineIdAsync: Invalid vaccine ID");
-                return new BaseResponse<DiseaseResponseDTO>
+                return new BaseResponse<List<DiseaseResponseDTO>>
                 {
                     Code = 400,
-                    Message = "Invalid vaccine ID",
+                    Message = "Vắc xin ID không hợp lệ",
                     Data = null
                 };
             }
             try
             {
-                var vaccineDisease = await _vaccineDiseaseRepository.GetVaccineDiseaseByVaccineIdAsync(vaccineId, cancellationToken);
-                if (vaccineDisease == null)
-                {
-                    _logger.LogError($"GetDiseaseByVaccineIdAsync: No disease found for vaccine ID {vaccineId}");
-                    return new BaseResponse<DiseaseResponseDTO>
-                    {
-                        Code = 404,
-                        Message = "No disease found for the specified vaccine ID",
-                        Data = null
-                    };
-                }
-
-                var disease = await _diseaseRepository.GetDiseaseByIdAsync(vaccineDisease.DiseaseId, cancellationToken);
+                var disease = await _diseaseRepository.GetDiseaseByVaccineId(vaccineId, cancellationToken);
                 if (disease == null)
                 {
-                    _logger.LogError($"GetDiseaseByVaccineIdAsync: Disease with ID {vaccineDisease.DiseaseId} not found");
-                    return new BaseResponse<DiseaseResponseDTO>
+                    return new BaseResponse<List<DiseaseResponseDTO>>
                     {
-                        Code = 404,
-                        Message = "Disease not found",
+                        Code = 200,
+                        Success = false,
+                        Message = "Bệnh không tồn tại với vaccineId này",
                         Data = null
                     };
                 }
-                var diseaseResponse = _mapper.Map<DiseaseResponseDTO>(disease);
-                return new BaseResponse<DiseaseResponseDTO>
+                var diseaseResponse = _mapper.Map<List<DiseaseResponseDTO>>(disease);
+                
+                return new BaseResponse<List<DiseaseResponseDTO>>
                 {
                     Code = 200,
-                    Message = "Disease retrieved successfully",
+                    Message = "Bệnh đã được lấy thành công theo vắc xin ID",
                     Data = diseaseResponse
                 };
             }
             catch(Exception ex)
             {
                 _logger.LogError(ex, "GetDiseaseByVaccineIdAsync: An error occurred while retrieving disease by vaccine ID");
-                return new BaseResponse<DiseaseResponseDTO>
+                return new BaseResponse<List<DiseaseResponseDTO>>
                 {
                     Code = 500,
-                    Message = "An error occurred while retrieving disease by vaccine ID",
+                    Message = "Lỗi khi lấy bệnh theo vắc xin ID",
                     Data = null
                 };
             }
@@ -335,7 +385,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 400,
-                    Message = "Invalid request data",
+                    Message = "Dữ liệu không hợp lệ",
                     Success = false
                 };
             }
@@ -348,7 +398,7 @@ namespace PetVax.Services.Service
                     return new BaseResponse<DiseaseResponseDTO>
                     {
                         Code = 404,
-                        Message = "Disease not found",
+                        Message = "Bệnh không tồn tại",
                         Success = false
                     };
                 }
@@ -362,7 +412,7 @@ namespace PetVax.Services.Service
                     existingDisease.Symptoms = updateDiseaseDTO.Symptoms;
                 if (!string.IsNullOrWhiteSpace(updateDiseaseDTO.Species))
                     existingDisease.Species = updateDiseaseDTO.Species;
-                existingDisease.ModifiedAt = DateTime.UtcNow;
+                existingDisease.ModifiedAt = DateTimeHelper.Now();
                 existingDisease.ModifiedBy = GetCurrentUserName();
                 var result = await _diseaseRepository.UpdateDiseaseAsync(existingDisease, cancellationToken);
                 if (result <= 0)
@@ -371,7 +421,7 @@ namespace PetVax.Services.Service
                     return new BaseResponse<DiseaseResponseDTO>
                     {
                         Code = 500,
-                        Message = "Failed to update disease",
+                        Message = "Lỗi khi cập nhật bệnh",
                         Success = false
                     };
                 }
@@ -381,7 +431,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 200,
-                    Message = "Disease updated successfully",
+                    Message = "Bệnh đã được cập nhật thành công",
                     Data = diseaseResponse,
                     Success = true
                 };
@@ -392,7 +442,7 @@ namespace PetVax.Services.Service
                 return new BaseResponse<DiseaseResponseDTO>
                 {
                     Code = 500,
-                    Message = "An error occurred while updating disease",
+                    Message = "Lỗi khi cập nhật bệnh",
                     Success = false
                 };
             }

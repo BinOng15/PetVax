@@ -13,6 +13,7 @@ namespace PetVax.Services.IService
         Task<List<BaseResponse<VaccineProfileResponseDTO>>> GetAllVaccineProfilesAsync(CancellationToken cancellationToken);
         Task<BaseResponse<VaccineProfileResponseDTO>> CreateVaccineProfileAsync(VaccineProfileRequestDTO vaccineProfileRequest, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineProfileResponseDTO>> GetVaccineProfileByPetIdAsync(int petId, CancellationToken cancellationToken);
+        Task<BaseResponse<List<VaccineProfileGroupByDiseaseResponseDTO>>> GetGroupedVaccineProfilesByPetIdAsync(int petId, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineProfileResponseDTO>> GetVaccineProfileByIdAsync(int id, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineProfileResponseDTO>> UpdateVaccineProfileAsync(int id, VaccineProfileRequestDTO vaccineProfileRequest, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineProfileResponseDTO>> DeleteVaccineProfileAsync(int vaccineProfileId, CancellationToken cancellationToken);

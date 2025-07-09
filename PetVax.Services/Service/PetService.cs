@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
+using PetVax.Repositories.Repository;
 using PetVax.Services.ExternalService;
 using PetVax.Services.IService;
 using System;
@@ -22,21 +24,38 @@ namespace PetVax.Services.Service
     {
         private readonly IPetRepository _petRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IVaccineProfileRepository _vaccineProfileRepository;
+        private readonly IVaccinationScheduleRepository _vaccinationScheduleRepository;
         private readonly ILogger<PetService> _logger;
         private readonly IMapper _mapper;
         private readonly ICloudinariService _cloudinariService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-            
-        public PetService(IPetRepository petRepository, ICustomerRepository customerRepository, ILogger<PetService> logger, IMapper mapper, ICloudinariService cloudinariService, IHttpContextAccessor httpContextAccessor)
+        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IMicrochipItemRepository _microchipItemRepository;
+
+        public PetService(
+            IPetRepository petRepository,
+            ICustomerRepository customerRepository,
+            IVaccineProfileRepository vaccineProfileRepository,
+            IVaccinationScheduleRepository vaccinationScheduleRepository,
+            ILogger<PetService> logger,
+            IMapper mapper,
+            ICloudinariService cloudinariService,
+            IHttpContextAccessor httpContextAccessor,
+            IAppointmentRepository appointmentRepository,
+            IMicrochipItemRepository microchipItemRepository)
         {
             _petRepository = petRepository;
             _customerRepository = customerRepository;
+            _vaccineProfileRepository = vaccineProfileRepository;
+            _vaccinationScheduleRepository = vaccinationScheduleRepository;
             _logger = logger;
             _mapper = mapper;
             _cloudinariService = cloudinariService;
             _httpContextAccessor = httpContextAccessor;
+            _appointmentRepository = appointmentRepository;
+            _microchipItemRepository = microchipItemRepository;
         }
-
         public async Task<DynamicResponse<PetResponseDTO>> GetAllPetsAsync(GetAllPetsRequestDTO getAllPetsRequest, CancellationToken cancellationToken)
         {
             try
@@ -47,8 +66,11 @@ namespace PetVax.Services.Service
                 if (!string.IsNullOrWhiteSpace(getAllPetsRequest?.KeyWord))
                 {
                     var keyword = getAllPetsRequest.KeyWord.Trim().ToLower();
+                    var status = getAllPetsRequest?.Status;
                     pets = pets
-                        .Where(a => a.Name.ToLower().Contains(keyword))
+                        .Where(a => a.Name.ToLower().Contains(keyword) || a.PetCode.ToLower().Contains(keyword)
+                        || a.Species.ToLower().Contains(keyword) || a.Breed.ToLower().Contains(keyword)
+                        || a.isSterilized == status)
                         .ToList();
                 }
 
@@ -78,25 +100,9 @@ namespace PetVax.Services.Service
                     SearchInfo = new SearchCondition
                     {
                         keyWord = getAllPetsRequest?.KeyWord,
+                        status = getAllPetsRequest?.Status,
                     },
-                    PageData = pateVets.Select(p => new PetResponseDTO
-                    {
-                        PetId = p.PetId,
-                        PetCode = p.PetCode,
-                        CustomerId = p.CustomerId,
-                        Name = p.Name,
-                        Species = p.Species,
-                        Breed = p.Breed,
-                        Gender = p.Gender,
-                        DateOfBirth = p.DateOfBirth,
-                        PlaceToLive = p.PlaceToLive,
-                        PlaceOfBirth = p.PlaceOfBirth,
-                        Image = p.Image,
-                        Weight = p.Weight,
-                        Color = p.Color,
-                        Nationality = p.Nationality,
-                        isSterilized = p.isSterilized
-                    }).ToList()
+                    PageData = pateVets.Select(p => _mapper.Map<PetResponseDTO>(p)).ToList()
                 };
 
                 if (!pateVets.Any())
@@ -104,7 +110,7 @@ namespace PetVax.Services.Service
                     _logger.LogInformation("No pets found for the given criteria");
                     return new DynamicResponse<PetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "No vets found",
                         Data = responseData
@@ -133,17 +139,17 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<PetResponseDTO>> UpdatePetAsync(UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken)
+        public async Task<BaseResponse<PetResponseDTO>> UpdatePetAsync(int petId, UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken)
         {
             try
             {
-                var pet = await _petRepository.GetPetByIdAsync(updatePetRequest.PetId, cancellationToken);
+                var pet = await _petRepository.GetPetByIdAsync(petId, cancellationToken);
                 if (pet == null)
                 {
-                    _logger.LogWarning("Pet with ID {PetId} not found", updatePetRequest.PetId);
+                    _logger.LogWarning("Pet with ID {PetId} not found", petId);
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Pet not found",
                         Data = null
@@ -164,23 +170,19 @@ namespace PetVax.Services.Service
                 {
                     pet.Image = await _cloudinariService.UploadImage(updatePetRequest.Image);
                 }
-                else
-                {
-                    pet.Image = null;
-                }
-                // else keep existing image
+
 
                 pet.Weight = updatePetRequest?.Weight ?? pet.Weight;
                 pet.Color = updatePetRequest?.Color ?? pet.Color;
                 pet.Nationality = updatePetRequest.Nationality ?? pet.Nationality;
                 pet.isSterilized = updatePetRequest.isSterilized;
-                pet.ModifiedAt = DateTime.UtcNow;
+                pet.ModifiedAt = DateTimeHelper.Now();
                 pet.ModifiedBy = GetCurrentUserName();
 
                 int update = await _petRepository.UpdatePetAsync(pet, cancellationToken);
                 if (update <= 0)
                 {
-                    _logger.LogWarning("No changes made to pet with ID {PetId}", updatePetRequest.PetId);
+                    _logger.LogWarning("No changes made to pet with ID {PetId}", petId);
                     return new BaseResponse<PetResponseDTO>
                     {
                         Code = 200,
@@ -190,7 +192,7 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                _logger.LogInformation("Pet with ID {PetId} updated successfully", updatePetRequest.PetId);
+                _logger.LogInformation("Pet with ID {PetId} updated successfully", petId);
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 200,
@@ -219,7 +221,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating pet with ID {PetId}", updatePetRequest.PetId);
+                _logger.LogError(ex, "Error updating pet with ID {PetId}", petId);
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 500,
@@ -240,37 +242,23 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("Pet with ID {PetId} not found", petId);
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
                         Message = "Pet not found",
                         Data = null
                     };
                 }
                 _logger.LogInformation("Retrieved pet with ID {PetId} successfully", petId);
+
+                // Use AutoMapper to map Pet entity to PetResponseDTO
+                var petResponse = _mapper.Map<PetResponseDTO>(pet);
+
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Pet retrieved successfully",
-                    Data = new PetResponseDTO
-                    {
-                        PetId = pet.PetId,
-                        PetCode = pet.PetCode,
-                        CustomerId = pet.CustomerId,
-                        Name = pet.Name,
-                        Species = pet.Species,
-                        Breed = pet.Breed,
-                        Gender = pet.Gender,
-                        DateOfBirth = pet.DateOfBirth,
-                        PlaceToLive = pet.PlaceToLive,
-                        PlaceOfBirth = pet.PlaceOfBirth,
-                        Image = pet.Image,
-                        Weight = pet.Weight,
-                        Color = pet.Color,
-                        Nationality = pet.Nationality,
-                        isSterilized = pet.isSterilized
-                    }
-
+                    Data = petResponse
                 };
             }
             catch (Exception ex)
@@ -288,17 +276,6 @@ namespace PetVax.Services.Service
 
         public async Task<BaseResponse<PetResponseDTO>> CreatePetAsync(CreatePetRequestDTO createPetRequest, CancellationToken cancellationToken)
         {
-            if (createPetRequest == null)
-            {
-                _logger.LogError("CreatePetRequestDTO is null");
-                return new BaseResponse<PetResponseDTO>
-                {
-                    Code = 400,
-                    Success = false,
-                    Message = "Invalid request data",
-                    Data = null
-                };
-            }
             try
             {
                 var pet = _mapper.Map<Pet>(createPetRequest);
@@ -311,13 +288,23 @@ namespace PetVax.Services.Service
                     pet.Image = null;
                 }
 
-                var dob = DateTime.Parse(createPetRequest.DateOfBirth); 
+                if (pet.Species != "Dog" && pet.Species != "Cat" && pet.Species != "dog" && pet.Species != "cat")
+                {
+                    return new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = $"Để tạo loài vui lòng nhập 'Dog' hoặc 'Cat'",
+                        Data = null
+                    };
+                }
+
+                var dob = DateTime.Parse(createPetRequest.DateOfBirth);
                 var today = DateTime.Today;
                 int age = today.Year - dob.Year;
-
                 if (dob.Date > today.AddYears(-age))
                 {
-                    age--; 
+                    age--;
                 }
                 var random = new Random();
 
@@ -334,7 +321,7 @@ namespace PetVax.Services.Service
                 pet.Color = createPetRequest.Color;
                 pet.Nationality = createPetRequest.Nationality;
                 pet.isSterilized = createPetRequest.isSterilized;
-                pet.CreatedAt = DateTime.UtcNow;
+                pet.CreatedAt = DateTimeHelper.Now();
                 pet.CreatedBy = GetCurrentUserName();
 
                 var createdPetId = await _petRepository.CreatePetAsync(pet, cancellationToken);
@@ -342,11 +329,75 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<PetResponseDTO>
                     {
-                        Code = 500,
+                        Code = 200,
                         Success = false,
                         Message = "Failed to create pet",
                         Data = null
                     };
+                }
+
+                // Only get schedules with matching species
+                var vaccinationSchedules = await _vaccinationScheduleRepository.GetAllVaccinationSchedulesAsync(cancellationToken);
+                var matchedSchedules = vaccinationSchedules
+                    .Where(s => string.Equals(s.Species?.Trim(), pet.Species?.Trim(), StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                var vaccineProfilesToCreate = new List<VaccineProfile>();
+
+                foreach (var schedule in matchedSchedules)
+                {
+                    if (schedule is VaccinationSchedule vaccinationSchedule)
+                    {
+                        DateTime preferedDate = dob.AddDays(vaccinationSchedule.AgeInterval * 7);
+                        var newVaccineProfile = new VaccineProfile
+                        {
+                            PetId = pet.PetId,
+                            VaccinationScheduleId = vaccinationSchedule.VaccinationScheduleId,
+                            DiseaseId = vaccinationSchedule.DiseaseId,
+                            PreferedDate = preferedDate,
+                            IsCompleted = false,
+                            CreatedAt = DateTimeHelper.Now(),
+                            CreatedBy = GetCurrentUserName(),
+                            Dose = vaccinationSchedule.DoseNumber // Set Dose from DoseNumber
+                        };
+                        vaccineProfilesToCreate.Add(newVaccineProfile);
+                    }
+                }
+
+                if (vaccineProfilesToCreate.Any())
+                {
+                    foreach (var vp in vaccineProfilesToCreate)
+                    {
+                        await _vaccineProfileRepository.CreateVaccineProfileAsync(vp, cancellationToken);
+                    }
+                    _logger.LogInformation("Vaccine profiles created for pet with ID {PetId}", pet.PetId);
+                }
+                else
+                {
+                    // Fallback: create a default vaccine profile if no schedule found
+                    var vaccineProfile = new VaccineProfile
+                    {
+                        PetId = pet.PetId,
+                        IsCompleted = false,
+                        CreatedAt = DateTimeHelper.Now(),
+                        CreatedBy = GetCurrentUserName()
+                    };
+                    var vaccineProfileCreated = await _vaccineProfileRepository.CreateVaccineProfileAsync(vaccineProfile, cancellationToken);
+                    if (vaccineProfileCreated <= 0)
+                    {
+                        _logger.LogWarning("Failed to create vaccine profile for pet with ID {PetId}", pet.PetId);
+                        return new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Lỗi khi tạo hồ sơ tiêm chủng cho thú cưng",
+                            Data = null
+                        };
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Vaccine profile created successfully for pet with ID {PetId}", pet.PetId);
+                    }
                 }
 
                 var createdPet = await _petRepository.GetPetByIdAsync(pet.PetId, cancellationToken);
@@ -384,7 +435,7 @@ namespace PetVax.Services.Service
                     {
                         new BaseResponse<PetResponseDTO>
                         {
-                            Code = 404,
+                            Code = 200,
                             Success = false,
                             Message = "Customer not found",
                             Data = null
@@ -399,31 +450,14 @@ namespace PetVax.Services.Service
                     {
                         new BaseResponse<PetResponseDTO>
                         {
-                            Code = 404,
+                            Code = 200,
                             Success = false,
                             Message = "No pets found for this customer",
                             Data = null
                         }
                     };
                 }
-                var petResponses = pets.Select(p => new PetResponseDTO
-                {
-                    PetId = p.PetId,
-                    PetCode = p.PetCode,
-                    CustomerId = p.CustomerId,
-                    Name = p.Name,
-                    Species = p.Species,
-                    Breed = p.Breed,
-                    Gender = p.Gender,
-                    DateOfBirth = p.DateOfBirth,
-                    PlaceToLive = p.PlaceToLive,
-                    PlaceOfBirth = p.PlaceOfBirth,
-                    Image = p.Image,
-                    Weight = p.Weight,
-                    Color = p.Color,
-                    Nationality = p.Nationality,
-                    isSterilized = p.isSterilized
-                }).ToList();
+                var petResponses = pets.Select(p => _mapper.Map<PetResponseDTO>(p)).ToList();
 
                 return petResponses.Select(p => new BaseResponse<PetResponseDTO>
                 {
@@ -445,6 +479,104 @@ namespace PetVax.Services.Service
                         Message = "Error while retrieving pets: " + (ex.InnerException?.Message ?? ex.Message),
                         Data = null
                     }
+                };
+            }
+        }
+
+        public async Task<BaseResponse<PetResponseDTO>> DeletePetById(int petId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var pet = await _petRepository.GetPetByIdAsync(petId, cancellationToken);
+                if (pet == null)
+                {
+                    _logger.LogWarning("Pet with ID {PetId} not found", petId);
+                    return new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm tháy pet",
+                        Data = null
+                    };
+                }
+
+                // Check if pet has appointments
+                var appointments = await _appointmentRepository.GetAppointmentsByPetIdAsync(petId, cancellationToken);
+                if (appointments != null && appointments.Any())
+                {
+                    foreach (var appointment in appointments)
+                    {
+                        if (appointment.AppointmentDate >= DateTimeHelper.Now())
+                        {
+                            _logger.LogWarning("Cannot delete pet with ID {PetId} because it has active appointments", petId);
+                            return new BaseResponse<PetResponseDTO>
+                            {
+                                Code = 200,
+                                Success = false,
+                                Message = "Không thể xóa pet vì có lịch hẹn liên kết",
+                                Data = null
+                            };
+                        }
+                        else
+                        {
+                            appointment.isDeleted = true;
+                            var deleteAppoiment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+
+                        }
+
+                    }
+                }
+            
+
+                    // Check if pet has microchip items
+                    var microchipItems = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(petId, cancellationToken);
+                    if (microchipItems != null)
+                    {
+                        microchipItems.isDeleted = true;
+                        int deleteMicrochipItem = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItems, cancellationToken);
+                    }
+
+                    //check if pet has vaccine profile
+                    var vaccineProfile = await _vaccineProfileRepository.GetVaccineProfileByPetIdAsync(petId, cancellationToken);
+                    if (vaccineProfile != null)
+                    {
+                        vaccineProfile.isDeleted = true;
+                        int isVaccineProfileUpdated = await _vaccineProfileRepository.UpdateVaccineProfileAsync(vaccineProfile, cancellationToken);
+                    }
+
+                    pet.isDeleted = true;
+                    int isDeleted = await _petRepository.UpdatePetAsync(pet, cancellationToken);
+                    if (isDeleted <= 0)
+                    {
+                        _logger.LogWarning("Failed to delete pet with ID {PetId}", petId);
+                        return new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Không thể xóa pet",
+                            Data = null
+                        };
+                    }
+
+                    _logger.LogInformation("Pet with ID {PetId} deleted successfully", petId);
+                    return new BaseResponse<PetResponseDTO>
+                    {
+                        Code = 200,
+                        Success = true,
+                        Message = "Pet xóa thành công",
+                        Data = null
+                    };
+                
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting pet with ID {PetId}", petId);
+                return new BaseResponse<PetResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Error while deleting pet: " + (ex.InnerException?.Message ?? ex.Message),
+                    Data = null
                 };
             }
         }
