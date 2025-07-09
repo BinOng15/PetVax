@@ -70,5 +70,23 @@ namespace PetVax.Repositories.Repository
             return await UpdateAsync(pet, cancellationToken);
         }
 
+        public async Task<Pet?> GetPetWithHealthDataAsync(int petId)
+        {
+            return await _context.Pets
+                .Include(p => p.HealthConditions.Where(h => h.isDeleted == false || h.isDeleted == null))
+                .FirstOrDefaultAsync(p => p.PetId == petId && (p.isDeleted == false || p.isDeleted == null));
+        }
+        public async Task<List<VaccineProfile>> GetVaccineProfilesByPetIdAsync(int petId)
+        {
+            return await _context.VaccineProfiles
+                .Include(vp => vp.Disease)
+                .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.VaccineBatch)
+                        .ThenInclude(vb => vb.Vaccine)
+                .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.Vet)
+                .Where(vp => vp.PetId == petId && (vp.isDeleted == false || vp.isDeleted == null))
+                .ToListAsync();
+        }
     }
 }

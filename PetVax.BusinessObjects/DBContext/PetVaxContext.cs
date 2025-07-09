@@ -68,6 +68,7 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Disease> Diseases { get; set; }
         public DbSet<HealthCondition> HealthConditions { get; set; }
+        public DbSet<HealthConditionVaccinationCertificate> HealthConditionVaccinationCertificates { get; set; }
         public DbSet<MicrochipItem> MicrochipItems { get; set; }
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<Microchip> Microchips { get; set; }

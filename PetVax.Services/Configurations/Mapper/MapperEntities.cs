@@ -195,6 +195,7 @@ namespace PetVax.Services.Configurations.Mapper
 
             //HealthCondition
             CreateMap<CreateHealthConditionDTO, HealthCondition>();
+            CreateMap<UpdateHealthCondition, HealthCondition>();
             CreateMap<HealthCondition, BaseHealthConditionResponseDTO>()
                 .ForMember(dest => dest.Pet, opt => opt.MapFrom(src => src.Pet))
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet));

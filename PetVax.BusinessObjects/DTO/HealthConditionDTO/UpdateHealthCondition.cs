@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace PetVax.BusinessObjects.DTO.HealthConditionDTO
 {
-    public class CreateHealthConditionDTO
+    public class UpdateHealthCondition
     {
         public int? PetId { get; set; }
-        public int? VetId { get; set; }
         public int? MicrochipItemId { get; set; }
         public string? HeartRate { get; set; }
         public string? BreathingRate { get; set; }
@@ -23,8 +22,7 @@ namespace PetVax.BusinessObjects.DTO.HealthConditionDTO
         public string? Behavior { get; set; } //Hành vi
         public string? Psycho { get; set; } //Tâm lý
         public string? Different { get; set; } //Những điều khác
+        public decimal Price { get; set; }
         public DateTime? CheckDate { get; set; }
-
-
     }
 }
