@@ -25,6 +25,7 @@ namespace PetVax.BusinessObjects.Models
         public decimal Amount { get; set; } // Amount paid for the service
         public DateTime PaymentDate { get; set; } // Date of the payment in "yyyy-MM-dd" format
         public string CheckoutUrl { get; set; }
+        public string QRCode { get; set; } // QR code for payment, if applicable
         public string PaymentMethod { get; set; } // e.g., "Credit Card", "Cash", "Online Transfer"
         public EnumList.PaymentStatus PaymentStatus { get; set; } // e.g., "Pending", "Completed", "Failed"
         public DateTime CreatedAt { get; set; } // Date when the record was created

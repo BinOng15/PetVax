@@ -18,6 +18,6 @@ namespace PetVax.Services.IService
         Task<BaseResponse<PaymentResponseDTO>> DeletePaymentByIdAsync(int paymentId, CancellationToken cancellationToken);
         Task<BaseResponse<List<PaymentResponseDTO>>> GetPaymentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken);
         Task<BaseResponse<List<PaymentResponseDTO>>> GetPaymentsByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken);
-        Task HandlePayOsCallBackAsync(PaymentCallBackDTO paymentCallBackDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<PaymentResponseDTO>> HandlePayOsCallBackAsync(PaymentCallBackDTO paymentCallBackDTO, CancellationToken cancellationToken);
     }
 }

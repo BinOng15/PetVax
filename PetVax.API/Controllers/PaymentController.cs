@@ -61,10 +61,10 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpPost("paymen-callback")]
-        public async Task<IActionResult> PayOsCallback([FromBody] PaymentCallBackDTO callbackDto, CancellationToken cancellationToken)
+        public async Task<IActionResult> HandlePayOsCallBackAsync([FromBody] PaymentCallBackDTO paymentCallBackDTO, CancellationToken cancellationToken)
         {
-            await _paymentService.HandlePayOsCallBackAsync(callbackDto, cancellationToken);
-            return Ok();
+            var response = await _paymentService.HandlePayOsCallBackAsync(paymentCallBackDTO, cancellationToken);
+            return StatusCode(response.Code, response);
         }
     }
 }

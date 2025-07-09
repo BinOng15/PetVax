@@ -22,6 +22,7 @@ namespace PetVax.BusinessObjects.DTO.PaymentDTO
         public string PaymentMethod { get; set; }
         public EnumList.PaymentStatus PaymentStatus { get; set; }
         public string CheckoutUrl { get; set; }
+        public string QRCode { get; set; }
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
