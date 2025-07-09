@@ -12,6 +12,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using PetVax.BusinessObjects.Enum;
 
 namespace PetVax.Services.Service
 {
@@ -47,7 +48,12 @@ namespace PetVax.Services.Service
                         var upcomingAppointments = await _appointmentRepository.GetAppointmentsByDateRangeAsync(now, nextDay, stoppingToken);
                         _logger.LogInformation("Found {count} upcoming appointments for reminder", upcomingAppointments?.Count ?? 0);
 
-                        foreach (var appointment in upcomingAppointments)
+                        // Chỉ gửi mail cho các appointment có status là Processing hoặc Confirmed
+                        var filteredAppointments = upcomingAppointments
+                            .Where(a => a.AppointmentStatus == EnumList.AppointmentStatus.Processing || a.AppointmentStatus == EnumList.AppointmentStatus.Confirmed)
+                            .ToList();
+
+                        foreach (var appointment in filteredAppointments)
                         {
                             try
                             {
