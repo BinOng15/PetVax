@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using PediVax.BusinessObjects.DBContext;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
+using PetVax.BusinessObjects.DTO.CertificateForPet;
 using PetVax.BusinessObjects.DTO.HealthConditionDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.Models;
@@ -20,14 +23,22 @@ namespace PetVax.Services.Service
         private readonly IHealthConditionRepository _healthConditionRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IPetRepository _petRepository;
+        private readonly PetVaxContext _context;
 
-        public HealthConditionService(IHealthConditionRepository healthConditionRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public HealthConditionService(
+            IHealthConditionRepository healthConditionRepository,
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor,
+            IPetRepository petRepository,
+            PetVaxContext context)
         {
             _healthConditionRepository = healthConditionRepository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _petRepository = petRepository;
+            _context = context;
         }
-
         // / Get all health conditions with pagination and Response DTO
         public async Task<DynamicResponse<BaseHealthConditionResponseDTO>> GetAllHealthConditionsAsync(GetAllVetRequestDTO getAllVetRequest, CancellationToken cancellationToken)
         {
@@ -95,7 +106,6 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                // Log the exception (implement logging as needed)
                 return new DynamicResponse<BaseHealthConditionResponseDTO>
                 {
                     Code = 500,
@@ -109,66 +119,138 @@ namespace PetVax.Services.Service
         public async Task<BaseResponse<HealthConditionResponse>> CreateHealthConditionAsync(CreateHealthConditionDTO healthConditionDto, CancellationToken cancellationToken)
         {
             try
+
             {
+                string Conclusion = string.Empty;
+                string Status = string.Empty;
+                if (healthConditionDto.PetId == null)
+                {
+                    return new BaseResponse<HealthConditionResponse>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "PetId là bắt buộc.",
+                        Data = null
+                    };
+                }
+
+                var pet = await _petRepository.GetPetByIdAsync(healthConditionDto.PetId.Value, cancellationToken);
+                if (pet == null)
+                {
+                    return new BaseResponse<HealthConditionResponse>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy thú cưng.",
+                        Data = null
+                    };
+                }
+
+                var species = pet.Species?.ToLower(); // "dog" hoặc "cat"
+                if (species != "dog" && species != "cat")
+                {
+                    return new BaseResponse<HealthConditionResponse>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Loài thú cưng không được hỗ trợ. Chỉ hỗ trợ 'cat' và 'dog'.",
+                        Data = null
+                    };
+                }
+
                 var healthIssues = new List<string>();
 
-                // Validate temperture (°C)
-                if (!string.IsNullOrEmpty(healthConditionDto.Temperature) &&
-                    decimal.TryParse(healthConditionDto.Temperature.Replace("°C", "").Trim(), out decimal temperatureC))
+                // Validate dog
+                if (species == "dog")
                 {
-                    if (temperatureC < 37.5m || temperatureC > 39.2m)
-                        healthIssues.Add($"Nhiệt độ bất thường: {temperatureC} °C");
+                    if (!string.IsNullOrEmpty(healthConditionDto.Temperature) &&
+                        decimal.TryParse(healthConditionDto.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                    {
+                        if (tempC < 37.5m || tempC > 39.2m)
+                            healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                    }
+
+                    if (!string.IsNullOrEmpty(healthConditionDto.HeartRate) &&
+                        int.TryParse(healthConditionDto.HeartRate.Trim(), out int heartRate))
+                    {
+                        if (heartRate < 60 || heartRate > 140)
+                            healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                    }
+
+                    if (!string.IsNullOrEmpty(healthConditionDto.BreathingRate) &&
+                        int.TryParse(healthConditionDto.BreathingRate.Trim(), out int breathingRate))
+                    {
+                        if (breathingRate < 10 || breathingRate > 30)
+                            healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                    }
                 }
 
-                // Validate heart rate (bpm)
-                if (!string.IsNullOrEmpty(healthConditionDto.HeartRate) &&
-                    int.TryParse(healthConditionDto.HeartRate.Trim(), out int heartRate))
+                //  Validate cat
+                else if (species == "cat")
                 {
-                    if (heartRate < 60 || heartRate > 140)
-                        healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                    if (!string.IsNullOrEmpty(healthConditionDto.Temperature) &&
+                        decimal.TryParse(healthConditionDto.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                    {
+                        if (tempC < 38.0m || tempC > 39.5m)
+                            healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                    }
+
+                    if (!string.IsNullOrEmpty(healthConditionDto.HeartRate) &&
+                        int.TryParse(healthConditionDto.HeartRate.Trim(), out int heartRate))
+                    {
+                        if (heartRate < 140 || heartRate > 220)
+                            healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                    }
+
+                    if (!string.IsNullOrEmpty(healthConditionDto.BreathingRate) &&
+                        int.TryParse(healthConditionDto.BreathingRate.Trim(), out int breathingRate))
+                    {
+                        if (breathingRate < 20 || breathingRate > 30)
+                            healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                    }
                 }
 
-                // Validate Breathing rate (breaths/min)
-                if (!string.IsNullOrEmpty(healthConditionDto.BreathingRate) &&
-                    int.TryParse(healthConditionDto.BreathingRate.Trim(), out int breathingRate))
-                {
-                    if (breathingRate < 10 || breathingRate > 30)
-                        healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
-                }
-
-                // Validate weight (kg)
+                // check weight
                 if (!string.IsNullOrEmpty(healthConditionDto.Weight) &&
                     !decimal.TryParse(healthConditionDto.Weight.Trim(), out _))
                 {
                     healthIssues.Add("Cân nặng không hợp lệ.");
                 }
 
-
+                // 
                 if (healthIssues.Any())
                 {
-                    healthConditionDto.Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}";
-                    healthConditionDto.Status = "FAIL";
+                    Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}";
+                    Status = "FAIL";
                 }
                 else
                 {
-                    healthConditionDto.Conclusion = "✅ Đạt: Tình trạng sức khỏe trong ngưỡng bình thường.";
-                    healthConditionDto.Status = "PASS";
+                    Conclusion = "Đạt: Tình trạng sức khỏe trong ngưỡng bình thường.";
+                    Status = "PASS";
                 }
 
-                // Mapping & lưu DB
+                // save to database
+                var random = new Random();
                 var healthCondition = _mapper.Map<HealthCondition>(healthConditionDto);
+                healthCondition.ConditionCode = $"HC" + random.Next(0, 1000000).ToString("D6");
+
+                healthCondition.Price = 0;
                 healthCondition.CreatedAt = DateTime.UtcNow;
                 healthCondition.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
 
-                var createdHealthCondition = await _healthConditionRepository.AddHealthConditionAsync(healthCondition, cancellationToken);
-                var responseData = _mapper.Map<HealthConditionResponse>(createdHealthCondition);
+                var created = await _healthConditionRepository.AddHealthConditionAsync(healthCondition, cancellationToken);
+                if (created != null)
+                {
+
+                }
+                var response = _mapper.Map<HealthConditionResponse>(created);
 
                 return new BaseResponse<HealthConditionResponse>
                 {
                     Code = 201,
                     Success = true,
-                    Message = "✅ Khám sức khỏe hoàn tất.",
-                    Data = responseData
+                    Message = "Khám sức khỏe hoàn tất.",
+                    Data = response
                 };
             }
             catch (Exception ex)
@@ -177,11 +259,270 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "❌ Đã xảy ra lỗi khi tạo điều kiện sức khỏe.",
+                    Message = "Đã xảy ra lỗi khi tạo điều kiện sức khỏe.",
                     Data = null
                 };
             }
         }
 
+        public async Task<BaseResponse<HealthConditionResponse>> UpdateHealthConditionAsync(int healthConditionId, UpdateHealthCondition healthConditionDto, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string Conclusion = string.Empty;
+                string Status = string.Empty;
+                var existingHealthCondition = await _healthConditionRepository.GetHealthConditionByIdAsync(healthConditionId, cancellationToken);
+                if (existingHealthCondition == null)
+                {
+                    return new BaseResponse<HealthConditionResponse>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy điều kiện sức khỏe.",
+                        Data = null
+                    };
+                }
+
+                if (healthConditionDto.PetId == null)
+                {
+                    return new BaseResponse<HealthConditionResponse>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "PetId là bắt buộc.",
+                        Data = null
+                    };
+                }
+
+                var pet = await _petRepository.GetPetByIdAsync(healthConditionDto.PetId.Value, cancellationToken);
+                if (pet == null)
+                {
+                    return new BaseResponse<HealthConditionResponse>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy thú cưng.",
+                        Data = null
+                    };
+                }
+
+                var species = pet.Species?.ToLower(); // "dog" hoặc "cat"
+                if (species != "dog" && species != "cat")
+                {
+                    return new BaseResponse<HealthConditionResponse>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Loài thú cưng không được hỗ trợ. Chỉ hỗ trợ 'cat' và 'dog'.",
+                        Data = null
+                    };
+                }
+
+                var healthIssues = new List<string>();
+
+                // Validate dog
+                if (species == "dog")
+                {
+                    if (!string.IsNullOrEmpty(healthConditionDto.Temperature) &&
+                        decimal.TryParse(healthConditionDto.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                    {
+                        if (tempC < 37.5m || tempC > 39.2m)
+                            healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                    }
+
+                    if (!string.IsNullOrEmpty(healthConditionDto.HeartRate) &&
+                        int.TryParse(healthConditionDto.HeartRate.Trim(), out int heartRate))
+                    {
+                        if (heartRate < 60 || heartRate > 140)
+                            healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                    }
+
+                    if (!string.IsNullOrEmpty(healthConditionDto.BreathingRate) &&
+                        int.TryParse(healthConditionDto.BreathingRate.Trim(), out int breathingRate))
+                    {
+                        if (breathingRate < 10 || breathingRate > 30)
+                            healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                    }
+                }
+
+                //  Validate cat
+                else if (species == "cat")
+                {
+                    if (!string.IsNullOrEmpty(healthConditionDto.Temperature) &&
+                        decimal.TryParse(healthConditionDto.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                    {
+                        if (tempC < 38.0m || tempC > 39.5m)
+                            healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                    }
+
+                    if (!string.IsNullOrEmpty(healthConditionDto.HeartRate) &&
+                        int.TryParse(healthConditionDto.HeartRate.Trim(), out int heartRate))
+                    {
+                        if (heartRate < 140 || heartRate > 220)
+                            healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                    }
+
+                    if (!string.IsNullOrEmpty(healthConditionDto.BreathingRate) &&
+                        int.TryParse(healthConditionDto.BreathingRate.Trim(), out int breathingRate))
+                    {
+                        if (breathingRate < 20 || breathingRate > 30)
+                            healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                    }
+                }
+
+                // check weight
+                if (!string.IsNullOrEmpty(healthConditionDto.Weight) &&
+                    !decimal.TryParse(healthConditionDto.Weight.Trim(), out _))
+                {
+                    healthIssues.Add("Cân nặng không hợp lệ.");
+                }
+
+                // 
+                if (healthIssues.Any())
+                {
+                    Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}";
+                    Status = "FAIL";
+                }
+                else
+                {
+                    Conclusion = "Đạt: Tình trạng sức khỏe trong ngưỡng bình thường.";
+                    Status = "PASS";
+                }
+
+                // save to database
+                var healthCondition = _mapper.Map<HealthCondition>(healthConditionDto);
+                healthCondition.ModifiedAt = DateTime.UtcNow;
+                healthCondition.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+
+                var created = await _healthConditionRepository.AddHealthConditionAsync(healthCondition, cancellationToken);
+                if (created != null)
+                {
+
+                }
+                var response = _mapper.Map<HealthConditionResponse>(created);
+
+                return new BaseResponse<HealthConditionResponse>
+                {
+                    Code = 201,
+                    Success = true,
+                    Message = "Khám sức khỏe hoàn tất.",
+                    Data = response
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<HealthConditionResponse>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi tạo điều kiện sức khỏe.",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<HealthConditionResponse>> GetHealthConditionByIdAsync(int healthConditionId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var healthCondition = await _healthConditionRepository.GetHealthConditionByIdAsync(healthConditionId, cancellationToken);
+                if (healthCondition == null)
+                {
+                    return new BaseResponse<HealthConditionResponse>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy điều kiện sức khỏe.",
+                        Data = null
+                    };
+                }
+                var response = _mapper.Map<HealthConditionResponse>(healthCondition);
+                return new BaseResponse<HealthConditionResponse>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy điều kiện sức khỏe thành công.",
+                    Data = response
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<HealthConditionResponse>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy điều kiện sức khỏe.",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<PetVaccinationRecordDTO?> GetPetVaccinationRecordAsync(int petId)
+        {
+            var pet = await _petRepository.GetPetWithHealthDataAsync(petId);
+            if (pet == null)
+                return null;
+
+            var vaccineProfiles = await _petRepository.GetVaccineProfilesByPetIdAsync(petId);
+
+            var result = new PetVaccinationRecordDTO
+            {
+                PetId = pet.PetId,
+                PetName = pet.Name,
+                Species = pet.Species,
+                Breed = pet.Breed,
+                Gender = pet.Gender,
+                DateOfBirth = pet.DateOfBirth,
+                HealthConditions = pet.HealthConditions?
+                     .Select(h => _mapper.Map<HealthConditionResponse>(h))
+                        .ToList() ?? new(),
+                Certificates = new List<VaccinationCertificateWithHealthResponseDTO>()
+            };
+
+            foreach (var vp in vaccineProfiles)
+            {
+                var batch = vp.AppointmentDetail?.VaccineBatch;
+                var vaccine = batch?.Vaccine;
+                var vet = vp.AppointmentDetail?.Vet;
+
+                result.Certificates.Add(new VaccinationCertificateWithHealthResponseDTO
+                {
+                    DiseaseId = vp.DiseaseId,
+                    DiseaseName = vp.Disease?.Name ?? "Không rõ",
+                    Dose = vp.Dose,
+
+                    VaccineId = vaccine?.VaccineId,
+                    VaccineName = vaccine?.Name ?? "Không rõ",
+                    VaccineCode = vaccine?.VaccineCode ?? "",
+                    VaccineImage = vaccine?.Image ?? "",
+                    VaccineDescription = vaccine?.Description ?? "",
+            
+
+
+                    BatchId = batch?.VaccineBatchId,
+                    BatchNumber = batch?.BatchNumber ?? "",
+                    ManufactureDate = batch?.ManufactureDate ?? DateTime.MinValue,
+                    ExpiryDate = batch?.ExpiryDate ?? DateTime.MinValue,
+
+                    DoseNumber = vp.Dose ?? 0,
+                    VaccinationDate = vp.VaccinationDate ?? DateTime.MinValue,
+                    ExpirationDate = null,
+
+                    VetName = vet?.Name ?? "Không rõ",
+                    ClinicName = "PetVax Clinic",
+                    ClinicAddress = "123 Pet Street",
+
+                    Purpose = vp.NextVaccinationInfo ?? "",
+                    Price = vaccine?.Price ?? 0,
+                    Status = vp.IsCompleted == true ? "Hoàn tất" : "Chưa hoàn tất",
+
+                    IssueDate = vp.CreatedAt,
+                    ValidUntil = null,
+
+                });
+            }
+
+            return result;
+        }
     }
 }

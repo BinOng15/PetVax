@@ -1,4 +1,6 @@
-﻿using PetVax.Repositories.IRepository;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PediVax.BusinessObjects.DBContext;
+using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository;
 using PetVax.Services.Configurations.Mapper;
 using PetVax.Services.ExternalService;
@@ -41,6 +43,8 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVaccinationScheduleRepository, VaccinationScheduleRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IVaccinationCertificateRepository, VaccinationCertificateRepository>();
+            services.AddScoped<IHealthConditionRepository, HealthConditionRepository>();
+            
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -64,12 +68,15 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVaccineBatchService, VaccineBatchService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IHealthConditionService, HealthConditionService>();
 
             services.AddScoped<PayOsService>();
+            services.AddScoped<PetVaxContext>();
 
             services.AddHostedService<VetScheduleBackgroundService>();
             services.AddHostedService<AppointmentBackgroundService>();
             services.AddHostedService<AppointmentReminderBackgroundService>();
+            
 
             #endregion
 
