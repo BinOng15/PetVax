@@ -213,6 +213,7 @@ namespace PetVax.Services.Service
                 {
                     payment.PaymentStatus = EnumList.PaymentStatus.Pending;
                     payment.CheckoutUrl = string.Empty;
+                    payment.QRCode = string.Empty;
                 }
 
                 var result = await _paymentRepository.AddPaymentAsync(payment, cancellationToken);

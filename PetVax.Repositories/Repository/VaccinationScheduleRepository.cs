@@ -33,11 +33,20 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<VaccinationSchedule> GetVaccinationScheduleByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
+        public async Task<List<VaccinationSchedule>> GetVaccinationScheduleByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
         {
             return await _context.VaccinationSchedules
+                .Where(vs => vs.DiseaseId == diseaseId)
                 .Include(vs => vs.Disease)
-                .FirstOrDefaultAsync(vs => vs.DiseaseId == diseaseId, cancellationToken);
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<VaccinationSchedule> GetVaccinationScheduleByDiseaseIdAsyncs(int diseaseId, CancellationToken cancellationToken)
+        {
+            return await _context.VaccinationSchedules
+                .Where(vs => vs.DiseaseId == diseaseId)
+                .Include(vs => vs.Disease)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<VaccinationSchedule> GetVaccinationScheduleByIdAsync(int vaccinationScheduleId, CancellationToken cancellationToken)
