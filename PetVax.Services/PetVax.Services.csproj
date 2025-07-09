@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\PetVax.BusinessObjects\PetVax.BusinessObjects.csproj" />
       <ProjectReference Include="..\PetVax.Repositories\PetVax.Repositories.csproj" />
     </ItemGroup>
 

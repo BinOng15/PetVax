@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.DTO.HealthConditionDTO;
+﻿using PetVax.BusinessObjects.DTO.CertificateForPet;
+using PetVax.BusinessObjects.DTO.HealthConditionDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,11 @@ namespace PetVax.Services.IService
         Task<BaseResponse<HealthConditionResponse>> CreateHealthConditionAsync(CreateHealthConditionDTO healthConditionDto, CancellationToken cancellationToken);
 
         Task<DynamicResponse<BaseHealthConditionResponseDTO>> GetAllHealthConditionsAsync(GetAllVetRequestDTO getAllVetRequest, CancellationToken cancellationToken);
+
+        Task<BaseResponse<HealthConditionResponse>> UpdateHealthConditionAsync(int healthConditionId, UpdateHealthCondition healthConditionDto, CancellationToken cancellationToken);
+        Task<BaseResponse<HealthConditionResponse>> GetHealthConditionByIdAsync(int healthConditionId, CancellationToken cancellationToken);
+
+        Task<PetVaccinationRecordDTO?> GetPetVaccinationRecordAsync(int petId);
 
     }
 }

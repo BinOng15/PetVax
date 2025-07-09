@@ -14,10 +14,10 @@ namespace PetVax.BusinessObjects.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int HealthConditionVaccinationCertificateId { get; set; }
-        public int HealthConditionId { get; set; }
-        public int VaccinationCertificateId { get; set; }
+        public int? HealthConditionId { get; set; }
+        public int? VaccinationCertificateId { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
         public bool? isDeleted { get; set; } = false;
