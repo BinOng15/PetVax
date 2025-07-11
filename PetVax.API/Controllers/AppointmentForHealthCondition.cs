@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.HealthConditionDTO;
@@ -83,6 +84,14 @@ namespace PediVax.Controllers
             if (result == null)
                 return NotFound("Pet not found or no certificates.");
 
+            return Ok(result);
+        }
+
+
+        [HttpGet("Get-All-Appointment-Detail-HealthConditions")]
+        public async Task<IActionResult> GetAllAppointmentDetailHealthConditionAsync([FromQuery] GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            var result = await _appointmentDetailService.GetAllAppointmentDetailHealthConditionAsync(getAllItemsDTO, cancellationToken);
             return Ok(result);
         }
     }
