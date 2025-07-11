@@ -889,7 +889,7 @@ namespace PetVax.Services.Service
                         Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn sức khỏe với ID đã cung cấp.",
-                        Data = null
+                        Data = new AppointmentHealthConditionResponseDTO()
                     };
                 }
                 var responseData = _mapper.Map<AppointmentHealthConditionResponseDTO>(appointmentDetail);
@@ -909,7 +909,7 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn sức khỏe.",
-                    Data = null
+                    Data = new AppointmentHealthConditionResponseDTO()
                 };
             }
         }
@@ -946,6 +946,75 @@ namespace PetVax.Services.Service
                     Success = false,
                     Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn sức khỏe theo Pet ID.",
                     Data = new List<AppointmentHealthConditionResponseDTO>()
+                };
+            }
+        }
+
+        public async Task<DynamicResponse<AppointmentDetailHealthConditionResponseDTO>> GetAllAppointmentDetailHealthConditionAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailHealthConditionAsync(cancellationToken);
+                if (appointmentDetails == null || !appointmentDetails.Any())
+                {
+                    return new DynamicResponse<AppointmentDetailHealthConditionResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn sức khỏe nào.",
+                        Data = null
+                    };
+                }
+                // Filtering by keyword if provided
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO?.KeyWord))
+                {
+                    var keyword = getAllItemsDTO.KeyWord.ToLower();
+                    appointmentDetails = appointmentDetails
+                        .Where(d => d.AppointmentDetailCode != null && d.AppointmentDetailCode.ToLower().Contains(keyword))
+                        .ToList();
+                }
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = appointmentDetails.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+                var pagedDetails = appointmentDetails
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+                var responseData = _mapper.Map<List<AppointmentDetailHealthConditionResponseDTO>>(pagedDetails);
+                var megaData = new MegaData<AppointmentDetailHealthConditionResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                        status = getAllItemsDTO?.Status,
+                    },
+                    PageData = responseData
+                };
+                return new DynamicResponse<AppointmentDetailHealthConditionResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy tất cả chi tiết cuộc hẹn sức khỏe thành công.",
+                    Data = megaData
+                };
+            }
+            catch (Exception ex)
+            {
+                return new DynamicResponse<AppointmentDetailHealthConditionResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả chi tiết cuộc hẹn sức khỏe.",
+                    Data = null
                 };
             }
         }
