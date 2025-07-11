@@ -162,7 +162,7 @@ namespace PetVax.Services.Service
                 int totalItem = diseases.Count;
                 int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
 
-                var pagedVaccines = diseases
+                var pagedVDiseases = diseases
                     .Skip(skip)
                     .Take(pageSize)
                     .ToList();
@@ -181,9 +181,9 @@ namespace PetVax.Services.Service
                         keyWord = getAllItemsDTO?.KeyWord,
                         status = getAllItemsDTO?.Status
                     },
-                    PageData = _mapper.Map<List<DiseaseResponseDTO>>(pagedVaccines)
+                    PageData = _mapper.Map<List<DiseaseResponseDTO>>(pagedVDiseases)
                 };
-                if (!pagedVaccines.Any())
+                if (!pagedVDiseases.Any())
                 {
                     _logger.LogInformation("GetAllDiseaseAsync: No diseases found");
                     return new DynamicResponse<DiseaseResponseDTO>
@@ -194,7 +194,7 @@ namespace PetVax.Services.Service
                         Data = responseData
                     };
                 }
-                _logger.LogInformation($"GetAllDiseaseAsync: Retrieved {pagedVaccines.Count} diseases successfully");
+                _logger.LogInformation($"GetAllDiseaseAsync: Retrieved {pagedVDiseases.Count} diseases successfully");
                 return new DynamicResponse<DiseaseResponseDTO>
                 {
                     Code = 200,

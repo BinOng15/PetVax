@@ -27,6 +27,7 @@ namespace PetVax.Services.Service
         private readonly IMicrochipRepository _microchipRepository;
         private readonly IVaccinationCertificateRepository _vaccinationCertificateRepository;
         private readonly IHealthConditionRepository _healthConditionRepository;
+        private readonly IAppointmentRepository _appointmentRepository;
         private readonly PayOsService _payOsService;
         private readonly ILogger<PaymentService> _logger;
         private readonly IMapper _mapper;
@@ -39,6 +40,7 @@ namespace PetVax.Services.Service
             IMicrochipRepository microchipRepository,
             IVaccinationCertificateRepository vaccinationCertificateRepository,
             IHealthConditionRepository healthConditionRepository,
+            IAppointmentRepository appointmentRepository,
             PayOsService payOsService,
             ILogger<PaymentService> logger,
             IMapper mapper,
@@ -50,6 +52,7 @@ namespace PetVax.Services.Service
             _microchipRepository = microchipRepository;
             _vaccinationCertificateRepository = vaccinationCertificateRepository;
             _healthConditionRepository = healthConditionRepository;
+            _appointmentRepository = appointmentRepository;
             _payOsService = payOsService;
             _logger = logger;
             _mapper = mapper;
@@ -202,15 +205,15 @@ namespace PetVax.Services.Service
                 {
                     payment.PaymentStatus = EnumList.PaymentStatus.Pending;
                     var paymentLink = await GeneratePaymentLinkForAppointmentDetailAsync(createPaymentRequest.AppointmentDetailId, cancellationToken);
-                    payment.CheckoutUrl = paymentLink;
+                    payment.CheckoutUrl = paymentLink.paymentLink;
+                    payment.QRCode = paymentLink.qrCode;
                 }
 
                 else if (createPaymentRequest.PaymentMethod == EnumList.PaymentMethod.Cash)
                 {
-                    payment.PaymentStatus = EnumList.PaymentStatus.Completed;
-                    // Optionally, update appointment status to Paid
-                    appointmentDetail.AppointmentStatus = EnumList.AppointmentStatus.Paid;
-                    await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                    payment.PaymentStatus = EnumList.PaymentStatus.Pending;
+                    payment.CheckoutUrl = string.Empty;
+                    payment.QRCode = string.Empty;
                 }
 
                 var result = await _paymentRepository.AddPaymentAsync(payment, cancellationToken);
@@ -486,25 +489,14 @@ namespace PetVax.Services.Service
                 Data = paymentResponse
             };
         }
-        public async Task<string> GeneratePaymentLinkForAppointmentDetailAsync(int appointmentDetailId, CancellationToken cancellationToken)
+        public async Task<(string paymentLink, string qrCode)> GeneratePaymentLinkForAppointmentDetailAsync(int appointmentDetailId, CancellationToken cancellationToken)
         {
             var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetailId, cancellationToken);
             if (appointmentDetail == null)
             {
                 _logger.LogError("GeneratePaymentLinkForAppointmentDetailAsync: Appointment detail not found for ID {AppointmentDetailId}", appointmentDetailId);
-                return null;
+                return (null, null);
             }
-
-            // Tạo một CreatePaymentRequestDTO giả định để truyền vào hàm tính amount
-            var createPaymentRequest = new CreatePaymentRequestDTO
-            {
-                AppointmentDetailId = appointmentDetail.AppointmentDetailId,
-                VaccineBatchId = appointmentDetail.VaccineBatchId,
-                MicrochipId = appointmentDetail.MicrochipItem?.Microchip?.MicrochipId,
-                VaccinationCertificateId = appointmentDetail.VaccinationCertificate?.CertificateId,
-                HealthConditionId = appointmentDetail.HealthCondition?.HealthConditionId,
-                // Có thể bổ sung các trường khác nếu cần thiết
-            };
 
             decimal amount = 0;
 
@@ -516,9 +508,7 @@ namespace PetVax.Services.Service
             else if (appointmentDetail.MicrochipItemId.HasValue)
             {
                 var microchipItem = appointmentDetail.MicrochipItem;
-
                 var microchip = await _microchipRepository.GetMicrochipByIdAsync(microchipItem.MicrochipId, cancellationToken);
-
                 amount = microchip.Price;
             }
             else if (appointmentDetail.VaccinationCertificateId.HasValue)
@@ -541,45 +531,102 @@ namespace PetVax.Services.Service
                 returnUrl: "http://localhost:5173/staff/vaccination-appointments/success"
             );
 
-            _logger.LogInformation("Amount: {amount}",
-                        amount);
-                var paymentLink = await _payOsService.CreatePaymentLink(paymentData);
+            _logger.LogInformation("Amount: {amount}", amount);
+            var paymentLink = await _payOsService.CreatePaymentLink(paymentData);
             _logger.LogInformation("PayOs checkoutUrl: {CheckoutUrl}", paymentLink.checkoutUrl);
-            return paymentLink.checkoutUrl;
+            _logger.LogInformation("PayOs QRCode: {QRCode}", paymentLink.qrCode);
+            // Trả ra cả link và QRCode
+            return (paymentLink.checkoutUrl, paymentLink.qrCode);
         }
-        
-        public async Task HandlePayOsCallBackAsync(PaymentCallBackDTO paymentCallBackDTO, CancellationToken cancellationToken)
+
+        public async Task<BaseResponse<PaymentResponseDTO>> HandlePayOsCallBackAsync(PaymentCallBackDTO paymentCallBackDTO, CancellationToken cancellationToken)
         {
-            var payment = await _paymentRepository.GetPaymentByIdAsync(paymentCallBackDTO.PaymentId, cancellationToken);
-            if (payment == null) return;
-
-            if (paymentCallBackDTO.PaymentStatus == EnumList.PaymentStatus.Completed)
+            try
             {
-                payment.PaymentStatus = EnumList.PaymentStatus.Completed;
-
-                // Update AppointmentDetail status to Paid
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(payment.AppointmentDetailId, cancellationToken);
-                if (appointmentDetail != null)
+                var payment = await _paymentRepository.GetPaymentByIdAsync(paymentCallBackDTO.PaymentId, cancellationToken);
+                if (payment == null)
                 {
-                    appointmentDetail.AppointmentStatus = EnumList.AppointmentStatus.Paid;
-                    await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
-
-                    // Update Appointment status to Paid if exists
-                    if (appointmentDetail.Appointment != null)
+                    _logger.LogError("HandlePayOsCallBackAsync: Payment not found for ID {PaymentId}", paymentCallBackDTO.PaymentId);
+                    return new BaseResponse<PaymentResponseDTO>
                     {
-                        appointmentDetail.Appointment.AppointmentStatus = EnumList.AppointmentStatus.Paid;
-                        // If you have a repository for Appointment, update it here, e.g.:
-                        // await _appointmentRepository.UpdateAppointmentAsync(appointmentDetail.Appointment, cancellationToken);
+                        Code = 404,
+                        Success = false,
+                        Message = "Thông tin thanh toán không tồn tại, vui lòng kiểm tra lại!",
+                        Data = null
+                    };
+                }
+
+                // Only allow status update from Pending (1) to Completed (2) or Failed (3)
+                if (payment.PaymentStatus != EnumList.PaymentStatus.Pending ||
+                    (paymentCallBackDTO.PaymentStatus != EnumList.PaymentStatus.Completed && paymentCallBackDTO.PaymentStatus != EnumList.PaymentStatus.Failed))
+                {
+                    _logger.LogWarning("HandlePayOsCallBackAsync: Invalid status transition from {CurrentStatus} to {NewStatus} for PaymentId {PaymentId}",
+                        payment.PaymentStatus, paymentCallBackDTO.PaymentStatus, paymentCallBackDTO.PaymentId);
+                    return new BaseResponse<PaymentResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Chỉ cho phép cập nhật trạng thái thanh toán từ 'Pending - 1' sang 'Completed - 2' hoặc 'Failed - 3'!",
+                        Data = null
+                    };
+                }
+
+                if (paymentCallBackDTO.PaymentStatus == EnumList.PaymentStatus.Completed)
+                {
+                    payment.PaymentStatus = EnumList.PaymentStatus.Completed;
+                    // Update AppointmentDetail and Appointment status to Paid
+                    var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(payment.AppointmentDetailId, cancellationToken);
+                    if (appointmentDetail != null)
+                    {
+                        appointmentDetail.AppointmentStatus = EnumList.AppointmentStatus.Paid;
+                        await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                    }
+                    var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentDetail.AppointmentId, cancellationToken);
+                    if (appointment != null)
+                    {
+                        appointment.AppointmentStatus = EnumList.AppointmentStatus.Paid;
+                        await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
                     }
                 }
-            }
-            else if (paymentCallBackDTO.PaymentStatus == EnumList.PaymentStatus.Failed)
-            {
-                payment.PaymentStatus = EnumList.PaymentStatus.Failed;
-                // No need to update appointment status
-            }
+                else if (paymentCallBackDTO.PaymentStatus == EnumList.PaymentStatus.Failed)
+                {
+                    payment.PaymentStatus = EnumList.PaymentStatus.Failed;
+                    var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(payment.AppointmentDetailId, cancellationToken);
+                    if (appointmentDetail != null)
+                    {
+                        appointmentDetail.AppointmentStatus = appointmentDetail.AppointmentStatus;
+                        await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                    }
+                    var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentDetail.AppointmentId, cancellationToken);
+                    if (appointment != null)
+                    {
+                        appointment.AppointmentStatus = appointment.AppointmentStatus;
+                        await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+                    }
+                }
 
-            await _paymentRepository.UpdatePaymentAsync(payment, cancellationToken);
+                await _paymentRepository.UpdatePaymentAsync(payment, cancellationToken);
+
+                var paymentResponse = _mapper.Map<PaymentResponseDTO>(payment);
+                return new BaseResponse<PaymentResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Xử lý callback từ PayOs thành công!",
+                    Data = paymentResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "HandlePayOsCallBackAsync: An error occurred while handling PayOs callback");
+                return new BaseResponse<PaymentResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi xử lý callback từ PayOs, vui lòng thử lại sau!",
+                    Data = null
+                };
+            }
         }
     }
 }

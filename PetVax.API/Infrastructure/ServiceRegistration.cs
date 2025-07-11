@@ -44,6 +44,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IVaccinationCertificateRepository, VaccinationCertificateRepository>();
             services.AddScoped<IHealthConditionRepository, HealthConditionRepository>();
+            services.AddScoped<IVaccinationScheduleRepository, VaccinationScheduleRepository>();
             
 
             //Register services
@@ -69,6 +70,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IHealthConditionService, HealthConditionService>();
+            services.AddScoped<IVaccinationScheduleService, VaccinationScheduleService>();
 
             services.AddScoped<PayOsService>();
             services.AddScoped<PetVaxContext>();
