@@ -1407,24 +1407,24 @@ namespace PetVax.Services.Service
             try
             {
                 var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
-                if (appointment == null)
+                if (appointment == null || appointment.ServiceType != EnumList.ServiceType.Vaccination)
                 {
                     return new BaseResponse<AppointmentForVaccinationResponseDTO>
                     {
                         Code = 200,
                         Success = false,
-                        Message = "Không tìm thấy cuộc hẹn với ID đã cung cấp.",
+                        Message = "Không tìm thấy cuộc hẹn tiêm chủng với ID đã cung cấp.",
                         Data = null
                     };
                 }
                 var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentId, cancellationToken);
-                if (appointmentDetail == null)
+                if (appointmentDetail == null || appointment.ServiceType != EnumList.ServiceType.Vaccination)
                 {
                     return new BaseResponse<AppointmentForVaccinationResponseDTO>
                     {
                         Code = 200,
                         Success = false,
-                        Message = "Không tìm thấy chi tiết cuộc hẹn với ID đã cung cấp.",
+                        Message = "Không tìm thấy chi tiết cuộc hẹn tiêm chủng với ID đã cung cấp.",
                         Data = null
                     };
                 }
@@ -1931,6 +1931,52 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Đã xảy ra lỗi khi tạo cuộc hẹn tiêm phòng. " + ex.Message,
+                    Data = null
+                };
+            }
+        }
+        public async Task<BaseResponse<AppointmentResponseDTO>> GetAppointmentMicrochipByAppointmentId(int appointmentId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
+                if (appointment == null || appointment.ServiceType != EnumList.ServiceType.Microchip)
+                {
+                    return new BaseResponse<AppointmentResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn cấy microchip với ID đã cung cấp.",
+                        Data = null
+                    };
+                }
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appointmentId, cancellationToken);
+                if (appointmentDetail == null || appointmentDetail.ServiceType != EnumList.ServiceType.Microchip)
+                {
+                    return new BaseResponse<AppointmentResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn cấy microchip với ID đã cung cấp.",
+                        Data = null
+                    };
+                }
+                return new BaseResponse<AppointmentResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin cuộc hẹn cấy microchip thành công.",
+                    Data = _mapper.Map<AppointmentResponseDTO>(appointment)
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy thông tin cuộc hẹn cấy microchip.");
+                return new BaseResponse<AppointmentResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy thông tin cuộc hẹn cấy microchip.",
                     Data = null
                 };
             }
@@ -3506,6 +3552,6 @@ namespace PetVax.Services.Service
             }
         }
 
-
+        
     }
 }
