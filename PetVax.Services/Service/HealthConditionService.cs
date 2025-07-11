@@ -524,5 +524,41 @@ namespace PetVax.Services.Service
 
             return result;
         }
+
+        public async Task<BaseResponse<List<HealthConditionResponse>>> GetHealthConditionByPetIdAndStatus(int petId, string status, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var healthConditions = await _healthConditionRepository.GetHealthConditionsByPetIdAndStatusAsync(petId, status, cancellationToken);
+                if (healthConditions == null)
+                {
+                    return new BaseResponse<List<HealthConditionResponse>>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy điều kiện sức khỏe cho thú cưng này.",
+                        Data = null
+                    };
+                }
+                var response = _mapper.Map<List<HealthConditionResponse>>(healthConditions);
+                return new BaseResponse<List<HealthConditionResponse>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy điều kiện sức khỏe thành công.",
+                    Data = response
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<HealthConditionResponse>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy điều kiện sức khỏe.",
+                    Data = null
+                };
+            }
+        }
     }
 }

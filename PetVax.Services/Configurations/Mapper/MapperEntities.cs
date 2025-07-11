@@ -141,12 +141,14 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
                 .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
                 .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease))
-                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment));
+                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
+                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment));
 
             CreateMap<AppointmentDetail, AppointmentMicrochipResponseDTO>()
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
                 .ForMember(dest => dest.MicrochipItem, opt => opt.MapFrom(src => src.MicrochipItem))
-                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment));
+                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
+                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment));
             CreateMap<AppointmentDetail, AppointmenDetialMicorchipResponseDTO>()
                 .ForMember(dest => dest.Microchip, opt => opt.MapFrom(src => src));
 

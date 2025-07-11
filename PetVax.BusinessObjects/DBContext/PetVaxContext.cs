@@ -231,7 +231,7 @@ namespace PediVax.BusinessObjects.DBContext
             // Payment - AppointmentDetail (1-1)
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.AppointmentDetail)
-                .WithOne()
+                .WithOne(ad => ad.Payment)
                 .HasForeignKey<Payment>(p => p.AppointmentDetailId)
                 .OnDelete(DeleteBehavior.Restrict);
 

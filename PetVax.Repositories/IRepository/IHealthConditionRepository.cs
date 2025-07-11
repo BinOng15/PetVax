@@ -15,5 +15,6 @@ namespace PetVax.Repositories.IRepository
         Task<HealthCondition> UpdateHealthConditionAsync(HealthCondition healthCondition, CancellationToken cancellationToken);
         Task<bool> DeleteHealthConditionAsync(int id, CancellationToken cancellationToken);
         Task<List<HealthCondition>> GetHealthConditionsByPetIdAsync(int petId, CancellationToken cancellationToken);
+        Task<List<HealthCondition>> GetHealthConditionsByPetIdAndStatusAsync(int petId, string status, CancellationToken cancellationToken);
     }
 }

@@ -18,6 +18,7 @@ namespace PetVax.Services.IService
 
         Task<BaseResponse<HealthConditionResponse>> UpdateHealthConditionAsync(int healthConditionId, UpdateHealthCondition healthConditionDto, CancellationToken cancellationToken);
         Task<BaseResponse<HealthConditionResponse>> GetHealthConditionByIdAsync(int healthConditionId, CancellationToken cancellationToken);
+        Task<BaseResponse<List<HealthConditionResponse>>> GetHealthConditionByPetIdAndStatus(int petId, string status, CancellationToken cancellationToken);
 
         Task<PetVaccinationRecordDTO?> GetPetVaccinationRecordAsync(int petId);
 

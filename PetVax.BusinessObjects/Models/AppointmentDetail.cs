@@ -49,5 +49,6 @@ namespace PetVax.BusinessObjects.Models
         public virtual VaccineBatch VaccineBatch { get; set; } // Navigation to VaccineBatch table
         public virtual Disease Disease { get; set; } // Navigation to Disease table, if applicable (for vaccinations)
         public virtual ICollection<VaccineProfile> VaccineProfiles { get; set; } // Collection of vaccine profiles associated with this appointment detail
+        public virtual Payment Payment { get; set; } // Collection of payments associated with this appointment detail
     }
 }

@@ -85,5 +85,11 @@ namespace PediVax.Controllers
 
             return Ok(result);
         }
+        [HttpGet("Get-HealthCondition-By-PetId-And-Status/{petId}/{status}")]
+        public async Task<IActionResult> GetHealthConditionByPetIdAndStatusAsync(int petId, string status, CancellationToken cancellationToken)
+        {
+            var result = await _healthConditionService.GetHealthConditionByPetIdAndStatus(petId, status, cancellationToken);
+            return StatusCode(result.Code, result);
+        }
     }
 }

@@ -758,47 +758,40 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<List<BaseResponse<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetIdAndStatus(int petId, AppointmentStatus status, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetIdAndStatus(int petId, AppointmentStatus status, CancellationToken cancellationToken)
         {
-            var responses = new List<BaseResponse<AppointmenDetialMicorchipResponseDTO>>();
             try
             {
                 var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailsMicrochipByPetIdAndStatusAsync(petId, status, cancellationToken);
-                if (appointmentDetails == null || !appointmentDetails.Any())
+                if (appointmentDetails == null)
                 {
-                    responses.Add(new BaseResponse<AppointmenDetialMicorchipResponseDTO>
+                    return new BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>
                     {
                         Code = 200,
                         Success = false,
-                        Message = "Không tìm thấy chi tiết cuộc hẹn microchip.",
-                        Data = new AppointmenDetialMicorchipResponseDTO()
-                    });
-                    return responses;
+                        Message = "Không tìm thấy chi tiết cuộc hẹn microchip cho thú cưng này với trạng thái đã cung cấp.",
+                        Data = null
+                    };
                 }
-
-                foreach (var detail in appointmentDetails)
+                var appointmentMicrochipResponses = _mapper.Map<List<AppointmenDetialMicorchipResponseDTO>>(appointmentDetails);
+                return new BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>
                 {
-                    var appointmentMicrochipResponse = _mapper.Map<AppointmenDetialMicorchipResponseDTO>(detail);
-                    responses.Add(new BaseResponse<AppointmenDetialMicorchipResponseDTO>
-                    {
-                        Code = 200,
-                        Success = true,
-                        Message = "Lấy thông tin lịch hẹn thành công.",
-                        Data = appointmentMicrochipResponse
-                    });
-                }
-                return responses;
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin microchip theo thú cưng và trạng thái thành công.",
+                    Data = appointmentMicrochipResponses
+                };
             }
             catch (Exception ex)
             {
-                responses.Add(new BaseResponse<AppointmenDetialMicorchipResponseDTO>
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy thông tin microchip theo ID thú cưng và trạng thái.");
+                return new BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy thông tin lịch hẹn. " + ex.Message,
-                    Data = new AppointmenDetialMicorchipResponseDTO()
-                });
-                return responses;
+                    Message = "Đã xảy ra lỗi khi lấy thông tin microchip theo ID thú cưng và trạng thái.",
+                    Data = null
+                };
             }
         }
 

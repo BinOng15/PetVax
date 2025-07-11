@@ -51,6 +51,19 @@ namespace PetVax.Repositories.Repository
                 .FirstOrDefaultAsync(hc => hc.HealthConditionId == id, cancellationToken);
         }
 
+        public async Task<List<HealthCondition>> GetHealthConditionsByPetIdAndStatusAsync(int petId, string status, CancellationToken cancellationToken)
+        {
+            return await _context.HealthConditions
+                .Where(hc => hc.PetId == petId && hc.Status == status)
+                .Include(hc => hc.Pet)
+                    .ThenInclude(p => p.Customer)
+                    .ThenInclude(c => c.Account)
+                .Include(hc => hc.Vet)
+                    .ThenInclude(hc => hc.Account)
+                .Include(hc => hc.MicrochipItem)
+                .ToListAsync(cancellationToken);
+        }
+
         public Task<List<HealthCondition>> GetHealthConditionsByPetIdAsync(int petId, CancellationToken cancellationToken)
         {
             return _context.HealthConditions
