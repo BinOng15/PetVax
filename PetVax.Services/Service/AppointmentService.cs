@@ -1801,76 +1801,67 @@ namespace PetVax.Services.Service
                 };
             }
         }
-        public async Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> UpdateAppointmentMicrochipAsync(int appointmentId, CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> UpdateAppointmentMicrochipAsync(int appointmentId, UpdateAppointmentDTO updateAppointmentDTO, CancellationToken cancellationToken)
         {
 
-            var appointmentExist = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
-            if (appointmentExist == null)
-            {
-                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
-                {
-                    Code = 200,
-                    Success = false,
-                    Message = "Cuộc hẹn không tồn tại.",
-                    Data = null
-                };
-            }
-            if (appointmentExist.AppointmentStatus == AppointmentStatus.Confirmed)
-            {
-                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
-                {
-                    Code = 200,
-                    Success = false,
-                    Message = "Cuộc hẹn đã được xác nhận, không thể cập nhật!",
-                    Data = null
-                };
-            }
-            if (createAppointmentMicrochipDTO == null)
-            {
-                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
-                {
-                    Code = 200,
-                    Success = false,
-                    Message = "Dữ liệu tạo cuộc hẹn tiêm phòng không hợp lệ.",
-                    Data = null
-                };
-            }
-            if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(createAppointmentMicrochipDTO.Appointment.Address))
-            {
-                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
-                {
-                    Code = 200,
-                    Success = false,
-                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
-                    Data = null
-                };
-            }
-            if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.Clinic)
-            {
-                createAppointmentMicrochipDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
-            }
-            var pet = await _petRepository.GetPetByIdAsync(createAppointmentMicrochipDTO.Appointment.PetId, cancellationToken);
-            if (pet == null || pet.CustomerId != createAppointmentMicrochipDTO.Appointment.CustomerId)
-            {
-                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
-                {
-                    Code = 200,
-                    Success = false,
-                    Message = "Thú cưng này không thuộc quyền sở hữu của chủ nuôi này",
-                    Data = null
-                };
-            }
+     
 
             try
             {
+                var appointmentExist = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
+                if (appointmentExist == null)
+                {
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Cuộc hẹn không tồn tại.",
+                        Data = null
+                    };
+                }
+                if (appointmentExist.AppointmentStatus == AppointmentStatus.Confirmed)
+                {
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Cuộc hẹn đã được xác nhận, không thể cập nhật!",
+                        Data = null
+                    };
+                }
+                if (updateAppointmentDTO == null)
+                {
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Dữ liệu tạo cuộc hẹn cấy microchip không hợp lệ.",
+                        Data = null
+                    };
+                }
+                if (updateAppointmentDTO.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(updateAppointmentDTO.Address))
+                {
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                        Data = null
+                    };
+                }
+                if (updateAppointmentDTO.Location == EnumList.Location.Clinic)
+                {
+                    updateAppointmentDTO.Address = "Đại học FPT TP. Hồ Chí Minh";
+                }
 
-                appointmentExist = _mapper.Map<Appointment>(createAppointmentMicrochipDTO.Appointment);
 
-                appointmentExist.AppointmentDate = createAppointmentMicrochipDTO.Appointment.AppointmentDate;
-                appointmentExist.ServiceType = createAppointmentMicrochipDTO.Appointment.ServiceType;
-                appointmentExist.Location = createAppointmentMicrochipDTO.Appointment.Location;
-                appointmentExist.Address = createAppointmentMicrochipDTO.Appointment.Address;
-                appointmentExist.AppointmentStatus = EnumList.AppointmentStatus.Processing;
+
+                appointmentExist.AppointmentDate = updateAppointmentDTO.AppointmentDate ?? appointmentExist.AppointmentDate;
+                appointmentExist.ServiceType = updateAppointmentDTO.ServiceType ?? appointmentExist.ServiceType;
+    
+                appointmentExist.Location = updateAppointmentDTO.Location ?? appointmentExist.Location;
+                appointmentExist.Address = updateAppointmentDTO.Address ?? appointmentExist.Address;
+
                 appointmentExist.ModifiedAt = DateTime.UtcNow;
                 appointmentExist.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
@@ -1888,15 +1879,36 @@ namespace PetVax.Services.Service
 
                 var appoimentCheck = await _appointmentRepository.GetAppointmentByIdAsync(updateAppointment.AppointmentId, cancellationToken);
 
-                var appointmentDetail = new AppointmentDetail
+                if( appoimentCheck == null)
                 {
-                    AppointmentId = appoimentCheck.AppointmentId,
-                    AppointmentDate = appoimentCheck.AppointmentDate,
-                    ServiceType = appoimentCheck.ServiceType,
-                    AppointmentStatus = appoimentCheck.AppointmentStatus,
-                    ModifiedAt = DateTime.UtcNow,
-                    ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
-                };
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không tìm thấy cuộc hẹn cấy microchip vừa mới cập nhật",
+                        Data = null
+                    };
+                }
+
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appoimentCheck.AppointmentId, cancellationToken);
+                if (appointmentDetail == null)
+                {
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn cấy microchip.",
+                        Data = null
+                    };
+                }
+
+                appointmentDetail.AppointmentId = appoimentCheck.AppointmentId;
+                appointmentDetail.AppointmentDate = appoimentCheck.AppointmentDate;
+                appointmentDetail.ServiceType = appoimentCheck.ServiceType;
+                appointmentDetail.AppointmentStatus = appoimentCheck.AppointmentStatus;
+                appointmentDetail.ModifiedAt = DateTime.UtcNow;
+                appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
 
 
                 var updatedAppointmentDetail = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
@@ -1912,7 +1924,7 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                var createdAppointmentDetailId = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(updatedAppointmentDetail, cancellationToken);
+                var createdAppointmentDetailId = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appoimentCheck.AppointmentId, cancellationToken);
                 if (updatedAppointmentDetail == null || createdAppointmentDetailId == null)
                 {
                     return new BaseResponse<AppointmentWithMicorchipResponseDTO>
@@ -1927,7 +1939,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 201,
                     Success = true,
-                    Message = "Cập nhật cuộc hẹn tiêm phòng thành công.",
+                    Message = "Cập nhật cuộc hẹn cấy microchip thành công.",
                     Data = new AppointmentWithMicorchipResponseDTO
                     {
                         Appointment = _mapper.Map<AppointmentResponseDTO>(appoimentCheck),
@@ -1941,7 +1953,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi tạo cuộc hẹn tiêm phòng. " + ex.Message,
+                    Message = "Đã xảy ra lỗi khi tạo cuộc hẹn cấy microchip. " + ex.Message + ex.InnerException,
                     Data = null
                 };
             }
