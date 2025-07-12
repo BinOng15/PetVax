@@ -6,6 +6,7 @@ using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.HealthConditionDTO;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PediVax.Controllers
 {
@@ -42,7 +43,7 @@ namespace PediVax.Controllers
             return StatusCode(result.Code, result);
         }
 
-        [HttpPut("Update-Appointment-HealthCondition")]
+        [HttpPut("Update-Appointment-HealthCondition-For-Staff")]
         public async Task<IActionResult> UpdateAppointmentHealthConditionAsync([FromBody] UpdateAppointmentHealthConditionDTO updateAppointmentHealthConditionDTO, CancellationToken cancellationToken)
         {
             var result = await _appointmentService.UpdateAppointmentHealthConditionAsync(updateAppointmentHealthConditionDTO, cancellationToken);
@@ -98,6 +99,20 @@ namespace PediVax.Controllers
         {
             var result = await _appointmentDetailService.GetAllAppointmentDetailHealthConditionAsync(getAllItemsDTO, cancellationToken);
             return Ok(result);
+        }
+
+        [HttpPost("Update-appointment-for-customer/{appointmentId}")]
+        public async Task<IActionResult> UpdateAppointmentForCustomerAsync(int appointmentId, [FromBody] CreateAppointmentHealthConditionDTO createAppointmentHealthConditionDTO, CancellationToken cancellationToken)
+        {
+            var result = await _appointmentService.UpdateAppointmentHealConditionAsync(appointmentId, createAppointmentHealthConditionDTO, cancellationToken);
+            return StatusCode(result.Code, result);
+        }
+
+        [HttpGet("Get-Appointment-Detail-Healthcondition-by-Pet-And-Status/{petId}/{status}")]
+            public async Task<IActionResult> GetAppointmentDetailHealthConditionByPetIdAndStatusAsync(int petId, AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            var result = await _appointmentDetailService.GetAppointmentDetailHealthConditionByPetIdAndStatusAsync(petId, status, cancellationToken);
+            return StatusCode(result.Code, result);
         }
     }
 }

@@ -471,5 +471,21 @@ namespace PetVax.Repositories.Repository
                    .Where(a => a.isDeleted == false)
                    .ToListAsync(cancellationToken);
         }
+
+        public async Task<List<AppointmentDetail>> GetAllAppointmentDetailsHealthconditionByPetIdAndStatusAsync(int petId, AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            return await _context.AppointmentDetails
+           .Include(ad => ad.HealthCondition)
+           .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+           .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
+           .Include(ad => ad.Appointment)
+               .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
+           .Include(ad => ad.Appointment)
+               .ThenInclude(a => a.Pet)
+           .Include(ad => ad.Payment)
+
+           .Where(ad => ad.Appointment.PetId == petId && ad.AppointmentStatus == status && ad.Appointment.ServiceType == ServiceType.Microchip && ad.isDeleted == false)
+           .ToListAsync(cancellationToken);
+        }
     }
 }
