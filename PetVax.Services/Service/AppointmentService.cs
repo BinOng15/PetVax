@@ -1477,6 +1477,17 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
+            var hour = createAppointmentMicrochipDTO.Appointment.AppointmentDate.Hour;
+            if (!((hour >= 8 && hour <= 11) || (hour >= 13 && hour <= 16)))
+            {
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Chỉ cho phép đặt lịch trong khung giờ từ 8h-11h và 13h-16h.",
+                    Data = null
+                };
+            }
             if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.Clinic)
             {
                 createAppointmentMicrochipDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
@@ -3263,6 +3274,18 @@ namespace PetVax.Services.Service
             if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.Clinic)
             {
                 createAppointmentHealConditionDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
+            }
+
+            var hour = createAppointmentHealConditionDTO.Appointment.AppointmentDate.Hour;
+            if (!((hour >= 8 && hour <= 11) || (hour >= 13 && hour <= 16)))
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Chỉ cho phép đặt lịch trong khung giờ từ 8h-11h và 13h-16h.",
+                    Data = null
+                };
             }
 
             var pet = await _petRepository.GetPetByIdAsync(createAppointmentHealConditionDTO.Appointment.PetId, cancellationToken);
