@@ -484,7 +484,7 @@ namespace PetVax.Repositories.Repository
                .ThenInclude(a => a.Pet)
            .Include(ad => ad.Payment)
 
-           .Where(ad => ad.Appointment.PetId == petId && ad.AppointmentStatus == status && ad.Appointment.ServiceType == ServiceType.Microchip && ad.isDeleted == false)
+           .Where(ad => ad.Appointment.PetId == petId && ad.AppointmentStatus == status && ad.Appointment.ServiceType == ServiceType.HealthCondition && ad.isDeleted == false)
            .ToListAsync(cancellationToken);
         }
     }
