@@ -1870,7 +1870,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Không thể tạo cuộc hẹn cấy microchip.",
+                        Message = "Không thể cập nhật cuộc hẹn cấy microchip.",
                         Data = null
                     };
                 }
@@ -1896,7 +1896,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Không thể tạo chi tiết cuộc hẹn cấy microchip.",
+                        Message = "Không thể cập nhật chi tiết cuộc hẹn cấy microchip.",
                         Data = null
                     };
                 }
@@ -1916,7 +1916,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 201,
                     Success = true,
-                    Message = "Tạo cuộc hẹn tiêm phòng thành công.",
+                    Message = "Cập nhật cuộc hẹn tiêm phòng thành công.",
                     Data = new AppointmentWithMicorchipResponseDTO
                     {
                         Appointment = _mapper.Map<AppointmentResponseDTO>(appoimentCheck),
@@ -3552,6 +3552,149 @@ namespace PetVax.Services.Service
             }
         }
 
-        
+        public async Task<BaseResponse<AppointmenWithHealthConditionResponseDTO>> UpdateAppointmentHealConditionAsync(int appointmentId, CreateAppointmentHealthConditionDTO createAppointmentHealConditionDTO, CancellationToken cancellationToken)
+        {
+            if (createAppointmentHealConditionDTO == null)
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Dữ liệu tạo cuộc hẹn khám bệnh không hợp lệ.",
+                    Data = null
+                };
+            }
+
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
+
+            if (appointment == null)
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Cuộc hẹn không tồn tại.",
+                    Data = new AppointmenWithHealthConditionResponseDTO()
+                };
+            }
+
+            if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.HomeVisit &&
+                string.IsNullOrWhiteSpace(createAppointmentHealConditionDTO.Appointment.Address))
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                    Data = null
+                };
+            }
+
+            if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.Clinic)
+            {
+                createAppointmentHealConditionDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
+            }
+
+            var pet = await _petRepository.GetPetByIdAsync(createAppointmentHealConditionDTO.Appointment.PetId, cancellationToken);
+            if (pet == null || pet.CustomerId != createAppointmentHealConditionDTO.Appointment.CustomerId)
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 200,
+                    Success = false,
+                    Message = "Thú cưng này không thuộc quyền sở hữu của chủ nuôi này.",
+                    Data = null
+                };
+            }
+
+            try
+            {
+     
+                 appointment = _mapper.Map<Appointment>(createAppointmentHealConditionDTO.Appointment);
+
+
+                appointment.AppointmentDate = createAppointmentHealConditionDTO.Appointment.AppointmentDate;
+                appointment.ServiceType = createAppointmentHealConditionDTO.Appointment.ServiceType;
+                appointment.Location = createAppointmentHealConditionDTO.Appointment.Location;
+                appointment.Address = createAppointmentHealConditionDTO.Appointment.Address;
+                appointment.AppointmentStatus = EnumList.AppointmentStatus.Processing;
+                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                var updated = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+                if (updated == null)
+                {
+                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không thể cập nhật cuộc hẹn khám bệnh.",
+                        Data = null
+                    };
+                }
+
+                var updatedAppointmentId = await _appointmentRepository.GetAppointmentByIdAsync(updated.AppointmentId, cancellationToken);
+
+                var appointmentDetail = new AppointmentDetail
+                {
+                    AppointmentId = updatedAppointmentId.AppointmentId,
+                    AppointmentDate = updated.AppointmentDate,
+                    ServiceType = updated.ServiceType,
+                    AppointmentStatus = updated.AppointmentStatus,
+                    ModifiedAt = DateTime.UtcNow,
+                    ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                };
+
+                var createdAppointmentDetail = await _appointmentDetailRepository.AddAppointmentDetailAsync(appointmentDetail, cancellationToken);
+                if (createdAppointmentDetail == null)
+                {
+                    await _appointmentRepository.DeleteAppointmentAsync(updated.AppointmentId, cancellationToken);
+                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không thể cập nhật chi tiết cuộc hẹn khám bệnh.",
+                        Data = null
+                    };
+                }
+
+                var updateedAppointmentDetailId = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(createdAppointmentDetail.AppointmentDetailId, cancellationToken);
+                if (updatedAppointmentId == null || updateedAppointmentDetailId == null)
+                {
+                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Lỗi khi lấy thông tin cuộc hẹn đã cập nhật.",
+                        Data = null
+                    };
+                }
+
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 201,
+                    Success = true,
+                    Message = "Tạo cuộc hẹn khám bệnh thành công.",
+                    Data = new AppointmenWithHealthConditionResponseDTO
+                    {
+                        Appointment = _mapper.Map<AppointmentResponseDTO>(updatedAppointmentId),
+                        HealthCondition = _mapper.Map<AppointmentHealthConditionResponseDTO>(updateedAppointmentDetailId)
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi tạo cuộc hẹn khám bệnh. " + ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+
+
     }
 }

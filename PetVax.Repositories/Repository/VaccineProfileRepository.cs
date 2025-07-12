@@ -31,6 +31,12 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VaccineProfiles
                 .Include(vp => vp.Disease)
+                .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.Vet)
+                .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.VaccineBatch)
+                        .ThenInclude(vb => vb.Vaccine)
+                .AsNoTracking()
     .           ToListAsync(cancellationToken);
         }
 
@@ -51,6 +57,13 @@ namespace PetVax.Repositories.Repository
         public async Task<VaccineProfile> GetVaccineProfileByIdAsync(int vaccineProfileId, CancellationToken cancellationToken)
         {
             return await _context.VaccineProfiles
+                .Include(vp => vp.Disease)
+                .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.Vet)
+                .Include(vp => vp.AppointmentDetail)
+                    .ThenInclude(ad => ad.VaccineBatch)
+                        .ThenInclude(vb => vb.Vaccine)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(vp => vp.VaccineProfileId == vaccineProfileId, cancellationToken);
         }
 
