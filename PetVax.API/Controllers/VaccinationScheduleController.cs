@@ -42,6 +42,14 @@ namespace PediVax.Controllers
             var response = await _vaccinationScheduleService.GetVaccinationScheduleByDiseaseIdAsync(diseaseId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+
+        [HttpGet("get-vaccination-schedule-by-species/{species}")]
+        public async Task<IActionResult> GetVaccinationScheduleBySpecies(string species, CancellationToken cancellationToken)
+        {
+            var response = await _vaccinationScheduleService.GetVaccinationScheduleBySpecies(species, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+
         [HttpPost("create-vaccination-schedule")]
         public async Task<IActionResult> CreateVaccinationSchedule([FromBody] CreateVaccinationScheduleDTO createVaccinationScheduleDTO, CancellationToken cancellationToken)
         {

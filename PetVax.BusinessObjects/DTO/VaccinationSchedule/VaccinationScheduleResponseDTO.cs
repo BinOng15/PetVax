@@ -37,4 +37,10 @@ namespace PetVax.BusinessObjects.DTO.VaccinationSchedule
         public string Description { get; set; }
     }
 
+    public class VaccinationScheduleBySpeciesResponseDTO
+    {
+        public string Species { get; set; }
+        public List<VaccinationScheduleByDiseaseResponseDTO> Schedules { get; set; }
+    }
+
 }
