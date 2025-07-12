@@ -35,7 +35,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPut("update-appointment-microchip/{appointmentId}")]
-        public async Task<IActionResult> UpdateAppointmentMicrochipById(int appointmentId, [FromBody] CreateAppointmentMicrochipDTO updateAppointmentForMicrochipDTO, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UpdateAppointmentMicrochipById(int appointmentId, [FromBody] UpdateAppointmentDTO updateAppointmentForMicrochipDTO, CancellationToken cancellationToken = default)
         {
             var response = await _appointmentService.UpdateAppointmentMicrochipAsync(appointmentId, updateAppointmentForMicrochipDTO, cancellationToken);
             return StatusCode(response.Code, response);
