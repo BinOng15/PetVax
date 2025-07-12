@@ -1018,5 +1018,41 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<BaseResponse<List<AppointmentHealthConditionResponseDTO>>> GetAppointmentDetailHealthConditionByPetIdAndStatusAsync(int petId, AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailsHealthconditionByPetIdAndStatusAsync(petId, status, cancellationToken);
+                if (appointmentDetails == null || !appointmentDetails.Any())
+                {
+                    return new BaseResponse<List<AppointmentHealthConditionResponseDTO>>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn sức khỏe cho Pet ID và trạng thái đã cung cấp.",
+                        Data = new List<AppointmentHealthConditionResponseDTO>()
+                    };
+                }
+                var responseData = _mapper.Map<List<AppointmentHealthConditionResponseDTO>>(appointmentDetails);
+                return new BaseResponse<List<AppointmentHealthConditionResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy chi tiết cuộc hẹn sức khỏe theo Pet ID và trạng thái thành công.",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<AppointmentHealthConditionResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn sức khỏe theo Pet ID và trạng thái.",
+                    Data = new List<AppointmentHealthConditionResponseDTO>()
+                };
+            }
+        }
     }
 }
