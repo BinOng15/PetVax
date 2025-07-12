@@ -175,7 +175,7 @@ namespace PetVax.Services.Service
                 pet.Weight = updatePetRequest?.Weight ?? pet.Weight;
                 pet.Color = updatePetRequest?.Color ?? pet.Color;
                 pet.Nationality = updatePetRequest.Nationality ?? pet.Nationality;
-                pet.isSterilized = updatePetRequest.isSterilized;
+                pet.isSterilized = updatePetRequest.isSterilized ?? pet.isSterilized;
                 pet.ModifiedAt = DateTimeHelper.Now();
                 pet.ModifiedBy = GetCurrentUserName();
 
@@ -187,7 +187,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 200,
                         Success = false,
-                        Message = "No changes made to pet",
+                        Message = "Không thể cập nhật thông tin thú cưng, vui lòng thử lại",
                         Data = null
                     };
                 }
@@ -197,7 +197,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Pet updated successfully",
+                    Message = "Cập nhật thông tin thú cưng thành công!",
                     Data = new PetResponseDTO
                     {
                         PetId = pet.PetId,
@@ -226,7 +226,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Error while updating pet: " + (ex.InnerException?.Message ?? ex.Message),
+                    Message = "Lỗi khi cập nhật thú cưng: " + (ex.InnerException?.Message ?? ex.Message),
                     Data = null
                 };
             }

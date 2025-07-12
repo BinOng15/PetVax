@@ -3575,143 +3575,164 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmenWithHealthConditionResponseDTO>> UpdateAppointmentHealConditionAsync(int appointmentId, CreateAppointmentHealthConditionDTO createAppointmentHealConditionDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AppointmentResponseDTO>> UpdateAppointmentHealConditionAsync(int appointmentId, UpdateAppointmentDTO updateAppointmentHealConditionDTO, CancellationToken cancellationToken)
         {
-            if (createAppointmentHealConditionDTO == null)
+            if (updateAppointmentHealConditionDTO == null)
             {
-                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                return new BaseResponse<AppointmentResponseDTO>
                 {
-                    Code = 200,
+                    Code = 400,
                     Success = false,
-                    Message = "Dữ liệu tạo cuộc hẹn khám bệnh không hợp lệ.",
+                    Message = "Dữ liệu cập nhật cuộc hẹn khám bệnh không hợp lệ.",
                     Data = null
                 };
             }
-
             var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
-
             if (appointment == null)
             {
-                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                return new BaseResponse<AppointmentResponseDTO>
                 {
-                    Code = 200,
+                    Code = 404,
                     Success = false,
-                    Message = "Cuộc hẹn không tồn tại.",
-                    Data = new AppointmenWithHealthConditionResponseDTO()
-                };
-            }
-
-            if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.HomeVisit &&
-                string.IsNullOrWhiteSpace(createAppointmentHealConditionDTO.Appointment.Address))
-            {
-                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
-                {
-                    Code = 200,
-                    Success = false,
-                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                    Message = "Không tìm thấy cuộc hẹn với ID đã cung cấp.",
                     Data = null
                 };
             }
-
-            if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.Clinic)
+            var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appointmentId, cancellationToken);
+            if (appointmentDetail == null)
             {
-                createAppointmentHealConditionDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
-            }
-
-            var pet = await _petRepository.GetPetByIdAsync(createAppointmentHealConditionDTO.Appointment.PetId, cancellationToken);
-            if (pet == null || pet.CustomerId != createAppointmentHealConditionDTO.Appointment.CustomerId)
-            {
-                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                return new BaseResponse<AppointmentResponseDTO>
                 {
-                    Code = 200,
+                    Code = 404,
                     Success = false,
-                    Message = "Thú cưng này không thuộc quyền sở hữu của chủ nuôi này.",
+                    Message = "Không tìm thấy chi tiết cuộc hẹn với ID đã cung cấp.",
                     Data = null
                 };
             }
-
             try
             {
-     
-                 appointment = _mapper.Map<Appointment>(createAppointmentHealConditionDTO.Appointment);
-
-
-                appointment.AppointmentDate = createAppointmentHealConditionDTO.Appointment.AppointmentDate;
-                appointment.ServiceType = createAppointmentHealConditionDTO.Appointment.ServiceType;
-                appointment.Location = createAppointmentHealConditionDTO.Appointment.Location;
-                appointment.Address = createAppointmentHealConditionDTO.Appointment.Address;
-                appointment.AppointmentStatus = EnumList.AppointmentStatus.Processing;
+                // Update Appointment fields
+                var updateApp = updateAppointmentHealConditionDTO;
+                if (updateApp.AppointmentDate.HasValue)
+                    appointment.AppointmentDate = updateApp.AppointmentDate.Value;
+                if (updateApp.Location.HasValue)
+                    appointment.Location = updateApp.Location.Value;
+                if (!string.IsNullOrWhiteSpace(updateApp.Address))
+                    appointment.Address = updateApp.Address;
                 appointment.ModifiedAt = DateTime.UtcNow;
                 appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
-                var updated = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
-                if (updated == null)
-                {
-                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Không thể cập nhật cuộc hẹn khám bệnh.",
-                        Data = null
-                    };
-                }
+                // Update AppointmentDetail fields
+                appointmentDetail.AppointmentDate = updateApp.AppointmentDate ?? appointmentDetail.AppointmentDate;
+                appointmentDetail.ModifiedAt = DateTimeHelper.Now();
+                appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
-                var updatedAppointmentId = await _appointmentRepository.GetAppointmentByIdAsync(updated.AppointmentId, cancellationToken);
+                await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+                await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
 
-                var appointmentDetail = new AppointmentDetail
-                {
-                    AppointmentId = updatedAppointmentId.AppointmentId,
-                    AppointmentDate = updated.AppointmentDate,
-                    ServiceType = updated.ServiceType,
-                    AppointmentStatus = updated.AppointmentStatus,
-                    ModifiedAt = DateTime.UtcNow,
-                    ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
-                };
+                // Lấy lại thông tin đã cập nhật
+                var updatedAppointment = await _appointmentRepository.GetAppointmentByIdAsync(appointment.AppointmentId, cancellationToken);
+                var updatedAppointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetail.AppointmentDetailId, cancellationToken);
 
-                var createdAppointmentDetail = await _appointmentDetailRepository.AddAppointmentDetailAsync(appointmentDetail, cancellationToken);
-                if (createdAppointmentDetail == null)
+                return new BaseResponse<AppointmentResponseDTO>
                 {
-                    await _appointmentRepository.DeleteAppointmentAsync(updated.AppointmentId, cancellationToken);
-                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Không thể cập nhật chi tiết cuộc hẹn khám bệnh.",
-                        Data = null
-                    };
-                }
-
-                var updateedAppointmentDetailId = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(createdAppointmentDetail.AppointmentDetailId, cancellationToken);
-                if (updatedAppointmentId == null || updateedAppointmentDetailId == null)
-                {
-                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
-                    {
-                        Code = 500,
-                        Success = false,
-                        Message = "Lỗi khi lấy thông tin cuộc hẹn đã cập nhật.",
-                        Data = null
-                    };
-                }
-
-                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
-                {
-                    Code = 201,
+                    Code = 200,
                     Success = true,
-                    Message = "Tạo cuộc hẹn khám bệnh thành công.",
-                    Data = new AppointmenWithHealthConditionResponseDTO
+                    Message = "Cập nhật thông tin cuộc hẹn khám bệnh thành công.",
+                    Data = _mapper.Map<AppointmentResponseDTO>(updatedAppointment)
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật cuộc hẹn khám bệnh.");
+                return new BaseResponse<AppointmentResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi cập nhật cuộc hẹn khám bệnh.",
+                    Data = null
+                };
+            }
+        }
+        public async Task<BaseResponse<AppointmentForVaccinationResponseDTO>> UpdateAppointmentHealthConditionForVaccinationAsync(int appointmentId, UpdateAppointmentForVaccinationDTO updateAppointmentForVaccinationDTO, CancellationToken cancellationToken)
+        {
+            if (updateAppointmentForVaccinationDTO == null || updateAppointmentForVaccinationDTO.Appointment == null)
+            {
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Dữ liệu cập nhật cuộc hẹn khám bệnh không hợp lệ.",
+                    Data = null
+                };
+            }
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
+            if (appointment == null)
+            {
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 404,
+                    Success = false,
+                    Message = "Không tìm thấy cuộc hẹn với ID đã cung cấp.",
+                    Data = null
+                };
+            }
+            var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentId, cancellationToken);
+            if (appointmentDetail == null)
+            {
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 404,
+                    Success = false,
+                    Message = "Không tìm thấy chi tiết cuộc hẹn với ID đã cung cấp.",
+                    Data = null
+                };
+            }
+            try
+            {
+                // Update Appointment fields
+                var updateApp = updateAppointmentForVaccinationDTO.Appointment;
+                if (updateApp.AppointmentDate.HasValue)
+                    appointment.AppointmentDate = updateApp.AppointmentDate.Value;
+                if (updateApp.Location.HasValue)
+                    appointment.Location = updateApp.Location.Value;
+                if (!string.IsNullOrWhiteSpace(updateApp.Address))
+                    appointment.Address = updateApp.Address;
+                appointment.ModifiedAt = DateTime.UtcNow;
+                appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                // Update AppointmentDetail fields
+                appointmentDetail.AppointmentDate = updateApp.AppointmentDate ?? appointmentDetail.AppointmentDate;
+                appointmentDetail.ModifiedAt = DateTimeHelper.Now();
+                appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+
+                await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
+                await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
+
+                // Lấy lại thông tin đã cập nhật
+                var updatedAppointment = await _appointmentRepository.GetAppointmentByIdAsync(appointment.AppointmentId, cancellationToken);
+                var updatedAppointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetail.AppointmentDetailId, cancellationToken);
+
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Cập nhật thông tin cuộc hẹn khám bệnh thành công.",
+                    Data = new AppointmentForVaccinationResponseDTO
                     {
-                        Appointment = _mapper.Map<AppointmentResponseDTO>(updatedAppointmentId),
-                        HealthCondition = _mapper.Map<AppointmentHealthConditionResponseDTO>(updateedAppointmentDetailId)
+                        Appointment = _mapper.Map<AppointmentResponseDTO>(updatedAppointment),
+                        AppointmentHasDiseaseResponseDTO = null // Không trả về UpdateDiseaseForAppointmentDTO
                     }
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                _logger.LogError(ex, "Đã xảy ra lỗi khi cập nhật cuộc hẹn khám bệnh.");
+                return new BaseResponse<AppointmentForVaccinationResponseDTO>
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi tạo cuộc hẹn khám bệnh. " + ex.Message,
+                    Message = "Đã xảy ra lỗi khi cập nhật cuộc hẹn khám bệnh.",
                     Data = null
                 };
             }

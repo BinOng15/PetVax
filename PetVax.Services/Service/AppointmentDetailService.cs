@@ -659,7 +659,20 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
+
                 var vaccinationResponse = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(vaccinations);
+
+                // Filter Vet.ScheduleResponse to only include schedules matching AppointmentDate and Slot
+                if (vaccinationResponse?.Vet?.ScheduleResponse != null)
+                {
+                    var appointmentDate = vaccinations.AppointmentDate.Date;
+                    var appointmentSlot = vaccinations.AppointmentDate.Hour; // Assuming AppointmentDetail has AppointmentSlot property
+
+                    vaccinationResponse.Vet.ScheduleResponse = vaccinationResponse.Vet.ScheduleResponse
+                        .Where(s => s.ScheduleDate.Date == appointmentDate && s.SlotNumber == appointmentSlot)
+                        .ToList();
+                }
+
                 return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
                 {
                     Code = 200,

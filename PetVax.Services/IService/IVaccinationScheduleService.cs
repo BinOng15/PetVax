@@ -19,5 +19,6 @@ namespace PetVax.Services.IService
         Task<BaseResponse<VaccinationScheduleResponseDTO>> CreateVaccinationScheduleAsync(CreateVaccinationScheduleDTO createVaccinationScheduleDTO, CancellationToken cancellationToken);
         Task<BaseResponse<VaccinationScheduleResponseDTO>> UpdateVaccinationScheduleAsync(int vaccinationScheduleId, UpdateVaccinationScheduleDTO updateVaccinationScheduleDTO, CancellationToken cancellationToken);
         Task<BaseResponse<bool>> DeleteVaccinationScheduleAsync(int vaccinationScheduleId, CancellationToken cancellationToken);
+        Task<BaseResponse<List<VaccinationScheduleBySpeciesResponseDTO>>> GetVaccinationScheduleBySpecies(string species, CancellationToken cancellationToken);
     }
 }

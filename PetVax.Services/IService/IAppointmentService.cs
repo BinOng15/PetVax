@@ -54,6 +54,6 @@ namespace PetVax.Services.IService
         // Health Condition
         Task<BaseResponse<AppointmenWithHealthConditionResponseDTO>> CreateAppointmentHealConditionAsync(CreateAppointmentHealthConditionDTO createAppointmentHealConditionDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentHealthConditionResponseDTO>> UpdateAppointmentHealthConditionAsync(UpdateAppointmentHealthConditionDTO updateDTO, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmenWithHealthConditionResponseDTO>> UpdateAppointmentHealConditionAsync(int appointmentId, CreateAppointmentHealthConditionDTO createAppointmentHealConditionDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmentResponseDTO>> UpdateAppointmentHealConditionAsync(int appointmentId, UpdateAppointmentDTO updateAppointmentHealConditionDTO, CancellationToken cancellationToken);
     }
 }
