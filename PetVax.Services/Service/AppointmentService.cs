@@ -1631,9 +1631,12 @@ namespace PetVax.Services.Service
                         isValidTransition = newStatus == EnumList.AppointmentStatus.CheckedIn || newStatus == EnumList.AppointmentStatus.Rejected;
                         break;
                     case EnumList.AppointmentStatus.CheckedIn:
-                        isValidTransition = newStatus == EnumList.AppointmentStatus.Processed;
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Processed || newStatus == EnumList.AppointmentStatus.Cancelled;
                         break;
                     case EnumList.AppointmentStatus.Processed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Completed;
+                        break;
+                    case EnumList.AppointmentStatus.Paid:
                         isValidTransition = newStatus == EnumList.AppointmentStatus.Completed;
                         break;
                     default:
@@ -3451,9 +3454,12 @@ namespace PetVax.Services.Service
                         isValidTransition = newStatus == EnumList.AppointmentStatus.CheckedIn || newStatus == EnumList.AppointmentStatus.Rejected;
                         break;
                     case EnumList.AppointmentStatus.CheckedIn:
-                        isValidTransition = newStatus == EnumList.AppointmentStatus.Processed;
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Processed || newStatus == EnumList.AppointmentStatus.Cancelled;
                         break;
                     case EnumList.AppointmentStatus.Processed:
+                        isValidTransition = newStatus == EnumList.AppointmentStatus.Completed;
+                        break;
+                    case EnumList.AppointmentStatus.Paid:
                         isValidTransition = newStatus == EnumList.AppointmentStatus.Completed;
                         break;
                     default:
