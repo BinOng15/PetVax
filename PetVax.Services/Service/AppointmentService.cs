@@ -1710,6 +1710,17 @@ namespace PetVax.Services.Service
 
                 if (updateAppointmentMicrochipDTO.MicrochipItemId > 0)
                 {
+                    var appointmentDetailExist = await _appointmentDetailRepository.GetAppointmentDetailsByMicrochipItemIdAsync(updateAppointmentMicrochipDTO.MicrochipItemId, cancellationToken);
+                    if (appointmentDetailExist != null && appointmentDetailExist.AppointmentId != updateAppointmentMicrochipDTO.AppointmentId)
+                    {
+                        return new BaseResponse<AppointmentMicrochipResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Microchip đã được sử dụng trong cuộc hẹn khác.",
+                            Data = null
+                        };
+                    }
                     var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(updateAppointmentMicrochipDTO.MicrochipItemId, cancellationToken);
                     if (microchipItem == null)
                     {
@@ -1740,6 +1751,7 @@ namespace PetVax.Services.Service
                     }
                     ;
                 }
+
 
                 appointmentDetail.VetId = updateAppointmentMicrochipDTO.VetId;
                 appointmentDetail.MicrochipItemId = updateAppointmentMicrochipDTO.MicrochipItemId;
@@ -1799,7 +1811,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi cập nhật thông tin microchip cho cuộc hẹn." + ex.Message,
+                    Message = "Đã xảy ra lỗi khi cập nhật thông tin microchip cho cuộc hẹn." + ex.Message + ex.InnerException,
                     Data = null
                 };
             }
