@@ -119,7 +119,7 @@ namespace PetVax.Repositories.Repository
 
   
 
-        public Task<AppointmentDetail> GetAppointmentDetailsByMicrochipItemIdAsync(int microchipItemId, CancellationToken cancellationToken)
+        public Task<AppointmentDetail> GetAppointmentDetailsByMicrochipItemIdAsync(int? microchipItemId, CancellationToken cancellationToken)
         {
             return _context.AppointmentDetails
                 .Include(a => a.Appointment)

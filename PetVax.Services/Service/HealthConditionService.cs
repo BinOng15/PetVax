@@ -492,7 +492,7 @@ namespace PetVax.Services.Service
                     Dose = vp.Dose,
 
                     VaccineId = vaccine?.VaccineId,
-                    VaccineName = vaccine?.Name ?? "Không rõ",
+                    VaccineName = vaccine?.Name,
                     VaccineCode = vaccine?.VaccineCode ?? "",
                     VaccineImage = vaccine?.Image ?? "",
                     VaccineDescription = vaccine?.Description ?? "",
