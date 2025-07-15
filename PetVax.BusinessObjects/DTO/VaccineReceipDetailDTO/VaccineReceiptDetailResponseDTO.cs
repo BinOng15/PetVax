@@ -1,4 +1,6 @@
-﻿using PetVax.BusinessObjects.Models;
+﻿using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
+using PetVax.BusinessObjects.DTO.VaccineReceiptDTO;
+using PetVax.BusinessObjects.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,7 +26,7 @@ namespace PetVax.BusinessObjects.DTO.VaccineReceipDetailDTO
         public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
-        public VaccineReceipt VaccineReceipt { get; set; }
-        public VaccineBatch VaccineBatch { get; set; }
+        public VaccineReceiptResponseDTO VaccineReceipt { get; set; }
+        public VaccineBatchResponseDTO VaccineBatch { get; set; }
     }
 }

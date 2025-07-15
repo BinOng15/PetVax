@@ -408,6 +408,8 @@ namespace PetVax.Services.Service
                     };
                 }
                 // Cập nhật thông tin chi tiết phiếu nhập kho
+                existingDetail.VaccineReceiptId = updateVaccineReceiptDetailDTO.VaccineReceiptId ?? existingDetail.VaccineReceiptId;
+                existingDetail.VaccineBatchId = updateVaccineReceiptDetailDTO.VaccineBatchId ?? existingDetail.VaccineBatchId;
                 existingDetail.Suppiler = updateVaccineReceiptDetailDTO.Suppiler ?? existingDetail.Suppiler;
                 existingDetail.Quantity = updateVaccineReceiptDetailDTO.Quantity ?? existingDetail.Quantity;
                 existingDetail.VaccineStatus = updateVaccineReceiptDetailDTO.VaccineStatus ?? existingDetail.VaccineStatus;

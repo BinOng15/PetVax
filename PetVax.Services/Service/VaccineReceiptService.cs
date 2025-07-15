@@ -52,6 +52,7 @@ namespace PetVax.Services.Service
             {
                 var vaccineReceipt = _mapper.Map<VaccineReceipt>(createVaccineReceiptDTO);
                 vaccineReceipt.ReceiptDate = DateTimeHelper.Now();
+                vaccineReceipt.ReceiptCode = "RECEIPT" + new Random().Next(100000, 1000000).ToString();
                 vaccineReceipt.CreatedAt = DateTimeHelper.Now();
                 vaccineReceipt.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
                 // Call repository to create the vaccine receipt

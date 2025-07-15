@@ -9,7 +9,7 @@ namespace PetVax.BusinessObjects.DTO.VaccineBatchDTO
 {
     public class UpdateVaccineBatchDTO
     {
-        //public int? VaccineId { get; set; }
+        public int? VaccineId { get; set; }
         public DateTime? ManufactureDate { get; set; }
         public DateTime? ExpiryDate { get; set; }
         public string? Manufacturer { get; set; }
