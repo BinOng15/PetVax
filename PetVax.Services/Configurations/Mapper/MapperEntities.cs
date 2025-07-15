@@ -175,6 +175,8 @@ namespace PetVax.Services.Configurations.Mapper
              .ForMember(dest => dest.Customer, opt => opt.Ignore());
             CreateMap<MicrochipItem, MicrochipItemResponse>()
                 .ForMember(dest => dest.Pet, opt => opt.Ignore());
+            CreateMap<HealthCondition, HealthConditionResponse>();
+       
 
             //VaccineProfile
             CreateMap<VaccineProfile, VaccineProfileResponseDTO>()
