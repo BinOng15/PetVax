@@ -318,7 +318,7 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                
+
                 // Update properties
                 existingBatch.VaccineId = updateVaccineBatchDTO.VaccineId ?? existingBatch.VaccineId;
                 existingBatch.ManufactureDate = updateVaccineBatchDTO.ManufactureDate ?? existingBatch.ManufactureDate;
@@ -331,7 +331,7 @@ namespace PetVax.Services.Service
                 existingBatch.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 int batchId = await _vaccineBatchRepository.UpdateVaccineBatchAsync(existingBatch, cancellationToken);
 
-                var updatedBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(batchId, cancellationToken); // Ensure navigation properties are loaded
+                var updatedBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(batchId, cancellationToken);
 
                 var response = _mapper.Map<VaccineBatchResponseDTO>(updatedBatch);
                 return new BaseResponse<VaccineBatchResponseDTO>

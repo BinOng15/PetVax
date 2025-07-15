@@ -9,6 +9,7 @@ namespace PetVax.BusinessObjects.DTO.VaccineBatchDTO
 {
     public class UpdateVaccineBatchDTO
     {
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn vắc xin hợp lệ.")]
         public int? VaccineId { get; set; }
         public DateTime? ManufactureDate { get; set; }
         public DateTime? ExpiryDate { get; set; }
