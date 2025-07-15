@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PediVax.BusinessObjects.DBContext;
 
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250714140758_UpdateVaccineBatchVaccineRecieptAndExport")]
+    partial class UpdateVaccineBatchVaccineRecieptAndExport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,11 +73,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 7, 14, 14, 26, 40, 696, DateTimeKind.Utc).AddTicks(4425),
+                            CreatedAt = new DateTime(2025, 7, 14, 14, 7, 57, 328, DateTimeKind.Utc).AddTicks(5898),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "HV79d4eeb/WSvIIN+Xzp5Y/TkbTJhkqbgCB7cwi1eIs=",
-                            PasswordSalt = "L5KdKrw8JFT3JzlhZkJaquInwaECVmgedhVAUe7Vb6Q=",
+                            PasswordHash = "q+Bpi464Myl/C3It5spFviug3I9GZQ31V9wlsN98nh8=",
+                            PasswordSalt = "bbhKcrBuzFd7Gdci2ZKWylXRWgPGjxlsRGYkBS0TxiA=",
                             RefereshToken = "",
                             Role = 1,
                             isDeleted = false,
@@ -84,11 +87,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 7, 14, 14, 26, 40, 696, DateTimeKind.Utc).AddTicks(4430),
+                            CreatedAt = new DateTime(2025, 7, 14, 14, 7, 57, 328, DateTimeKind.Utc).AddTicks(5909),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "NUHJv3/dGUP5Qt0vG8nLva/O4vbq/dDxs3CCNOjCEtA=",
-                            PasswordSalt = "BWEDxAJPo8FJBONt/tJJe3BOHNrYtG8BLeDlYiLR/OQ=",
+                            PasswordHash = "ZGqWYaNSpIlVdEQAj7nSJP194KDm966dFGcilKrV5Rw=",
+                            PasswordSalt = "z904tRcV+ZFr8Yru8+n/2L2e/VMy4T8Kc4PLxYcwj90=",
                             RefereshToken = "",
                             Role = 2,
                             isDeleted = false,
@@ -265,57 +268,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.HasIndex("VetId");
 
                     b.ToTable("AppointmentDetail");
-                });
-
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.ColdChainLog", b =>
-                {
-                    b.Property<int>("ColdChainLogId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ColdChainLogId"));
-
-                    b.Property<string>("Event")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Humidity")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("LogTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("RecordedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RecordedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Temperature")
-                        .HasColumnType("float");
-
-                    b.Property<int>("VaccineBatchId")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("ColdChainLogId");
-
-                    b.HasIndex("VaccineBatchId");
-
-                    b.ToTable("ColdChainLog");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Customer", b =>
@@ -1703,17 +1655,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Navigation("Vet");
                 });
 
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.ColdChainLog", b =>
-                {
-                    b.HasOne("PetVax.BusinessObjects.Models.VaccineBatch", "VaccineBatch")
-                        .WithMany("ColdChainLogs")
-                        .HasForeignKey("VaccineBatchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("VaccineBatch");
-                });
-
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Customer", b =>
                 {
                     b.HasOne("PetVax.BusinessObjects.Models.Account", "Account")
@@ -2119,8 +2060,6 @@ namespace PetVax.BusinessObjects.Migrations
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccineBatch", b =>
                 {
                     b.Navigation("AppointmentDetails");
-
-                    b.Navigation("ColdChainLogs");
 
                     b.Navigation("VaccineExports");
 

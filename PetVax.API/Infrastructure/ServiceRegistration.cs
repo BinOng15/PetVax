@@ -45,7 +45,11 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVaccinationCertificateRepository, VaccinationCertificateRepository>();
             services.AddScoped<IHealthConditionRepository, HealthConditionRepository>();
             services.AddScoped<IVaccinationScheduleRepository, VaccinationScheduleRepository>();
-            
+            services.AddScoped<IVaccineReceiptRepository, VaccineReceiptRepository>();
+            services.AddScoped<IVaccineReceiptDetailRepository, VaccineReceiptDetailRepository>();
+            services.AddScoped<IVaccineExportRepository, VaccineExportRepository>();
+            services.AddScoped<IVaccineExportDetailRepository, VaccineExportDetailRepository>();
+            services.AddScoped<IColdChainLogRepository, ColdChainLogRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -53,7 +57,6 @@ namespace PetVax.Infrastructure
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IVaccineService, VaccineService>();
             services.AddScoped<ICloudinariService, CloudinaryService>();
-            
             services.AddScoped<IPetService, PetService>();
             services.AddScoped<IVetService, VetService>();
             services.AddScoped<IVetScheduleService, VetScheduleService>();
@@ -71,10 +74,14 @@ namespace PetVax.Infrastructure
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IHealthConditionService, HealthConditionService>();
             services.AddScoped<IVaccinationScheduleService, VaccinationScheduleService>();
+            services.AddScoped<IVaccineReceiptService, VaccineReceiptService>();
+            services.AddScoped<IVaccineReceiptDetailService, VaccineReceiptDetailService>();
 
+            //Register external services
             services.AddScoped<PayOsService>();
             services.AddScoped<PetVaxContext>();
 
+            //Register background services
             services.AddHostedService<VetScheduleBackgroundService>();
             services.AddHostedService<AppointmentBackgroundService>();
             services.AddHostedService<AppointmentReminderBackgroundService>();

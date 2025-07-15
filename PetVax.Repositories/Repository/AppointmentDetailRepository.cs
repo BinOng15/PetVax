@@ -309,6 +309,7 @@ namespace PetVax.Repositories.Repository
                .Include(ad => ad.Vet)
                    .ThenInclude(v => v.Account)
                .Include(ad => ad.VaccineBatch)
+                    .ThenInclude(vb => vb.Vaccine)
                .Include(ad => ad.Disease)
                .Include(ad => ad.Appointment)
                    .ThenInclude(a => a.Pet)

@@ -14,23 +14,17 @@ namespace PetVax.BusinessObjects.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VaccineReceiptDetailId { get; set; } // Unique identifier for the vaccine receipt detail
-
         [ForeignKey(nameof(VaccineReceipt))]
         public int VaccineReceiptId { get; set; } // Foreign key to VaccineReceipt table
-
         [ForeignKey(nameof(VaccineBatch))]
         public int VaccineBatchId { get; set; } // Foreign key to VaccineBatch table
-
+        public string Suppiler { get; set; }
         public int Quantity { get; set; } // Quantity of vaccines in the receipt detail
-
+        public string VaccineStatus { get; set; } // Status of the vaccine, e.g., "damage", "packaging error", "storage temperature"
         public string Notes { get; set; } // Additional notes for the vaccine receipt detail
-
         public DateTime CreatedAt { get; set; } // Date when the record was created
-
         public string CreatedBy { get; set; } // User who created the record
-
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
-
         public string? ModifiedBy { get; set; } // User who last modified the record
         public bool? isDeleted { get; set; } = false;
 
