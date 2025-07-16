@@ -963,14 +963,14 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<DynamicResponse<AppointmentDetailHealthConditionResponseDTO>> GetAllAppointmentDetailHealthConditionAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        public async Task<DynamicResponse<AppointmentHealthConditionResponseDTO>> GetAllAppointmentDetailHealthConditionAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
         {
             try
             {
                 var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailHealthConditionAsync(cancellationToken);
                 if (appointmentDetails == null || !appointmentDetails.Any())
                 {
-                    return new DynamicResponse<AppointmentDetailHealthConditionResponseDTO>
+                    return new DynamicResponse<AppointmentHealthConditionResponseDTO>
                     {
                         Code = 200,
                         Success = false,
@@ -995,8 +995,8 @@ namespace PetVax.Services.Service
                     .Skip(skip)
                     .Take(pageSize)
                     .ToList();
-                var responseData = _mapper.Map<List<AppointmentDetailHealthConditionResponseDTO>>(pagedDetails);
-                var megaData = new MegaData<AppointmentDetailHealthConditionResponseDTO>
+                var responseData = _mapper.Map<List<AppointmentHealthConditionResponseDTO>>(pagedDetails);
+                var megaData = new MegaData<AppointmentHealthConditionResponseDTO>
                 {
                     PageInfo = new PagingMetaData
                     {
@@ -1012,7 +1012,7 @@ namespace PetVax.Services.Service
                     },
                     PageData = responseData
                 };
-                return new DynamicResponse<AppointmentDetailHealthConditionResponseDTO>
+                return new DynamicResponse<AppointmentHealthConditionResponseDTO>
                 {
                     Code = 200,
                     Success = true,
@@ -1022,11 +1022,11 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                return new DynamicResponse<AppointmentDetailHealthConditionResponseDTO>
+                return new DynamicResponse<AppointmentHealthConditionResponseDTO>
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy tất cả chi tiết cuộc hẹn sức khỏe.",
+                    Message = "Đã xảy ra lỗi khi lấy tất cả chi tiết cuộc hẹn sức khỏe." + ex.InnerException,
                     Data = null
                 };
             }
