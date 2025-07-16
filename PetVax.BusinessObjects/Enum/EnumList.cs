@@ -61,6 +61,7 @@ namespace PetVax.BusinessObjects.Enum
         {
             Available = 1,
             Unavailable = 2,
+            Scheduled = 3,
         }
 
         public enum PaymentStatus
