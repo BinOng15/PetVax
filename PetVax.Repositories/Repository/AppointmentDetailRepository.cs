@@ -468,7 +468,7 @@ namespace PetVax.Repositories.Repository
                    .Include(ad => ad.Appointment)
                        .ThenInclude(a => a.Pet)
                     .Include(ad => ad.Payment)
-                   .Where(a => a.isDeleted == false)
+                   .Where(a => a.isDeleted == false && a.Appointment.ServiceType == ServiceType.HealthCondition)
                    .ToListAsync(cancellationToken);
         }
 

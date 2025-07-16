@@ -76,7 +76,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
 
     public class AppointmentDetailHealthConditionResponseDTO
     {
-        public AppointmentHealthConditionResponseDTO HealthCondition { get; set; }
+        public AppointmentHealthConditionResponseDTO HealthConditionDTO { get; set; }
     }
 
     public class AppointmentWithVaccinationCertificateResponseDTO
