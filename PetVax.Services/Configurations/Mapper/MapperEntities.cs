@@ -15,6 +15,8 @@ using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineDTO;
 using PetVax.BusinessObjects.DTO.VaccineProfileDTO;
+using PetVax.BusinessObjects.DTO.VaccineReceipDetailDTO;
+using PetVax.BusinessObjects.DTO.VaccineReceiptDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
 using PetVax.BusinessObjects.Enum;
@@ -214,6 +216,18 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<UpdateVaccinationScheduleDTO, VaccinationSchedule>();
             CreateMap<VaccinationSchedule, VaccinationScheduleResponseDTO>()
                 .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease));
+
+            //VaccineReceipt
+            CreateMap<CreateVaccineReceiptDTO, VaccineReceipt>();
+            CreateMap<UpdateVaccineReceiptDTO, VaccineReceipt>();
+            CreateMap<VaccineReceipt, VaccineReceiptResponseDTO>();
+
+            //VaccineReceiptDetail
+            CreateMap<CreateVaccineReceiptDetailDTO, VaccineReceiptDetail>();
+            CreateMap<UpdateVaccineReceiptDetailDTO, VaccineReceiptDetail>();
+            CreateMap<VaccineReceiptDetail, VaccineReceiptDetailResponseDTO>()
+                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
+                .ForMember(dest => dest.VaccineReceipt, opt => opt.MapFrom(src => src.VaccineReceipt));
         }
     }   
 }

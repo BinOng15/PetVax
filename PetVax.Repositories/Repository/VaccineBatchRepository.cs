@@ -18,7 +18,8 @@ namespace PetVax.Repositories.Repository
 
         public async Task<int> CreateVaccineBatchAsync(VaccineBatch vaccineBatch, CancellationToken cancellationToken)
         {
-            return await CreateAsync(vaccineBatch, cancellationToken);
+            await CreateAsync(vaccineBatch, cancellationToken);
+            return vaccineBatch.VaccineBatchId;
         }
 
         public async Task<bool> DeleteVaccineBatchAsync(int vaccineBatchId, CancellationToken cancellationToken)

@@ -66,6 +66,7 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<AppointmentDetail> AppointmentDetails { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<ColdChainLog> ColdChainLogs { get; set; }
         public DbSet<Disease> Diseases { get; set; }
         public DbSet<HealthCondition> HealthConditions { get; set; }
         public DbSet<HealthConditionVaccinationCertificate> HealthConditionVaccinationCertificates { get; set; }
@@ -413,6 +414,13 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasOne(hcvc => hcvc.VaccinationCertificate)
                 .WithMany(vc => vc.HealthConditionVaccinationCertificates)
                 .HasForeignKey(hcvc => hcvc.VaccinationCertificateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //ColdChainLog - VaccineBatch (N-1)
+            modelBuilder.Entity<ColdChainLog>()
+                .HasOne(ccl => ccl.VaccineBatch)
+                .WithMany(vb => vb.ColdChainLogs)
+                .HasForeignKey(ccl => ccl.VaccineBatchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Microchip>()
