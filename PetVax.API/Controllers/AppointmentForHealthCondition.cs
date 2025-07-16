@@ -50,12 +50,12 @@ namespace PediVax.Controllers
             return StatusCode(result.Code, result);
         }
 
-        [HttpPost("Create-healthcondion-by-vet")]
-        public async Task<IActionResult> CreateHealthConditionByVetAsync([FromForm] CreateHealthConditionDTO createHealthConditionDTO, CancellationToken cancellationToken)
-        {
-            var result = await _healthConditionService.CreateHealthConditionAsync(createHealthConditionDTO, cancellationToken);
-            return StatusCode(result.Code, result);
-        }
+        //[HttpPost("Create-healthcondion-by-vet")]
+        //public async Task<IActionResult> CreateHealthConditionByVetAsync([FromForm] CreateHealthConditionDTO createHealthConditionDTO, CancellationToken cancellationToken)
+        //{
+        //    var result = await _healthConditionService.CreateHealthConditionAsync(createHealthConditionDTO, cancellationToken);
+        //    return StatusCode(result.Code, result);
+        //}
 
         [HttpGet("Get-Appointment-Detail-HealthCondition-By-PetId/{petId}")]
         public async Task<IActionResult> GetAppointmentDetailHealthConditionByPetIdAsync(int petId, CancellationToken cancellationToken)
@@ -71,12 +71,12 @@ namespace PediVax.Controllers
             return StatusCode(result.Code, result);
         }
 
-        [HttpPut("Update-HealthCondition-By-Vet/{healthConditionId}")]
-        public async Task<IActionResult> UpdateHealthConditionByVetAsync(int healthConditionId, [FromForm] UpdateHealthCondition updateHealthCondition, CancellationToken cancellationToken)
-        {
-            var result = await _healthConditionService.UpdateHealthConditionAsync(healthConditionId, updateHealthCondition, cancellationToken);
-            return StatusCode(result.Code, result);
-        }
+        //[HttpPut("Update-HealthCondition-By-Vet/{healthConditionId}")]
+        //public async Task<IActionResult> UpdateHealthConditionByVetAsync(int healthConditionId, [FromForm] UpdateHealthCondition updateHealthCondition, CancellationToken cancellationToken)
+        //{
+        //    var result = await _healthConditionService.UpdateHealthConditionAsync(healthConditionId, updateHealthCondition, cancellationToken);
+        //    return StatusCode(result.Code, result);
+        //}
 
         [HttpGet("get-certificate-for-pet/{petId}")]
         public async Task<IActionResult> GetVaccinationRecord(int petId)
