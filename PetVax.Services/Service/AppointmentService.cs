@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.DTO.HealthConditionDTO;
 using PetVax.BusinessObjects.DTO.VaccineProfileDTO;
 using PetVax.BusinessObjects.Enum;
 using PetVax.BusinessObjects.Helpers;
@@ -15,14 +17,13 @@ using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mail;
 using System.Net;
+using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static PetVax.BusinessObjects.DTO.ResponseModel;
 using static PetVax.BusinessObjects.Enum.EnumList;
-using Microsoft.Extensions.Configuration;
 
 namespace PetVax.Services.Service
 {
@@ -43,6 +44,7 @@ namespace PetVax.Services.Service
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMicrochipItemRepository _microchipItemRepository;
+        private readonly IHealthConditionRepository _healthConditionRepository;
 
         public AppointmentService(
             IAppointmentRepository appointmentRepository,
@@ -59,7 +61,8 @@ namespace PetVax.Services.Service
             ILogger<AppointmentService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IMicrochipItemRepository microchipItemRepository)
+            IMicrochipItemRepository microchipItemRepository,
+            IHealthConditionRepository healthConditionRepository)
         {
             _appointmentRepository = appointmentRepository;
             _petRepository = petRepository;
@@ -76,8 +79,8 @@ namespace PetVax.Services.Service
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _microchipItemRepository = microchipItemRepository;
+            _healthConditionRepository = healthConditionRepository;
         }
-
         private int GetSlotNumberFromAppointmentDate(DateTime appointmenDate)
         {
             var hour = appointmenDate.Hour;
@@ -3617,7 +3620,6 @@ namespace PetVax.Services.Service
            
 
                 appointmentDetail.VetId = updateDTO.VetId ?? appointmentDetail.VetId;
-                appointmentDetail.HealthConditionId = updateDTO.HealthConditionId ?? appointmentDetail.HealthConditionId;
                 appointmentDetail.Notes = updateDTO.Note;
                 appointmentDetail.AppointmentStatus = newStatus;
                 appointmentDetail.ModifiedAt = DateTime.UtcNow;
@@ -3628,10 +3630,170 @@ namespace PetVax.Services.Service
                 appointment.ModifiedAt = DateTime.UtcNow;
                 appointment.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
+                //create health condition
+                HealthCondition healthConditiont = new HealthCondition();
+                if (currentStatus != EnumList.AppointmentStatus.Confirmed && newStatus == EnumList.AppointmentStatus.Confirmed)
+                {
+
+                    healthConditiont.Price = 1000;
+                    healthConditiont.CreatedAt = DateTime.UtcNow;
+                    healthConditiont.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                    var createHealthcondition = await _healthConditionRepository.AddHealthConditionAsync(healthConditiont, cancellationToken);
+                    if(createHealthcondition == null)
+                    {
+                        return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                        {
+                            Code = 500,
+                            Success = false,
+                            Message = "Không thể tạo tình trạng sức khỏe.",
+                            Data = null
+                        };
+                    }
+                    appointmentDetail.HealthConditionId = updateDTO.HealthConditionId ?? appointmentDetail.HealthConditionId;
+                }
+                
+              if(updateDTO.PetId > 0 && updateDTO.HealthConditionId > 0)
+                {
+                    var pet = await _petRepository.GetPetByIdAsync(appointment.PetId, cancellationToken);
+                    if (pet == null)
+                    {
+                        return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                        {
+                            Code = 404,
+                            Success = false,
+                            Message = "Không tìm thấy thú cưng.",
+                            Data = null
+                        };
+                    }
+
+                    var species = pet.Species?.ToLower(); // "dog" hoặc "cat"
+                    if (species != "dog" && species != "cat")
+                    {
+                        return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Loài thú cưng không được hỗ trợ. Chỉ hỗ trợ 'cat' và 'dog'.",
+                            Data = null
+                        };
+                    }
+                    if (pet != null)
+                    {
+                        string Conclusion = string.Empty;
+                        string Status = string.Empty;
+
+                        var getHealthCondition = await _healthConditionRepository.GetHealthConditionByIdAsync(updateDTO.HealthConditionId, cancellationToken);
+
+                        var healthIssues = new List<string>();
+
+                        // Validate dog
+                        if (species == "dog")
+                        {
+                            if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
+                                decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                            {
+                                if (tempC < 37.5m || tempC > 39.2m)
+                                    healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                            }
+
+                            if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
+                                int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
+                            {
+                                if (heartRate < 60 || heartRate > 140)
+                                    healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                            }
+
+                            if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
+                                int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
+                            {
+                                if (breathingRate < 10 || breathingRate > 30)
+                                    healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                            }
+                        }
+
+                        //  Validate cat
+                        else if (species == "cat")
+                        {
+                            if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
+                                decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                            {
+                                if (tempC < 38.0m || tempC > 39.5m)
+                                    healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                            }
+
+                            if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
+                                int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
+                            {
+                                if (heartRate < 140 || heartRate > 220)
+                                    healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                            }
+
+                            if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
+                                int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
+                            {
+                                if (breathingRate < 20 || breathingRate > 30)
+                                    healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                            }
+                        }
+
+                        // check weight
+                        if (!string.IsNullOrEmpty(updateDTO.Weight) &&
+                            !decimal.TryParse(updateDTO.Weight.Trim(), out _))
+                        {
+                            healthIssues.Add("Cân nặng không hợp lệ.");
+                        }
+
+                        // 
+                        if (healthIssues.Any())
+                        {
+                            Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}";
+                            Status = "FAIL";
+                        }
+                        else
+                        {
+                            Conclusion = "Đạt: Tình trạng sức khỏe trong ngưỡng bình thường.";
+                            Status = "PASS";
+                        }
+
+                         getHealthCondition.PetId = updateDTO.PetId?? getHealthCondition.PetId;
+                        getHealthCondition.VetId = updateDTO.VetId ?? getHealthCondition.VetId;
+                        getHealthCondition.HeartRate = updateDTO.HeartRate ?? getHealthCondition.HeartRate;
+                        getHealthCondition.BreathingRate = updateDTO.BreathingRate ?? getHealthCondition.BreathingRate;
+                        getHealthCondition.Weight = updateDTO.Weight ?? getHealthCondition.Weight;
+                        getHealthCondition.Temperature = updateDTO.Temperature ?? getHealthCondition.Temperature;
+                        getHealthCondition.EHNM = updateDTO.EHNM ?? getHealthCondition.EHNM; // Mắt tai mũi họng
+                        getHealthCondition.SkinAFur = updateDTO.SkinAFur ?? getHealthCondition.SkinAFur; // Da và lông
+                        getHealthCondition.Digestion = updateDTO.Digestion ?? getHealthCondition.Digestion; // Tiêu hóa
+                        getHealthCondition.Respiratory = updateDTO.Respiratory ?? getHealthCondition.Respiratory; // Hô hấp
+                        getHealthCondition.Excrete = updateDTO.Excrete ?? getHealthCondition.Excrete; // Bài tiết
+                        getHealthCondition.Behavior = updateDTO.Behavior ?? getHealthCondition.Behavior; // Hành vi
+                        getHealthCondition.Psycho = updateDTO.Psycho ?? getHealthCondition.Psycho; // Tâm lý
+                        getHealthCondition.Different = updateDTO.Different ?? getHealthCondition.Different; // Những điều khác
+                        getHealthCondition.Conclusion = Conclusion ?? getHealthCondition.Conclusion; // Kết luận
+                        getHealthCondition.Status = Status ?? getHealthCondition.Status; // Trạng thái
+                        getHealthCondition.CheckDate = DateTime.UtcNow;
+                        getHealthCondition.ModifiedAt = DateTime.UtcNow;
+                        getHealthCondition.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+
+                        var updated = await _healthConditionRepository.UpdateHealthConditionAsync(getHealthCondition, cancellationToken);
+                        if( updated == null)
+                        {
+                            return new BaseResponse<AppointmentHealthConditionResponseDTO>
+                            {
+                                Code = 500,
+                                Success = false,
+                                Message = "Không thể cập nhật tình trạng sức khỏe.",
+                                Data = null
+                            };
+                        }
+                    }
+                }
+
                 using (var transaction = await _appointmentRepository.BeginTransactionAsync())
                 {
                     try
                     {
+                        
                         var updatedDetail = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
                         var updatedAppointment = await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
 

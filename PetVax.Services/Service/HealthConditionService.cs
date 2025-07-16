@@ -394,7 +394,7 @@ namespace PetVax.Services.Service
                 healthCondition.ModifiedAt = DateTime.UtcNow;
                 healthCondition.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
 
-                var created = await _healthConditionRepository.AddHealthConditionAsync(healthCondition, cancellationToken);
+                var created = await _healthConditionRepository.UpdateHealthConditionAsync(healthCondition, cancellationToken);
                 if (created != null)
                 {
 

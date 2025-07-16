@@ -55,6 +55,7 @@ namespace PetVax.Repositories.Repository
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Pet)
+                .Include(ad => ad.HealthCondition)
                 .Include(ad => ad.Disease)
                 .Include(ad => ad.Payment)
                 .FirstOrDefaultAsync(a => a.AppointmentDetailId == id, cancellationToken);
