@@ -79,6 +79,7 @@ namespace PetVax.Infrastructure
 
             //Register external services
             services.AddScoped<PayOsService>();
+            services.AddScoped<MapBoxService>();
             services.AddScoped<PetVaxContext>();
 
             //Register background services

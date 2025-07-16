@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Net.payOS.Types;
 using PetVax.BusinessObjects.DTO;
@@ -32,6 +33,7 @@ namespace PetVax.Services.Service
         private readonly ILogger<PaymentService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly string _mapboxToken;
 
         public PaymentService(
             IPaymentRepository paymentRepository,
@@ -44,7 +46,9 @@ namespace PetVax.Services.Service
             PayOsService payOsService,
             ILogger<PaymentService> logger,
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IConfiguration configuration
+            )
         {
             _paymentRepository = paymentRepository;
             _appointmentDetailRepository = appointmentDetailRepository;
@@ -57,6 +61,7 @@ namespace PetVax.Services.Service
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _mapboxToken = configuration["Mapbox:AccessToken"];
         }
 
         public async Task<BaseResponse<PaymentResponseDTO>> CreatePaymentAsync(CreatePaymentRequestDTO createPaymentRequest, CancellationToken cancellationToken)
@@ -182,6 +187,19 @@ namespace PetVax.Services.Service
                     };
                 }
 
+                // Add extra fee for HomeVisit
+                var appointment = appointmentDetail.Appointment;
+                if (appointment != null && appointment.Location == EnumList.Location.HomeVisit)
+                {
+                    var clinicAddress = "Trường Đại Học FPT Thành Phố Hồ Chí Minh";
+                    var customerAddress = appointment.Address;
+                    var clinicCoords = await GetLatLngFromAddressAsync(clinicAddress);
+                    var customerCoords = await GetLatLngFromAddressAsync(customerAddress);
+                    var distanceKm = await GetDistanceKmAsync(clinicCoords, customerCoords);
+                    decimal extraFee = (decimal)distanceKm * 10000;
+                    amount += extraFee;
+                }
+
                 if (amount < 0.01m)
                 {
                     _logger.LogError("CreatePaymentAsync: Payment amount must be greater than or equal to 0.01 for AppointmentDetailId {AppointmentDetailId}", createPaymentRequest.AppointmentDetailId);
@@ -208,7 +226,6 @@ namespace PetVax.Services.Service
                     payment.CheckoutUrl = paymentLink.paymentLink;
                     payment.QRCode = paymentLink.qrCode;
                 }
-
                 else if (createPaymentRequest.PaymentMethod == EnumList.PaymentMethod.Cash)
                 {
                     payment.PaymentStatus = EnumList.PaymentStatus.Pending;
@@ -628,5 +645,28 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
+        public async Task<(double lat, double lng)> GetLatLngFromAddressAsync(string address)
+        {
+            using var client = new HttpClient();
+            var url = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{Uri.EscapeDataString(address)}.json?access_token={_mapboxToken}";
+            var response = await client.GetAsync(url);
+            var json = await response.Content.ReadAsStringAsync();
+            dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            var coordinates = result.features[0].geometry.coordinates;
+            return ((double)coordinates[1], (double)coordinates[0]); // lat, lng
+        }
+
+        public async Task<double> GetDistanceKmAsync((double lat, double lng) origin, (double lat, double lng) destination)
+        {
+            using var client = new HttpClient();
+            var url = $"https://api.mapbox.com/directions/v5/mapbox/driving/{origin.lng},{origin.lat};{destination.lng},{destination.lat}?access_token={_mapboxToken}";
+            var response = await client.GetAsync(url);
+            var json = await response.Content.ReadAsStringAsync();
+            dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            var distanceMeters = result.routes[0].distance;
+            return (double)distanceMeters / 1000.0;
+        }
+
     }
 }

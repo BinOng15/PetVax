@@ -841,7 +841,6 @@ namespace PetVax.Services.Service
             {
                 createAppointmentVaccinationDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
             }
-            // Validate allowed appointment hours: 8-11 and 13-16
             var hour = createAppointmentVaccinationDTO.Appointment.AppointmentDate.Hour;
             if (!((hour >= 8 && hour <= 11) || (hour >= 13 && hour <= 16)))
             {
@@ -874,7 +873,8 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
-            var disease = await _diseaseRepository.GetDiseaseByIdAsync(createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId, cancellationToken);
+            var diseaseId = createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId;
+            var disease = await _diseaseRepository.GetDiseaseByIdAsync(diseaseId, cancellationToken);
             if (disease == null)
             {
                 return new BaseResponse<AppointmentWithVaccinationResponseDTO>
@@ -886,49 +886,96 @@ namespace PetVax.Services.Service
                 };
             }
 
-            // Check if the pet has already completed all doses for this disease
+            // 1. Kiểm tra lịch tiêm cùng bệnh trong cùng ngày
+            var appointmentDate = createAppointmentVaccinationDTO.Appointment.AppointmentDate.Date;
+            var appointmentsForPet = await _appointmentDetailRepository.GetAppointmentVaccinationDetailByPetId(pet.PetId, cancellationToken);
+            var sameDaySameDisease = appointmentsForPet
+                .Where(a => a.DiseaseId == diseaseId && a.AppointmentDate.Date == appointmentDate)
+                .ToList();
+            if (sameDaySameDisease.Any())
+            {
+                return new BaseResponse<AppointmentWithVaccinationResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Đã có lịch tiêm cho bệnh này trong ngày. Vui lòng chọn ngày khác.",
+                    Data = null
+                };
+            }
+
+            // 2. Kiểm tra trạng thái lịch cũ cho cùng bệnh (chưa hoàn thành hoặc đang chờ xử lý)
+            var pendingStatuses = new[]
+            {
+                EnumList.AppointmentStatus.Processing,
+                EnumList.AppointmentStatus.Confirmed,
+                EnumList.AppointmentStatus.CheckedIn,
+                EnumList.AppointmentStatus.Processed,
+                EnumList.AppointmentStatus.Paid
+            };
+            var unfinishedForDisease = appointmentsForPet
+                .Where(a => a.DiseaseId == diseaseId && pendingStatuses.Contains(a.AppointmentStatus))
+                .ToList();
+            if (unfinishedForDisease.Any())
+            {
+                return new BaseResponse<AppointmentWithVaccinationResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Đã có lịch tiêm cho bệnh này chưa hoàn thành hoặc đang chờ xử lý. Vui lòng hoàn thành lịch cũ trước khi tạo mới.",
+                    Data = null
+                };
+            }
+
+            // 3. Kiểm tra khoảng cách giữa các mũi tiêm theo vaccinationSchedule
             var vaccinationSchedules = await _vaccinationScheduleRepository.GetAllVaccinationSchedulesAsync(cancellationToken);
             var schedulesForDisease = vaccinationSchedules
-                .Where(s => s.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId)
+                .Where(s => s.DiseaseId == diseaseId)
+                .OrderBy(s => s.DoseNumber)
                 .ToList();
             int totalDose = schedulesForDisease.Sum(s => s.DoseNumber);
 
-            if (totalDose > 0)
-            {
-                var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(pet.PetId, cancellationToken);
-                var profilesForDisease = vaccineProfiles?.Where(p => p.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId).ToList() ?? new List<VaccineProfile>();
-                int completedDoses = profilesForDisease.Count(p => p.IsCompleted == true);
-                if (completedDoses >= totalDose)
-                {
-                    return new BaseResponse<AppointmentWithVaccinationResponseDTO>
-                    {
-                        Code = 400,
-                        Success = false,
-                        Message = "Bệnh này đã được tiêm đủ liều lượng theo lịch tiêm chủng cho thú cưng. Không thể tạo thêm lịch tiêm cho bệnh này.",
-                        Data = null
-                    };
-                }
-            }
-            if (vaccinationSchedules != null)
-            {
-                var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(pet.PetId, cancellationToken);
-                var profilesForDisease = vaccineProfiles?.Where(p => p.DiseaseId == createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId).ToList() ?? new List<VaccineProfile>();
+            var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(pet.PetId, cancellationToken);
+            var profilesForDisease = vaccineProfiles?.Where(p => p.DiseaseId == diseaseId).OrderBy(p => p.Dose ?? 0).ToList() ?? new List<VaccineProfile>();
+            int completedDoses = profilesForDisease.Count(p => p.IsCompleted == true);
 
-                var totalDoseProp = vaccinationSchedules.GetType().GetProperty("TotalDose");
-                int totalDoses = totalDoseProp != null ? (int)(totalDoseProp.GetValue(vaccinationSchedules) ?? 0) : 0;
-
-                int completedDoses = profilesForDisease.Count(p => p.IsCompleted == true);
-                if (totalDose > 0 && completedDoses >= totalDose)
+            if (totalDose > 0 && completedDoses >= totalDose)
+            {
+                return new BaseResponse<AppointmentWithVaccinationResponseDTO>
                 {
-                    return new BaseResponse<AppointmentWithVaccinationResponseDTO>
-                    {
-                        Code = 400,
-                        Success = false,
-                        Message = "Bệnh này đã được tiêm đủ liều lượng theo lịch tiêm chủng. Không thể tạo thêm lịch tiêm cho bệnh này.",
-                        Data = null
-                    };
-                }
+                    Code = 400,
+                    Success = false,
+                    Message = "Bệnh này đã được tiêm đủ liều lượng theo lịch tiêm chủng cho thú cưng. Không thể tạo thêm lịch tiêm cho bệnh này.",
+                    Data = null
+                };
             }
+
+            //// Tìm mũi tiêm gần nhất đã hoàn thành cho bệnh này
+            //var lastCompletedProfile = profilesForDisease
+            //    .Where(p => p.IsCompleted == true)
+            //    .OrderByDescending(p => p.VaccinationDate)
+            //    .FirstOrDefault();
+
+            //// Tìm lịch tiêm cho mũi tiếp theo
+            //int nextDoseNumber = completedDoses + 1;
+            //var nextSchedule = schedulesForDisease.FirstOrDefault(s => s.DoseNumber == nextDoseNumber);
+
+            //if (lastCompletedProfile != null && nextSchedule != null)
+            //{
+            //    var minDaysBetween = nextSchedule.MinDaysBetweenDoses;
+            //    var lastVaccinationDate = lastCompletedProfile.VaccinationDate ?? DateTime.MinValue;
+            //    var earliestNextDate = lastVaccinationDate.AddDays(minDaysBetween);
+
+            //    if (appointmentDate < earliestNextDate.Date)
+            //    {
+            //        return new BaseResponse<AppointmentWithVaccinationResponseDTO>
+            //        {
+            //            Code = 400,
+            //            Success = false,
+            //            Message = $"Khoảng cách giữa các mũi chưa đủ ngày. Chỉ được đặt lịch vào ngày {earliestNextDate:dd/MM/yyyy}.",
+            //            Data = null
+            //        };
+            //    }
+            //}
 
             try
             {
@@ -967,7 +1014,7 @@ namespace PetVax.Services.Service
                     AppointmentDetailCode = "AD" + random.Next(0, 1000000).ToString("D6"),
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
-                    DiseaseId = createAppointmentVaccinationDTO.AppointmentDetailVaccination.DiseaseId,
+                    DiseaseId = diseaseId,
                 };
                 var createdAppointmentDetailId = await _appointmentDetailRepository.AddAppointmentDetailAsync(appointmentDetail, cancellationToken);
                 if (createdAppointmentDetailId == null)
@@ -1140,7 +1187,8 @@ namespace PetVax.Services.Service
                     var isValidSchedule = vetSchedules.Any(s =>
                         s.ScheduleDate.Date == appointmentDate.Date &&
                         s.SlotNumber == slotNumber &&
-                        s.Status == EnumList.VetScheduleStatus.Available);
+                        s.Status == EnumList.VetScheduleStatus.Available ||
+                        s.Status == EnumList.VetScheduleStatus.Scheduled);
 
                     if (!isValidSchedule)
                     {
@@ -1152,11 +1200,37 @@ namespace PetVax.Services.Service
                             Data = null
                         };
                     }
+
+                    // Không cho chọn nếu VetScheduleStatus là Scheduled
+                    var vetScheduleToCheck = vetSchedules.FirstOrDefault(s =>
+                        s.ScheduleDate.Date == appointmentDate.Date &&
+                        s.SlotNumber == slotNumber);
+
+                    if (vetScheduleToCheck != null && vetScheduleToCheck.Status == EnumList.VetScheduleStatus.Scheduled)
+                    {
+                        return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Bác sĩ đã có lịch hẹn khác vào khung giờ này.",
+                            Data = null
+                        };
+                    }
+
+                    // Chuyển trạng thái VetSchedule sang Scheduled nếu vet được chọn cho slot này
+                    var vetScheduleToUpdate = vetSchedules.FirstOrDefault(s =>
+                        s.ScheduleDate.Date == appointmentDate.Date &&
+                        s.SlotNumber == slotNumber &&
+                        s.Status == EnumList.VetScheduleStatus.Available);
+
+                    if (vetScheduleToUpdate != null)
+                    {
+                        vetScheduleToUpdate.Status = EnumList.VetScheduleStatus.Scheduled;
+                        await _vetScheduleRepository.UpdateVetScheduleAsync(vetScheduleToUpdate, cancellationToken);
+                    }
                 }
 
-
-
-                // Cập nhật thông tin tiêm phòng, giữ giá trị cũ nếu không truyền mới
+                // Cập nhật thông tin tiêm phòng
                 appointmentDetail.DiseaseId = updateAppointmentVaccinationDTO.DiseaseId ?? appointmentDetail.DiseaseId;
                 appointmentDetail.VaccineBatchId = updateAppointmentVaccinationDTO.VaccineBatchId ?? appointmentDetail.VaccineBatchId;
                 if (appointmentDetail.VaccineBatchId.HasValue)
