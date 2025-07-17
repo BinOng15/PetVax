@@ -43,7 +43,7 @@ namespace PetVax.Services.Service
                 vaccineBatch.ExpiryDate = createVaccineBatchDTO.ExpiryDate;
                 vaccineBatch.Source = createVaccineBatchDTO.Source;
                 vaccineBatch.StorageConditions = createVaccineBatchDTO.StorageCondition;
-                vaccineBatch.Quantity = createVaccineBatchDTO.Quantity;
+                vaccineBatch.Quantity = 0;
                 vaccineBatch.CreateAt = DateTimeHelper.Now();
                 vaccineBatch.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 int batchId = await _vaccineBatchRepository.CreateVaccineBatchAsync(vaccineBatch, cancellationToken);

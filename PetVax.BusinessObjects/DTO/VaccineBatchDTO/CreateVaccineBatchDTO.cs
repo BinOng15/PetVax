@@ -25,8 +25,8 @@ namespace PetVax.BusinessObjects.DTO.VaccineBatchDTO
         [Required(ErrorMessage = "Vui lòng nhập điều kiện bảo quản của lô vắc xin.")]
         [StringLength(200, ErrorMessage = "Điều kiện bảo quản không được vượt quá 200 ký tự.")]
         public string StorageCondition { get; set; }
-        [Required(ErrorMessage = "Vui lòng nhập số lượng.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0.")]
-        public int Quantity { get; set; }
+        //[Required(ErrorMessage = "Vui lòng nhập số lượng.")]
+        //[Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0.")]
+        //public int Quantity { get; set; }
     }
 }

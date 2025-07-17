@@ -39,6 +39,9 @@ namespace PetVax.Services.Service
         private readonly IVaccinationScheduleRepository _vaccinationScheduleRepository;
         private readonly IVetScheduleRepository _vetScheduleRepository;
         private readonly IVaccinationCertificateRepository _vaccinationCertificateRepository;
+        private readonly IVaccineExportRepository _vaccineExportRepository;
+        private readonly IVaccineExportDetailRepository _vaccineExportDetailRepository;
+        private readonly IColdChainLogRepository _coldChainLogRepository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AppointmentService> _logger;
         private readonly IMapper _mapper;
@@ -57,6 +60,9 @@ namespace PetVax.Services.Service
             IVaccinationScheduleRepository vaccinationScheduleRepository,
             IVetScheduleRepository vetScheduleRepository,
             IVaccinationCertificateRepository vaccinationCertificateRepository,
+            IVaccineExportRepository vaccineExportRepository,
+            IVaccineExportDetailRepository vaccineExportDetailRepository,
+            IColdChainLogRepository coldChainLogRepository,
             IConfiguration configuration,
             ILogger<AppointmentService> logger,
             IMapper mapper,
@@ -74,6 +80,9 @@ namespace PetVax.Services.Service
             _vaccinationScheduleRepository = vaccinationScheduleRepository;
             _vetScheduleRepository = vetScheduleRepository;
             _vaccinationCertificateRepository = vaccinationCertificateRepository;
+            _vaccineExportRepository = vaccineExportRepository;
+            _vaccineExportDetailRepository = vaccineExportDetailRepository;
+            _coldChainLogRepository = coldChainLogRepository;
             _configuration = configuration;
             _logger = logger;
             _mapper = mapper;
@@ -1288,6 +1297,47 @@ namespace PetVax.Services.Service
                                 }
                                 vaccineBatch.Quantity -= 1;
                                 await _vaccineBatchRepository.UpdateVaccineBatchAsync(vaccineBatch, cancellationToken);
+
+                                // Tạo mới VaccineExport
+                                var vaccineExport = new VaccineExport
+                                {
+                                    ExportCode = "EXPORT" + new Random().Next(100000, 1000000).ToString(),
+                                    ExportDate = DateTimeHelper.Now(),
+                                    CreatedAt = DateTimeHelper.Now(),
+                                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                                };
+                                var createdExport = await _vaccineExportRepository.CreateVaccineExportAsync(vaccineExport, cancellationToken);
+
+                                // Tạo mới VaccineExportDetail
+                                if (createdExport != null)
+                                {
+                                    var vaccineExportDetail = new VaccineExportDetail
+                                    {
+                                        VaccineExportId = createdExport,
+                                        VaccineBatchId = appointmentDetail.VaccineBatchId.Value,
+                                        AppointmentDetailId = appointmentDetail.AppointmentDetailId,
+                                        Quantity = 1,
+                                        Purpose = "Tiêm phòng",
+                                        Notes = "Xuất kho vắc xin để tiêm phòng",
+                                        CreatedAt = DateTimeHelper.Now(),
+                                        CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
+                                    };
+                                    await _vaccineExportDetailRepository.CreateVaccineExportDetailAsync(vaccineExportDetail, cancellationToken);
+
+                                    // Tạo mới ColdChainLog
+                                    var coldChainLog = new ColdChainLog
+                                    {
+                                        VaccineBatchId = appointmentDetail.VaccineBatchId.Value,
+                                        LogTime = DateTimeHelper.Now(),
+                                        Temperature = 8,
+                                        Humidity = 30,
+                                        Event = "Tiêm phòng",
+                                        Notes = "Ghi nhận xuất kho vắc xin cho tiêm phòng",
+                                        RecordedAt = DateTimeHelper.Now(),
+                                        RecordedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
+                                    };
+                                    await _coldChainLogRepository.CreateColdChainLogAsync(coldChainLog, cancellationToken);
+                                }
                             }
                             if (appointmentDetail.DiseaseId.HasValue && appointmentDetail.VaccineBatchId.HasValue)
                             {

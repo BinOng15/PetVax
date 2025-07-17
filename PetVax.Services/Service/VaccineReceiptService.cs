@@ -44,7 +44,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Dữ liệu để tạo phiếu xuất kho không hợp lệ.",
+                    Message = "Dữ liệu để tạo phiếu nhập kho không hợp lệ.",
                     Data = null
                 };
             }
@@ -64,7 +64,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Không thể tạo phiếu xuất kho.",
+                        Message = "Không thể tạo phiếu nhập kho.",
                         Data = null
                     };
                 }
@@ -85,7 +85,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi tạo phiếu xuất kho.",
+                    Message = "Đã xảy ra lỗi khi tạo phiếu nhập kho.",
                     Data = null
                 };
             }
@@ -100,7 +100,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "ID phiếu xuất kho không hợp lệ.",
+                    Message = "ID phiếu nhập kho không hợp lệ.",
                     Data = false
                 };
             }
@@ -114,7 +114,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Phiếu xuất kho không tồn tại.",
+                        Message = "Phiếu nhập kho không tồn tại.",
                         Data = false
                     };
                 }
@@ -128,7 +128,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Không thể xóa phiếu xuất kho.",
+                        Message = "Không thể xóa phiếu nhập kho.",
                         Data = false
                     };
                 }
@@ -136,7 +136,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Phiếu xuất kho đã được xóa thành công.",
+                    Message = "Phiếu nhập kho đã được xóa thành công.",
                     Data = true
                 };
             }
@@ -147,7 +147,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi xóa phiếu xuất kho.",
+                    Message = "Đã xảy ra lỗi khi xóa phiếu nhập kho.",
                     Data = false
                 };
             }
@@ -199,7 +199,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 200,
                         Success = true,
-                        Message = "Danh sách phiếu xuất kho đã được lấy thành công.",
+                        Message = "Danh sách phiếu nhập kho đã được lấy thành công.",
                         Data = response
                     };
                 }
@@ -207,10 +207,10 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<VaccineReceiptResponseDTO>
                     {
-                        Code = 404,
+                        Code = 200,
                         Success = false,
-                        Message = "Không tìm thấy phiếu xuất kho nào.",
-                        Data = response
+                        Message = "Không tìm thấy phiếu nhập kho nào.",
+                        Data = null
                     };
 
                 }
@@ -222,7 +222,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy danh sách phiếu xuất kho.",
+                    Message = "Đã xảy ra lỗi khi lấy danh sách phiếu nhập kho.",
                     Data = null
                 };
             }
@@ -237,7 +237,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "ID phiếu xuất kho không hợp lệ.",
+                    Message = "ID phiếu nhập kho không hợp lệ.",
                     Data = null
                 };
             }
@@ -251,7 +251,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Phiếu xuất kho không tồn tại hoặc đã bị xóa.",
+                        Message = "Phiếu nhập kho không tồn tại hoặc đã bị xóa.",
                         Data = null
                     };
                 }
@@ -260,7 +260,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Phiếu xuất kho đã được lấy thành công.",
+                    Message = "Phiếu nhập kho đã được lấy thành công.",
                     Data = responseDTO
                 };
             }
@@ -271,7 +271,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy phiếu xuất kho.",
+                    Message = "Đã xảy ra lỗi khi lấy phiếu nhập kho.",
                     Data = null
                 };
             }
@@ -286,7 +286,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Mã phiếu xuất kho không hợp lệ.",
+                    Message = "Mã phiếu nhập kho không hợp lệ.",
                     Data = null
                 };
             }
@@ -300,7 +300,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Phiếu xuất kho không tồn tại hoặc đã bị xóa.",
+                        Message = "Phiếu nhập kho không tồn tại hoặc đã bị xóa.",
                         Data = null
                     };
                 }
@@ -309,7 +309,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Phiếu xuất kho đã được lấy thành công.",
+                    Message = "Phiếu nhập kho đã được lấy thành công.",
                     Data = responseDTO
                 };
             }
@@ -320,7 +320,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy phiếu xuất kho theo mã.",
+                    Message = "Đã xảy ra lỗi khi lấy phiếu nhập kho theo mã.",
                     Data = null
                 };
             }
@@ -341,7 +341,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Không tìm thấy phiếu xuất kho nào cho ngày đã cho.",
+                        Message = "Không tìm thấy phiếu nhập kho nào cho ngày đã cho.",
                         Data = null
                     };
                 }
@@ -350,7 +350,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Phiếu xuất kho đã được lấy thành công.",
+                    Message = "Phiếu nhập kho đã được lấy thành công.",
                     Data = responseDTO
                 };
             }
@@ -361,7 +361,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy phiếu xuất kho theo ngày.",
+                    Message = "Đã xảy ra lỗi khi lấy phiếu nhập kho theo ngày.",
                     Data = null
                 };
             }
@@ -376,7 +376,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Dữ liệu để cập nhật phiếu xuất kho không hợp lệ.",
+                    Message = "Dữ liệu để cập nhật phiếu nhập kho không hợp lệ.",
                     Data = null
                 };
             }
@@ -390,14 +390,14 @@ namespace PetVax.Services.Service
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Phiếu xuất kho không tồn tại hoặc đã bị xóa.",
+                        Message = "Phiếu nhập kho không tồn tại hoặc đã bị xóa.",
                         Data = null
                     };
                 }
                 // Map the updated fields
                 existingReceipt.ReceiptDate = updateVaccineReceiptDTO.ReceiptDate ?? existingReceipt.ReceiptDate;
                 existingReceipt.ModifiedAt = DateTimeHelper.Now();
-                existingReceipt.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+                existingReceipt.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
                 int updatedId = await _vaccineReceiptRepository.UpdateVaccineReceiptAsync(existingReceipt, cancellationToken);
                 if (updatedId <= 0)
                 {
@@ -406,7 +406,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 500,
                         Success = false,
-                        Message = "Không thể cập nhật phiếu xuất kho.",
+                        Message = "Không thể cập nhật phiếu nhập kho.",
                         Data = null
                     };
                 }
@@ -415,7 +415,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Phiếu xuất kho đã được cập nhật thành công.",
+                    Message = "Phiếu nhập kho đã được cập nhật thành công.",
                     Data = responseDTO
                 };
             }
@@ -426,7 +426,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi cập nhật phiếu xuất kho.",
+                    Message = "Đã xảy ra lỗi khi cập nhật phiếu nhập kho.",
                     Data = null
                 };
             }
