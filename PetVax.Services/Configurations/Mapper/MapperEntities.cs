@@ -2,6 +2,7 @@
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
+using PetVax.BusinessObjects.DTO.ColdChainLogDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.HealthConditionDTO;
@@ -14,6 +15,8 @@ using PetVax.BusinessObjects.DTO.VaccinationSchedule;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
 using PetVax.BusinessObjects.DTO.VaccineDiseaseDTO;
 using PetVax.BusinessObjects.DTO.VaccineDTO;
+using PetVax.BusinessObjects.DTO.VaccineExportDetailDTO;
+using PetVax.BusinessObjects.DTO.VaccineExportDTO;
 using PetVax.BusinessObjects.DTO.VaccineProfileDTO;
 using PetVax.BusinessObjects.DTO.VaccineReceipDetailDTO;
 using PetVax.BusinessObjects.DTO.VaccineReceiptDTO;
@@ -228,6 +231,29 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<VaccineReceiptDetail, VaccineReceiptDetailResponseDTO>()
                 .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
                 .ForMember(dest => dest.VaccineReceipt, opt => opt.MapFrom(src => src.VaccineReceipt));
+
+            //ColdChainLog
+            CreateMap<CreateColdChainLogDTO, ColdChainLog>();
+            CreateMap<UpdateColdChainLogDTO, ColdChainLog>();
+            CreateMap<ColdChainLog, ColdChainLogResponseDTO>()
+                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch));
+
+            //VaccineExport
+            CreateMap<CreateVaccineExportDTO, VaccineExport>();
+            CreateMap<UpdateVaccineExportDTO, VaccineExport>();
+            CreateMap<VaccineExport, VaccineExportResponseDTO>();
+
+            //VaccineExportDetail
+            CreateMap<CreateVaccineExportDetailDTO, VaccineExportDetail>();
+            CreateMap<UpdateVaccineExportDetailDTO, VaccineExportDetail>();
+            CreateMap<UpdateVaccineExportDetailForVaccinationDTO, VaccineExportDetail>();
+            CreateMap<VaccineExportDetail, VaccineExportDetailResponseDTO>()
+                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
+                .ForMember(dest => dest.VaccineExport, opt => opt.MapFrom(src => src.VaccineExport));
+            CreateMap<VaccineExportDetail, VaccineExportDetailResponseForVaccinationDTO>()
+                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
+                .ForMember(dest => dest.VaccineExport, opt => opt.MapFrom(src => src.VaccineExport))
+                .ForMember(dest => dest.AppointmentDetailId, opt => opt.MapFrom(src => src.AppointmentDetailId));
         }
     }   
 }

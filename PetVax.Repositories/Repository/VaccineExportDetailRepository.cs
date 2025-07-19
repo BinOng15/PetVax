@@ -17,7 +17,9 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<int> CreateVaccineExportDetailAsync(VaccineExportDetail vaccineExportDetail, CancellationToken cancellationToken)
         {
-            return await CreateAsync(vaccineExportDetail, cancellationToken);
+            await _context.VaccineExportDetails.AddAsync(vaccineExportDetail, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return vaccineExportDetail.VaccineExportDetailId;
         }
         public async Task<bool> DeleteVaccineExportDetailAsync(int vaccineExportDetailId, CancellationToken cancellationToken)
         {
@@ -29,6 +31,8 @@ namespace PetVax.Repositories.Repository
                 .Include(ved => ved.VaccineBatch)
                     .ThenInclude(vb => vb.Vaccine)
                 .Include(ved => ved.VaccineExport)
+                .Include(ved => ved.AppointmentDetail)
+                    .ThenInclude(ad => ad.Appointment)
                 .ToListAsync(cancellationToken);
         }
         public async Task<VaccineExportDetail> GetVaccineExportDetailByIdAsync(int vaccineExportDetailId, CancellationToken cancellationToken)
@@ -37,6 +41,8 @@ namespace PetVax.Repositories.Repository
                 .Include(ved => ved.VaccineBatch)
                     .ThenInclude(vb => vb.Vaccine)
                 .Include(ved => ved.VaccineExport)
+                .Include(ved => ved.AppointmentDetail)
+                    .ThenInclude(ad => ad.Appointment)
                 .FirstOrDefaultAsync(ved => ved.VaccineExportDetailId == vaccineExportDetailId, cancellationToken);
         }
         public async Task<List<VaccineExportDetail>> GetVaccineExportDetailsByVaccineExportIdAsync(int vaccineExportId, CancellationToken cancellationToken)
@@ -45,6 +51,8 @@ namespace PetVax.Repositories.Repository
                 .Include(ved => ved.VaccineBatch)
                     .ThenInclude(vb => vb.Vaccine)
                 .Include(ved => ved.VaccineExport)
+                .Include(ved => ved.AppointmentDetail)
+                    .ThenInclude(ad => ad.Appointment)
                 .Where(ved => ved.VaccineExportId == vaccineExportId && !ved.isDeleted.HasValue || !ved.isDeleted.Value)
                 .ToListAsync(cancellationToken);
         }
@@ -54,11 +62,24 @@ namespace PetVax.Repositories.Repository
                 .Include(ved => ved.VaccineBatch)
                     .ThenInclude(vb => vb.Vaccine)
                 .Include(ved => ved.VaccineExport)
+                .Include(ved => ved.AppointmentDetail)
+                    .ThenInclude(ad => ad.Appointment)
                 .FirstOrDefaultAsync(ved => ved.VaccineBatchId == vaccineBatchId && !ved.isDeleted.HasValue || !ved.isDeleted.Value, cancellationToken);
         }
         public async Task<int> UpdateVaccineExportDetailAsync(VaccineExportDetail vaccineExportDetail, CancellationToken cancellationToken)
         {
             return await UpdateAsync(vaccineExportDetail, cancellationToken);
+        }
+
+        public async Task<VaccineExportDetail> GetVaccineExportDetailByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
+        {
+            return await _context.VaccineExportDetails
+                .Include(ved => ved.VaccineBatch)
+                    .ThenInclude(vb => vb.Vaccine)
+                .Include(ved => ved.VaccineExport)
+                .Include(ved => ved.AppointmentDetail)
+                    .ThenInclude(ad => ad.Appointment)
+                .FirstOrDefaultAsync(ved => ved.AppointmentDetailId == appointmentDetailId && !ved.isDeleted.HasValue || !ved.isDeleted.Value, cancellationToken);
         }
     }
 }

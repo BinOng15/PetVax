@@ -17,7 +17,9 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<int> CreateVaccineExportAsync(VaccineExport vaccineExport, CancellationToken cancellationToken)
         {
-            return await CreateAsync(vaccineExport, cancellationToken);
+            await _context.VaccineExports.AddAsync(vaccineExport, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return vaccineExport.VaccineExportId;
         }
         public async Task<bool> DeleteVaccineExportAsync(int vaccineExportId, CancellationToken cancellationToken)
         {
@@ -28,6 +30,13 @@ namespace PetVax.Repositories.Repository
             return await _context.VaccineExports
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<VaccineExport> GetVaccineExportByExportCodeAsync(string exportCode, CancellationToken cancellationToken)
+        {
+            return await _context.VaccineExports
+                .FirstOrDefaultAsync(ve => ve.ExportCode == exportCode, cancellationToken);
+        }
+
         public async Task<VaccineExport> GetVaccineExportByIdAsync(int vaccineExportId, CancellationToken cancellationToken)
         {
             return await _context.VaccineExports

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PetVax.BusinessObjects.DTO.ColdChainLogDTO;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -20,5 +21,7 @@ namespace PetVax.BusinessObjects.DTO.VaccineReceipDetailDTO
         public string? VaccineStatus { get; set; }
         [StringLength(500, ErrorMessage = "Ghi chú không được vượt quá 500 ký tự.")]
         public string? Notes { get; set; }
+
+        public UpdateColdChainLogDTO? ColdChainLog { get; set; }
     }
 }

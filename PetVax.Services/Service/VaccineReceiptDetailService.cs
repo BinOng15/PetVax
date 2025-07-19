@@ -20,26 +20,26 @@ namespace PetVax.Services.Service
     public class VaccineReceiptDetailService : IVaccineReceiptDetailService
     {
         private readonly IVaccineReceiptDetailRepository _vaccineReceiptDetailRepository;
-        private readonly IVaccineReceiptRepository _vaccineReceiptRepository;
         private readonly IColdChainLogRepository _coldChainLogRepository;
         private readonly IVaccineBatchRepository _vaccineBatchRepository;
+        private readonly IVaccineReceiptRepository _vaccineReceiptRepository;
         private readonly ILogger<VaccineReceiptDetailService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public VaccineReceiptDetailService(
             IVaccineReceiptDetailRepository vaccineReceiptDetailRepository,
-            IVaccineReceiptRepository vaccineReceiptRepository,
             IColdChainLogRepository coldChainLogRepository,
             IVaccineBatchRepository vaccineBatchRepository,
+            IVaccineReceiptRepository vaccineReceiptRepository,
             ILogger<VaccineReceiptDetailService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor)
         {
             _vaccineReceiptDetailRepository = vaccineReceiptDetailRepository;
-            _vaccineReceiptRepository = vaccineReceiptRepository;
             _coldChainLogRepository = coldChainLogRepository;
             _vaccineBatchRepository = vaccineBatchRepository;
+            _vaccineReceiptRepository = vaccineReceiptRepository;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -59,6 +59,30 @@ namespace PetVax.Services.Service
             }
             try
             {
+                // 1. Kiểm tra VaccineReceiptId có hợp lệ không
+                var vaccineReceipt = await _vaccineReceiptRepository.GetVaccineReceiptByIdAsync(createVaccineReceiptDetailDTO.VaccineReceiptId, cancellationToken);
+                if (vaccineReceipt == null)
+                {
+                    return new BaseResponse<VaccineReceiptDetailResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Phiếu nhập kho không tồn tại.",
+                        Data = null
+                    };
+                }
+                // 1.1. Kiểm tra VaccineBatchId có hợp lệ không
+                var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(createVaccineReceiptDetailDTO.VaccineBatchId, cancellationToken);
+                if (vaccineBatch == null)
+                {
+                    return new BaseResponse<VaccineReceiptDetailResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Lô vắc xin không tồn tại.",
+                        Data = null
+                    };
+                }
                 // 2.Tạo VaccineReceiptDetail
                 var vaccineReceiptDetail = new VaccineReceiptDetail
                 {
@@ -73,6 +97,13 @@ namespace PetVax.Services.Service
                     isDeleted = false
                 };
                 var vaccineReceiptDetailId = await _vaccineReceiptDetailRepository.CreateVaccineReceiptDetailAsync(vaccineReceiptDetail, cancellationToken);
+
+                // 2.1. Tăng quantity của VaccineBatch
+                if (vaccineBatch != null)
+                {
+                    vaccineBatch.Quantity += createVaccineReceiptDetailDTO.Quantity;
+                    await _vaccineBatchRepository.UpdateVaccineBatchAsync(vaccineBatch, cancellationToken);
+                }
 
                 // 3. Tạo ColdChainLog
                 var coldChainLogDTO = createVaccineReceiptDetailDTO.ColdChainLog;
@@ -130,13 +161,13 @@ namespace PetVax.Services.Service
             try
             {
                 var detailToDelete = await _vaccineReceiptDetailRepository.GetVaccineReceiptDetailByIdAsync(vaccineReceiptDetailId, cancellationToken);
-                if (detailToDelete == null)
+                if (detailToDelete == null || detailToDelete.isDeleted == true)
                 {
                     return new BaseResponse<bool>
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Chi tiết phiếu nhập kho không tồn tại.",
+                        Message = "Chi tiết phiếu nhập kho không tồn tại hoặc đã bị xóa.",
                         Data = false
                     };
                 }
@@ -407,6 +438,19 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
+
+                // Nếu Quantity có giá trị cập nhật, cập nhật cả VaccineBatch.Quantity
+                if (updateVaccineReceiptDetailDTO.Quantity.HasValue)
+                {
+                    var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(existingDetail.VaccineBatchId, cancellationToken);
+                    if (vaccineBatch != null)
+                    {
+                        // Trừ quantity cũ, cộng quantity mới
+                        vaccineBatch.Quantity = vaccineBatch.Quantity - existingDetail.Quantity + updateVaccineReceiptDetailDTO.Quantity.Value;
+                        await _vaccineBatchRepository.UpdateVaccineBatchAsync(vaccineBatch, cancellationToken);
+                    }
+                }
+
                 // Cập nhật thông tin chi tiết phiếu nhập kho
                 existingDetail.VaccineReceiptId = updateVaccineReceiptDetailDTO.VaccineReceiptId ?? existingDetail.VaccineReceiptId;
                 existingDetail.VaccineBatchId = updateVaccineReceiptDetailDTO.VaccineBatchId ?? existingDetail.VaccineBatchId;
@@ -417,6 +461,26 @@ namespace PetVax.Services.Service
                 existingDetail.ModifiedAt = DateTimeHelper.Now();
                 existingDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
                 var updatedId = await _vaccineReceiptDetailRepository.UpdateVaccineReceiptDetailAsync(existingDetail, cancellationToken);
+
+                // Cập nhật ColdChainLog nếu có
+                if (updateVaccineReceiptDetailDTO.ColdChainLog != null)
+                {
+                    var coldChainLogs = await _coldChainLogRepository.GetColdChainLogsByVaccineBatchIdAsync(existingDetail.VaccineBatchId, cancellationToken);
+                    var coldChainLog = coldChainLogs.FirstOrDefault();
+                    if (coldChainLog != null)
+                    {
+                        coldChainLog.VaccineBatchId = updateVaccineReceiptDetailDTO.ColdChainLog.VaccineBatchId ?? coldChainLog.VaccineBatchId;
+                        coldChainLog.LogTime = updateVaccineReceiptDetailDTO.ColdChainLog.LogTime ?? coldChainLog.LogTime;
+                        coldChainLog.Temperature = updateVaccineReceiptDetailDTO.ColdChainLog.Temperature ?? coldChainLog.Temperature;
+                        coldChainLog.Humidity = updateVaccineReceiptDetailDTO.ColdChainLog.Humidity ?? coldChainLog.Humidity;
+                        coldChainLog.Event = updateVaccineReceiptDetailDTO.ColdChainLog.Event ?? coldChainLog.Event;
+                        coldChainLog.Notes = updateVaccineReceiptDetailDTO.ColdChainLog.Notes ?? coldChainLog.Notes;
+                        coldChainLog.ModifiedAt = DateTimeHelper.Now();
+                        coldChainLog.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                        await _coldChainLogRepository.UpdateColdChainLogAsync(coldChainLog, cancellationToken);
+                    }
+                }
+
                 // Lấy lại chi tiết đã cập nhật để trả về
                 var updatedDetail = await _vaccineReceiptDetailRepository.GetVaccineReceiptDetailByIdAsync(updatedId, cancellationToken);
                 var responseDTO = _mapper.Map<VaccineReceiptDetailResponseDTO>(updatedDetail);

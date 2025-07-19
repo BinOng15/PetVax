@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.DTO.VaccineDTO;
+﻿using PetVax.BusinessObjects.DTO.ColdChainLogDTO;
+using PetVax.BusinessObjects.DTO.VaccineDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

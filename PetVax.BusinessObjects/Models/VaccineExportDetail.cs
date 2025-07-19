@@ -16,7 +16,7 @@ namespace PetVax.BusinessObjects.Models
         public int VaccineExportDetailId { get; set; } // Unique identifier for the vaccine export detail
         public int VaccineBatchId { get; set; } // Foreign key to VaccineBatch table
         public int VaccineExportId { get; set; } // Foreign key to VaccineExport table
-        public int AppointmentDetailId { get; set; } // Foreign key to AppointmentDetail table
+        public int? AppointmentDetailId { get; set; } // Foreign key to AppointmentDetail table
         public int Quantity { get; set; } // Quantity of vaccines exported
         public string Purpose { get; set; } // Purpose of the export, e.g., "Export to Clinic", "Donation", "Research"
         public string Notes { get; set; } // Additional notes regarding the export

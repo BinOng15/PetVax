@@ -28,7 +28,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="DTO\VaccineExportDTO\" />
       <Folder Include="Migrations\" />
     </ItemGroup>
 

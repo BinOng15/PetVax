@@ -17,7 +17,9 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<int> CreateVaccineReceiptDetailAsync(VaccineReceiptDetail vaccineReceiptDetail, CancellationToken cancellationToken)
         {
-            return await CreateAsync(vaccineReceiptDetail, cancellationToken);
+            await _context.VaccineReceiptDetails.AddAsync(vaccineReceiptDetail, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return vaccineReceiptDetail.VaccineReceiptDetailId;
         }
         public async Task<bool> DeleteVaccineReceiptDetailAsync(int vaccineReceiptDetailId, CancellationToken cancellationToken)
         {
