@@ -114,7 +114,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public int? HealthConditionId { get; set; }
         public DateTime AppointmentDate { get; set; } // Date of the appointment
         public EnumList.AppointmentStatus AppointmentStatus { get; set; }
-        public string Notes { get; set; } // Additional notes for the appointment detail
+        public string Note { get; set; } // Additional notes for the appointment detail
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
