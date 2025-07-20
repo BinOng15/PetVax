@@ -3672,10 +3672,7 @@ namespace PetVax.Services.Service
                 {
                     appointmentDetail.VetId = updateDTO.VetId;
                 }
-                else
-                {
-                    appointmentDetail.VetId = null;
-                }
+
                 appointmentDetail.Notes = updateDTO.Note;
                 appointmentDetail.AppointmentStatus = newStatus;
                 appointmentDetail.ModifiedAt = DateTime.UtcNow;
