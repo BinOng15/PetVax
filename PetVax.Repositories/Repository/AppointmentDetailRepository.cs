@@ -162,6 +162,7 @@ namespace PetVax.Repositories.Repository
             return await _context.AppointmentDetails
            .Include(ad => ad.MicrochipItem).ThenInclude(mi => mi.Microchip)
            .Include(ad => ad.Vet).ThenInclude(v => v.Account)
+           .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
            .Include(ad => ad.Appointment)
                .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
            .Include(ad => ad.Appointment)
