@@ -1,18 +1,14 @@
-﻿using System;
+﻿using PetVax.BusinessObjects.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PetVax.BusinessObjects.Models
+namespace PetVax.BusinessObjects.DTO.MembershipDTO
 {
-    [Table("Membership")]
-    public class Membership
+    public class MembershipResponseDTO
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MembershipId { get; set; }
         public string MembershipCode { get; set; }
         public string Name { get; set; }
@@ -27,6 +23,5 @@ namespace PetVax.BusinessObjects.Models
         public bool? isDeleted { get; set; } = false;
 
         public virtual Customer Customer { get; set; }
-
     }
 }

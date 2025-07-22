@@ -29,6 +29,10 @@ namespace PetVax.Services.Service
         private readonly IVaccinationCertificateRepository _vaccinationCertificateRepository;
         private readonly IHealthConditionRepository _healthConditionRepository;
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IPointTransactionRepository _pointTransactionRepository;
+        private readonly ICustomerRepository _customerRepository;
+        private readonly IMembershipRepository _membershipRepository;
+        private readonly IVoucherRepository _voucherRepository;
         private readonly PayOsService _payOsService;
         private readonly ILogger<PaymentService> _logger;
         private readonly IMapper _mapper;
@@ -43,6 +47,10 @@ namespace PetVax.Services.Service
             IVaccinationCertificateRepository vaccinationCertificateRepository,
             IHealthConditionRepository healthConditionRepository,
             IAppointmentRepository appointmentRepository,
+            IPointTransactionRepository pointTransactionRepository,
+            ICustomerRepository customerRepository,
+            IMembershipRepository membershipRepository,
+            IVoucherRepository voucherRepository,
             PayOsService payOsService,
             ILogger<PaymentService> logger,
             IMapper mapper,
@@ -57,6 +65,10 @@ namespace PetVax.Services.Service
             _vaccinationCertificateRepository = vaccinationCertificateRepository;
             _healthConditionRepository = healthConditionRepository;
             _appointmentRepository = appointmentRepository;
+            _pointTransactionRepository = pointTransactionRepository;
+            _customerRepository = customerRepository;
+            _membershipRepository = membershipRepository;
+            _voucherRepository = voucherRepository;
             _payOsService = payOsService;
             _logger = logger;
             _mapper = mapper;
@@ -95,6 +107,8 @@ namespace PetVax.Services.Service
                 var payment = _mapper.Map<Payment>(createPaymentRequest);
                 decimal amount = 0;
 
+                bool isRabiesVaccine = false;
+
                 if (appointmentDetail.VaccineBatchId.HasValue)
                 {
                     var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(appointmentDetail.VaccineBatchId.Value, cancellationToken);
@@ -111,6 +125,16 @@ namespace PetVax.Services.Service
                     }
                     amount = vaccineBatch.Vaccine.Price;
                     payment.VaccineBatchId = vaccineBatch.VaccineBatchId;
+
+                    // Check if vaccine is rabies (case-insensitive, equals "dại" or "dại ở mèo")
+                    if (!string.IsNullOrWhiteSpace(vaccineBatch.Vaccine.Name))
+                    {
+                        var vaccineName = vaccineBatch.Vaccine.Name.Trim().ToLower();
+                        if (vaccineName == "rabisin" || vaccineName == "Vaccine Dại Cho Mèo")
+                        {
+                            isRabiesVaccine = true;
+                        }
+                    }
                 }
                 else if (appointmentDetail.MicrochipItemId.HasValue)
                 {
@@ -196,8 +220,67 @@ namespace PetVax.Services.Service
                     var clinicCoords = await GetLatLngFromAddressAsync(clinicAddress);
                     var customerCoords = await GetLatLngFromAddressAsync(customerAddress);
                     var distanceKm = await GetDistanceKmAsync(clinicCoords, customerCoords);
-                    decimal extraFee = (decimal)distanceKm * 10000;
+                    decimal extraFee = (decimal)distanceKm * 1000;
                     amount += extraFee;
+                }
+
+                // Apply membership discount
+                if (appointment != null && appointment.CustomerId > 0)
+                {
+                    var customer = await _customerRepository.GetCustomerByIdAsync(appointment.CustomerId, cancellationToken);
+                    if (customer != null && customer.MembershipId.HasValue)
+                    {
+                        var membership = await _membershipRepository.GetMembershipByIdAsync(customer.MembershipId.Value, cancellationToken);
+                        if (membership != null && !string.IsNullOrWhiteSpace(membership.Rank))
+                        {
+                            var rank = membership.Rank.Trim().ToLower();
+                            if (rank == "silver")
+                            {
+                                amount -= amount * 0.10m;
+                            }
+                            else if (rank == "gold")
+                            {
+                                amount -= amount * 0.20m;
+                            }
+                        }
+                    }
+                }
+
+                // Apply rabies vaccine discount
+                if (isRabiesVaccine)
+                {
+                    amount -= amount * 0.50m;
+                }
+
+                // Add voucher
+                if (createPaymentRequest.VoucherCode != null)
+                {
+                    var voucher = await _voucherRepository.GetVoucherByCodeAsync(createPaymentRequest.VoucherCode, cancellationToken);
+                    if (voucher == null || voucher.isDeleted == true)
+                    {
+                        _logger.LogError("CreatePaymentAsync: Voucher not found or is deleted for code {VoucherCode}", createPaymentRequest.VoucherCode);
+                        return new BaseResponse<PaymentResponseDTO>
+                        {
+                            Code = 404,
+                            Success = false,
+                            Message = "Mã giảm giá không hợp lệ hoặc đã bị xóa, vui lòng kiểm tra lại!",
+                            Data = default!
+                        };
+                    }
+                    if (voucher.ExpirationDate < DateTimeHelper.Now())
+                    {
+                        _logger.LogError("CreatePaymentAsync: Voucher {VoucherCode} has expired", createPaymentRequest.VoucherCode);
+                        return new BaseResponse<PaymentResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Mã giảm giá đã hết hạn, vui lòng kiểm tra lại!",
+                            Data = default!
+                        };
+                    }
+                    var discountPercent = voucher.DiscountAmount;
+                    var discountAmount = amount * (discountPercent / 100m);
+                    amount -= discountAmount;
                 }
 
                 if (amount < 0.01m)
@@ -604,6 +687,48 @@ namespace PetVax.Services.Service
                         appointment.AppointmentStatus = EnumList.AppointmentStatus.Paid;
                         await _appointmentRepository.UpdateAppointmentAsync(appointment, cancellationToken);
                     }
+
+                    // --- Begin: Update Customer's totalSpent, CurrentPoints, create PointTransaction, check Membership ---
+                    // Get customer from payment
+                    var customer = payment.Customer;
+                    if (customer != null)
+                    {
+                        // Update totalSpent
+                        customer.TotalSpent += payment.Amount;
+
+                        // Calculate points: 1 point per 10,000 VND
+                        int earnedPoints = (int)(payment.Amount / 10000m);
+                        customer.CurrentPoints += earnedPoints;
+
+                        // Create point transaction
+                        var pointTransaction = new PointTransaction
+                        {
+                            CustomerId = customer.CustomerId,
+                            Change = earnedPoints.ToString(),
+                            TransactionType = "Earned",
+                            TransactionDate = DateTimeHelper.Now(),
+                            Description = $"Tích điểm từ thanh toán {payment.PaymentCode}",
+                            CreatedAt = DateTimeHelper.Now(),
+                            CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system",
+                        };
+                        // Save point transaction
+                        await _pointTransactionRepository.CreatePointTransactionAsync(pointTransaction, cancellationToken);
+
+                        // Check membership upgrade
+                        var memberships = await _membershipRepository.GetAllMembershipsAsync(cancellationToken);
+                        var eligibleMembership = memberships
+                            .Where(m => m.MinPoints <= customer.CurrentPoints)
+                            .OrderByDescending(m => m.MinPoints)
+                            .FirstOrDefault();
+                        if (eligibleMembership != null && (customer.MembershipId != eligibleMembership.MembershipId))
+                        {
+                            customer.MembershipId = eligibleMembership.MembershipId;
+                        }
+
+                        // Update customer (assume _customerRepository exists)
+                        await _customerRepository.UpdateCustomerAsync(customer, cancellationToken);
+                    }
+                    // --- End: Update Customer's totalSpent, CurrentPoints, create PointTransaction, check Membership ---
                 }
                 else if (paymentCallBackDTO.PaymentStatus == EnumList.PaymentStatus.Failed)
                 {

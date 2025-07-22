@@ -52,6 +52,8 @@ namespace PetVax.Infrastructure
             services.AddScoped<IColdChainLogRepository, ColdChainLogRepository>();
             services.AddScoped<IVaccineExportRepository, VaccineExportRepository>();
             services.AddScoped<IVaccineExportDetailRepository, VaccineExportDetailRepository>();
+            services.AddScoped<IPointTransactionRepository, PointTransactionRepository>();
+            services.AddScoped<IVoucherRepository, VoucherRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();

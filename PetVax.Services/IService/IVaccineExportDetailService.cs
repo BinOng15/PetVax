@@ -13,8 +13,9 @@ namespace PetVax.Services.IService
     {
         Task<DynamicResponse<VaccineExportDetailResponseDTO>> GetAllVaccineExportDetailsAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineExportDetailResponseDTO>> GetVaccineExportDetailByIdAsync(int vaccineExportDetailId, CancellationToken cancellationToken);
-        Task<BaseResponse<VaccineExportDetailResponseDTO>> GetVaccineExportDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken);
-        Task<BaseResponse<VaccineExportDetailResponseDTO>> GetVaccineExportDetailByVaccineExportIdAsync(int vaccineExportId, CancellationToken cancellationToken);
+        Task<BaseResponse<List<VaccineExportDetailResponseDTO>>> GetVaccineExportDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken);
+        Task<BaseResponse<List<VaccineExportDetailResponseDTO>>> GetVaccineExportDetailByVaccineExportIdAsync(int vaccineExportId, CancellationToken cancellationToken);
+        Task<BaseResponse<VaccineExportDetailResponseForVaccinationDTO>> GetVaccineExportDetailByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineExportDetailResponseDTO>> CreateVaccineExportDetailAsync(CreateVaccineExportDetailDTO createVaccineExportDetailDTO, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineExportDetailResponseDTO>> UpdateVaccineExportDetailAsync(int vaccineExportDetailId, UpdateVaccineExportDetailDTO updateVaccineExportDetailDTO, CancellationToken cancellationToken);
         Task<BaseResponse<bool>> DeleteVaccineExportDetailAsync(int vaccineExportDetailId, CancellationToken cancellationToken);

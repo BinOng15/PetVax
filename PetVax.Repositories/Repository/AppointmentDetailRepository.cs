@@ -97,6 +97,8 @@ namespace PetVax.Repositories.Repository
              .Include(a => a.Appointment)
                  .ThenInclude(a => a.Pet)
              .Include(a => a.Vet)
+             .Include(a => a.VaccineBatch)
+                .ThenInclude(vb => vb.Vaccine)
              .Include(a => a.Disease)
              .Include(a => a.MicrochipItem)
                  .ThenInclude(m => m.Microchip)

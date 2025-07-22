@@ -1,24 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetVax.BusinessObjects.Models
 {
-    [Table("PointTransaction")]
-    public class PointTransaction
+    [Table("Voucher")]
+    public class Voucher
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int VoucherId { get; set; }
+        public string VoucherCode { get; set; }
         public int TransactionId { get; set; }
-        public int CustomerId { get; set; }
-        public string Change { get; set; }
-        public string TransactionType { get; set; } // e.g., "Earned", "Redeemed"
+        public string VoucherName { get; set; }
+        public int PointsRequired { get; set; }
         public string Description { get; set; }
-        public DateTime TransactionDate { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public DateTime ExpirationDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
@@ -26,8 +28,6 @@ namespace PetVax.BusinessObjects.Models
         public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
-        public virtual Customer Customer { get; set; }
-        public virtual ICollection<Voucher> Vouchers { get; set; } // Collection of vouchers associated with this transaction
-
+        public virtual PointTransaction PointTransaction { get; set; }
     }
 }

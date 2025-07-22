@@ -24,7 +24,8 @@ namespace PetVax.BusinessObjects.Models
         public string? DateOfBirth { get; set; }
         public string? Gender { get; set; }
         public string? Address { get; set; }
-        public string? CurrentPoints { get; set; }
+        public int? CurrentPoints { get; set; }
+        public decimal? TotalSpent { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
