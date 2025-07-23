@@ -89,6 +89,7 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<VaccineReceiptDetail> VaccineReceiptDetails { get; set; }
         public DbSet<Vet> Vets { get; set; }
         public DbSet<VetSchedule> VetSchedules { get; set; }
+        public DbSet<Voucher> Vouchers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -423,6 +424,13 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey(ccl => ccl.VaccineBatchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //Voucher - PointTransaction (N-1)
+            modelBuilder.Entity<Voucher>()
+                .HasOne(v => v.PointTransaction)
+                .WithMany(pt => pt.Vouchers)
+                .HasForeignKey(v => v.TransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Microchip>()
                 .Property(m => m.Price)
                 .HasColumnType("decimal(18,2)");
@@ -439,6 +447,12 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasColumnType("decimal(18,2)");
             modelBuilder.Entity<HealthCondition>()
                 .Property(hc => hc.Price)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.TotalSpent)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Voucher>()
+                .Property(v => v.DiscountAmount)
                 .HasColumnType("decimal(18,2)");
 
             SeedData.Seed(modelBuilder);

@@ -79,5 +79,11 @@ namespace PediVax.Controllers
             var response = await _vaccineExportDetailService.UpdateVaccineExportDetailForVaccinationAsync(exportDetailId, vaccineExportDetailDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpGet("get-vaccine-export-detail-by-appointment-detail-id/{appointmentDetailId}")]
+        public async Task<IActionResult> GetVaccineExportDetailByAppointmentDetailId(int appointmentDetailId, CancellationToken cancellationToken = default)
+        {
+            var response = await _vaccineExportDetailService.GetVaccineExportDetailByAppointmentDetailIdAsync(appointmentDetailId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

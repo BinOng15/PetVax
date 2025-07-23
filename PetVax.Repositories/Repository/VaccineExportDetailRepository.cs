@@ -53,10 +53,11 @@ namespace PetVax.Repositories.Repository
                 .Include(ved => ved.VaccineExport)
                 .Include(ved => ved.AppointmentDetail)
                     .ThenInclude(ad => ad.Appointment)
-                .Where(ved => ved.VaccineExportId == vaccineExportId && !ved.isDeleted.HasValue || !ved.isDeleted.Value)
+                .Where(ved => ved.VaccineExportId == vaccineExportId)
                 .ToListAsync(cancellationToken);
         }
-        public async Task<VaccineExportDetail> GetVaccineExportDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
+
+        public async Task<List<VaccineExportDetail>> GetVaccineExportDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
         {
             return await _context.VaccineExportDetails
                 .Include(ved => ved.VaccineBatch)
@@ -64,7 +65,9 @@ namespace PetVax.Repositories.Repository
                 .Include(ved => ved.VaccineExport)
                 .Include(ved => ved.AppointmentDetail)
                     .ThenInclude(ad => ad.Appointment)
-                .FirstOrDefaultAsync(ved => ved.VaccineBatchId == vaccineBatchId && !ved.isDeleted.HasValue || !ved.isDeleted.Value, cancellationToken);
+                .Where(ved => ved.VaccineBatchId == vaccineBatchId 
+                    && (!ved.isDeleted.HasValue || !ved.isDeleted.Value))
+                .ToListAsync(cancellationToken);
         }
         public async Task<int> UpdateVaccineExportDetailAsync(VaccineExportDetail vaccineExportDetail, CancellationToken cancellationToken)
         {
@@ -79,7 +82,10 @@ namespace PetVax.Repositories.Repository
                 .Include(ved => ved.VaccineExport)
                 .Include(ved => ved.AppointmentDetail)
                     .ThenInclude(ad => ad.Appointment)
-                .FirstOrDefaultAsync(ved => ved.AppointmentDetailId == appointmentDetailId && !ved.isDeleted.HasValue || !ved.isDeleted.Value, cancellationToken);
+                .FirstOrDefaultAsync(
+                    ved => ved.AppointmentDetailId == appointmentDetailId
+                        && (!ved.isDeleted.HasValue || !ved.isDeleted.Value),
+                    cancellationToken);
         }
     }
 }

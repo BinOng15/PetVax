@@ -414,6 +414,53 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse<VaccineExportDetailResponseForVaccinationDTO>> GetVaccineExportDetailByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
+        {
+            if (appointmentDetailId <= 0)
+            {
+                return new BaseResponse<VaccineExportDetailResponseForVaccinationDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "ID chi tiết cuộc hẹn không hợp lệ.",
+                    Data = null
+                };
+            }
+            try
+            {
+                var vaccineExportDetail = await _vaccineExportDetailRepository.GetVaccineExportDetailByAppointmentDetailIdAsync(appointmentDetailId, cancellationToken);
+                if (vaccineExportDetail == null || vaccineExportDetail.isDeleted == true)
+                {
+                    return new BaseResponse<VaccineExportDetailResponseForVaccinationDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Chi tiết phiếu xuất vắc xin không tồn tại hoặc đã bị xóa.",
+                        Data = null
+                    };
+                }
+                var responseDTO = _mapper.Map<VaccineExportDetailResponseForVaccinationDTO>(vaccineExportDetail);
+                return new BaseResponse<VaccineExportDetailResponseForVaccinationDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy chi tiết phiếu xuất vắc xin theo chi tiết cuộc hẹn thành công.",
+                    Data = responseDTO
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy chi tiết phiếu xuất vắc xin theo chi tiết cuộc hẹn.");
+                return new BaseResponse<VaccineExportDetailResponseForVaccinationDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy chi tiết phiếu xuất kho cho lô vắc xin, vui lòng thử lại sau!",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<VaccineExportDetailResponseDTO>> GetVaccineExportDetailByIdAsync(int vaccineExportDetailId, CancellationToken cancellationToken)
         {
             if (vaccineExportDetailId <= 0)
@@ -461,11 +508,11 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<VaccineExportDetailResponseDTO>> GetVaccineExportDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<VaccineExportDetailResponseDTO>>> GetVaccineExportDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
         {
             if (vaccineBatchId <= 0)
             {
-                return new BaseResponse<VaccineExportDetailResponseDTO>
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                 {
                     Code = 400,
                     Success = false,
@@ -476,9 +523,9 @@ namespace PetVax.Services.Service
             try
             {
                 var vaccineExportDetail = await _vaccineExportDetailRepository.GetVaccineExportDetailByVaccineBatchIdAsync(vaccineBatchId, cancellationToken);
-                if (vaccineExportDetail == null || vaccineExportDetail.isDeleted == true)
+                if (vaccineExportDetail == null)
                 {
-                    return new BaseResponse<VaccineExportDetailResponseDTO>
+                    return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                     {
                         Code = 404,
                         Success = false,
@@ -486,8 +533,8 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                var responseDTO = _mapper.Map<VaccineExportDetailResponseDTO>(vaccineExportDetail);
-                return new BaseResponse<VaccineExportDetailResponseDTO>
+                var responseDTO = _mapper.Map<List<VaccineExportDetailResponseDTO>>(vaccineExportDetail);
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                 {
                     Code = 200,
                     Success = true,
@@ -498,7 +545,7 @@ namespace PetVax.Services.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Lỗi khi lấy chi tiết phiếu xuất vắc xin theo lô.");
-                return new BaseResponse<VaccineExportDetailResponseDTO>
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                 {
                     Code = 500,
                     Success = false,
@@ -508,11 +555,11 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<VaccineExportDetailResponseDTO>> GetVaccineExportDetailByVaccineExportIdAsync(int vaccineExportId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<VaccineExportDetailResponseDTO>>> GetVaccineExportDetailByVaccineExportIdAsync(int vaccineExportId, CancellationToken cancellationToken)
         {
             if (vaccineExportId <= 0)
             {
-                return new BaseResponse<VaccineExportDetailResponseDTO>
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                 {
                     Code = 400,
                     Success = false,
@@ -523,9 +570,9 @@ namespace PetVax.Services.Service
             try
             {
                 var vaccineExportDetails = await _vaccineExportDetailRepository.GetVaccineExportDetailsByVaccineExportIdAsync(vaccineExportId, cancellationToken);
-                if (vaccineExportDetails == null || !vaccineExportDetails.Any())
+                if (vaccineExportDetails == null)
                 {
-                    return new BaseResponse<VaccineExportDetailResponseDTO>
+                    return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                     {
                         Code = 404,
                         Success = false,
@@ -534,18 +581,18 @@ namespace PetVax.Services.Service
                     };
                 }
                 var responseDTOs = _mapper.Map<List<VaccineExportDetailResponseDTO>>(vaccineExportDetails);
-                return new BaseResponse<VaccineExportDetailResponseDTO>
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Lấy danh sách chi tiết phiếu xuất vắc xin thành công.",
-                    Data = responseDTOs.FirstOrDefault() // Assuming you want the first detail
+                    Data = responseDTOs
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Lỗi khi lấy chi tiết phiếu xuất vắc xin theo phiếu xuất.");
-                return new BaseResponse<VaccineExportDetailResponseDTO>
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                 {
                     Code = 500,
                     Success = false,

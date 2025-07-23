@@ -18,7 +18,7 @@ namespace PetVax.BusinessObjects.DTO.PaymentDTO
         public int? MicrochipId { get; set; }
         public int? VaccinationCertificateId { get; set; }
         public int? HealthConditionId { get; set; }
-        [Required(ErrorMessage = "Vui lòng chọn hình thức thanh toán!")]
+        public string? VoucherCode { get; set; }
         public EnumList.PaymentMethod PaymentMethod { get; set; }
     }
 }
