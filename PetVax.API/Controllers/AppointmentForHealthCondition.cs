@@ -27,10 +27,10 @@ namespace PediVax.Controllers
             _petService = petService;
         }
 
-        [HttpGet("Get-Appointment-Detail-HealthCondition-By/{appointmentDetailId}")]
-        public async Task<IActionResult> GetAppointmentDetailHealthConditionByIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
+        [HttpGet("Get-Appointment-Detail-HealthCondition-By/{appointmentId}")]
+        public async Task<IActionResult> GetAppointmentDetailHealthConditionByIdAsync(int appointmentId, CancellationToken cancellationToken)
         {
-            var result = await _appointmentDetailService.GetAppointmentDetailHealthConditionByAppointmentDetailIdAsync(appointmentDetailId, cancellationToken);
+            var result = await _appointmentDetailService.GetAppointmentDetailHealthConditionByAppointmentIdAsync(appointmentId, cancellationToken);
 
             return Ok(result);
 
@@ -43,10 +43,10 @@ namespace PediVax.Controllers
             return StatusCode(result.Code, result);
         }
 
-        [HttpPut("Update-Appointment-HealthCondition-For-Staff")]
-        public async Task<IActionResult> UpdateAppointmentHealthConditionAsync([FromForm] UpdateAppointmentHealthConditionDTO updateAppointmentHealthConditionDTO, CancellationToken cancellationToken)
+        [HttpPut("Update-Appointment-HealthCondition-For-Staff/{AppointmentId}")]
+        public async Task<IActionResult> UpdateAppointmentHealthConditionAsync(int AppointmentId, [FromForm] UpdateAppointmentHealthConditionDTO updateAppointmentHealthConditionDTO, CancellationToken cancellationToken)
         {
-            var result = await _appointmentService.UpdateAppointmentHealthConditionAsync(updateAppointmentHealthConditionDTO, cancellationToken);
+            var result = await _appointmentService.UpdateAppointmentHealthConditionAsync( AppointmentId, updateAppointmentHealthConditionDTO, cancellationToken);
             return StatusCode(result.Code, result);
         }
 

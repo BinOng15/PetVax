@@ -54,7 +54,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
 
     public class UpdateAppointmentHealthConditionDTO
     {
-        public int AppointmentId { get; set; }
+
         public int? VetId { get; set; }
         public string? Note { get; set; }
         public DateTime? AppointmentDate { get; set; }

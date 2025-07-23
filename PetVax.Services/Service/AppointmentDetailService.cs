@@ -890,11 +890,11 @@ namespace PetVax.Services.Service
 
 
 
-        public async Task<BaseResponse<AppointmentHealthConditionResponseDTO>> GetAppointmentDetailHealthConditionByAppointmentDetailIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AppointmentHealthConditionResponseDTO>> GetAppointmentDetailHealthConditionByAppointmentIdAsync(int id, CancellationToken cancellationToken)
         {
             try
             {
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailHealthConditionByAppointmentDetailIdAsync(id, cancellationToken);
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailHealthConditionByAppointmentIdAsync(id, cancellationToken);
                 if (appointmentDetail == null)
                 {
                     return new BaseResponse<AppointmentHealthConditionResponseDTO>
