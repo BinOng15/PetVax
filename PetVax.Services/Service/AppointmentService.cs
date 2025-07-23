@@ -3542,7 +3542,7 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmentHealthConditionResponseDTO>> UpdateAppointmentHealthConditionAsync(UpdateAppointmentHealthConditionDTO updateDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AppointmentHealthConditionResponseDTO>> UpdateAppointmentHealthConditionAsync(int AppointmentId, UpdateAppointmentHealthConditionDTO updateDTO, CancellationToken cancellationToken)
         {
             if (updateDTO == null)
             {
@@ -3557,7 +3557,7 @@ namespace PetVax.Services.Service
 
             try
             {
-                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(updateDTO.AppointmentId, cancellationToken);
+                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(AppointmentId, cancellationToken);
                 if (appointment == null)
                 {
                     return new BaseResponse<AppointmentHealthConditionResponseDTO>
@@ -3632,7 +3632,7 @@ namespace PetVax.Services.Service
                 }
 
 
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(updateDTO.AppointmentId, cancellationToken);
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(AppointmentId, cancellationToken);
                 if (appointmentDetail == null)
                 {
                     return new BaseResponse<AppointmentHealthConditionResponseDTO>
