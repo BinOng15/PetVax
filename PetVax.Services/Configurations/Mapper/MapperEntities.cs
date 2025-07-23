@@ -211,7 +211,8 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<AppointmentDetail, AppointmentHealthConditionResponseDTO>()
                 .ForMember(dest => dest.HealthCondition, opt => opt.MapFrom(src => src.HealthCondition))
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
-                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment));
+                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
+                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment));
             CreateMap<AppointmentDetail, AppointmentDetailHealthConditionResponseDTO>();
             CreateMap<UpdateAppointmentHealthConditionDTO, HealthCondition>();
             //VaccinationSchedule
