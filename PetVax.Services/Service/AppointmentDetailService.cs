@@ -733,11 +733,11 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmenDetialMicorchipResponseDTO>> GetAppointmentMicrochipByAppointmentDetailId(int appointmentDetailId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AppointmenDetialMicorchipResponseDTO>> GetAppointmentMicrochipByAppointmentDetailId(int appointmentId, CancellationToken cancellationToken)
         {
             try
             {
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetailId, cancellationToken);
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailMicrochipByAppointmentIdAsync(appointmentId, cancellationToken);
                 if (appointmentDetail == null)
                 {
                     return new BaseResponse<AppointmenDetialMicorchipResponseDTO>

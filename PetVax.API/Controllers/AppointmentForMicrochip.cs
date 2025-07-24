@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
+using PetVax.BusinessObjects.Models;
 using PetVax.Services.IService;
 using static PetVax.BusinessObjects.Enum.EnumList;
 
@@ -48,10 +49,10 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
 
-        [HttpGet("get-appoinment-microchip-by-appointment-detail/{appointmentDetailId}")]
-        public async Task<IActionResult> GetAppointmentMicrochipByAppoinmentDetailId(int appointmentDetailId, CancellationToken cancellationToken = default)
+        [HttpGet("get-appoinment-microchip-by-appointment-detail/{appointmentId}")]
+        public async Task<IActionResult> GetAppointmentMicrochipByAppoinmentDetailId(int appointmentId, CancellationToken cancellationToken = default)
         {
-            var response = await _appointmentDetailService.GetAppointmentMicrochipByAppointmentDetailId(appointmentDetailId, cancellationToken);
+            var response = await _appointmentDetailService.GetAppointmentMicrochipByAppointmentDetailId(appointmentId, cancellationToken);
             return StatusCode(response.Code, response);
         }
 
