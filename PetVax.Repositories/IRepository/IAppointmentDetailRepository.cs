@@ -39,6 +39,7 @@ namespace PetVax.Repositories.IRepository
         //Microchip
         Task<List<AppointmentDetail>> GetAppointmentDetaiMicrochiplsByPetIdAsync(int petId, CancellationToken cancellationToken);
         Task<List<AppointmentDetail>> GetAllAppointmentDetailsMicrochipAsync(CancellationToken cancellationToken);
+        Task<AppointmentDetail> GetAppointmentDetailMicrochipByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken);
 
         //Vaccination Certificate
         Task<List<AppointmentDetail>> GetAppointmentVaccinationCertificateByPetIdAsync(int petId, CancellationToken cancellationToken);
