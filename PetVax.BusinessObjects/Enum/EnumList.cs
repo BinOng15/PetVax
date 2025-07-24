@@ -61,6 +61,7 @@ namespace PetVax.BusinessObjects.Enum
         {
             Available = 1,
             Unavailable = 2,
+            Scheduled = 3,
         }
 
         public enum PaymentStatus
@@ -75,6 +76,14 @@ namespace PetVax.BusinessObjects.Enum
         {
             Cash = 1,
             BankTransfer = 2,
+        }
+
+        public enum VoucherStatus
+        {
+            Available = 1,
+            Used = 2,
+            Expired = 3,
+            Cancelled = 4,
         }
     }
 }

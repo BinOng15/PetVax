@@ -27,6 +27,7 @@ namespace PetVax.BusinessObjects.Models
 
         // Navigation properties
         public virtual Customer Customer { get; set; }
+        public virtual ICollection<Voucher> Vouchers { get; set; } // Collection of vouchers associated with this transaction
 
     }
 }

@@ -22,6 +22,7 @@ namespace PetVax.BusinessObjects.Models
         public int? VaccinationCertificateId { get; set; } // Foreign key to VaccinationCertificate table, if applicable
         public int? HealthConditionId { get; set; } // Foreign key to HealthCondition table, if applicable
         public string PaymentCode { get; set; } // e.g., "PAY123456", unique identifier for the payment
+        public string? VoucherCode { get; set; }
         public decimal Amount { get; set; } // Amount paid for the service
         public DateTime PaymentDate { get; set; } // Date of the payment in "yyyy-MM-dd" format
         public string CheckoutUrl { get; set; }

@@ -54,12 +54,27 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
 
     public class UpdateAppointmentHealthConditionDTO
     {
-        public int AppointmentId { get; set; }
+
         public int? VetId { get; set; }
-        public int? HealthConditionId { get; set; }
         public string? Note { get; set; }
         public DateTime? AppointmentDate { get; set; }
         public EnumList.AppointmentStatus? AppointmentStatus { get; set; }
+
+        public int? HealthConditionId { get; set; }
+        public int? PetId { get; set; }
+        public int? MicrochipItemId { get; set; }
+        public string? HeartRate { get; set; }
+        public string? BreathingRate { get; set; }
+        public string? Weight { get; set; }
+        public string? Temperature { get; set; } // "38.5 °C", "101.5 °F"
+        public string? EHNM { get; set; } //Mắt tai mũi họng
+        public string? SkinAFur { get; set; } //Da và lông
+        public string? Digestion { get; set; } //Tiêu hóa
+        public string? Respiratory { get; set; } //Hô hấp
+        public string? Excrete { get; set; } //Bài tiết
+        public string? Behavior { get; set; } //Hành vi
+        public string? Psycho { get; set; } //Tâm lý
+        public string? Different { get; set; } //Những điều khác
     }
 
 

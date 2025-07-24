@@ -2,6 +2,7 @@
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.HealthConditionDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
+using PetVax.BusinessObjects.DTO.PaymentDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VaccinationCertificate;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
@@ -79,6 +80,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public VaccineBatchResponseDTO VaccineBatch { get; set; } // Navigation to VaccineBatch table
         public DiseaseResponseDTO Disease { get; set; } // Navigation to Disease table, if applicable (for vaccinations)
         public AppointmentResponseDTO Appointment { get; set; } // Navigation to Appointment table
+        public PaymentResponseDTO Payment { get; set; } // Navigation to Payment table, if applicable
     }
 
     public class AppointmentMicrochipResponseDTO
@@ -90,6 +92,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public int? MicrochipItemId { get; set; }
         public DateTime AppointmentDate { get; set; } // Date of the appointment
         public EnumList.AppointmentStatus AppointmentStatus { get; set; }
+        public string Notes { get; set; } // Additional notes for the appointment detail
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
@@ -98,6 +101,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public BaseMicrochipItemResponse MicrochipItem { get; set; } // Navigation to MicrochipItem table
 
         public AppointmentResponseDTO Appointment { get; set; } // Navigation to Pet table
+        public PaymentResponseDTO Payment { get; set; }
     }
 
     public class AppointmentHealthConditionResponseDTO
@@ -110,14 +114,15 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public int? HealthConditionId { get; set; }
         public DateTime AppointmentDate { get; set; } // Date of the appointment
         public EnumList.AppointmentStatus AppointmentStatus { get; set; }
+        public string Note { get; set; } // Additional notes for the appointment detail
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string CreatedBy { get; set; } // User who created the record
         public DateTime? ModifiedAt { get; set; } // Date when the record was last modified
         public string? ModifiedBy { get; set; } // User who last modified the record
         public VetResponseDTO Vet { get; set; } // Navigation to Vet table
         public HealthConditionResponse HealthCondition { get; set; }
-
         public AppointmentResponseDTO Appointment { get; set; } // Navigation to Appointment table
+        public PaymentResponseDTO Payment { get; set; } // Navigation to Payment table, if applicables
 
     }
 

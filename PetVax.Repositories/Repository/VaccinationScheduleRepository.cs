@@ -60,5 +60,13 @@ namespace PetVax.Repositories.Repository
         {
             return await UpdateAsync(vaccinationSchedule, cancellationToken);
         }
+
+        public async Task<List<VaccinationSchedule>> GetVaccinationScheduleBySpeciesAsync(string species, CancellationToken cancellationToken)
+        {
+            return await _context.VaccinationSchedules
+                .Where(vs => vs.Species.ToLower() == species.ToLower())
+                .Include(vs => vs.Disease)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

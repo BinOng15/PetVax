@@ -15,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static PetVax.BusinessObjects.DTO.ResponseModel;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PetVax.Services.Service
 {
@@ -42,7 +43,7 @@ namespace PetVax.Services.Service
             _appointmentDetailRepository = appointmentDetailRepository;
             _httpContextAccessor = httpContextAccessor;
         }
-        public async Task<BaseResponse<MicrochipItemResponse>> GetMicrochipItemByMicrochipCodeAsync(string code, CancellationToken cancellationToken = default)
+        public async Task<BaseResponse<MicrochipItemResponse>> GetMicrochipItemByMicrochipCodeAsync(string code, AppointmentStatus status, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -70,8 +71,14 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                // Get all appointment details for the Pet
+
+
                 var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailByPetIdAsync(pet.PetId, cancellationToken);
+                appointmentDetails = appointmentDetails
+                    .Where(ad => ad.AppointmentStatus == status)
+                    .OrderByDescending(ad => ad.AppointmentDate)
+                    .ToList();
+
                 var appointmentDetailDtos = _mapper.Map<List<AppointmentDetailResponseDTO>>(appointmentDetails);
 
                 // Map Customer

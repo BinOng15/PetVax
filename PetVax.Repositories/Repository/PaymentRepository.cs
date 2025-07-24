@@ -38,6 +38,18 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<Payment> GetPaymentByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
+        {
+            return await _context.Payments
+                .Include(p => p.AppointmentDetail)
+                .Include(p => p.Customer)
+                .Include(p => p.VaccineBatch)
+                .Include(p => p.Microchip)
+                .Include(p => p.VaccinationCertificate)
+                .Include(p => p.HealthCondition)
+                .FirstOrDefaultAsync(p => p.AppointmentDetailId == appointmentDetailId && p.isDeleted == false, cancellationToken);
+        }
+
         public async Task<Payment?> GetPaymentByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _context.Payments

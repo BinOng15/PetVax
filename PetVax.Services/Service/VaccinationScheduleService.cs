@@ -335,6 +335,69 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse<List<VaccinationScheduleBySpeciesResponseDTO>>> GetVaccinationScheduleBySpecies(string species, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(species))
+            {
+                return new BaseResponse<List<VaccinationScheduleBySpeciesResponseDTO>>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Loài không được bỏ trống.",
+                    Data = null
+                };
+            }
+            try
+            {
+                var schedules = await _vaccinationScheduleRepository.GetVaccinationScheduleBySpeciesAsync(species, cancellationToken);
+                if (schedules == null || !schedules.Any())
+                {
+                    return new BaseResponse<List<VaccinationScheduleBySpeciesResponseDTO>>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy lịch tiêm cho loài này.",
+                        Data = null
+                    };
+                }
+                var response = schedules
+                    .GroupBy(x => x.Species)
+                    .Select(g => new VaccinationScheduleBySpeciesResponseDTO
+                    {
+                        Species = g.Key,
+                        Schedules = g.GroupBy(x => x.DiseaseId)
+                            .Select(dg => new VaccinationScheduleByDiseaseResponseDTO
+                            {
+                                DiseaseId = dg.Key,
+                                DiseaseName = dg.First().Disease?.Name ?? "",
+                                Schedules = dg.OrderBy(x => x.DoseNumber)
+                                    .Select(x => _mapper.Map<VaccinationScheduleResponseDTO>(x))
+                                    .ToList()
+                            })
+                            .ToList()
+                    })
+                    .ToList();
+                return new BaseResponse<List<VaccinationScheduleBySpeciesResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy lịch tiêm theo loài thành công.",
+                    Data = response
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving vaccination schedule by species");
+                return new BaseResponse<List<VaccinationScheduleBySpeciesResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Lỗi khi lấy lịch tiêm theo loài.",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<VaccinationScheduleResponseDTO>> UpdateVaccinationScheduleAsync(int vaccinationScheduleId, UpdateVaccinationScheduleDTO updateVaccinationScheduleDTO, CancellationToken cancellationToken)
         {
             if (vaccinationScheduleId <= 0 || updateVaccinationScheduleDTO == null)

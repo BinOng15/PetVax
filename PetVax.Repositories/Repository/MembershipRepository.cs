@@ -17,7 +17,9 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<int> AddMembershipAsync(Membership membership, CancellationToken cancellationToken)
         {
-            return await CreateAsync(membership, cancellationToken);
+            await _context.AddAsync(membership, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return membership.MembershipId;
         }
 
         public async Task<bool> DeleteMembershipAsync(int id, CancellationToken cancellationToken)
@@ -27,17 +29,37 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<Membership>> GetAllMembershipsAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.Memberships
+                .Include(m => m.Customers)
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<Membership?> GetMembershipByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<Membership> GetMembershipByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
-            return await GetByIdAsync(id, cancellationToken);
+            return await _context.Memberships
+                .Include(m => m.Customers)
+                .FirstOrDefaultAsync(m => m.Customers.Any(c => c.CustomerId == customerId), cancellationToken);
+        }
+
+        public async Task<Membership> GetMembershipByIdAsync(int id, CancellationToken cancellationToken)
+        {
+            return await _context.Memberships
+                .Include(m => m.Customers)
+                .FirstOrDefaultAsync(m => m.MembershipId == id, cancellationToken);
+        }
+
+        public async Task<Membership> GetMembershipByRankAsync(string rank, CancellationToken cancellationToken)
+        {
+            return await _context.Memberships
+                .Where(m => m.Rank == rank)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<Membership> GetMembershipsByMembershiCodeAsync(string membershiCode, CancellationToken cancellationToken)
         {
-            return await _context.Memberships.FirstOrDefaultAsync(m => m.MembershipCode == membershiCode, cancellationToken);
+            return await _context.Memberships
+                .Include(m => m.Customers)
+                .FirstOrDefaultAsync(m => m.MembershipCode == membershiCode, cancellationToken);
         }
 
         public async Task<int> UpdateMembershipAsync(Membership membership, CancellationToken cancellationToken)

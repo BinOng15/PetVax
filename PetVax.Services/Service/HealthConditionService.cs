@@ -394,7 +394,7 @@ namespace PetVax.Services.Service
                 healthCondition.ModifiedAt = DateTime.UtcNow;
                 healthCondition.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
 
-                var created = await _healthConditionRepository.AddHealthConditionAsync(healthCondition, cancellationToken);
+                var created = await _healthConditionRepository.UpdateHealthConditionAsync(healthCondition, cancellationToken);
                 if (created != null)
                 {
 
@@ -492,7 +492,7 @@ namespace PetVax.Services.Service
                     Dose = vp.Dose,
 
                     VaccineId = vaccine?.VaccineId,
-                    VaccineName = vaccine?.Name ?? "Không rõ",
+                    VaccineName = vaccine?.Name,
                     VaccineCode = vaccine?.VaccineCode ?? "",
                     VaccineImage = vaccine?.Image ?? "",
                     VaccineDescription = vaccine?.Description ?? "",
@@ -523,6 +523,42 @@ namespace PetVax.Services.Service
             }
 
             return result;
+        }
+
+        public async Task<BaseResponse<List<HealthConditionResponse>>> GetHealthConditionByPetIdAndStatus(int petId, string status, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var healthConditions = await _healthConditionRepository.GetHealthConditionsByPetIdAndStatusAsync(petId, status, cancellationToken);
+                if (healthConditions == null)
+                {
+                    return new BaseResponse<List<HealthConditionResponse>>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy điều kiện sức khỏe cho thú cưng này.",
+                        Data = null
+                    };
+                }
+                var response = _mapper.Map<List<HealthConditionResponse>>(healthConditions);
+                return new BaseResponse<List<HealthConditionResponse>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy điều kiện sức khỏe thành công.",
+                    Data = response
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<HealthConditionResponse>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy điều kiện sức khỏe.",
+                    Data = null
+                };
+            }
         }
     }
 }

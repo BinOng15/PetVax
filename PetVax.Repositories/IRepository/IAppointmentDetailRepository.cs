@@ -18,7 +18,7 @@ namespace PetVax.Repositories.IRepository
         //Task<bool> DeleteAppointmentDetailAsync(int id, CancellationToken cancellationToken);
         Task<AppointmentDetail> GetAppointmentDetailsByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken);
         Task<AppointmentDetail> GetAppointmentDetailsByVetIdAsync(int vetId, CancellationToken cancellationToken);
-        Task<AppointmentDetail> GetAppointmentDetailsByMicrochipItemIdAsync(int microchipItemId, CancellationToken cancellationToken);
+        Task<AppointmentDetail> GetAppointmentDetailsByMicrochipItemIdAsync(int? microchipItemId, CancellationToken cancellationToken);
         Task<AppointmentDetail> GetAppointmentDetailsByPassportIdAsync(int passportId, CancellationToken cancellationToken);
         Task<AppointmentDetail> GetAppointmentDetailsByHealthConditionIdAsync(int healthConditionId, CancellationToken cancellationToken);
         Task<AppointmentDetail> GetAppointmentDetailsByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken);
@@ -39,6 +39,7 @@ namespace PetVax.Repositories.IRepository
         //Microchip
         Task<List<AppointmentDetail>> GetAppointmentDetaiMicrochiplsByPetIdAsync(int petId, CancellationToken cancellationToken);
         Task<List<AppointmentDetail>> GetAllAppointmentDetailsMicrochipAsync(CancellationToken cancellationToken);
+        Task<AppointmentDetail> GetAppointmentDetailMicrochipByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken);
 
         //Vaccination Certificate
         Task<List<AppointmentDetail>> GetAppointmentVaccinationCertificateByPetIdAsync(int petId, CancellationToken cancellationToken);
@@ -47,6 +48,7 @@ namespace PetVax.Repositories.IRepository
         Task<List<AppointmentDetail>> GetAppointmentVaccinationCertificateByPetIdAndStatusAsync(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken);
         // Healthcondition
         Task<List<AppointmentDetail>> GetAllAppointmentDetailHealthConditionAsync(CancellationToken cancellationToken);
+        Task<List<AppointmentDetail>> GetAllAppointmentDetailsHealthconditionByPetIdAndStatusAsync(int petId, AppointmentStatus status, CancellationToken cancellationToken);
         Task<AppointmentDetail> GetAppointmentDetailHealthConditionByAppointmentDetailIdAsync(int id, CancellationToken cancellationToken);
         Task<AppointmentDetail> GetAppointmentDetailHealthConditionByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken);
         Task<List<AppointmentDetail>> GetAppointmentDetailHealthConditionByPetIdAsync(int petId, CancellationToken cancellationToken);

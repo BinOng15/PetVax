@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.AccountDTO;
@@ -25,15 +26,16 @@ namespace PetVax.Services.Service
         private readonly ILogger<CustomerService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICloudinariService _cloudinariService;
+        private readonly IConfiguration _configuration;
 
-
-        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger, IHttpContextAccessor httpContextAccessor, ICloudinariService cloudinariService)
+        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger, IHttpContextAccessor httpContextAccessor, ICloudinariService cloudinariService, IConfiguration configuration)
         {
             _customerRepository = customerRepository;
             _mapper = mapper;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _cloudinariService = cloudinariService;
+            _configuration = configuration;
         }
 
         public async Task<BaseResponse<bool>> DeleteCustomerAsync(int customerId, CancellationToken cancellationToken)
@@ -276,8 +278,22 @@ namespace PetVax.Services.Service
                 if (!string.IsNullOrWhiteSpace(updateCustomerDTO.Gender))
                     customer.Gender = updateCustomerDTO.Gender;
 
+                // Validate address is in Ho Chi Minh City
                 if (!string.IsNullOrWhiteSpace(updateCustomerDTO.Address))
+                {
+                    bool isValidAddress = await IsAddressInHoChiMinhCity(updateCustomerDTO.Address);
+                    if (!isValidAddress)
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Địa chỉ phải nằm trong khu vực Thành phố Hồ Chí Minh.",
+                            Data = false
+                        };
+                    }
                     customer.Address = updateCustomerDTO.Address;
+                }
 
                 customer.ModifiedAt = DateTimeHelper.Now();
 
@@ -312,5 +328,64 @@ namespace PetVax.Services.Service
                 };
             }
         }
+        private async Task<bool> IsAddressInHoChiMinhCity(string address)
+        {
+            try
+            {
+                string mapboxApiKey = _configuration["Mapbox:AccessToken"];
+                string encodedAddress = Uri.EscapeDataString(address);
+                string requestUrl = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{encodedAddress}.json?access_token={mapboxApiKey}&country=vn&limit=1";
+
+                using (HttpClient client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.GetAsync(requestUrl);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogWarning("Mapbox API returned non-success status code: {StatusCode}", response.StatusCode);
+                        return false;
+                    }
+
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    using (var document = System.Text.Json.JsonDocument.Parse(jsonResponse))
+                    {
+                        var features = document.RootElement.GetProperty("features");
+                        if (features.GetArrayLength() == 0)
+                        {
+                            _logger.LogWarning("No features found for address: {Address}", address);
+                            return false;
+                        }
+
+                        var feature = features[0];
+                        // Lấy tọa độ (longitude, latitude)
+                        if (!feature.TryGetProperty("center", out var center) || center.GetArrayLength() != 2)
+                        {
+                            _logger.LogWarning("No center coordinates found for address: {Address}", address);
+                            return false;
+                        }
+                        double longitude = center[0].GetDouble();
+                        double latitude = center[1].GetDouble();
+
+                        // Khu vực Thành phố Hồ Chí Minh (ước lượng)
+                        // Lat: 10.35 - 11.20, Lng: 106.35 - 107.05
+                        double minLat = 10.35, maxLat = 11.20;
+                        double minLng = 106.35, maxLng = 107.05;
+
+                        bool isInHCM = latitude >= minLat && latitude <= maxLat && longitude >= minLng && longitude <= maxLng;
+                        if (!isInHCM)
+                        {
+                            _logger.LogInformation("Address coordinates ({Lat}, {Lng}) are not in Ho Chi Minh City area.", latitude, longitude);
+                        }
+                        return isInHCM;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while validating address with Mapbox API.");
+                return false;
+            }
+        }
     }
 }
+
+    

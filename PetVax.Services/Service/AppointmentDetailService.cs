@@ -659,7 +659,20 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
+
                 var vaccinationResponse = _mapper.Map<AppointmentVaccinationDetailResponseDTO>(vaccinations);
+
+                // Filter Vet.ScheduleResponse to only include schedules matching AppointmentDate and Slot
+                if (vaccinationResponse?.Vet?.ScheduleResponse != null)
+                {
+                    var appointmentDate = vaccinations.AppointmentDate.Date;
+                    var appointmentSlot = vaccinations.AppointmentDate.Hour; // Assuming AppointmentDetail has AppointmentSlot property
+
+                    vaccinationResponse.Vet.ScheduleResponse = vaccinationResponse.Vet.ScheduleResponse
+                        .Where(s => s.ScheduleDate.Date == appointmentDate && s.SlotNumber == appointmentSlot)
+                        .ToList();
+                }
+
                 return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
                 {
                     Code = 200,
@@ -720,11 +733,11 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AppointmenDetialMicorchipResponseDTO>> GetAppointmentMicrochipByAppointmentDetailId(int appointmentDetailId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AppointmenDetialMicorchipResponseDTO>> GetAppointmentMicrochipByAppointmentDetailId(int appointmentId, CancellationToken cancellationToken)
         {
             try
             {
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetailId, cancellationToken);
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailMicrochipByAppointmentIdAsync(appointmentId, cancellationToken);
                 if (appointmentDetail == null)
                 {
                     return new BaseResponse<AppointmenDetialMicorchipResponseDTO>
@@ -758,47 +771,40 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<List<BaseResponse<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetIdAndStatus(int petId, AppointmentStatus status, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetIdAndStatus(int petId, AppointmentStatus status, CancellationToken cancellationToken)
         {
-            var responses = new List<BaseResponse<AppointmenDetialMicorchipResponseDTO>>();
             try
             {
                 var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailsMicrochipByPetIdAndStatusAsync(petId, status, cancellationToken);
-                if (appointmentDetails == null || !appointmentDetails.Any())
+                if (appointmentDetails == null)
                 {
-                    responses.Add(new BaseResponse<AppointmenDetialMicorchipResponseDTO>
+                    return new BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>
                     {
                         Code = 200,
                         Success = false,
-                        Message = "Không tìm thấy chi tiết cuộc hẹn microchip.",
-                        Data = new AppointmenDetialMicorchipResponseDTO()
-                    });
-                    return responses;
+                        Message = "Không tìm thấy chi tiết cuộc hẹn microchip cho thú cưng này với trạng thái đã cung cấp.",
+                        Data = null
+                    };
                 }
-
-                foreach (var detail in appointmentDetails)
+                var appointmentMicrochipResponses = _mapper.Map<List<AppointmenDetialMicorchipResponseDTO>>(appointmentDetails);
+                return new BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>
                 {
-                    var appointmentMicrochipResponse = _mapper.Map<AppointmenDetialMicorchipResponseDTO>(detail);
-                    responses.Add(new BaseResponse<AppointmenDetialMicorchipResponseDTO>
-                    {
-                        Code = 200,
-                        Success = true,
-                        Message = "Lấy thông tin lịch hẹn thành công.",
-                        Data = appointmentMicrochipResponse
-                    });
-                }
-                return responses;
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin microchip theo thú cưng và trạng thái thành công.",
+                    Data = appointmentMicrochipResponses
+                };
             }
             catch (Exception ex)
             {
-                responses.Add(new BaseResponse<AppointmenDetialMicorchipResponseDTO>
+                _logger.LogError(ex, "Đã xảy ra lỗi khi lấy thông tin microchip theo ID thú cưng và trạng thái.");
+                return new BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi lấy thông tin lịch hẹn. " + ex.Message,
-                    Data = new AppointmenDetialMicorchipResponseDTO()
-                });
-                return responses;
+                    Message = "Đã xảy ra lỗi khi lấy thông tin microchip theo ID thú cưng và trạng thái.",
+                    Data = null
+                };
             }
         }
 
@@ -884,11 +890,11 @@ namespace PetVax.Services.Service
 
 
 
-        public async Task<BaseResponse<AppointmentHealthConditionResponseDTO>> GetAppointmentDetailHealthConditionByAppointmentDetailIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AppointmentHealthConditionResponseDTO>> GetAppointmentDetailHealthConditionByAppointmentIdAsync(int id, CancellationToken cancellationToken)
         {
             try
             {
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailHealthConditionByAppointmentDetailIdAsync(id, cancellationToken);
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailHealthConditionByAppointmentIdAsync(id, cancellationToken);
                 if (appointmentDetail == null)
                 {
                     return new BaseResponse<AppointmentHealthConditionResponseDTO>
@@ -896,7 +902,7 @@ namespace PetVax.Services.Service
                         Code = 200,
                         Success = false,
                         Message = "Không tìm thấy chi tiết cuộc hẹn sức khỏe với ID đã cung cấp.",
-                        Data = null
+                        Data = new AppointmentHealthConditionResponseDTO()
                     };
                 }
                 var responseData = _mapper.Map<AppointmentHealthConditionResponseDTO>(appointmentDetail);
@@ -916,7 +922,7 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn sức khỏe.",
-                    Data = null
+                    Data = new AppointmentHealthConditionResponseDTO()
                 };
             }
         }
@@ -952,6 +958,111 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn sức khỏe theo Pet ID.",
+                    Data = new List<AppointmentHealthConditionResponseDTO>()
+                };
+            }
+        }
+
+        public async Task<DynamicResponse<AppointmentHealthConditionResponseDTO>> GetAllAppointmentDetailHealthConditionAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailHealthConditionAsync(cancellationToken);
+                if (appointmentDetails == null || !appointmentDetails.Any())
+                {
+                    return new DynamicResponse<AppointmentHealthConditionResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn sức khỏe nào.",
+                        Data = null
+                    };
+                }
+                // Filtering by keyword if provided
+                if (!string.IsNullOrWhiteSpace(getAllItemsDTO?.KeyWord))
+                {
+                    var keyword = getAllItemsDTO.KeyWord.ToLower();
+                    appointmentDetails = appointmentDetails
+                        .Where(d => d.AppointmentDetailCode != null && d.AppointmentDetailCode.ToLower().Contains(keyword))
+                        .ToList();
+                }
+                int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
+                int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = appointmentDetails.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+                var pagedDetails = appointmentDetails
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+                var responseData = _mapper.Map<List<AppointmentHealthConditionResponseDTO>>(pagedDetails);
+                var megaData = new MegaData<AppointmentHealthConditionResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllItemsDTO?.KeyWord,
+                        status = getAllItemsDTO?.Status,
+                    },
+                    PageData = responseData
+                };
+                return new DynamicResponse<AppointmentHealthConditionResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy tất cả chi tiết cuộc hẹn sức khỏe thành công.",
+                    Data = megaData
+                };
+            }
+            catch (Exception ex)
+            {
+                return new DynamicResponse<AppointmentHealthConditionResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy tất cả chi tiết cuộc hẹn sức khỏe." + ex.InnerException,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<AppointmentHealthConditionResponseDTO>>> GetAppointmentDetailHealthConditionByPetIdAndStatusAsync(int petId, AppointmentStatus status, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailsHealthconditionByPetIdAndStatusAsync(petId, status, cancellationToken);
+                if (appointmentDetails == null || !appointmentDetails.Any())
+                {
+                    return new BaseResponse<List<AppointmentHealthConditionResponseDTO>>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết cuộc hẹn sức khỏe cho Pet ID và trạng thái đã cung cấp.",
+                        Data = new List<AppointmentHealthConditionResponseDTO>()
+                    };
+                }
+                var responseData = _mapper.Map<List<AppointmentHealthConditionResponseDTO>>(appointmentDetails);
+                return new BaseResponse<List<AppointmentHealthConditionResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy chi tiết cuộc hẹn sức khỏe theo Pet ID và trạng thái thành công.",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<AppointmentHealthConditionResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy chi tiết cuộc hẹn sức khỏe theo Pet ID và trạng thái.",
                     Data = new List<AppointmentHealthConditionResponseDTO>()
                 };
             }

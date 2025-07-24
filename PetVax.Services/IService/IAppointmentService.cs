@@ -39,7 +39,8 @@ namespace PetVax.Services.IService
         //Microphip
         Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> CreateAppointmentMicrochipAsync(CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentMicrochipResponseDTO>> UpdateAppointmentMicrochip( UpdateAppointmentMicrochipDTO updateAppointmentMicrochipDTO, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> UpdateAppointmentMicrochipAsync(int appointmentId, CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> UpdateAppointmentMicrochipAsync(int appointmentId, UpdateAppointmentDTO updateAppointment, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmentResponseDTO>> GetAppointmentMicrochipByAppointmentId(int appointmentId, CancellationToken cancellationToken);
 
         //Vaccination Certificate
         Task<BaseResponse<AppointmentWithVaccinationCertificateResponseDTO>> CreateAppointmentVaccinationCertificate(CreateAppointmentVaccinationCertificateDTO createAppointmentVaccinationCertificateDTO, CancellationToken cancellationToken);
@@ -52,6 +53,7 @@ namespace PetVax.Services.IService
 
         // Health Condition
         Task<BaseResponse<AppointmenWithHealthConditionResponseDTO>> CreateAppointmentHealConditionAsync(CreateAppointmentHealthConditionDTO createAppointmentHealConditionDTO, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentHealthConditionResponseDTO>> UpdateAppointmentHealthConditionAsync(UpdateAppointmentHealthConditionDTO updateDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmentHealthConditionResponseDTO>> UpdateAppointmentHealthConditionAsync(int AppointmentId, UpdateAppointmentHealthConditionDTO updateDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmentResponseDTO>> UpdateAppointmentHealConditionAsync(int appointmentId, UpdateAppointmentDTO updateAppointmentHealConditionDTO, CancellationToken cancellationToken);
     }
 }

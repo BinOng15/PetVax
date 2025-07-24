@@ -39,7 +39,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPut("update-pet-by/{petId}")]
-        public async Task<IActionResult> UpdatePet(int petId, [FromBody] UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UpdatePet(int petId, [FromForm] UpdatePetRequestDTO updatePetRequest, CancellationToken cancellationToken = default)
         {
             var response = await _petService.UpdatePetAsync(petId, updatePetRequest, cancellationToken);
             return StatusCode(response.Code, response);

@@ -35,24 +35,25 @@ namespace PetVax.Services.Service
         {
             try
             {
-                var existingBatch = await _vaccineBatchRepository.GetVaccineBatchByVaccineId(createVaccineBatchDTO.VaccineId, cancellationToken);
-                if (existingBatch != null)
-                {
-                    return new BaseResponse<VaccineBatchResponseDTO>
-                    {
-                        Code = 400,
-                        Success = false,
-                        Message = "Lô vaccine với mã này đã tồn tại",
-                        Data = null
-                    };
-                }
                 var vaccineBatch = _mapper.Map<VaccineBatch>(createVaccineBatchDTO);
+                vaccineBatch.VaccineId = createVaccineBatchDTO.VaccineId;
                 vaccineBatch.BatchNumber = "BATCH" + new Random().Next(100000, 1000000).ToString();
+                vaccineBatch.Manufacturer = createVaccineBatchDTO.Manufacturer;
+                vaccineBatch.ManufactureDate = createVaccineBatchDTO.ManufactureDate;
+                vaccineBatch.ExpiryDate = createVaccineBatchDTO.ExpiryDate;
+                vaccineBatch.Source = createVaccineBatchDTO.Source;
+                vaccineBatch.StorageConditions = createVaccineBatchDTO.StorageCondition;
+                vaccineBatch.Quantity = 0;
                 vaccineBatch.CreateAt = DateTimeHelper.Now();
                 vaccineBatch.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 int batchId = await _vaccineBatchRepository.CreateVaccineBatchAsync(vaccineBatch, cancellationToken);
-                var response = _mapper.Map<VaccineBatchResponseDTO>(vaccineBatch);
+
+                // Get the batch again to ensure navigation properties are loaded
+                var createdBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(batchId, cancellationToken);
+
+                var response = _mapper.Map<VaccineBatchResponseDTO>(createdBatch);
                 response.VaccineBatchId = batchId;
+
                 return new BaseResponse<VaccineBatchResponseDTO>
                 {
                     Code = 201,
@@ -317,14 +318,22 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                
+
                 // Update properties
+                existingBatch.VaccineId = updateVaccineBatchDTO.VaccineId ?? existingBatch.VaccineId;
+                existingBatch.ManufactureDate = updateVaccineBatchDTO.ManufactureDate ?? existingBatch.ManufactureDate;
                 existingBatch.ExpiryDate = updateVaccineBatchDTO.ExpiryDate ?? existingBatch.ExpiryDate;
+                existingBatch.Manufacturer = updateVaccineBatchDTO.Manufacturer ?? existingBatch.Manufacturer;
+                existingBatch.Source = updateVaccineBatchDTO.Source ?? existingBatch.Source;
+                existingBatch.StorageConditions = updateVaccineBatchDTO.StorageCondition ?? existingBatch.StorageConditions;
                 existingBatch.Quantity = updateVaccineBatchDTO.Quantity ?? existingBatch.Quantity;
                 existingBatch.ModifiedAt = DateTimeHelper.Now();
                 existingBatch.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
-                await _vaccineBatchRepository.UpdateVaccineBatchAsync(existingBatch, cancellationToken);
-                var response = _mapper.Map<VaccineBatchResponseDTO>(existingBatch);
+                int batchId = await _vaccineBatchRepository.UpdateVaccineBatchAsync(existingBatch, cancellationToken);
+
+                var updatedBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(batchId, cancellationToken);
+
+                var response = _mapper.Map<VaccineBatchResponseDTO>(updatedBatch);
                 return new BaseResponse<VaccineBatchResponseDTO>
                 {
                     Code = 200,

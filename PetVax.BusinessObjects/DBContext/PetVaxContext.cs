@@ -66,6 +66,7 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<AppointmentDetail> AppointmentDetails { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<ColdChainLog> ColdChainLogs { get; set; }
         public DbSet<Disease> Diseases { get; set; }
         public DbSet<HealthCondition> HealthConditions { get; set; }
         public DbSet<HealthConditionVaccinationCertificate> HealthConditionVaccinationCertificates { get; set; }
@@ -88,6 +89,8 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<VaccineReceiptDetail> VaccineReceiptDetails { get; set; }
         public DbSet<Vet> Vets { get; set; }
         public DbSet<VetSchedule> VetSchedules { get; set; }
+        public DbSet<Voucher> Vouchers { get; set; }
+        public DbSet<CustomerVoucher> CustomerVouchers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -104,7 +107,7 @@ namespace PediVax.BusinessObjects.DBContext
             // Customer - Membership (N-1)
             modelBuilder.Entity<Customer>()
                 .HasOne(c => c.Membership)
-                .WithMany()
+                .WithMany(m => m.Customers)
                 .HasForeignKey(c => c.MembershipId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -113,13 +116,6 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasMany(c => c.Pets)
                 .WithOne(p => p.Customer)
                 .HasForeignKey(p => p.CustomerId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Membership - Customer (1-1)
-            modelBuilder.Entity<Customer>()
-                .HasOne(c => c.Membership)
-                .WithOne(m => m.Customer)
-                .HasForeignKey<Customer>(c => c.MembershipId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Pet - MicrochipItem (1-N)
@@ -231,7 +227,7 @@ namespace PediVax.BusinessObjects.DBContext
             // Payment - AppointmentDetail (1-1)
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.AppointmentDetail)
-                .WithOne()
+                .WithOne(ad => ad.Payment)
                 .HasForeignKey<Payment>(p => p.AppointmentDetailId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -415,6 +411,34 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey(hcvc => hcvc.VaccinationCertificateId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //ColdChainLog - VaccineBatch (N-1)
+            modelBuilder.Entity<ColdChainLog>()
+                .HasOne(ccl => ccl.VaccineBatch)
+                .WithMany(vb => vb.ColdChainLogs)
+                .HasForeignKey(ccl => ccl.VaccineBatchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Voucher - PointTransaction (N-1)
+            modelBuilder.Entity<Voucher>()
+                .HasOne(v => v.PointTransaction)
+                .WithMany(pt => pt.Vouchers)
+                .HasForeignKey(v => v.TransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //CustomerVoucher - Customer (N-1)
+            modelBuilder.Entity<CustomerVoucher>()
+                .HasOne(cv => cv.Customer)
+                .WithMany(c => c.CustomerVouchers)
+                .HasForeignKey(cv => cv.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //CustomerVoucher - Voucher (N-1)
+            modelBuilder.Entity<CustomerVoucher>()
+                .HasOne(cv => cv.Voucher)
+                .WithMany(v => v.CustomerVouchers)
+                .HasForeignKey(cv => cv.VoucherId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Microchip>()
                 .Property(m => m.Price)
                 .HasColumnType("decimal(18,2)");
@@ -431,6 +455,12 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasColumnType("decimal(18,2)");
             modelBuilder.Entity<HealthCondition>()
                 .Property(hc => hc.Price)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.TotalSpent)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Voucher>()
+                .Property(v => v.DiscountAmount)
                 .HasColumnType("decimal(18,2)");
 
             SeedData.Seed(modelBuilder);

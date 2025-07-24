@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetVax.BusinessObjects.Enum;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
@@ -56,7 +57,7 @@ namespace PetVax.Repositories.Repository
         }
         public async Task UpdateExpiredVetScheduleAsync(CancellationToken cancellationToken)
         {
-            var currentDateTime = DateTime.UtcNow;
+            var currentDateTime = DateTimeHelper.Now();
             var currentDate = currentDateTime.Date;
             var currentHour = currentDateTime.Hour;
 
@@ -72,7 +73,7 @@ namespace PetVax.Repositories.Repository
                     (schedule.ScheduleDate.Date == currentDate && slotHour < currentHour))
                 {
                     schedule.Status = EnumList.VetScheduleStatus.Unavailable;
-                    schedule.ModifiedAt = DateTime.UtcNow;
+                    schedule.ModifiedAt = DateTimeHelper.Now();
                     schedule.ModifiedBy = "System-Auto";
                 }
             }

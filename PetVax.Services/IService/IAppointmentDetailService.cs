@@ -29,11 +29,13 @@ namespace PetVax.Services.IService
         Task<BaseResponse<List<AppointmentVaccinationDetailResponseDTO>>> GetAppointmentVaccinationByPetIdAndStatus(int petId, EnumList.AppointmentStatus status, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> GetAppointmentVaccinationByAppointmentId(int appointmentId, CancellationToken cancellationToken);
         Task<BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetId(int petId, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmenDetialMicorchipResponseDTO>> GetAppointmentMicrochipByAppointmentDetailId(int appointmentDetailId, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmenDetialMicorchipResponseDTO>> GetAppointmentMicrochipByAppointmentDetailId(int appointmentId, CancellationToken cancellationToken);
         Task<DynamicResponse<AppointmenDetialMicorchipResponseDTO>> GetAllAppointmemtMicrochipAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
-        Task<BaseResponse<AppointmentHealthConditionResponseDTO>> GetAppointmentDetailHealthConditionByAppointmentDetailIdAsync(int id, CancellationToken cancellationToken);
-        Task<List<BaseResponse<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetIdAndStatus(int petId, AppointmentStatus status, CancellationToken cancellationToken);
+        Task<BaseResponse<AppointmentHealthConditionResponseDTO>> GetAppointmentDetailHealthConditionByAppointmentIdAsync(int id, CancellationToken cancellationToken);
+        Task<BaseResponse<List<AppointmenDetialMicorchipResponseDTO>>> GetAppointmentMicrochipByPetIdAndStatus(int petId, AppointmentStatus status, CancellationToken cancellationToken);
 
         Task<BaseResponse<List<AppointmentHealthConditionResponseDTO>>> GetAppointmentDetailHealthConditionByPetIdAsync(int petId, CancellationToken cancellationToken);
+        Task<DynamicResponse<AppointmentHealthConditionResponseDTO>> GetAllAppointmentDetailHealthConditionAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<List<AppointmentHealthConditionResponseDTO>>> GetAppointmentDetailHealthConditionByPetIdAndStatusAsync(int petId, AppointmentStatus status, CancellationToken cancellationToken);
     }
 }

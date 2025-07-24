@@ -45,7 +45,16 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVaccinationCertificateRepository, VaccinationCertificateRepository>();
             services.AddScoped<IHealthConditionRepository, HealthConditionRepository>();
             services.AddScoped<IVaccinationScheduleRepository, VaccinationScheduleRepository>();
-            
+            services.AddScoped<IVaccineReceiptRepository, VaccineReceiptRepository>();
+            services.AddScoped<IVaccineReceiptDetailRepository, VaccineReceiptDetailRepository>();
+            services.AddScoped<IVaccineExportRepository, VaccineExportRepository>();
+            services.AddScoped<IVaccineExportDetailRepository, VaccineExportDetailRepository>();
+            services.AddScoped<IColdChainLogRepository, ColdChainLogRepository>();
+            services.AddScoped<IVaccineExportRepository, VaccineExportRepository>();
+            services.AddScoped<IVaccineExportDetailRepository, VaccineExportDetailRepository>();
+            services.AddScoped<IPointTransactionRepository, PointTransactionRepository>();
+            services.AddScoped<IVoucherRepository, VoucherRepository>();
+            services.AddScoped<ICustomerVoucherRepository, CustomerVoucherRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -53,7 +62,6 @@ namespace PetVax.Infrastructure
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IVaccineService, VaccineService>();
             services.AddScoped<ICloudinariService, CloudinaryService>();
-            
             services.AddScoped<IPetService, PetService>();
             services.AddScoped<IVetService, VetService>();
             services.AddScoped<IVetScheduleService, VetScheduleService>();
@@ -71,13 +79,25 @@ namespace PetVax.Infrastructure
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IHealthConditionService, HealthConditionService>();
             services.AddScoped<IVaccinationScheduleService, VaccinationScheduleService>();
+            services.AddScoped<IVaccineReceiptService, VaccineReceiptService>();
+            services.AddScoped<IVaccineReceiptDetailService, VaccineReceiptDetailService>();
+            services.AddScoped<IVaccineExportService, VaccineExportService>();
+            services.AddScoped<IVaccineExportDetailService, VaccineExportDetailService>();
+            services.AddScoped<IMembershipService, MembershipService>();
+            services.AddScoped<IVoucherService, VoucherService>();
+            services.AddScoped<IPointTransactionService, PointTransactionService>();
+            services.AddScoped<ICustomerVoucherService, CustomerVoucherService>();
 
+            //Register external services
             services.AddScoped<PayOsService>();
+            services.AddScoped<MapBoxService>();
             services.AddScoped<PetVaxContext>();
 
+            //Register background services
             services.AddHostedService<VetScheduleBackgroundService>();
             services.AddHostedService<AppointmentBackgroundService>();
             services.AddHostedService<AppointmentReminderBackgroundService>();
+            services.AddHostedService<CustomerVoucherBackgroundService>();
             
 
             #endregion

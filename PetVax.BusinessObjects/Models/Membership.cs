@@ -14,10 +14,10 @@ namespace PetVax.BusinessObjects.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MembershipId { get; set; }
-        public string MembershipCode { get; set; } // e.g., "MEMB123456", unique identifier for the membership
+        public string MembershipCode { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string MinPoints { get; set; }
+        public int MinPoints { get; set; }
         public string Benefits { get; set; }
         public string Rank { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -26,7 +26,7 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; }
         public bool? isDeleted { get; set; } = false;
 
-        public virtual Customer Customer { get; set; }
+        public virtual ICollection<Customer> Customers { get; set; }
 
     }
 }
