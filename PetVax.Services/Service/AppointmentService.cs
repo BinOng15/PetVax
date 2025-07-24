@@ -1579,9 +1579,6 @@ namespace PetVax.Services.Service
                 };
             }
         }
-        #endregion
-
-        #region Microchip Appointment Service
         public async Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> CreateAppointmentMicrochipAsync(CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken)
         {
             if (createAppointmentMicrochipDTO == null)
@@ -1591,6 +1588,17 @@ namespace PetVax.Services.Service
                     Code = 200,
                     Success = false,
                     Message = "Dữ liệu tạo cuộc hẹn tiêm phòng không hợp lệ.",
+                    Data = null
+                };
+            }
+            // Check ServiceType == 2 (Microchip)
+            if (createAppointmentMicrochipDTO.Appointment.ServiceType != EnumList.ServiceType.Microchip)
+            {
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Loại dịch vụ không hợp lệ. Chỉ cho phép tạo cuộc hẹn với dịch vụ là 2 - Microchip.",
                     Data = null
                 };
             }
@@ -1669,7 +1677,6 @@ namespace PetVax.Services.Service
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
                 };
-
 
                 var createdAppointmentDetail = await _appointmentDetailRepository.AddAppointmentDetailAsync(appointmentDetail, cancellationToken);
                 if (createdAppointmentDetail == null)
@@ -1880,10 +1887,10 @@ namespace PetVax.Services.Service
                 }
 
 
-                appointmentDetail.VetId = updateAppointmentMicrochipDTO.VetId;
-                appointmentDetail.MicrochipItemId = updateAppointmentMicrochipDTO.MicrochipItemId;
+                appointmentDetail.VetId = updateAppointmentMicrochipDTO.VetId ?? appointmentDetail.VetId;
+                appointmentDetail.MicrochipItemId = updateAppointmentMicrochipDTO.MicrochipItemId ?? appointmentDetail.MicrochipItemId;
                 appointmentDetail.AppointmentStatus = newStatus;
-                appointmentDetail.Notes = updateAppointmentMicrochipDTO.Note;
+                appointmentDetail.Notes = updateAppointmentMicrochipDTO.Note ?? appointmentDetail.Notes;
                 appointmentDetail.ModifiedAt = DateTime.UtcNow;
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
@@ -3428,6 +3435,17 @@ namespace PetVax.Services.Service
             if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.Clinic)
             {
                 createAppointmentHealConditionDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
+            }
+
+            if (createAppointmentHealConditionDTO.Appointment.ServiceType != EnumList.ServiceType.HealthCondition)
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Loại dịch vụ không hợp lệ. Chỉ cho phép tạo cuộc hẹn với dịch vụ là 3 - HealthCondition.",
+                    Data = null
+                };
             }
 
             var hour = createAppointmentHealConditionDTO.Appointment.AppointmentDate.Hour;

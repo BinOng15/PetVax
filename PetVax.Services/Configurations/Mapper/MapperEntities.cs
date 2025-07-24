@@ -4,12 +4,15 @@ using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.ColdChainLogDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.DTO.CustomerVoucherDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
 using PetVax.BusinessObjects.DTO.HealthConditionDTO;
+using PetVax.BusinessObjects.DTO.MembershipDTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PaymentDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
+using PetVax.BusinessObjects.DTO.PointTransactionDTO;
 using PetVax.BusinessObjects.DTO.VaccinationCertificate;
 using PetVax.BusinessObjects.DTO.VaccinationSchedule;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
@@ -22,6 +25,7 @@ using PetVax.BusinessObjects.DTO.VaccineReceipDetailDTO;
 using PetVax.BusinessObjects.DTO.VaccineReceiptDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
+using PetVax.BusinessObjects.DTO.VoucherDTO;
 using PetVax.BusinessObjects.Enum;
 using PetVax.BusinessObjects.Models;
 using System;
@@ -45,15 +49,13 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore());
             CreateMap<Account, AccountResponseDTO>();
 
-            CreateMap<Customer, CustomerResponseDTO>()
-                 .ForMember(dest => dest.AccountResponseDTO, opt => opt.Ignore()); 
-
             //Customer
             CreateMap<CreateCustomerDTO, Customer>();
             CreateMap<UpdateCustomerDTO, Customer>();
             CreateMap<Customer, CustomerResponseDTO>()
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image))
-                .ForMember(dest => dest.AccountResponseDTO, opt => opt.MapFrom(src => src.Account));
+                .ForMember(dest => dest.AccountResponseDTO, opt => opt.MapFrom(src => src.Account))
+                .ForMember(dest => dest.MembershipResponseDTO, opt => opt.MapFrom(src => src.Membership));
 
             //Vet
             CreateMap<Vet, VetResponseDTO>()
@@ -255,6 +257,30 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
                 .ForMember(dest => dest.VaccineExport, opt => opt.MapFrom(src => src.VaccineExport))
                 .ForMember(dest => dest.AppointmentDetailId, opt => opt.MapFrom(src => src.AppointmentDetailId));
+
+            //Membership
+            CreateMap<CreateMembershipDTO, Membership>();
+            CreateMap<UpdateMembershipDTO, Membership>();
+            CreateMap<Membership, MembershipResponseDTO>()
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customers));
+            CreateMap<Membership, CreateUpdateMembershipResponseDTO>();
+
+            //Voucher
+            CreateMap<CreateVoucherDTO, Voucher>();
+            CreateMap<UpdateVoucherDTO, Voucher>();
+            CreateMap<Voucher, VoucherResponseDTO>()
+                .ForMember(dest => dest.PointTransaction, opt => opt.MapFrom(src => src.PointTransaction));
+            CreateMap<Voucher, CreateUpdateVoucherResponseDTO>();
+            CreateMap<Voucher, CustomerVoucherResponseDTO>();
+
+            //PointTransaction
+            CreateMap<PointTransaction, PointTransactionResponseDTO>()
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer));
+
+            //CustomerVoucher
+            CreateMap<CustomerVoucher, CustomerVoucherResponseDTO>()
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.Voucher, opt => opt.MapFrom(src => src.Voucher));
         }
     }   
 }

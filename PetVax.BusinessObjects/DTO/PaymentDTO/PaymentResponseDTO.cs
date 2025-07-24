@@ -17,6 +17,7 @@ namespace PetVax.BusinessObjects.DTO.PaymentDTO
         public int? VaccinationCertificateId { get; set; }
         public int? HealthConditionId { get; set; }
         public string PaymentCode { get; set; }
+        public string? VoucherCode { get; set; }
         public decimal Amount { get; set; }
         public DateTime PaymentDate { get; set; }
         public string PaymentMethod { get; set; }

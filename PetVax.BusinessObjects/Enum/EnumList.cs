@@ -77,5 +77,13 @@ namespace PetVax.BusinessObjects.Enum
             Cash = 1,
             BankTransfer = 2,
         }
+
+        public enum VoucherStatus
+        {
+            Available = 1,
+            Used = 2,
+            Expired = 3,
+            Cancelled = 4,
+        }
     }
 }

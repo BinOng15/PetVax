@@ -12,9 +12,10 @@ namespace PetVax.Repositories.IRepository
         Task<List<Voucher>> GetAllVoucherAsync(CancellationToken cancellationToken);
         Task<Voucher> GetVoucherByIdAsync(int id, CancellationToken cancellationToken);
         Task<Voucher> GetVoucherByCodeAsync(string voucherCode, CancellationToken cancellationToken);
-        Task<List<Voucher>> GetVouchersByTransactionIdAsync(int transactionId, CancellationToken cancellationToken);
+        Task<Voucher> GetVouchersByTransactionIdAsync(int transactionId, CancellationToken cancellationToken);
         Task<int> CreateVoucherAsync(Voucher voucher, CancellationToken cancellationToken);
         Task<int> UpdateVoucherAsync(Voucher voucher, CancellationToken cancellationToken);
         Task<bool> DeleteVoucherAsync(int id, CancellationToken cancellationToken);
+        Task<Voucher> GetVoucherByPointsRequiredAsync(int pointsRequired, CancellationToken cancellationToken);
     }
 }
