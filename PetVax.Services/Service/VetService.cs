@@ -153,8 +153,8 @@ namespace PetVax.Services.Service
                 {
                     existingVet.image = null;
                 }
-                    // Map updated properties
-                    existingVet.Name = updateVetRequest.Name ?? existingVet.Name;
+                // Map updated properties
+                existingVet.Name = updateVetRequest.Name ?? existingVet.Name;
                 existingVet.PhoneNumber = updateVetRequest.PhoneNumber ?? existingVet.PhoneNumber;
                 existingVet.Specialization = updateVetRequest.Specialization ?? existingVet.Specialization;
                 existingVet.DateOfBirth = updateVetRequest.DateOfBirth ?? existingVet.DateOfBirth;
@@ -334,9 +334,9 @@ namespace PetVax.Services.Service
                 var vets = _mapper.Map<Vet>(createVetDTO);
                 var random = new Random();
 
-                if(createVetDTO.Image != null)
+                if (createVetDTO.Image != null)
                 {
-                    
+
                     vets.image = await _cloudinariService.UploadImage(createVetDTO.Image);
                 }
                 else
@@ -383,6 +383,43 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Lỗi khi tạo bác sĩ thú y: " + (ex.InnerException?.Message ?? ex.Message),
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<VetResponseDTO>> GetVetByAccountIdAsync(int accountId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                
+                var vet = await _vetRepository.GetVetByAccountIdAsync(accountId, cancellationToken);
+                if (vet == null)
+                {
+                    return new BaseResponse<VetResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Account này không phải là vet hoặc vet không tồn tại!",
+                        Data = null
+                    };
+                }
+                var responseData = _mapper.Map<VetResponseDTO>(vet);
+                return new BaseResponse<VetResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy Vet thành công",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<VetResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Error while retrieving veterinarian: " + (ex.InnerException?.Message ?? ex.Message),
                     Data = null
                 };
             }

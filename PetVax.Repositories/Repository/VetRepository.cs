@@ -32,8 +32,17 @@ namespace PetVax.Repositories.Repository
         {
             return _context.Vets
                 .Include(v => v.Account)
+                .Include(v => v.VetSchedules)
                 .Where(v => v.isDeleted != true)
                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task<Vet> GetVetByAccountIdAsync(int accountId, CancellationToken cancellationToken)
+        {
+            return await _context.Vets
+                .Include(v => v.Account)
+                .Include(v => v.VetSchedules)
+                .FirstOrDefaultAsync(v => v.AccountId == accountId && v.isDeleted != true, cancellationToken);
         }
 
         public async Task<Vet> GetVetByIdAsync(int vetId, CancellationToken cancellationToken)
@@ -41,6 +50,7 @@ namespace PetVax.Repositories.Repository
 
             return await _context.Vets
                 .Include(v => v.Account)
+                .Include(v => v.VetSchedules)
                 .FirstOrDefaultAsync(v => v.VetId == vetId, cancellationToken);
         }
 
@@ -49,6 +59,7 @@ namespace PetVax.Repositories.Repository
             
             return await _context.Vets
                 .Include(v => v.Account)
+                .Include(v => v.VetSchedules)
                 .FirstOrDefaultAsync(v => v.VetCode == vetCode, cancellationToken);
         }
 
