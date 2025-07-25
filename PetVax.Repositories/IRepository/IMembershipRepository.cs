@@ -11,10 +11,12 @@ namespace PetVax.Repositories.IRepository
     {
         
         Task<List<Membership>> GetAllMembershipsAsync(CancellationToken cancellationToken);
-        Task<Membership?> GetMembershipByIdAsync(int id, CancellationToken cancellationToken);
+        Task<Membership> GetMembershipByIdAsync(int id, CancellationToken cancellationToken);
         Task<int> AddMembershipAsync(Membership membership, CancellationToken cancellationToken);
         Task<int> UpdateMembershipAsync(Membership membership, CancellationToken cancellationToken);
         Task<bool> DeleteMembershipAsync(int id, CancellationToken cancellationToken);
         Task<Membership> GetMembershipsByMembershiCodeAsync(string membershiCode, CancellationToken cancellationToken);
+        Task<Membership> GetMembershipByCustomerIdAsync(int customerId, CancellationToken cancellationToken);
+        Task<Membership> GetMembershipByRankAsync(string rank, CancellationToken cancellationToken);
     }
 }

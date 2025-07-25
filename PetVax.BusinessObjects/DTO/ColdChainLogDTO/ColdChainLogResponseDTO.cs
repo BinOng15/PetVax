@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.Models;
+﻿using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
+using PetVax.BusinessObjects.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,6 @@ namespace PetVax.BusinessObjects.DTO.ColdChainLogDTO
         public bool? isDeleted { get; set; } = false;
 
         // Navigation properties
-        public VaccineBatch VaccineBatch { get; set; }
+        public VaccineBatchResponseDTO VaccineBatch { get; set; }
     }
 }

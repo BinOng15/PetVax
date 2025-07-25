@@ -1,4 +1,5 @@
 ﻿using PetVax.BusinessObjects.DTO.AccountDTO;
+using PetVax.BusinessObjects.DTO.MembershipDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,5 +29,6 @@ namespace PetVax.BusinessObjects.DTO.CustomerDTO
         public bool? isDeleted { get; set; } = false; // Default to false, indicating the customer is not deleted
 
         public AccountResponseDTO AccountResponseDTO { get; set; }
+        public MembershipResponseDTO MembershipResponseDTO { get; set; }
     }
 }

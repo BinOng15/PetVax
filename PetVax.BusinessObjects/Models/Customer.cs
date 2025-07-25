@@ -25,6 +25,7 @@ namespace PetVax.BusinessObjects.Models
         public string? Gender { get; set; }
         public string? Address { get; set; }
         public int? CurrentPoints { get; set; }
+        public int? RedeemablePoints { get; set; }
         public decimal? TotalSpent { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? CreatedBy { get; set; }
@@ -36,6 +37,7 @@ namespace PetVax.BusinessObjects.Models
         public virtual Account Account { get; set; }
         public virtual Membership Membership { get; set; }
         public virtual ICollection<Pet> Pets { get; set; }
+        public virtual ICollection<CustomerVoucher> CustomerVouchers { get; set; }
 
     }
 }

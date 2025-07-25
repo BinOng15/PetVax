@@ -26,7 +26,7 @@ namespace PetVax.BusinessObjects.Models
         public string? ModifiedBy { get; set; }
         public bool? isDeleted { get; set; } = false;
 
-        public virtual Customer Customer { get; set; }
+        public virtual ICollection<Customer> Customers { get; set; }
 
     }
 }

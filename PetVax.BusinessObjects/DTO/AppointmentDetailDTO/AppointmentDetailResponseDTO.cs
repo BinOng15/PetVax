@@ -121,8 +121,8 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public string? ModifiedBy { get; set; } // User who last modified the record
         public VetResponseDTO Vet { get; set; } // Navigation to Vet table
         public HealthConditionResponse HealthCondition { get; set; }
-
         public AppointmentResponseDTO Appointment { get; set; } // Navigation to Appointment table
+        public PaymentResponseDTO Payment { get; set; } // Navigation to Payment table, if applicables
 
     }
 

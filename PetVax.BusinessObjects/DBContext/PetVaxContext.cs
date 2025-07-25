@@ -90,6 +90,7 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<Vet> Vets { get; set; }
         public DbSet<VetSchedule> VetSchedules { get; set; }
         public DbSet<Voucher> Vouchers { get; set; }
+        public DbSet<CustomerVoucher> CustomerVouchers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -106,7 +107,7 @@ namespace PediVax.BusinessObjects.DBContext
             // Customer - Membership (N-1)
             modelBuilder.Entity<Customer>()
                 .HasOne(c => c.Membership)
-                .WithMany()
+                .WithMany(m => m.Customers)
                 .HasForeignKey(c => c.MembershipId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -115,13 +116,6 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasMany(c => c.Pets)
                 .WithOne(p => p.Customer)
                 .HasForeignKey(p => p.CustomerId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Membership - Customer (1-1)
-            modelBuilder.Entity<Customer>()
-                .HasOne(c => c.Membership)
-                .WithOne(m => m.Customer)
-                .HasForeignKey<Customer>(c => c.MembershipId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Pet - MicrochipItem (1-N)
@@ -429,6 +423,20 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasOne(v => v.PointTransaction)
                 .WithMany(pt => pt.Vouchers)
                 .HasForeignKey(v => v.TransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //CustomerVoucher - Customer (N-1)
+            modelBuilder.Entity<CustomerVoucher>()
+                .HasOne(cv => cv.Customer)
+                .WithMany(c => c.CustomerVouchers)
+                .HasForeignKey(cv => cv.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //CustomerVoucher - Voucher (N-1)
+            modelBuilder.Entity<CustomerVoucher>()
+                .HasOne(cv => cv.Voucher)
+                .WithMany(v => v.CustomerVouchers)
+                .HasForeignKey(cv => cv.VoucherId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Microchip>()

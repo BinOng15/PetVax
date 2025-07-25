@@ -30,6 +30,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.Customers
                 .Include(c => c.Account)
+                .Include(c => c.Membership)
                 .ToListAsync(cancellationToken);
         }
 
@@ -38,6 +39,7 @@ namespace PetVax.Repositories.Repository
             
             var customer = await _context.Customers
                 .Include(c => c.Account)
+                .Include(c => c.Membership)
                 .FirstOrDefaultAsync(c => c.AccountId == accountId, cancellationToken);           
             return customer;
         }
@@ -46,6 +48,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.Customers
                 .Include(c => c.Account)
+                .Include(c => c.Membership)
                 .FirstOrDefaultAsync(c => c.CustomerId == customerId, cancellationToken);
         }
 
