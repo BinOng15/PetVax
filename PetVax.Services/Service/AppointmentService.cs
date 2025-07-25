@@ -3822,16 +3822,16 @@ namespace PetVax.Services.Service
                         // 
                         if (healthIssues.Any())
                         {
-                            Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}";
+                            Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}, {updateDTO.Conclusion}";
                             Status = "FAIL";
                         }
                         else
                         {
-                            Conclusion = "Đạt: Tình trạng sức khỏe trong ngưỡng bình thường.";
+                            Conclusion = $"Đạt: Tình trạng sức khỏe trong ngưỡng bình thường. {updateDTO.Conclusion}";
                             Status = "PASS";
                         }
 
-                         getHealthCondition.PetId = updateDTO.PetId?? getHealthCondition.PetId;
+                        getHealthCondition.PetId = updateDTO.PetId?? getHealthCondition.PetId;
                         getHealthCondition.VetId = updateDTO.VetId ?? getHealthCondition.VetId;
                         getHealthCondition.HeartRate = updateDTO.HeartRate ?? getHealthCondition.HeartRate;
                         getHealthCondition.BreathingRate = updateDTO.BreathingRate ?? getHealthCondition.BreathingRate;
