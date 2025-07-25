@@ -95,9 +95,9 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("Get-All-Appointment-Detail-HealthConditions")]
-        public async Task<IActionResult> GetAllAppointmentDetailHealthConditionAsync([FromQuery] GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllAppointmentDetailHealthConditionAsync([FromQuery] GetAllItemsDTO getAllItemsDTO, int? vetId, CancellationToken cancellationToken)
         {
-            var result = await _appointmentDetailService.GetAllAppointmentDetailHealthConditionAsync(getAllItemsDTO, cancellationToken);
+            var result = await _appointmentDetailService.GetAllAppointmentDetailHealthConditionAsync(getAllItemsDTO, vetId, cancellationToken);
             return Ok(result);
         }
 

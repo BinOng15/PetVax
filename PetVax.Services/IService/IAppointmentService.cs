@@ -34,7 +34,7 @@ namespace PetVax.Services.IService
         Task<BaseResponse<AppointmentForVaccinationResponseDTO>> UpdateAppointmentVaccinationAsync(int appointmentId, UpdateAppointmentForVaccinationDTO updateAppointmentForVaccinationDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentVaccinationDetailResponseDTO>> UpdateAppointmentVaccination(int appointmentId, UpdateAppointmentVaccinationDTO updateAppointmentVaccinationDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AppointmentForVaccinationResponseDTO>> GetAppointmentVaccinationByIdAsync(int appointmentId, CancellationToken cancellationToken);
-        Task<DynamicResponse<AppointmentForVaccinationResponseDTO>> GetAllAppointmentVaccinationAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken);
+        Task<DynamicResponse<AppointmentForVaccinationResponseDTO>> GetAllAppointmentVaccinationAsync(GetAllItemsDTO getAllItemsDTO, int? vetId, CancellationToken cancellationToken);
 
         //Microphip
         Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> CreateAppointmentMicrochipAsync(CreateAppointmentMicrochipDTO createAppointmentMicrochipDTO, CancellationToken cancellationToken);

@@ -731,10 +731,7 @@ namespace PetVax.Services.Service
                 };
             }
         }
-        #endregion
-
-        #region Vaccination Appointment Service
-        public async Task<DynamicResponse<AppointmentForVaccinationResponseDTO>> GetAllAppointmentVaccinationAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        public async Task<DynamicResponse<AppointmentForVaccinationResponseDTO>> GetAllAppointmentVaccinationAsync(GetAllItemsDTO getAllItemsDTO, int? vetId, CancellationToken cancellationToken)
         {
             try
             {
@@ -743,6 +740,14 @@ namespace PetVax.Services.Service
                 appointments = appointments
                     .Where(d => d.isDeleted == false || d.isDeleted == null)
                     .ToList();
+
+                // Filter by vetId if provided
+                if (vetId.HasValue && vetId > 0)
+                {
+                    appointments = appointments
+                        .Where(d => d.VetId == vetId.Value)
+                        .ToList();
+                }
 
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
