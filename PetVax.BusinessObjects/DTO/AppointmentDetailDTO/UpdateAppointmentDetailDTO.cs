@@ -75,6 +75,8 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDetailDTO
         public string? Behavior { get; set; } //Hành vi
         public string? Psycho { get; set; } //Tâm lý
         public string? Different { get; set; } //Những điều khác
+
+        public string? Conclusion { get; set; } //Chẩn đoán
     }
 
 
