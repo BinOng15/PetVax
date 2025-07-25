@@ -43,10 +43,10 @@ namespace PediVax.Controllers
             return StatusCode(result.Code, result);
         }
 
-        [HttpPut("Update-Appointment-HealthCondition-For-Staff/{AppointmentId}")]
-        public async Task<IActionResult> UpdateAppointmentHealthConditionAsync(int AppointmentId, [FromForm] UpdateAppointmentHealthConditionDTO updateAppointmentHealthConditionDTO, CancellationToken cancellationToken)
+        [HttpPut("Update-Appointment-HealthCondition-For-Staff")]
+        public async Task<IActionResult> UpdateAppointmentHealthConditionAsync([FromQuery] int appointmentId, [FromForm] UpdateAppointmentHealthConditionDTO updateAppointmentHealthConditionDTO, CancellationToken cancellationToken)
         {
-            var result = await _appointmentService.UpdateAppointmentHealthConditionAsync( AppointmentId, updateAppointmentHealthConditionDTO, cancellationToken);
+            var result = await _appointmentService.UpdateAppointmentHealthConditionAsync( appointmentId, updateAppointmentHealthConditionDTO, cancellationToken);
             return StatusCode(result.Code, result);
         }
 

@@ -3715,7 +3715,8 @@ namespace PetVax.Services.Service
                     healthConditiont.CreatedAt = DateTime.UtcNow;
                     healthConditiont.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
                     var createHealthcondition = await _healthConditionRepository.AddHealthConditionAsync(healthConditiont, cancellationToken);
-                    if(createHealthcondition == null)
+                    appointmentDetail.HealthConditionId = createHealthcondition.HealthConditionId;
+                    if (createHealthcondition == null)
                     {
                         return new BaseResponse<AppointmentHealthConditionResponseDTO>
                         {
@@ -3725,7 +3726,7 @@ namespace PetVax.Services.Service
                             Data = null
                         };
                     }
-                    appointmentDetail.HealthConditionId = updateDTO.HealthConditionId ?? appointmentDetail.HealthConditionId;
+                    
                 }
                 
               if(updateDTO.PetId > 0 && updateDTO.HealthConditionId > 0)

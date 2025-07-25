@@ -73,5 +73,13 @@ namespace PediVax.Controllers
             var response = await _vetService.CreateVetAsync(createVetDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
+
+        [HttpGet("get-vet-by-account-id/{accountId}")]
+        //[Authorize(Roles = "Admin, Vet, Staff")]
+        public async Task<IActionResult> GetVetByAccountId(int accountId, CancellationToken cancellationToken = default)
+        {
+            var response = await _vetService.GetVetByAccountIdAsync(accountId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }
