@@ -117,6 +117,12 @@ namespace PediVax.BusinessObjects.DBContext
                 .WithOne(p => p.Customer)
                 .HasForeignKey(p => p.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
+            // Customer - Pet (1-N)
+            modelBuilder.Entity<Customer>()
+                .HasMany(c => c.ServiceHistories)
+                .WithOne(p => p.Customer)
+                .HasForeignKey(p => p.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Pet - MicrochipItem (1-N)
             modelBuilder.Entity<Pet>()

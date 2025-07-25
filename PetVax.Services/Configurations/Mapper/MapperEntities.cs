@@ -13,6 +13,7 @@ using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PaymentDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.PointTransactionDTO;
+using PetVax.BusinessObjects.DTO.ServiceHistoryDTO;
 using PetVax.BusinessObjects.DTO.VaccinationCertificate;
 using PetVax.BusinessObjects.DTO.VaccinationSchedule;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
@@ -281,6 +282,11 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CustomerVoucher, CustomerVoucherResponseDTO>()
                 .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
                 .ForMember(dest => dest.Voucher, opt => opt.MapFrom(src => src.Voucher));
+            //ServiceHistory
+            CreateMap<ServiceHistory, ServiceHistoryResponseDTO>()
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => Convert.ToInt32(src.ServiceType)));
+
         }
     }   
 }
