@@ -3691,7 +3691,7 @@ namespace PetVax.Services.Service
                     }
                 }
            
-                if(appointmentDetail.VetId > 0)
+                if(updateDTO.VetId > 0)
                 {
                     appointmentDetail.VetId = updateDTO.VetId;
                 }
