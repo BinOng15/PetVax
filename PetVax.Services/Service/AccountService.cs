@@ -442,6 +442,78 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse<AccountResponseDTO>> GetCurrentAccountAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null || httpContext.User == null || !httpContext.User.Identity.IsAuthenticated)
+                {
+                    return new BaseResponse<AccountResponseDTO>
+                    {
+                        Code = 401,
+                        Success = false,
+                        Message = "Không xác thực được người dùng hiện tại."
+                    };
+                }
+
+                // Try to get accountId from claims
+                var accountIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (accountIdClaim == null || !int.TryParse(accountIdClaim.Value, out int accountId))
+                {
+                    return new BaseResponse<AccountResponseDTO>
+                    {
+                        Code = 401,
+                        Success = false,
+                        Message = "Không tìm thấy thông tin tài khoản trong token."
+                    };
+                }
+
+                var account = await _accountRepository.GetAccountByIdAsync(accountId, cancellationToken);
+                if (account == null)
+                {
+                    return new BaseResponse<AccountResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy tài khoản."
+                    };
+                }
+
+                // If role is Vet, try to get vetId
+                int vetId = 0;
+                if (account.Role == EnumList.Role.Vet)
+                {
+                    var vet = await _vetRepository.GetVetByAccountIdAsync(accountId, cancellationToken);
+                    if (vet != null)
+                    {
+                        vetId = vet.VetId;
+                    }
+                }
+
+                var dto = _mapper.Map<AccountResponseDTO>(account);
+                dto.VetId = vetId;
+
+                return new BaseResponse<AccountResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin tài khoản hiện tại thành công.",
+                    Data = dto
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy thông tin tài khoản hiện tại.");
+                return new BaseResponse<AccountResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Lỗi khi lấy thông tin tài khoản hiện tại: " + (ex.InnerException?.Message ?? ex.Message)
+                };
+            }
+        }
+
         public async Task<BaseResponse<bool>> UpdateAccountAsync(int accountId, UpdateAccountDTO updateAccountDTO, CancellationToken cancellationToken)
         {
             if (accountId <= 0)

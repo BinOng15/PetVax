@@ -132,8 +132,28 @@ namespace PetVax.Services.Service
 
                 _otpStore.TryRemove(email, out _);
 
-                var accessToken = GenerateJwtToken(account);
+                // Generate JWT token with NameIdentifier claim using accountId
+                var claims = new[]
+                {
+                    new Claim(System.Security.Claims.ClaimTypes.NameIdentifier, account.AccountId.ToString()),
+                    new Claim(System.Security.Claims.ClaimTypes.Email, account.Email),
+                    new Claim(System.Security.Claims.ClaimTypes.Role, account.Role.ToString())
+                };
+
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    signingCredentials: credentials
+                );
+
+                var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
                 var refreshToken = GenerateRefreshToken();
+
                 var response = new AuthResponseDTO
                 {
                     AccountId = account.AccountId,
@@ -269,7 +289,26 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                var accessToken = GenerateJwtToken(account);
+                // Generate JWT token with NameIdentifier claim
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
+                    new Claim(ClaimTypes.Email, account.Email),
+                    new Claim(ClaimTypes.Role, account.Role.ToString())
+                };
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    signingCredentials: credentials
+                );
+
+                var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
                 var refreshToken = GenerateRefreshToken();
 
                 AuthResponseDTO authResponseDTO = new AuthResponseDTO()
