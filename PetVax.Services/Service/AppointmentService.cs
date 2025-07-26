@@ -1549,7 +1549,7 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentId, cancellationToken);
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appointmentId, cancellationToken);
                 if (appointmentDetail == null || appointment.ServiceType != EnumList.ServiceType.Vaccination)
                 {
                     return new BaseResponse<AppointmentForVaccinationResponseDTO>
