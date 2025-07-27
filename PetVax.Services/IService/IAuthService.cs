@@ -14,7 +14,7 @@ namespace PetVax.Services.IService
     public interface IAuthService
     {
         Task<BaseResponse<AuthResponseDTO>> LoginAsync(LoginRequestDTO loginRequestDTO, CancellationToken cancellationToken);
-        Task<BaseResponse<AuthResponseDTO>> VerifyOtpAsync(string email, string otp, CancellationToken cancellationToken);
+        Task<BaseResponse<AuthResponseForMobileDTO>> VerifyOtpAsync(string email, string otp, CancellationToken cancellationToken);
         Task<BaseResponse<AuthResponseDTO>> LoginSimple(LoginRequestDTO loginRequestDTO, CancellationToken cancellationToken);
         Task<BaseResponse> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken);
         Task<BaseResponse<AuthResponseDTO>> LoginWithGoogleAsync(string email, string name, CancellationToken cancellationToken);

@@ -203,6 +203,7 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreatePaymentRequestDTO, Payment>();
             CreateMap<UpdatePaymentRequestDTO, Payment>();
             CreateMap<Payment, PaymentResponseDTO>();
+            CreateMap<Payment, PaymentForTransactionResponseDTO>();
 
             //HealthCondition
             CreateMap<CreateHealthConditionDTO, HealthCondition>();
@@ -265,6 +266,7 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<Membership, MembershipResponseDTO>()
                 .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customers));
             CreateMap<Membership, CreateUpdateMembershipResponseDTO>();
+            CreateMap<Membership, MembershipStatusResponseDTO>();
 
             //Voucher
             CreateMap<CreateVoucherDTO, Voucher>();
@@ -273,10 +275,13 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.PointTransaction, opt => opt.MapFrom(src => src.PointTransaction));
             CreateMap<Voucher, CreateUpdateVoucherResponseDTO>();
             CreateMap<Voucher, CustomerVoucherResponseDTO>();
+            CreateMap<Voucher, VoucherForTransactionResponseDTO>();
 
             //PointTransaction
             CreateMap<PointTransaction, PointTransactionResponseDTO>()
-                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer));
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment))
+                .ForMember(dest => dest.Voucher, opt => opt.MapFrom(src => src.Voucher));
 
             //CustomerVoucher
             CreateMap<CustomerVoucher, CustomerVoucherResponseDTO>()

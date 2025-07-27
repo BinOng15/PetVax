@@ -31,6 +31,8 @@ namespace PetVax.Repositories.Repository
             return await _context.PointTransactions
                 .Include(pt => pt.Customer)
                     .ThenInclude(c => c.Membership)
+                .Include(pt => pt.Voucher)
+                .Include(pt => pt.Payment)
                 .Where(pt => pt.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
@@ -40,6 +42,8 @@ namespace PetVax.Repositories.Repository
             return await _context.PointTransactions
                 .Include(pt => pt.Customer)
                     .ThenInclude(c => c.Membership)
+                .Include(pt => pt.Voucher)
+                .Include(pt => pt.Payment)
                 .FirstOrDefaultAsync(pt => pt.TransactionId == id && pt.isDeleted == false, cancellationToken);
         }
 
@@ -48,6 +52,8 @@ namespace PetVax.Repositories.Repository
             return await _context.PointTransactions
                 .Include(pt => pt.Customer)
                     .ThenInclude(c => c.Membership)
+                .Include(pt => pt.Voucher)
+                .Include(pt => pt.Payment)
                 .Where(pt => pt.CustomerId == customerId && pt.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }

@@ -15,6 +15,8 @@ namespace PetVax.BusinessObjects.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int TransactionId { get; set; }
         public int CustomerId { get; set; }
+        public int? PaymentId { get; set; }
+        public int? VoucherId { get; set; }
         public string Change { get; set; }
         public string TransactionType { get; set; } // e.g., "Earned", "Redeemed"
         public string Description { get; set; }
@@ -27,6 +29,8 @@ namespace PetVax.BusinessObjects.Models
 
         // Navigation properties
         public virtual Customer Customer { get; set; }
+        public virtual Payment Payment { get; set; } // Navigation to Payment table, if applicable
+        public virtual Voucher Voucher { get; set; } // Navigation to Voucher table, if applicable
         public virtual ICollection<Voucher> Vouchers { get; set; } // Collection of vouchers associated with this transaction
 
     }

@@ -73,5 +73,17 @@ namespace PediVax.Controllers
             var response = await _membershipService.DeleteMembershipAsync(membershipId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpGet("get-customer-ranking-info/{customerId}")]
+        public async Task<IActionResult> GetCustomerRankingInfoAsync(int customerId, CancellationToken cancellationToken = default)
+        {
+            var response = await _membershipService.GetCustomerRankingInfoAsync(customerId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
+        [HttpGet("get-membership-status/{customerId}")]
+        public async Task<IActionResult> GetMembershipStatusAsync(int customerId, CancellationToken cancellationToken = default)
+        {
+            var response = await _membershipService.GetMembershipStatusAsync(customerId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

@@ -445,6 +445,19 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey(cv => cv.VoucherId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //PointTransaction - Voucher (N-1, optional)
+            modelBuilder.Entity<PointTransaction>()
+                .HasOne(pt => pt.Voucher)
+                .WithMany()
+                .HasForeignKey(pt => pt.VoucherId)
+                .OnDelete(DeleteBehavior.Restrict);
+            // PointTransaction - Payment (1-1)
+            modelBuilder.Entity<PointTransaction>()
+                .HasOne(pt => pt.Payment)
+                .WithOne()
+                .HasForeignKey<PointTransaction>(pt => pt.PaymentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Microchip>()
                 .Property(m => m.Price)
                 .HasColumnType("decimal(18,2)");

@@ -21,7 +21,7 @@ namespace PetVax.BusinessObjects.DTO.CustomerDTO
         public string? DateOfBirth { get; set; }
         public string? Gender { get; set; }
         public string? Address { get; set; }
-        public string? CurrentPoints { get; set; }
+        public int? CurrentPoints { get; set; }
         public int? RedeemablePoints { get; set; }
         public decimal? TotalSpent { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -31,6 +31,6 @@ namespace PetVax.BusinessObjects.DTO.CustomerDTO
         public bool? isDeleted { get; set; } = false; // Default to false, indicating the customer is not deleted
 
         public AccountResponseDTO AccountResponseDTO { get; set; }
-        public MembershipResponseDTO MembershipResponseDTO { get; set; }
+        public CreateUpdateMembershipResponseDTO MembershipResponseDTO { get; set; }
     }
 }
