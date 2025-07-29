@@ -447,6 +447,7 @@ namespace PetVax.Services.Service
                 var pointTransaction = new PointTransaction
                 {
                     CustomerId = customerId,
+                    VoucherId = voucherId,
                     Change = pointsRequired.ToString(),
                     TransactionType = "Redeem",
                     Description = $"Đổi {pointsRequired} điểm để nhận voucher {voucher.VoucherName}",

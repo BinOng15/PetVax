@@ -20,17 +20,20 @@ namespace PetVax.Services.Service
     public class MembershipService : IMembershipService
     {
         private readonly IMembershipRepository _membershipRepository;
+        private readonly ICustomerRepository _customerRepository;
         private readonly ILogger<MembershipService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public MembershipService(
             IMembershipRepository membershipRepository,
+            ICustomerRepository customerRepository,
             ILogger<MembershipService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor)
         {
             _membershipRepository = membershipRepository;
+            _customerRepository = customerRepository;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -51,7 +54,7 @@ namespace PetVax.Services.Service
             }
 
             // Validate Rank
-            var allowedRanks = new[] { "silver", "gold" };
+            var allowedRanks = new[] { "silver", "gold", "bronze" };
             if (string.IsNullOrWhiteSpace(createMembershipDTO.Rank) ||
                 !allowedRanks.Contains(createMembershipDTO.Rank.Trim().ToLower()))
             {
@@ -60,7 +63,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Rank phải là 'silver' hoặc 'gold'!",
+                    Message = "Rank phải là 'bronze', 'silver' hoặc 'gold'!",
                     Data = null
                 };
             }
@@ -276,6 +279,103 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse<MembershipRankingResponseDTO>> GetCustomerRankingInfoAsync(int customerId, CancellationToken cancellationToken)
+        {
+            if (customerId <= 0)
+            {
+                _logger.LogError("GetCustomerRankingInfoAsync: Invalid customerId {CustomerId}", customerId);
+                return new BaseResponse<MembershipRankingResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "ID khách hàng không hợp lệ!",
+                    Data = null
+                };
+            }
+            try
+            {
+                // 1. Get customer by ID
+                var customer = await _customerRepository.GetCustomerByIdAsync(customerId, cancellationToken);
+                if (customer == null)
+                {
+                    _logger.LogWarning("GetCustomerRankingInfoAsync: Customer with ID {CustomerId} not found", customerId);
+                    return new BaseResponse<MembershipRankingResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy khách hàng với ID này!",
+                        Data = null
+                    };
+                }
+                // 2. Get current points of the customer
+                int currentPoints = customer.CurrentPoints ?? 0;
+                // 3. Get all memberships and sort them by MinPoints ascending (lowest to highest)
+                var memberships = await _membershipRepository.GetAllMembershipsAsync(cancellationToken);
+                var sortedMemberships = memberships.OrderBy(m => m.MinPoints).ToList();
+
+                // 4. Find the current membership (highest MinPoints <= currentPoints)
+                Membership currentMembership = null;
+                foreach (var m in sortedMemberships)
+                {
+                    if (currentPoints >= m.MinPoints)
+                    {
+                        currentMembership = m;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                // 5. Find the next membership (lowest MinPoints > currentPoints)
+                var nextMembership = sortedMemberships.FirstOrDefault(m => m.MinPoints > currentPoints);
+
+                int? pointsToNextRank = nextMembership != null ? nextMembership.MinPoints - currentPoints : 0;
+
+                int redeemablePoints = customer.RedeemablePoints ?? 0;
+                decimal totalSpents = customer.TotalSpent ?? 0;
+
+                int minPointsCurrentRank = currentMembership?.MinPoints ?? 0;
+                int maxPointsCurrentRank = nextMembership?.MinPoints ?? int.MaxValue;
+
+                var rankingInfo = new MembershipRankingResponseDTO
+                {
+                    CustomerId = customer.CustomerId,
+                    MembershipId = customer.MembershipId,
+                    CustomerCode = customer.CustomerCode,
+                    FullName = customer.FullName ?? "Vui lòng cập nhật hồ sơ cá nhân",
+                    CurrentRank = currentMembership?.Rank ?? "Chưa có hạng",
+                    CurrentPoints = currentPoints,
+                    MinPointsCurrentRank = minPointsCurrentRank,
+                    MaxPointsCurrentRank = maxPointsCurrentRank,
+                    NextRank = nextMembership?.Rank,
+                    PointsToNextRank = pointsToNextRank > 0 ? pointsToNextRank : 0,
+                    RedeemablePoints = redeemablePoints,
+                    TotalSpent = totalSpents
+                };
+
+                _logger.LogInformation("GetCustomerRankingInfoAsync: Successfully retrieved ranking info for customer ID {CustomerId}", customerId);
+                return new BaseResponse<MembershipRankingResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin xếp hạng khách hàng thành công!",
+                    Data = rankingInfo
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetCustomerRankingInfoAsync: An error occurred while retrieving ranking info for customer ID {CustomerId}", customerId);
+                return new BaseResponse<MembershipRankingResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy thông tin xếp hạng khách hàng!",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<MembershipResponseDTO>> GetMembershipByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
             if (customerId <= 0)
@@ -471,6 +571,60 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Đã xảy ra lỗi khi lấy danh sách membership theo rank!",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<MembershipRankingFullResponseDTO>> GetMembershipStatusAsync(int customerId, CancellationToken cancellationToken)
+        {
+            if (customerId <= 0)
+            {
+                _logger.LogError("GetMembershipStatusAsync: Invalid customerId {CustomerId}", customerId);
+                return new BaseResponse<MembershipRankingFullResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "ID khách hàng không hợp lệ!",
+                    Data = null
+                };
+            }
+            try
+            {
+                var customerRankingInfoResponse = await GetCustomerRankingInfoAsync(customerId, cancellationToken);
+
+                var allTiers = await _membershipRepository.GetAllMembershipsAsync(cancellationToken);
+                if (allTiers == null || !allTiers.Any())
+                {
+                    _logger.LogWarning("GetMembershipStatusAsync: No membership tiers found");
+                    return new BaseResponse<MembershipRankingFullResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy bất kỳ hạng membership nào!",
+                        Data = null
+                    };
+                }
+                return new BaseResponse<MembershipRankingFullResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy thông tin trạng thái membership thành công!",
+                    Data = new MembershipRankingFullResponseDTO
+                    {
+                        MembershipRankingResponseDTO = customerRankingInfoResponse.Data,
+                        Memberships = _mapper.Map<List<MembershipStatusResponseDTO>>(allTiers)
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetMembershipStatusAsync: An error occurred while retrieving membership status for customer ID {CustomerId}", customerId);
+                return new BaseResponse<MembershipRankingFullResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy thông tin trạng thái membership!",
                     Data = null
                 };
             }

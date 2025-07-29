@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.PointTransactionDTO;
+using PetVax.BusinessObjects.Enum;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
 using System;
@@ -17,13 +18,26 @@ namespace PetVax.Services.Service
     {
         private readonly IPointTransactionRepository _pointTransactionRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IAppointmentDetailRepository _appointmentDetailRepository;
+        private readonly IPaymentRepository _paymentRepository;
+        private readonly IVoucherRepository _voucherRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<PointTransactionService> _logger;
 
-        public PointTransactionService(IPointTransactionRepository pointTransactionRepository, ICustomerRepository customerRepository, IMapper mapper, ILogger<PointTransactionService> logger)
+        public PointTransactionService(
+            IPointTransactionRepository pointTransactionRepository, 
+            ICustomerRepository customerRepository, 
+            IAppointmentDetailRepository appointmentDetailRepository,
+            IPaymentRepository paymentRepository,
+            IVoucherRepository voucherRepository, 
+            IMapper mapper, 
+            ILogger<PointTransactionService> logger)
         {
             _pointTransactionRepository = pointTransactionRepository;
             _customerRepository = customerRepository;
+            _appointmentDetailRepository = appointmentDetailRepository;
+            _paymentRepository = paymentRepository;
+            _voucherRepository = voucherRepository;
             _mapper = mapper;
             _logger = logger;
         }
@@ -126,7 +140,57 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                var responseData = _mapper.Map<List<PointTransactionResponseDTO>>(pointTransactions);
+
+
+                var responseData = new List<PointTransactionResponseDTO>();
+
+                foreach (var pt in pointTransactions)
+                {
+                    var dto = _mapper.Map<PointTransactionResponseDTO>(pt);
+
+                    if (pt.PaymentId.HasValue)
+                    {
+                        var payment = await _paymentRepository.GetPaymentByIdAsync(pt.PaymentId.Value, cancellationToken);
+
+                        var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(payment.AppointmentDetailId, cancellationToken);
+                        if (appointmentDetail != null && dto.Payment != null)
+                        {
+                            switch (appointmentDetail.ServiceType)
+                            {
+                                case EnumList.ServiceType.Vaccination:
+                                    dto.Payment.ServiceName = "Tiêm phòng";
+                                    break;
+                                case EnumList.ServiceType.Microchip:
+                                    dto.Payment.ServiceName = "Gắn Microchip";
+                                    break;
+                                case EnumList.ServiceType.HealthCondition:
+                                    dto.Payment.ServiceName = "Khám tổng quát";
+                                    break;
+                                case EnumList.ServiceType.HealthConditionCertificate:
+                                    dto.Payment.ServiceName = "Cấp giấy chứng nhận sức khỏe";
+                                    break;
+                                case EnumList.ServiceType.VaccinationCertificate:
+                                    dto.Payment.ServiceName = "Cấp giấy chứng nhận tiêm vắc xin";
+                                    break;
+                                default:
+                                    dto.Payment.ServiceName = "Dịch vụ khác";
+                                    break;
+                            }
+                        }
+                    }
+                    if (pt.VoucherId.HasValue)
+                    {
+                        var voucher = await _voucherRepository.GetVoucherByIdAsync(pt.VoucherId.Value, cancellationToken);
+                        if (voucher != null && dto.Voucher != null)
+                        {
+                            dto.Voucher.VoucherName = voucher.VoucherName;
+                            dto.Voucher.VoucherCode = voucher.VoucherCode;
+                        }
+                    }
+
+                    responseData.Add(dto);
+                }
+
                 return new BaseResponse<List<PointTransactionResponseDTO>>
                 {
                     Code = 200,

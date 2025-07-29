@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.Enum;
+using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
 using System.Net;
 using System.Security.Claims;
@@ -15,39 +16,20 @@ namespace PediVax.Controllers
     {
         private readonly ILogger<AccountController> _logger;
         private readonly IAccountService _accountService;
-        public AccountController(ILogger<AccountController> logger, IAccountService accountService)
+        private readonly IVetRepository _vetRepository;
+        public AccountController(ILogger<AccountController> logger, IAccountService accountService, IVetRepository vetRepository)
         {
             _logger = logger;
             _accountService = accountService;
+            _vetRepository = vetRepository;
         }
 
         [HttpGet("current-account")]
         [Authorize]
-        public IActionResult GetCurrentAccount(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetCurrentAccount(CancellationToken cancellationToken)
         {
-            // Lấy claim AccountId và chuyển sang int, mặc định là 0 nếu không có
-            int accountId = 0;
-            var accountIdClaim = User.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier);
-            if (accountIdClaim != null)
-            {
-                int.TryParse(accountIdClaim.Value, out accountId);
-            }
-
-            var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "Unknown";
-            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value ?? "Customer";
-
-            // Chuyển đổi chuỗi role sang enum Role
-            if (!Enum.TryParse<EnumList.Role>(roleClaim, true, out var role))
-            {
-                role = EnumList.Role.Customer;
-            }
-
-            return Ok(new
-            {
-                AccountId = accountId, // Trả về int
-                Email = email,
-                Role = role
-            });
+            var response = await _accountService.GetCurrentAccountAsync(cancellationToken);
+            return StatusCode(response.Code, response);
         }
 
         [HttpGet("get-all-accounts")]

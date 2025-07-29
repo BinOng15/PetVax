@@ -39,5 +39,7 @@ namespace PetVax.BusinessObjects.Models
         public virtual ICollection<Pet> Pets { get; set; }
         public virtual ICollection<CustomerVoucher> CustomerVouchers { get; set; }
 
+        public virtual ICollection<ServiceHistory> ServiceHistories { get; set; } // Navigation to ServiceHistory table
+
     }
 }

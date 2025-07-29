@@ -731,10 +731,7 @@ namespace PetVax.Services.Service
                 };
             }
         }
-        #endregion
-
-        #region Vaccination Appointment Service
-        public async Task<DynamicResponse<AppointmentForVaccinationResponseDTO>> GetAllAppointmentVaccinationAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        public async Task<DynamicResponse<AppointmentForVaccinationResponseDTO>> GetAllAppointmentVaccinationAsync(GetAllItemsDTO getAllItemsDTO, int? vetId, CancellationToken cancellationToken)
         {
             try
             {
@@ -743,6 +740,14 @@ namespace PetVax.Services.Service
                 appointments = appointments
                     .Where(d => d.isDeleted == false || d.isDeleted == null)
                     .ToList();
+
+                // Filter by vetId if provided
+                if (vetId.HasValue && vetId > 0)
+                {
+                    appointments = appointments
+                        .Where(d => d.VetId == vetId.Value)
+                        .ToList();
+                }
 
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
@@ -1544,7 +1549,7 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentId, cancellationToken);
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appointmentId, cancellationToken);
                 if (appointmentDetail == null || appointment.ServiceType != EnumList.ServiceType.Vaccination)
                 {
                     return new BaseResponse<AppointmentForVaccinationResponseDTO>
@@ -1845,6 +1850,7 @@ namespace PetVax.Services.Service
                 if (updateAppointmentMicrochipDTO.MicrochipItemId > 0)
                 {
                     var appointmentDetailExist = await _appointmentDetailRepository.GetAppointmentDetailsByMicrochipItemIdAsync(updateAppointmentMicrochipDTO.MicrochipItemId, cancellationToken);
+                    var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(updateAppointmentMicrochipDTO.MicrochipItemId, cancellationToken);
                     if (appointmentDetailExist != null && appointmentDetailExist.AppointmentId != updateAppointmentMicrochipDTO.AppointmentId)
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
@@ -1855,7 +1861,6 @@ namespace PetVax.Services.Service
                             Data = null
                         };
                     }
-                    var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(updateAppointmentMicrochipDTO.MicrochipItemId, cancellationToken);
                     if (microchipItem == null)
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
@@ -1866,27 +1871,12 @@ namespace PetVax.Services.Service
                             Data = null
                         };
                     }
-                    else if (microchipItem.IsUsed == true)
-                    {
-                        return new BaseResponse<AppointmentMicrochipResponseDTO>
-                        {
-                            Code = 200,
-                            Success = false,
-                            Message = "Microchip đã được sử dụng.",
-                            Data = null
-                        };
-                    }
-                    else
-                    {   
 
                         microchipItem.Location = updateAppointmentMicrochipDTO.Description;
-                        int rowEffected = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
-
-                    }
-                    ;
-                }
-
-
+                     int rowEffected = await _microchipItemRepository.UpdateMicrochipItemAsync(microchipItem, cancellationToken);
+                 
+                }                  
+               
                 appointmentDetail.VetId = updateAppointmentMicrochipDTO.VetId ?? appointmentDetail.VetId;
                 appointmentDetail.MicrochipItemId = updateAppointmentMicrochipDTO.MicrochipItemId ?? appointmentDetail.MicrochipItemId;
                 appointmentDetail.AppointmentStatus = newStatus;
@@ -3686,7 +3676,7 @@ namespace PetVax.Services.Service
                     }
                 }
            
-                if(appointmentDetail.VetId > 0)
+                if(updateDTO.VetId > 0)
                 {
                     appointmentDetail.VetId = updateDTO.VetId;
                 }
@@ -3710,7 +3700,8 @@ namespace PetVax.Services.Service
                     healthConditiont.CreatedAt = DateTime.UtcNow;
                     healthConditiont.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
                     var createHealthcondition = await _healthConditionRepository.AddHealthConditionAsync(healthConditiont, cancellationToken);
-                    if(createHealthcondition == null)
+                    appointmentDetail.HealthConditionId = createHealthcondition.HealthConditionId;
+                    if (createHealthcondition == null)
                     {
                         return new BaseResponse<AppointmentHealthConditionResponseDTO>
                         {
@@ -3720,7 +3711,7 @@ namespace PetVax.Services.Service
                             Data = null
                         };
                     }
-                    appointmentDetail.HealthConditionId = updateDTO.HealthConditionId ?? appointmentDetail.HealthConditionId;
+                    
                 }
                 
               if(updateDTO.PetId > 0 && updateDTO.HealthConditionId > 0)
@@ -3817,16 +3808,16 @@ namespace PetVax.Services.Service
                         // 
                         if (healthIssues.Any())
                         {
-                            Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}";
+                            Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}, {updateDTO.Conclusion}";
                             Status = "FAIL";
                         }
                         else
                         {
-                            Conclusion = "Đạt: Tình trạng sức khỏe trong ngưỡng bình thường.";
+                            Conclusion = $"Đạt: Tình trạng sức khỏe trong ngưỡng bình thường. {updateDTO.Conclusion}";
                             Status = "PASS";
                         }
 
-                         getHealthCondition.PetId = updateDTO.PetId?? getHealthCondition.PetId;
+                        getHealthCondition.PetId = updateDTO.PetId?? getHealthCondition.PetId;
                         getHealthCondition.VetId = updateDTO.VetId ?? getHealthCondition.VetId;
                         getHealthCondition.HeartRate = updateDTO.HeartRate ?? getHealthCondition.HeartRate;
                         getHealthCondition.BreathingRate = updateDTO.BreathingRate ?? getHealthCondition.BreathingRate;

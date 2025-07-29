@@ -57,9 +57,9 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-all-appointment-microchip")]
-        public async Task<IActionResult> GetAllAppointmentMicrochip([FromQuery] GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllAppointmentMicrochip([FromQuery] GetAllItemsDTO getAllItemsDTO, int? vetId, CancellationToken cancellationToken = default)
         {
-            var response = await _appointmentDetailService.GetAllAppointmemtMicrochipAsync(getAllItemsDTO, cancellationToken);
+            var response = await _appointmentDetailService.GetAllAppointmemtMicrochipAsync(getAllItemsDTO, vetId, cancellationToken);
             return StatusCode(response.Code, response);
         }
 

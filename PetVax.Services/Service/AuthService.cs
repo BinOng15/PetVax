@@ -33,18 +33,20 @@ namespace PetVax.Services.Service
         private readonly IAccountRepository _accountRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IMembershipRepository _membershipRepository;
         private readonly ILogger<AuthService> _logger;
 
         // In-memory OTP store: Email -> (OTP, Expiration)
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otpStore = new();
 
-        public AuthService(IConfiguration configuration, IAccountRepository accountRepository, IHttpContextAccessor httpContextAccessor,
+        public AuthService(IConfiguration configuration, IAccountRepository accountRepository, IMembershipRepository membershipRepository, IHttpContextAccessor httpContextAccessor,
             ICustomerRepository customerRepository, ILogger<AuthService> logger)
         {
             _configuration = configuration;
             _accountRepository = accountRepository;
             _httpContextAccessor = httpContextAccessor;
             _customerRepository = customerRepository;
+            _membershipRepository = membershipRepository;
             _logger = logger;
         }
 
@@ -103,13 +105,13 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<AuthResponseDTO>> VerifyOtpAsync(string email, string otp, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AuthResponseForMobileDTO>> VerifyOtpAsync(string email, string otp, CancellationToken cancellationToken)
         {
             try
             {
                 if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
                 {
-                    return new BaseResponse<AuthResponseDTO>
+                    return new BaseResponse<AuthResponseForMobileDTO>
                     {
                         Code = 401,
                         Success = false,
@@ -121,7 +123,7 @@ namespace PetVax.Services.Service
                 var account = await _accountRepository.GetAccountByEmailAsync(email, cancellationToken);
                 if (account == null)
                 {
-                    return new BaseResponse<AuthResponseDTO>
+                    return new BaseResponse<AuthResponseForMobileDTO>
                     {
                         Code = 404,
                         Success = false,
@@ -132,9 +134,42 @@ namespace PetVax.Services.Service
 
                 _otpStore.TryRemove(email, out _);
 
-                var accessToken = GenerateJwtToken(account);
+                // Generate JWT token with NameIdentifier claim using accountId
+                var claims = new[]
+                {
+                    new Claim(System.Security.Claims.ClaimTypes.NameIdentifier, account.AccountId.ToString()),
+                    new Claim(System.Security.Claims.ClaimTypes.Email, account.Email),
+                    new Claim(System.Security.Claims.ClaimTypes.Role, account.Role.ToString())
+                };
+
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    signingCredentials: credentials
+                );
+
+                var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
                 var refreshToken = GenerateRefreshToken();
-                var response = new AuthResponseDTO
+
+                string? fullName = null;
+                string? image = null;
+
+                if (account.Role == EnumList.Role.Customer)
+                {
+                    var customer = await _customerRepository.GetCustomerByAccountId(account.AccountId, cancellationToken);
+                    if (customer != null)
+                    {
+                        fullName = customer.FullName;
+                        image = customer.Image;
+                    }
+                }
+
+                var response = new AuthResponseForMobileDTO
                 {
                     AccountId = account.AccountId,
                     Email = account.Email,
@@ -142,9 +177,12 @@ namespace PetVax.Services.Service
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
                     AccessTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
-                    RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"]))
+                    RefreshTokenExpiration = DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiration"])),
+                    IsVerify = account.isVerify,
+                    FullName = fullName,
+                    Image = image
                 };
-                return new BaseResponse<AuthResponseDTO>
+                return new BaseResponse<AuthResponseForMobileDTO>
                 {
                     Code = 200,
                     Success = true,
@@ -154,7 +192,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                return new BaseResponse<AuthResponseDTO>
+                return new BaseResponse<AuthResponseForMobileDTO>
                 {
                     Code = 500,
                     Success = false,
@@ -269,7 +307,26 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                var accessToken = GenerateJwtToken(account);
+                // Generate JWT token with NameIdentifier claim
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
+                    new Claim(ClaimTypes.Email, account.Email),
+                    new Claim(ClaimTypes.Role, account.Role.ToString())
+                };
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    signingCredentials: credentials
+                );
+
+                var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
                 var refreshToken = GenerateRefreshToken();
 
                 AuthResponseDTO authResponseDTO = new AuthResponseDTO()
@@ -397,13 +454,22 @@ namespace PetVax.Services.Service
 
                 if (update > 0)
                 {
+                    // Get bronze membership using membershipRepository
+                    int? bronzeMembershipId = null;
+                    var bronzeMembership = await _membershipRepository.GetMembershipByRankAsync("bronze", cancellationToken);
+                    if (bronzeMembership != null)
+                    {
+                        bronzeMembershipId = bronzeMembership.MembershipId;
+                    }
+
                     // Generate random customer code: C + 6 digits
                     string customerCode = "C" + new Random().Next(100000, 1000000).ToString();
                     Customer customer = new Customer
                     {
                         AccountId = account.AccountId,
                         CreatedAt = DateTimeHelper.Now(),
-                        CustomerCode = customerCode
+                        CustomerCode = customerCode,
+                        MembershipId = bronzeMembershipId
                     };
                     await _customerRepository.CreateCustomerAsync(customer);
                 }

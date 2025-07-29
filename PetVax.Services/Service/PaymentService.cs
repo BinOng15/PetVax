@@ -895,6 +895,7 @@ namespace PetVax.Services.Service
                         var pointTransaction = new PointTransaction
                         {
                             CustomerId = customer.CustomerId,
+                            PaymentId = payment.PaymentId,
                             Change = earnedPoints.ToString(),
                             TransactionType = "Earned",
                             TransactionDate = DateTimeHelper.Now(),

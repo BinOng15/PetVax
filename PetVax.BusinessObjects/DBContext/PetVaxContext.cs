@@ -117,6 +117,12 @@ namespace PediVax.BusinessObjects.DBContext
                 .WithOne(p => p.Customer)
                 .HasForeignKey(p => p.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
+            // Customer - Pet (1-N)
+            modelBuilder.Entity<Customer>()
+                .HasMany(c => c.ServiceHistories)
+                .WithOne(p => p.Customer)
+                .HasForeignKey(p => p.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Pet - MicrochipItem (1-N)
             modelBuilder.Entity<Pet>()
@@ -437,6 +443,19 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasOne(cv => cv.Voucher)
                 .WithMany(v => v.CustomerVouchers)
                 .HasForeignKey(cv => cv.VoucherId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //PointTransaction - Voucher (N-1, optional)
+            modelBuilder.Entity<PointTransaction>()
+                .HasOne(pt => pt.Voucher)
+                .WithMany()
+                .HasForeignKey(pt => pt.VoucherId)
+                .OnDelete(DeleteBehavior.Restrict);
+            // PointTransaction - Payment (1-1)
+            modelBuilder.Entity<PointTransaction>()
+                .HasOne(pt => pt.Payment)
+                .WithOne()
+                .HasForeignKey<PointTransaction>(pt => pt.PaymentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Microchip>()

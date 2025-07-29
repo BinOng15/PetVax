@@ -12,5 +12,6 @@ namespace PetVax.BusinessObjects.DTO.AccountDTO
         public int AccountId { get; set; }
         public string Email { get; set; }
         public EnumList.Role Role { get; set; }
+        public int VetId { get; set; }
     }
 }

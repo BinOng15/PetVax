@@ -54,6 +54,7 @@ namespace PetVax.BusinessObjects.DTO.AppointmentDTO
     public class AppointmentHasDiseaseResponseDTO
     {
         public int DiseaseId { get; set; }
+        public int VetId { get; set; }
         public DiseaseResponseDTO Disease { get; set; }
     }
 

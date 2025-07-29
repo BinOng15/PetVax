@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PediVax.BusinessObjects.DBContext;
 
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250725030658_update_databaseServiceHistory1")]
+    partial class update_databaseServiceHistory1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,11 +73,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 7, 27, 16, 5, 23, 374, DateTimeKind.Utc).AddTicks(8485),
+                            CreatedAt = new DateTime(2025, 7, 25, 3, 6, 57, 642, DateTimeKind.Utc).AddTicks(1748),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "djYJdXtkHUI89pvit8YGwQfamXqeUrzQnbxz7Zfyq60=",
-                            PasswordSalt = "KxU7SS0fp9/JTLt1inEcRZmKdfs9nHOS5QRp/MNMC+s=",
+                            PasswordHash = "cztZD1B1MXEB8ZZieaQCRZNcvWsDUJ3AnCyS3tOhuFM=",
+                            PasswordSalt = "7Alw0w8dXgZPeBKUzKxXW4iIu8uUcDQt/K0QH1nrfXs=",
                             RefereshToken = "",
                             Role = 1,
                             isDeleted = false,
@@ -84,11 +87,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 7, 27, 16, 5, 23, 374, DateTimeKind.Utc).AddTicks(8497),
+                            CreatedAt = new DateTime(2025, 7, 25, 3, 6, 57, 642, DateTimeKind.Utc).AddTicks(1752),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "lE+K91fxLReO2DjRJntsPOFnTTu5w0AeHsF6rGfFJ2s=",
-                            PasswordSalt = "QBq6zHCeir6Xy5YzjDPEs7zcYKFLmKs4VsP5Vp2zLhI=",
+                            PasswordHash = "nbOV4t43aBkimhtaScav3UAvnMDtzHtcUI+KjHLKKCA=",
+                            PasswordSalt = "omRCvnDC9EEDhqUOlyFf2vl/kS7eVsKqGjiWTdOb0QE=",
                             RefereshToken = "",
                             Role = 2,
                             isDeleted = false,
@@ -984,9 +987,6 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PaymentId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
 
@@ -994,21 +994,12 @@ namespace PetVax.BusinessObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("VoucherId")
-                        .HasColumnType("int");
-
                     b.Property<bool?>("isDeleted")
                         .HasColumnType("bit");
 
                     b.HasKey("TransactionId");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("PaymentId")
-                        .IsUnique()
-                        .HasFilter("[PaymentId] IS NOT NULL");
-
-                    b.HasIndex("VoucherId");
 
                     b.ToTable("PointTransaction");
                 });
@@ -1040,8 +1031,9 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<DateTime>("ServiceDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ServiceType")
-                        .HasColumnType("int");
+                    b.Property<string>("ServiceType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -2004,21 +1996,7 @@ namespace PetVax.BusinessObjects.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PetVax.BusinessObjects.Models.Payment", "Payment")
-                        .WithOne()
-                        .HasForeignKey("PetVax.BusinessObjects.Models.PointTransaction", "PaymentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("PetVax.BusinessObjects.Models.Voucher", "Voucher")
-                        .WithMany()
-                        .HasForeignKey("VoucherId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Customer");
-
-                    b.Navigation("Payment");
-
-                    b.Navigation("Voucher");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.ServiceHistory", b =>

@@ -808,7 +808,7 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<DynamicResponse<AppointmenDetialMicorchipResponseDTO>> GetAllAppointmemtMicrochipAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        public async Task<DynamicResponse<AppointmenDetialMicorchipResponseDTO>> GetAllAppointmemtMicrochipAsync(GetAllItemsDTO getAllItemsDTO, int? vetId, CancellationToken cancellationToken)
         {
             try
             {
@@ -822,6 +822,14 @@ namespace PetVax.Services.Service
                         Message = "Không tìm thấy chi tiết cuộc hẹn microchip nào.",
                         Data = null
                     };
+                }
+
+                // Filter by vetId if provided
+                if (vetId.HasValue && vetId > 0)
+                {
+                    appointmentDetails = appointmentDetails
+                        .Where(d => d.VetId.HasValue && d.VetId.Value == vetId.Value)
+                        .ToList();
                 }
 
                 // Filtering by keyword if provided
@@ -877,7 +885,6 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-
                 return new DynamicResponse<AppointmenDetialMicorchipResponseDTO>
                 {
                     Code = 500,
@@ -963,7 +970,7 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<DynamicResponse<AppointmentHealthConditionResponseDTO>> GetAllAppointmentDetailHealthConditionAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        public async Task<DynamicResponse<AppointmentHealthConditionResponseDTO>> GetAllAppointmentDetailHealthConditionAsync(GetAllItemsDTO getAllItemsDTO, int? vetId, CancellationToken cancellationToken)
         {
             try
             {
@@ -978,6 +985,15 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
+
+                // Filter by vetId if provided
+                if (vetId.HasValue && vetId > 0)
+                {
+                    appointmentDetails = appointmentDetails
+                        .Where(d => d.VetId == vetId.Value)
+                        .ToList();
+                }
+
                 // Filtering by keyword if provided
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO?.KeyWord))
                 {
@@ -986,6 +1002,7 @@ namespace PetVax.Services.Service
                         .Where(d => d.AppointmentDetailCode != null && d.AppointmentDetailCode.ToLower().Contains(keyword))
                         .ToList();
                 }
+
                 int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
                 int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
                 int skip = (pageNumber - 1) * pageSize;

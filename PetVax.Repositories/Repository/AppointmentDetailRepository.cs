@@ -92,19 +92,20 @@ namespace PetVax.Repositories.Repository
         public async Task<AppointmentDetail> GetAppointmentDetailsByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-             .Include(a => a.Appointment)
-                 .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
-             .Include(a => a.Appointment)
-                 .ThenInclude(a => a.Pet)
-             .Include(a => a.Vet)
-             .Include(a => a.VaccineBatch)
-                .ThenInclude(vb => vb.Vaccine)
-             .Include(a => a.Disease)
-             .Include(a => a.MicrochipItem)
-                 .ThenInclude(m => m.Microchip)
-             .Include(a => a.VaccineBatch)
-                .Include(ad => ad.Payment)
-
+             .Include(ad => ad.MicrochipItem)
+                .ThenInclude(mi => mi.Microchip)
+             .Include(ad => ad.Vet)
+                .ThenInclude(v => v.Account)
+             .Include(ad => ad.Vet)
+                .ThenInclude(v => v.VetSchedules)
+             .Include(ad => ad.Appointment)
+                 .ThenInclude(a => a.Customer)
+                 .ThenInclude(c => c.Account)
+             .Include(ad => ad.Appointment)
+                   .ThenInclude(a => a.Pet)
+             .Include(ad => ad.HealthCondition)
+             .Include(ad => ad.Disease)
+             .Include(ad => ad.Payment)
              .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
 
         }

@@ -20,5 +20,7 @@ namespace PetVax.Services.IService
         Task<BaseResponse<CreateUpdateMembershipResponseDTO>> CreateMembershipAsync(CreateMembershipDTO createMembershipDTO, CancellationToken cancellationToken);
         Task<BaseResponse<CreateUpdateMembershipResponseDTO>> UpdateMembershipAsync(int membershipId, UpdateMembershipDTO updateMembershipDTO, CancellationToken cancellationToken);
         Task<BaseResponse<bool>> DeleteMembershipAsync(int membershipId, CancellationToken cancellationToken);
+        Task<BaseResponse<MembershipRankingResponseDTO>> GetCustomerRankingInfoAsync(int customerId, CancellationToken cancellationToken);
+        Task<BaseResponse<MembershipRankingFullResponseDTO>> GetMembershipStatusAsync(int customerId, CancellationToken cancellationToken);
     }
 }
