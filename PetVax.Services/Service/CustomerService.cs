@@ -365,10 +365,9 @@ namespace PetVax.Services.Service
                         double longitude = center[0].GetDouble();
                         double latitude = center[1].GetDouble();
 
-                        // Khu vực Thành phố Hồ Chí Minh (ước lượng)
-                        // Lat: 10.35 - 11.20, Lng: 106.35 - 107.05
-                        double minLat = 10.35, maxLat = 11.20;
-                        double minLng = 106.35, maxLng = 107.05;
+                        // Khu vực Thành phố Hồ Chí Minh (theo wikipedia https://vi.wikipedia.org/wiki/Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh#V%E1%BB%8B_tr%C3%AD_%C4%91%E1%BB%8Ba_l%C3%BD)
+                        double minLat = 10.10, maxLat = 10.38;
+                        double minLng = 106.22, maxLng = 106.54;
 
                         bool isInHCM = latitude >= minLat && latitude <= maxLat && longitude >= minLng && longitude <= maxLng;
                         if (!isInHCM)
