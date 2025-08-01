@@ -17,7 +17,7 @@ namespace PetVax.Services.IService
         Task<BaseResponse<VaccineDiseaseResponseDTO>> CreateVaccineDiseaseAsync(CreateVaccineDiseaseDTO createVaccineDiseaseDTO, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineDiseaseResponseDTO>> UpdateVaccineDiseaseAsync(int vaccineDiseaseId, UpdateVaccineDiseaseDTO updateVaccineDiseaseDTO, CancellationToken cancellationToken);
         Task<BaseResponse<bool>> DeleteVaccineDiseaseAsync(int vaccineDiseaseId, CancellationToken cancellationToken);
-        Task<BaseResponse<VaccineDiseaseResponseDTO>> GetVaccineDiseaseByVaccineIdAsync(int vaccineId, CancellationToken cancellationToken);
-        Task<BaseResponse<VaccineDiseaseResponseDTO>> GetVaccineDiseaseByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken);
+        Task<BaseResponse<List<VaccineDiseaseResponseDTO>>> GetVaccineDiseaseByVaccineIdAsync(int vaccineId, CancellationToken cancellationToken);
+        Task<BaseResponse<List<VaccineDiseaseResponseDTO>>> GetVaccineDiseaseByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken);
     }
 }

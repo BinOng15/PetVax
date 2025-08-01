@@ -188,11 +188,11 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<VaccineDiseaseResponseDTO>> GetVaccineDiseaseByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<VaccineDiseaseResponseDTO>>> GetVaccineDiseaseByDiseaseIdAsync(int diseaseId, CancellationToken cancellationToken)
         {
             if (diseaseId <= 0)
             {
-                return new BaseResponse<VaccineDiseaseResponseDTO>
+                return new BaseResponse<List<VaccineDiseaseResponseDTO>>
                 {
                     Code = 400,
                     Success = false,
@@ -204,15 +204,15 @@ namespace PetVax.Services.Service
                 var vaccineDisease = await _vaccineDiseaseRepository.GetVaccineDiseaseByDiseaseIdAsync(diseaseId, cancellationToken);
                 if (vaccineDisease == null)
                 {
-                    return new BaseResponse<VaccineDiseaseResponseDTO>
+                    return new BaseResponse<List<VaccineDiseaseResponseDTO>>
                     {
                         Code = 200,
                         Success = false,
                         Message = "Vaccine disease không tồn tại cho bệnh này"
                     };
                 }
-                var responseDTO = _mapper.Map<VaccineDiseaseResponseDTO>(vaccineDisease);
-                return new BaseResponse<VaccineDiseaseResponseDTO>
+                var responseDTO = _mapper.Map<List<VaccineDiseaseResponseDTO>>(vaccineDisease);
+                return new BaseResponse<List<VaccineDiseaseResponseDTO>>
                 {
                     Code = 200,
                     Success = true,
@@ -223,7 +223,7 @@ namespace PetVax.Services.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving vaccine disease by disease ID");
-                return new BaseResponse<VaccineDiseaseResponseDTO>
+                return new BaseResponse<List<VaccineDiseaseResponseDTO>>
                 {
                     Code = 500,
                     Success = false,
@@ -276,11 +276,11 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<VaccineDiseaseResponseDTO>> GetVaccineDiseaseByVaccineIdAsync(int vaccineId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<VaccineDiseaseResponseDTO>>> GetVaccineDiseaseByVaccineIdAsync(int vaccineId, CancellationToken cancellationToken)
         {
             if (vaccineId <= 0)
             {
-                return new BaseResponse<VaccineDiseaseResponseDTO>
+                return new BaseResponse<List<VaccineDiseaseResponseDTO>>
                 {
                     Code = 400,
                     Success = false,
@@ -292,15 +292,15 @@ namespace PetVax.Services.Service
                 var vaccineDisease = await _vaccineDiseaseRepository.GetVaccineDiseaseByVaccineIdAsync(vaccineId, cancellationToken);
                 if (vaccineDisease == null)
                 {
-                    return new BaseResponse<VaccineDiseaseResponseDTO>
+                    return new BaseResponse<List<VaccineDiseaseResponseDTO>>
                     {
                         Code = 200,
                         Success = false,
                         Message = "Vaccine disease không tồn tại cho vaccine này"
                     };
                 }
-                var responseDTO = _mapper.Map<VaccineDiseaseResponseDTO>(vaccineDisease);
-                return new BaseResponse<VaccineDiseaseResponseDTO>
+                var responseDTO = _mapper.Map<List<VaccineDiseaseResponseDTO>>(vaccineDisease);
+                return new BaseResponse<List<VaccineDiseaseResponseDTO>>
                 {
                     Code = 200,
                     Success = true,
@@ -311,7 +311,7 @@ namespace PetVax.Services.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving vaccine disease by vaccine ID");
-                return new BaseResponse<VaccineDiseaseResponseDTO>
+                return new BaseResponse<List<VaccineDiseaseResponseDTO>>
                 {
                     Code = 500,
                     Success = false,
