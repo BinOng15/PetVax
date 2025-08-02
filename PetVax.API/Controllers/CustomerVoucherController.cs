@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO;
+using PetVax.BusinessObjects.Enum;
 using PetVax.Services.IService;
 using PetVax.Services.Service;
 
@@ -18,7 +19,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-all-customer-vouchers")]
-        public async Task<IActionResult> GetAllCustomerVouchersAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = true, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllCustomerVouchersAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = true, EnumList.VoucherStatus? voucherStatus = default, CancellationToken cancellationToken = default)
         {
             var getAllItemsDTO = new GetAllItemsDTO
             {
@@ -27,7 +28,7 @@ namespace PediVax.Controllers
                 KeyWord = keyWord,
                 Status = status
             };
-            var response = await _customerVoucherService.GetAllCustomerVouchersAsync(getAllItemsDTO, cancellationToken);
+            var response = await _customerVoucherService.GetAllCustomerVouchersAsync(getAllItemsDTO, voucherStatus, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpGet("get-customer-voucher-by-id/{customerVoucherId}")]
