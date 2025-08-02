@@ -81,12 +81,12 @@ namespace PetVax.Repositories.Repository
         public async Task<List<ServiceHistory>> GetAllServiceHistoriesAsync(CancellationToken cancellationToken)
         {
             return await _context.ServiceHistories
-                .Include(sh => sh.Customer)
-                
+                .Include(sh => sh.Customer)               
                 .ThenInclude(sh => sh.Account)
                 .Include(sh => sh.Pet)
                 .Include(sh => sh.Customer)
                 .ThenInclude(sh => sh.Pets)
+                .Include(sh => sh.Appointment)
                 .Where(sh => sh.isDeleted != true)
                 .ToListAsync(cancellationToken);
         }
@@ -99,6 +99,7 @@ namespace PetVax.Repositories.Repository
                 .Include(sh => sh.Pet)
                 .Include(sh => sh.Customer)
                 .ThenInclude(sh => sh.Pets)
+                .Include(sh => sh.Appointment)
                 .Where(sh => sh.CustomerId == customerId && sh.isDeleted != true)
                 .ToListAsync(cancellationToken);
         }
@@ -111,6 +112,7 @@ namespace PetVax.Repositories.Repository
                 .Include(sh => sh.Pet)
                 .Include(sh => sh.Customer)
                 .ThenInclude(sh => sh.Pets)
+                .Include(sh => sh.Appointment)   
                 .FirstOrDefaultAsync(sh => sh.ServiceHistoryId == serviceHistoryId && sh.isDeleted != true, cancellationToken);
         }
 
