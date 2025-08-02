@@ -129,6 +129,7 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreateAppointmentVaccinationCertificateDTO, AppointmentWithVaccinationCertificateResponseDTO>();
             CreateMap<UpdateAppointmentVaccinationCertificateDTO, AppointmentVaccinationCertificateResponseDTO>();
             CreateMap<Appointment, AppointmentWithVaccinationCertificateResponseDTO>();
+            CreateMap<Appointment, AppointmentDTO>();
 
             //AppointmentDetail
             CreateMap<CreateAppointmentDetailDTO, AppointmentDetail>();
@@ -291,7 +292,8 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<ServiceHistory, ServiceHistoryResponseDTO>()
                 .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
                 .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => Convert.ToInt32(src.ServiceType)))
-                .ForMember(dest => dest.Pet, opt => opt.MapFrom(src => src.Pet));
+                .ForMember(dest => dest.Pet, opt => opt.MapFrom(src => src.Pet))
+                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment));
 
         }
     }   
