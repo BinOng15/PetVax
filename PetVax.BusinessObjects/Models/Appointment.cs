@@ -33,5 +33,7 @@ namespace PetVax.BusinessObjects.Models
         public virtual Customer Customer { get; set; } // Navigation to Customer table
         public virtual Pet Pet { get; set; } // Navigation to Pet table
 
+        public virtual ServiceHistory ServiceHistory { get; set; } // Navigation to ServiceHistory table
+
     }
 }

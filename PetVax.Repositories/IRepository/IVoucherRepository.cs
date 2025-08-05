@@ -17,5 +17,6 @@ namespace PetVax.Repositories.IRepository
         Task<int> UpdateVoucherAsync(Voucher voucher, CancellationToken cancellationToken);
         Task<bool> DeleteVoucherAsync(int id, CancellationToken cancellationToken);
         Task<Voucher> GetVoucherByPointsRequiredAsync(int pointsRequired, CancellationToken cancellationToken);
+        Task<int> GetTotalVouchersAsync(CancellationToken cancellationToken);
     }
 }

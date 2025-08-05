@@ -6,6 +6,8 @@ using PetVax.BusinessObjects.DTO.ColdChainLogDTO;
 using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.CustomerVoucherDTO;
 using PetVax.BusinessObjects.DTO.DiseaseDTO;
+using PetVax.BusinessObjects.DTO.FAQItemDTO;
+using PetVax.BusinessObjects.DTO.HandbookDTO;
 using PetVax.BusinessObjects.DTO.HealthConditionDTO;
 using PetVax.BusinessObjects.DTO.MembershipDTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
@@ -14,6 +16,7 @@ using PetVax.BusinessObjects.DTO.PaymentDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.PointTransactionDTO;
 using PetVax.BusinessObjects.DTO.ServiceHistoryDTO;
+using PetVax.BusinessObjects.DTO.SupportCategoryDTO;
 using PetVax.BusinessObjects.DTO.VaccinationCertificate;
 using PetVax.BusinessObjects.DTO.VaccinationSchedule;
 using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
@@ -129,6 +132,7 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreateAppointmentVaccinationCertificateDTO, AppointmentWithVaccinationCertificateResponseDTO>();
             CreateMap<UpdateAppointmentVaccinationCertificateDTO, AppointmentVaccinationCertificateResponseDTO>();
             CreateMap<Appointment, AppointmentWithVaccinationCertificateResponseDTO>();
+            CreateMap<Appointment, AppointmentDTO>();
 
             //AppointmentDetail
             CreateMap<CreateAppointmentDetailDTO, AppointmentDetail>();
@@ -290,7 +294,25 @@ namespace PetVax.Services.Configurations.Mapper
             //ServiceHistory
             CreateMap<ServiceHistory, ServiceHistoryResponseDTO>()
                 .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
-                .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => Convert.ToInt32(src.ServiceType)));
+                .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => Convert.ToInt32(src.ServiceType)))
+                .ForMember(dest => dest.Pet, opt => opt.MapFrom(src => src.Pet))
+                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment));
+
+            //Handbook
+            CreateMap<CreateHandbookDTO, Handbook>();
+            CreateMap<UpdateHandbookDTO, Handbook>();
+            CreateMap<Handbook, HandbookResponseDTO>()
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl == null ? null : src.ImageUrl));
+
+            //SupportCategory
+            CreateMap<CreateSupportCategoryDTO, SupportCategory>();
+            CreateMap<UpdateSupportCategoryDTO, SupportCategory>();
+            CreateMap<SupportCategory, SupportCategoryResponseDTO>();
+
+            //FAQItem
+            CreateMap<CreateFAQDTO, FAQItem>();
+            CreateMap<UpdateFAQDTO, FAQItem>();
+            CreateMap<FAQItem, FAQResponseDTO>();
 
         }
     }   

@@ -52,6 +52,11 @@ namespace PetVax.Repositories.Repository
                 .FirstOrDefaultAsync(c => c.CustomerId == customerId, cancellationToken);
         }
 
+        public async Task<int> GetTotalCustomersAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Customers.Where(m => m.isDeleted == false).CountAsync(cancellationToken);
+        }
+
         public async Task<int> UpdateCustomerAsync(Customer customer, CancellationToken cancellationToken)
         {
             return await UpdateAsync(customer, cancellationToken);

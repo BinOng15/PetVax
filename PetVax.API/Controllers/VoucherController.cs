@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.VoucherDTO;
@@ -19,6 +20,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-all-vouchers")]
+        [Authorize(Roles = "Admin, Staff, Vet, Customer")]
         public async Task<IActionResult> GetAllVouchersAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = true, CancellationToken cancellationToken = default)
         {
             var getAllItemsDTO = new GetAllItemsDTO
@@ -32,36 +34,42 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpGet("get-voucher-by-id/{voucherId}")]
+        [Authorize(Roles = "Admin, Staff, Vet, Customer")]
         public async Task<IActionResult> GetVoucherByIdAsync(int voucherId, CancellationToken cancellationToken = default)
         {
             var response = await _voucherService.GetVoucherByIdAsync(voucherId, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpGet("get-voucher-by-code/{voucherCode}")]
+        [Authorize(Roles = "Admin, Staff, Vet, Customer")]
         public async Task<IActionResult> GetVoucherByCodeAsync(string voucherCode, CancellationToken cancellationToken = default)
         {
             var response = await _voucherService.GetVoucherByCodeAsync(voucherCode, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpGet("get-voucher-by-transaction-id/{transactionId}")]
+        [Authorize(Roles = "Admin, Staff, Vet, Customer")]
         public async Task<IActionResult> GetVoucherByTransactionIdAsync(int transactionId, CancellationToken cancellationToken = default)
         {
             var response = await _voucherService.GetVoucherByTransactionIdAsync(transactionId, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpPost("create-voucher")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> CreateVoucherAsync([FromBody] CreateVoucherDTO createVoucherDTO, CancellationToken cancellationToken = default)
         {
             var response = await _voucherService.CreateVoucherAsync(createVoucherDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpPut("update-voucher/{voucherId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> UpdateVoucherAsync(int voucherId, [FromBody] UpdateVoucherDTO updateVoucherDTO, CancellationToken cancellationToken = default)
         {
             var response = await _voucherService.UpdateVoucherAsync(voucherId, updateVoucherDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpDelete("delete-voucher/{voucherId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteVoucherAsync(int voucherId, CancellationToken cancellationToken = default)
         {
             var response = await _voucherService.DeleteVoucherAsync(voucherId, cancellationToken);

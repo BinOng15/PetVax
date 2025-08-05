@@ -34,6 +34,13 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<int> GetTotalVaccineBatchesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.VaccineBatches
+                .Where(vb => vb.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
+
         public async Task<VaccineBatch> GetVaccineBatchByIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
         {
             return await _context.VaccineBatches

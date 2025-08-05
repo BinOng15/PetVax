@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.CustomerVoucherDTO;
+using PetVax.BusinessObjects.Enum;
 using PetVax.Repositories.IRepository;
 using PetVax.Services.IService;
 using System;
@@ -30,15 +31,27 @@ namespace PetVax.Services.Service
             _mapper = mapper;
         }
 
-        public async Task<DynamicResponse<CustomerVoucherResponseDTO>> GetAllCustomerVouchersAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
+        public async Task<DynamicResponse<CustomerVoucherResponseDTO>> GetAllCustomerVouchersAsync(GetAllItemsDTO getAllItemsDTO, EnumList.VoucherStatus? voucherStatus, CancellationToken cancellationToken)
         {
             try
             {
                 var customerVouchers = await _customerVoucherRepository.GetAllCustomerVouchersAsync(cancellationToken);
+
+                // Filter by keyword
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
-                    customerVouchers = customerVouchers.Where(cv => cv.Customer.FullName.Contains(getAllItemsDTO.KeyWord, StringComparison.OrdinalIgnoreCase) ||
-                                                                    cv.Voucher.VoucherCode.Contains(getAllItemsDTO.KeyWord, StringComparison.OrdinalIgnoreCase)).ToList();
+                    customerVouchers = customerVouchers.Where(cv =>
+                        (cv.Customer.FullName != null && cv.Customer.FullName.Contains(getAllItemsDTO.KeyWord, StringComparison.OrdinalIgnoreCase)) ||
+                        (cv.Voucher.VoucherCode != null && cv.Voucher.VoucherCode.Contains(getAllItemsDTO.KeyWord, StringComparison.OrdinalIgnoreCase))
+                    ).ToList();
+                }
+
+                // Filter by voucher status: Status == null (all), true (valid), false (expired)
+                if (voucherStatus.HasValue)
+                {
+                    customerVouchers = customerVouchers
+                        .Where(cv => cv.Status == voucherStatus.Value)
+                        .ToList();
                 }
 
                 int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
@@ -222,9 +235,9 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<List<CustomerVoucherResponseDTO>>
                     {
-                        Code = 404,
-                        Success = false,
-                        Message = "Không tìm thấy CustomerVoucher nào cho Khách hàng này",
+                        Code = 200,
+                        Success = true,
+                        Message = "Khách hàng hiện chưa có voucher nào, vui lòng đổi điểm để có voucher!",
                         Data = null
                     };
                 }

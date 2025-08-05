@@ -59,6 +59,12 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.MicrochipItems.FirstOrDefaultAsync(m => m.PetId == petId, cancellationToken);
         }
+
+        public async Task<int> GetTotalMicrochipItemsAsync(CancellationToken cancellationToken)
+        {
+            return await _context.MicrochipItems.Where(m => m.isDeleted == false).CountAsync(cancellationToken);
+        }
+
         public async Task<int> UpdateMicrochipItemAsync(MicrochipItem microchipItem, CancellationToken cancellationToken)
         {
             return await UpdateAsync(microchipItem, cancellationToken);

@@ -667,15 +667,15 @@ namespace PetVax.Services.Service
             await client.SendMailAsync(mail, cancellationToken);
         }
 
-        public async Task<BaseResponse<ForgetPasswordResponseDTO>> ResetPasswordAsync(ForgetPasswordRequestDTO forgetPasswordRequestDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<ResetPasswordResponseDTO>> ResetPasswordAsync(ResetPasswordRequestDTO resetPasswordRequestDTO, CancellationToken cancellationToken)
         {
             try
             {
                 // Check if account exists
-                var account = await _accountRepository.GetAccountByEmailAsync(forgetPasswordRequestDTO.Email, cancellationToken);
+                var account = await _accountRepository.GetAccountByEmailAsync(resetPasswordRequestDTO.Email, cancellationToken);
                 if (account == null)
                 {
-                    return new BaseResponse<ForgetPasswordResponseDTO>
+                    return new BaseResponse<ResetPasswordResponseDTO>
                     {
                         Code = 404,
                         Success = false,
@@ -685,9 +685,9 @@ namespace PetVax.Services.Service
                 }
 
                 // Verify old password
-                if (!VerifyPassword(forgetPasswordRequestDTO.OldPassword, account.PasswordHash, account.PasswordSalt))
+                if (!VerifyPassword(resetPasswordRequestDTO.OldPassword, account.PasswordHash, account.PasswordSalt))
                 {
-                    return new BaseResponse<ForgetPasswordResponseDTO>
+                    return new BaseResponse<ResetPasswordResponseDTO>
                     {
                         Code = 401,
                         Success = false,
@@ -698,21 +698,67 @@ namespace PetVax.Services.Service
 
                 // Generate new password hash and salt
                 string newPasswordSalt = PasswordHelper.GenerateSalt();
-                string newPasswordHash = PasswordHelper.HashPassword(forgetPasswordRequestDTO.NewPassword, newPasswordSalt);
+                string newPasswordHash = PasswordHelper.HashPassword(resetPasswordRequestDTO.NewPassword, newPasswordSalt);
 
                 // Update account password
                 account.PasswordHash = newPasswordHash;
                 account.PasswordSalt = newPasswordSalt;
                 await _accountRepository.UpdateAccountAsync(account, cancellationToken);
 
-                return new BaseResponse<ForgetPasswordResponseDTO>
+                return new BaseResponse<ResetPasswordResponseDTO>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Đặt lại mật khẩu thành công.",
-                    Data = new ForgetPasswordResponseDTO
+                    Data = new ResetPasswordResponseDTO
                     {
                         Message = "Mật khẩu đã được đặt lại thành công.",
+                        IsSuccess = true
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ResetPasswordResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ForgetPasswordResponseDTO>> SendResetPasswordEmailAsync(string email, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Check if account exists
+                var account = await _accountRepository.GetAccountByEmailAsync(email, cancellationToken);
+                if (account == null)
+                {
+                    return new BaseResponse<ForgetPasswordResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Tài khoản không tồn tại.",
+                        Data = null
+                    };
+                }
+                // Generate OTP and expiration time
+                var otp = GenerateOtp();
+                var expiration = DateTimeHelper.Now().AddMinutes(10);
+                _otpStore[email] = (otp, expiration);
+                // Send OTP email
+                await SendOtpEmailAsync(email, otp, cancellationToken);
+                return new BaseResponse<ForgetPasswordResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Mã OTP đã được gửi đến email của bạn.",
+                    Data = new ForgetPasswordResponseDTO
+                    {
+                        Message = "Vui lòng kiểm tra email để nhận mã OTP.",
                         IsSuccess = true
                     }
                 };
@@ -729,5 +775,108 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse> VerifyResetPasswordOtpAsync(string email, string otp, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
+                {
+                    return new BaseResponse
+                    {
+                        Code = 401,
+                        Success = false,
+                        Message = "Mã OTP không hợp lệ hoặc đã hết hạn."
+                    };
+                }
+                // Remove OTP from store after verification
+                _otpStore.TryRemove(email, out _);
+                return new BaseResponse
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Xác thực OTP thành công. Bạn có thể đặt lại mật khẩu."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<BaseResponse<ResetPasswordResponseDTO>> ResetPasswordAfterForgetAsync(ResetPasswordAfterForgetDTO resetPasswordAfterForgetDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Check if account exists
+                var account = await _accountRepository.GetAccountByEmailAsync(resetPasswordAfterForgetDTO.Email, cancellationToken);
+                if (account == null)
+                {
+                    return new BaseResponse<ResetPasswordResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Tài khoản không tồn tại.",
+                        Data = null
+                    };
+                }
+                // Verify OTP
+                if (!_otpStore.TryGetValue(resetPasswordAfterForgetDTO.Email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != resetPasswordAfterForgetDTO.Otp)
+                {
+                    return new BaseResponse<ResetPasswordResponseDTO>
+                    {
+                        Code = 401,
+                        Success = false,
+                        Message = "Mã OTP không hợp lệ hoặc đã hết hạn.",
+                        Data = null
+                    };
+                }
+                // Check old password
+                if (!VerifyPassword(resetPasswordAfterForgetDTO.OldPassword, account.PasswordHash, account.PasswordSalt))
+                {
+                    return new BaseResponse<ResetPasswordResponseDTO>
+                    {
+                        Code = 401,
+                        Success = false,
+                        Message = "Mật khẩu cũ không đúng.",
+                        Data = null
+                    };
+                }
+                // Generate new password hash and salt
+                string newPasswordSalt = PasswordHelper.GenerateSalt();
+                string newPasswordHash = PasswordHelper.HashPassword(resetPasswordAfterForgetDTO.NewPassword, newPasswordSalt);
+                // Update account password
+                account.PasswordHash = newPasswordHash;
+                account.PasswordSalt = newPasswordSalt;
+                await _accountRepository.UpdateAccountAsync(account, cancellationToken);
+                // Remove OTP from store after successful reset
+                _otpStore.TryRemove(resetPasswordAfterForgetDTO.Email, out _);
+                return new BaseResponse<ResetPasswordResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Đặt lại mật khẩu thành công.",
+                    Data = new ResetPasswordResponseDTO
+                    {
+                        Message = "Mật khẩu đã được đặt lại thành công.",
+                        IsSuccess = true
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ResetPasswordResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                };
+            }
+        }
     }
 }

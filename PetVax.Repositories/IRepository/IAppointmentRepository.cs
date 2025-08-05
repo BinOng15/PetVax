@@ -31,5 +31,29 @@ namespace PetVax.Repositories.IRepository
         Task<List<Appointment>> GetFutureAppointmentsByCustomerIdAsync(DateTime now, int customerId, CancellationToken cancellationToken);
         Task UpdateExpiredAppointmentsAsync(CancellationToken cancellationToken);
         Task SendMailWhenAppointmentCancelledAsync(CancellationToken cancellationToken);
+        Task<int> GetTotalAppointmentVaccinations(CancellationToken cancellationToken);
+        Task<int> GetTotalProcessingAppointmentVaccinations(CancellationToken cancellationToken);
+        Task<int> GetTotalConfirmedAppointmentVaccinations(CancellationToken cancellationToken);
+        Task<int> GetTotalCheckedInAppointmentVaccinations(CancellationToken cancellationToken);
+        Task<int> GetTotalPaidAppointmentVaccinations(CancellationToken cancellationToken);
+        Task<int> GetTotalCompletedAppointmentVaccinations(CancellationToken cancellationToken);
+        Task<int> GetTotalCancelledAppointmentVaccinations(CancellationToken cancellationToken);
+        Task<int> GetTotalRejectedAppointmentVaccinations(CancellationToken cancellationToken);
+        Task<int> GetTotalAppointmentMicrochips(CancellationToken cancellationToken);
+        Task<int> GetTotalProcessingAppointmentMicrochips(CancellationToken cancellationToken);
+        Task<int> GetTotalConfirmedAppointmentMicrochips(CancellationToken cancellationToken);
+        Task<int> GetTotalCheckedInAppointmentMicrochips(CancellationToken cancellationToken);
+        Task<int> GetTotalPaidAppointmentMicrochips(CancellationToken cancellationToken);
+        Task<int> GetTotalCompletedAppointmentMicrochips(CancellationToken cancellationToken);
+        Task<int> GetTotalCancelledAppointmentMicrochips(CancellationToken cancellationToken);
+        Task<int> GetTotalRejectedAppointmentMicrochips(CancellationToken cancellationToken);
+        Task<int> GetTotalAppointmentHealthConditions(CancellationToken cancellationToken);
+        Task<int> GetTotalProcessingAppointmentHealthConditions(CancellationToken cancellationToken);
+        Task<int> GetTotalConfirmedAppointmentHealthConditions(CancellationToken cancellationToken);
+        Task<int> GetTotalCheckedInAppointmentHealthConditions(CancellationToken cancellationToken);
+        Task<int> GetTotalPaidAppointmentHealthConditions(CancellationToken cancellationToken);
+        Task<int> GetTotalCompletedAppointmentHealthConditions(CancellationToken cancellationToken);
+        Task<int> GetTotalCancelledAppointmentHealthConditions(CancellationToken cancellationToken);
+        Task<int> GetTotalRejectedAppointmentHealthConditions(CancellationToken cancellationToken);
     }
 }

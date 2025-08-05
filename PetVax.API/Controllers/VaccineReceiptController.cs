@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.VaccineReceiptDTO;
@@ -17,6 +18,7 @@ namespace PediVax.Controllers
             _vaccineReceiptService = vaccineReceiptService;
         }
         [HttpGet("get-all-vaccine-receipts")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
         public async Task<IActionResult> GetAllVaccineReceipts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = true, CancellationToken cancellationToken = default)
         {
             var getAllItemsDTO = new GetAllItemsDTO
@@ -30,30 +32,35 @@ namespace PediVax.Controllers
             return StatusCode(response.Code, response);
         }
         [HttpGet("get-vaccine-receipt-by-id/{vaccineReceiptId}")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
         public async Task<IActionResult> GetVaccineReceiptById(int vaccineReceiptId, CancellationToken cancellationToken = default)
         {
             var response = await _vaccineReceiptService.GetVaccineReceiptByIdAsync(vaccineReceiptId, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpGet("get-vaccine-receipt-by-receipt-code/{receiptCode}")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
         public async Task<IActionResult> GetVaccineReceiptByReceiptCode(string receiptCode, CancellationToken cancellationToken = default)
         {
             var response = await _vaccineReceiptService.GetVaccineReceiptByReceiptCodeAsync(receiptCode, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpPost("create-vaccine-receipt")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> CreateVaccineReceipt([FromBody] CreateVaccineReceiptDTO createVaccineReceiptDTO, CancellationToken cancellationToken = default)
         {
             var response = await _vaccineReceiptService.CreateVaccineReceiptAsync(createVaccineReceiptDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpPut("update-vaccine-receipt/{receiptId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> UpdateVaccineReceipt(int receiptId, [FromBody] UpdateVaccineReceiptDTO updateVaccineReceiptDTO, CancellationToken cancellationToken = default)
         {
             var response = await _vaccineReceiptService.UpdateVaccineReceiptAsync(receiptId, updateVaccineReceiptDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpDelete("delete-vaccine-receipt/{vaccineReceiptId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteVaccineReceipt(int vaccineReceiptId, CancellationToken cancellationToken = default)
         {
             var response = await _vaccineReceiptService.DeleteVaccineReceiptAsync(vaccineReceiptId, cancellationToken);

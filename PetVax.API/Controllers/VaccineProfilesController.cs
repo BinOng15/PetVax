@@ -54,6 +54,7 @@ namespace PediVax.Controllers
         //    return Ok(response);
         //}
         [HttpGet("GetVaccineProfileByPetId/{petId}")]
+        [Authorize(Roles = "Admin, Staff, Vet, Customer")]
         public async Task<IActionResult> GetListVaccineProfileByPetId(int petId, CancellationToken cancellationToken)
         {
             if (petId <= 0)
@@ -65,6 +66,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("GetVaccineProfileById/{id}")]
+        [Authorize(Roles = "Admin, Staff, Vet, Customer")]
         public async Task<IActionResult> GetVaccineProfileById(int id, CancellationToken cancellationToken)
         {
             if (id <= 0)
@@ -75,6 +77,7 @@ namespace PediVax.Controllers
             return Ok(response);
         }
         [HttpPut("UpdateVaccineProfile/{id}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> UpdateVaccineProfile(int id, [FromBody] VaccineProfileRequestDTO vaccineProfileRequest, CancellationToken cancellationToken)
         {
             if (id <= 0 || vaccineProfileRequest == null)
@@ -87,6 +90,7 @@ namespace PediVax.Controllers
 
         }
         [HttpDelete("DeleteVaccineProfile/{vaccineProfileId}")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteVaccineProfile(int vaccineProfileId, CancellationToken cancellationToken)
         {
             if (vaccineProfileId <= 0)

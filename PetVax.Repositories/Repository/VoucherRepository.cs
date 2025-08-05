@@ -36,6 +36,13 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<int> GetTotalVouchersAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Vouchers
+                .Where(v => v.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
+
         public async Task<Voucher> GetVoucherByCodeAsync(string voucherCode, CancellationToken cancellationToken)
         {
             return await _context.Vouchers

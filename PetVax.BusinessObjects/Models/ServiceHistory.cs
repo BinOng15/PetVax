@@ -17,8 +17,14 @@ namespace PetVax.BusinessObjects.Models
         public int ServiceHistoryId { get; set; } // Unique identifier for the service history record
 
         public int CustomerId { get; set; } // Foreign key to Customer table
+        public int AppointmentId { get; set; } // Foreign key to Appointment table, if applicable
+        public int PetId { get; set; } // Foreign key to Pet table, if applicable
         public ServiceType ServiceType { get; set; } // Type of service provided, e.g., "Vaccination", "Microchip", "Health Check"
         public DateTime ServiceDate { get; set; } // Date when the service was provided
+
+        public string PaymentMethod { get; set; } // Method of payment used for the service, e.g., "Cash", "Credit Card", "Online Payment"
+
+        public decimal Amount { get; set; } // Amount charged for the service   
         public string Status { get; set; } // Status of the service, e.g., "Completed", "Pending", "Cancelled"
         public DateTime CreatedAt { get; set; } // Date when the record was created
         public string CreatedBy { get; set; } // User who created the record
@@ -29,6 +35,9 @@ namespace PetVax.BusinessObjects.Models
         // Navigation properties
         public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; } // Navigation to AppointmentDetail table
         public virtual Customer Customer { get; set; } // Navigation to Customer table
+        public virtual Pet Pet { get; set; } // Navigation to Pet table, if applicable
+
+        public virtual Appointment Appointment { get; set; } // Navigation to Appointment table
 
     }
 }

@@ -16,5 +16,6 @@ namespace PetVax.Repositories.IRepository
         Task<bool> DeleteVaccineBatchAsync(int vaccineBatchId, CancellationToken cancellationToken);
         Task<VaccineBatch> GetVaccineBatchByVaccineCodeAsync(string vaccineCode, CancellationToken cancellationToken);
         Task<VaccineBatch> GetVaccineBatchByVaccineId(int vaccineId, CancellationToken cancellationToken);
+        Task<int> GetTotalVaccineBatchesAsync(CancellationToken cancellationToken);
     }
 }

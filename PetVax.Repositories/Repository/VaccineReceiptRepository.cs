@@ -34,6 +34,12 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<int> GetTotalVaccineReceiptsAsync(CancellationToken cancellationToken)
+        {
+            return await _context.VaccineReceipts.Where(vr => vr.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
+
         public async Task<VaccineReceipt> GetVaccineReceiptByIdAsync(int vaccineReceiptId, CancellationToken cancellationToken)
         {
             return await _context.VaccineReceipts

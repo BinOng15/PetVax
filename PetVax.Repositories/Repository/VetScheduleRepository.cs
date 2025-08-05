@@ -127,5 +127,12 @@ namespace PetVax.Repositories.Repository
                 .Where(vs => vs.ScheduleDate.Date >= fromDate && vs.ScheduleDate.Date <= toDate && vs.isDeleted != true)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<int> GetTotalVetSchedulesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.VetSchedules
+                .Where(vs => vs.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
     }
 }

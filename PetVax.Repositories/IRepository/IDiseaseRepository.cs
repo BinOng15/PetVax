@@ -18,5 +18,6 @@ namespace PetVax.Repositories.IRepository
         Task<Disease> GetDiseaseByName(string name, CancellationToken cancellationToken);
         Task<List<Disease>> GetDiseaseBySpecies(string species, CancellationToken cancellationToken);
         Task<List<Disease>> GetDiseaseByVaccineId(int vaccineId, CancellationToken cancellationToken);
+        Task<int> GetTotalDiseasesAsync(CancellationToken cancellationToken);
     }
 }

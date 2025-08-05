@@ -41,5 +41,6 @@ namespace PetVax.BusinessObjects.Models
         public virtual ICollection<Appointment> Appointments { get; set; } // Navigation to Appointment table
         public virtual ICollection<HealthCondition> HealthConditions { get; set; } // Navigation to HealthCondition table
         public virtual ICollection<VaccineProfile> VaccineProfiles { get; set; }
+        public virtual ICollection<ServiceHistory> ServiceHistories { get; set; } // Navigation to ServiceHistory table
     }
 }

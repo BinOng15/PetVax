@@ -87,5 +87,12 @@ namespace PetVax.Repositories.Repository
                         && (!ved.isDeleted.HasValue || !ved.isDeleted.Value),
                     cancellationToken);
         }
+
+        public async Task<int> GetTotalVaccineExportDetailsAsync(CancellationToken cancellationToken)
+        {
+            return await _context.VaccineExportDetails
+                .Where(ved => ved.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
     }
 }

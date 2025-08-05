@@ -88,5 +88,12 @@ namespace PetVax.Repositories.Repository
                 .Where(vp => vp.PetId == petId && (vp.isDeleted == false || vp.isDeleted == null))
                 .ToListAsync();
         }
+
+        public async Task<int> GetTotalPetsAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Pets
+                .Where(p => p.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
     }
 }
