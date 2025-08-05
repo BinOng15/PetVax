@@ -56,6 +56,9 @@ namespace PetVax.Infrastructure
             services.AddScoped<IVoucherRepository, VoucherRepository>();
             services.AddScoped<ICustomerVoucherRepository, CustomerVoucherRepository>();
             services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
+            services.AddScoped<IHandbookRepository, HandbookRepository>();
+            services.AddScoped<ISupportCategoryRepository, SupportCategoryRepository>();
+            services.AddScoped<IFAQItemRepository, FAQItemRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -89,6 +92,10 @@ namespace PetVax.Infrastructure
             services.AddScoped<IPointTransactionService, PointTransactionService>();
             services.AddScoped<ICustomerVoucherService, CustomerVoucherService>();
             services.AddScoped<IServiceHistoryService, ServiceHistoryService>();
+            services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<IHandbookService, HandbookService>();
+            services.AddScoped<ISupportCategoryService, SupportCategoryService>();
+            services.AddScoped<IFAQItemService, FAQItemService>();
 
             //Register external services
             services.AddScoped<PayOsService>();

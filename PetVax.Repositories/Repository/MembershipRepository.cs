@@ -62,6 +62,12 @@ namespace PetVax.Repositories.Repository
                 .FirstOrDefaultAsync(m => m.MembershipCode == membershiCode, cancellationToken);
         }
 
+        public async Task<int> GetTotalMembershipsAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Memberships.Where(m => m.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
+
         public async Task<int> UpdateMembershipAsync(Membership membership, CancellationToken cancellationToken)
         {
             return await UpdateAsync(membership, cancellationToken);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.VaccinationSchedule;
@@ -18,6 +19,7 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-all-vaccination-schedules")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
         public async Task<IActionResult> GetAllVaccinationSchedules([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = true, CancellationToken cancellationToken = default)
         {
             var request = new GetAllItemsDTO
@@ -51,18 +53,21 @@ namespace PediVax.Controllers
         }
 
         [HttpPost("create-vaccination-schedule")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateVaccinationSchedule([FromBody] CreateVaccinationScheduleDTO createVaccinationScheduleDTO, CancellationToken cancellationToken)
         {
             var response = await _vaccinationScheduleService.CreateVaccinationScheduleAsync(createVaccinationScheduleDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpPut("update-vaccination-schedule/{vaccinationScheduleId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateVaccinationSchedule(int vaccinationScheduleId, [FromBody] UpdateVaccinationScheduleDTO updateVaccinationScheduleDTO, CancellationToken cancellationToken)
         {
             var response = await _vaccinationScheduleService.UpdateVaccinationScheduleAsync(vaccinationScheduleId, updateVaccinationScheduleDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
         [HttpDelete("delete-vaccination-schedule/{vaccinationScheduleId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteVaccinationSchedule(int vaccinationScheduleId, CancellationToken cancellationToken)
         {
             var response = await _vaccinationScheduleService.DeleteVaccinationScheduleAsync(vaccinationScheduleId, cancellationToken);

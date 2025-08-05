@@ -212,5 +212,149 @@ namespace PetVax.Repositories.Repository
             // For example, you might call an email service method here
             // await _emailService.SendEmailAsync(toEmail, "Appointment Notification", "Your appointment has been updated.", cancellationToken);
         }
+
+        public async Task<int> GetTotalAppointmentVaccinations(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Vaccination && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalProcessingAppointmentVaccinations(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Vaccination && a.AppointmentStatus == EnumList.AppointmentStatus.Processing && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalConfirmedAppointmentVaccinations(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Vaccination && a.AppointmentStatus == EnumList.AppointmentStatus.Confirmed && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalCheckedInAppointmentVaccinations(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Vaccination && a.AppointmentStatus == EnumList.AppointmentStatus.CheckedIn && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalPaidAppointmentVaccinations(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Vaccination && a.AppointmentStatus == EnumList.AppointmentStatus.Paid && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalCompletedAppointmentVaccinations(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Vaccination && a.AppointmentStatus == EnumList.AppointmentStatus.Completed && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalCancelledAppointmentVaccinations(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Vaccination && a.AppointmentStatus == EnumList.AppointmentStatus.Cancelled && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalRejectedAppointmentVaccinations(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Vaccination && a.AppointmentStatus == EnumList.AppointmentStatus.Rejected && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalAppointmentMicrochips(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Microchip && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalProcessingAppointmentMicrochips(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Microchip && a.AppointmentStatus == EnumList.AppointmentStatus.Processing && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalConfirmedAppointmentMicrochips(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Microchip && a.AppointmentStatus == EnumList.AppointmentStatus.Confirmed && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalCheckedInAppointmentMicrochips(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Microchip && a.AppointmentStatus == EnumList.AppointmentStatus.CheckedIn && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalPaidAppointmentMicrochips(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Microchip && a.AppointmentStatus == EnumList.AppointmentStatus.Paid && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalCompletedAppointmentMicrochips(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Microchip && a.AppointmentStatus == EnumList.AppointmentStatus.Completed && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalCancelledAppointmentMicrochips(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Microchip && a.AppointmentStatus == EnumList.AppointmentStatus.Cancelled && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalRejectedAppointmentMicrochips(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.Microchip && a.AppointmentStatus == EnumList.AppointmentStatus.Rejected && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalAppointmentHealthConditions(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalProcessingAppointmentHealthConditions(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.AppointmentStatus == EnumList.AppointmentStatus.Processing && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalConfirmedAppointmentHealthConditions(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.AppointmentStatus == EnumList.AppointmentStatus.Confirmed && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalCheckedInAppointmentHealthConditions(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.AppointmentStatus == EnumList.AppointmentStatus.CheckedIn && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalPaidAppointmentHealthConditions(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.AppointmentStatus == EnumList.AppointmentStatus.Paid && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalCompletedAppointmentHealthConditions(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.AppointmentStatus == EnumList.AppointmentStatus.Completed && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalCancelledAppointmentHealthConditions(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.AppointmentStatus == EnumList.AppointmentStatus.Cancelled && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalRejectedAppointmentHealthConditions(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.AppointmentStatus == EnumList.AppointmentStatus.Rejected && a.isDeleted == false, cancellationToken);
+        }
     }
 }

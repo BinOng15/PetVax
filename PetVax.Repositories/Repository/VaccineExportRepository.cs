@@ -31,6 +31,12 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<int> GetTotalVaccineExportsAsync(CancellationToken cancellationToken)
+        {
+            return await _context.VaccineExports.Where(ve => ve.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
+
         public async Task<VaccineExport> GetVaccineExportByExportCodeAsync(string exportCode, CancellationToken cancellationToken)
         {
             return await _context.VaccineExports

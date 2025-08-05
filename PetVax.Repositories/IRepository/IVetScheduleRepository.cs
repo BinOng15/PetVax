@@ -16,12 +16,10 @@ namespace PetVax.Repositories.IRepository
         Task<bool> DeleteVetScheduleAsync(int vetScheduleId, CancellationToken cancellationToken);
         Task<List<VetSchedule>> GetVetSchedulesByVetIdAsync(int vetId, CancellationToken cancellationToken);
         Task UpdateExpiredVetScheduleAsync(CancellationToken cancellationToken);
-
         Task<List<VetSchedule>> GetVetSchedulesByDateAndSlotAsync(DateTime? date, int? slot, CancellationToken cancellationToken);
-
         Task<List<VetSchedule>> GetVetSchedulesByDateAsync(DateTime? date, CancellationToken cancellationToken);
         Task<List<VetSchedule>> GetVetSchedulesBySlotAsync(int? slot, CancellationToken cancellationToken);
-
         Task<List<VetSchedule>> GetVetSchedulesFromDateToDateAsync(DateTime? fromDate, DateTime? toDate, CancellationToken cancellationToken);
+        Task<int> GetTotalVetSchedulesAsync(CancellationToken cancellationToken);
     }
 }

@@ -18,5 +18,6 @@ namespace PetVax.Repositories.IRepository
         Task<Membership> GetMembershipsByMembershiCodeAsync(string membershiCode, CancellationToken cancellationToken);
         Task<Membership> GetMembershipByCustomerIdAsync(int customerId, CancellationToken cancellationToken);
         Task<Membership> GetMembershipByRankAsync(string rank, CancellationToken cancellationToken);
+        Task<int> GetTotalMembershipsAsync(CancellationToken cancellationToken);
     }
 }

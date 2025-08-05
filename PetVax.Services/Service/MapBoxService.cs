@@ -56,7 +56,7 @@ namespace PetVax.Services.Service
 
         public async Task<(double lat, double lng)?> GetFptHcmCoordinatesAsync()
         {
-            const string defaultAddress = "Trường Đại Học FPT Thành Phố Hồ Chí Minh";
+            const string defaultAddress = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam"; //FPTU
             return await GetCoordinatesAsync(defaultAddress);
         }
     }

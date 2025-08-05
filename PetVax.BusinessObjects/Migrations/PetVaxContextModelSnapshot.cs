@@ -70,11 +70,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 7, 31, 2, 28, 53, 490, DateTimeKind.Utc).AddTicks(9256),
+                            CreatedAt = new DateTime(2025, 8, 5, 18, 11, 52, 378, DateTimeKind.Utc).AddTicks(4470),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "wp0dFE5zyxSXF5/Qso0yb1sKDQQY73dZEagqYHKsUyE=",
-                            PasswordSalt = "s+9iOOgFe+urV8S9Yc/NG++778Ngr9VUiN/aZrBIDzs=",
+                            PasswordHash = "/jVB/Uod6JAEqlallfXLo+1bhTIJYZeoy7VD/ohyHGE=",
+                            PasswordSalt = "vfcAu6oZoJhzrEpbZrCPlk9D4IId3Wdq7AOJ1srm9Ys=",
                             RefereshToken = "",
                             Role = 1,
                             isDeleted = false,
@@ -84,11 +84,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 7, 31, 2, 28, 53, 490, DateTimeKind.Utc).AddTicks(9262),
+                            CreatedAt = new DateTime(2025, 8, 5, 18, 11, 52, 378, DateTimeKind.Utc).AddTicks(4479),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "9bIJEQIRW6eDVvZLX14jTH2pB6u9UyHj/o8JcTcw7tc=",
-                            PasswordSalt = "++zYm25Dg7p1NltxNSSgzSewTjwd+sxN5fSwXVZg/aE=",
+                            PasswordHash = "nXRB/EgbEq2i2tse76eOwmCRaQzubu1SRvL+mhUp1JQ=",
+                            PasswordSalt = "qarbrrtrWreYFt4ig8Wm8TgXq9XdBaKz2l8kbfdcuVY=",
                             RefereshToken = "",
                             Role = 2,
                             isDeleted = false,
@@ -493,6 +493,86 @@ namespace PetVax.BusinessObjects.Migrations
                     b.HasKey("DiseaseId");
 
                     b.ToTable("Disease");
+                });
+
+            modelBuilder.Entity("PetVax.BusinessObjects.Models.FAQItem", b =>
+                {
+                    b.Property<int>("FAQItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FAQItemId"));
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("FAQItemId");
+
+                    b.ToTable("FAQItem");
+                });
+
+            modelBuilder.Entity("PetVax.BusinessObjects.Models.Handbook", b =>
+                {
+                    b.Property<int>("HandbookId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HandbookId"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Highlight")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImportantNote")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Introduction")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("HandbookId");
+
+                    b.ToTable("Handbook");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.HealthCondition", b =>
@@ -1043,8 +1123,9 @@ namespace PetVax.BusinessObjects.Migrations
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PetId")
                         .HasColumnType("int");
@@ -1072,6 +1153,40 @@ namespace PetVax.BusinessObjects.Migrations
                     b.HasIndex("PetId");
 
                     b.ToTable("ServiceHistory");
+                });
+
+            modelBuilder.Entity("PetVax.BusinessObjects.Models.SupportCategory", b =>
+                {
+                    b.Property<int>("SupportCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SupportCategoryId"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("SupportCategoryId");
+
+                    b.ToTable("SupportCategory");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.VaccinationCertificate", b =>

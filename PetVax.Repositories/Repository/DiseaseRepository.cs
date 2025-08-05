@@ -57,6 +57,11 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<int> GetTotalDiseasesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Diseases.Where(m => m.isDeleted == false).CountAsync(cancellationToken);
+        }
+
         public async Task<int> UpdateDiseaseAsync(Disease disease, CancellationToken cancellationToken)
         {
             return await UpdateAsync(disease, cancellationToken);

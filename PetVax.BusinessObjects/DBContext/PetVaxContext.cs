@@ -91,6 +91,9 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<VetSchedule> VetSchedules { get; set; }
         public DbSet<Voucher> Vouchers { get; set; }
         public DbSet<CustomerVoucher> CustomerVouchers { get; set; }
+        public DbSet<Handbook> Handbooks { get; set; }
+        public DbSet<SupportCategory> SupportCategories { get; set; }
+        public DbSet<FAQItem> FAQItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -492,6 +495,9 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Voucher>()
                 .Property(v => v.DiscountAmount)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<ServiceHistory>()
+                .Property(sh => sh.Amount)
                 .HasColumnType("decimal(18,2)");
 
             SeedData.Seed(modelBuilder);

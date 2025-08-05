@@ -88,6 +88,13 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<int> GetTotalPaymentsAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Payments
+                .Where(p => p.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
+
         public async Task<int> UpdatePaymentAsync(Payment payment, CancellationToken cancellationToken)
         {
             return await UpdateAsync(payment, cancellationToken);

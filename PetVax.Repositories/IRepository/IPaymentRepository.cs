@@ -17,5 +17,6 @@ namespace PetVax.Repositories.IRepository
         Task<List<Payment>> GetPaymentsByAccountIdAsync(int customerId, CancellationToken cancellationToken);
         Task<List<Payment>> GetPaymentsByAppointmentIdAsync(int appointmenDetailtId, CancellationToken cancellationToken);
         Task<Payment> GetPaymentByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken);
+        Task<int> GetTotalPaymentsAsync(CancellationToken cancellationToken);
     }
 }

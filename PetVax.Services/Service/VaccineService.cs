@@ -185,8 +185,6 @@ namespace PetVax.Services.Service
                         Size = pageSize,
                         TotalItem = totalItem,
                         TotalPage = totalPage,
-                        Sort = null,
-                        Order = null
                     },
                     SearchInfo = new SearchCondition
                     {

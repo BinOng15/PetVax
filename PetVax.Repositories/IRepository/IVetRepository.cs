@@ -17,6 +17,6 @@ namespace PetVax.Repositories.IRepository
         Task<int> UpdateVetAsync(Vet vet, CancellationToken cancellationToken);
         Task<bool> DeleteVetAsync(int vetId, CancellationToken cancellationToken);
         Task<Vet> GetVetByAccountIdAsync(int accountId, CancellationToken cancellationToken);
-
+        Task<int> GetTotalVetsAsync(CancellationToken cancellationToken);
     }
 }
