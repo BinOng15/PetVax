@@ -13,8 +13,6 @@ namespace PetVax.BusinessObjects.DTO.ServiceHistoryDTO
     public class ServiceHistoryResponseDTO
     {
         public int ServiceHistoryId { get; set; }
-
-        public int AppointmentId { get; set; } 
         public ServiceType ServiceType { get; set; } 
         public DateTime ServiceDate { get; set; } 
 
@@ -30,5 +28,12 @@ namespace PetVax.BusinessObjects.DTO.ServiceHistoryDTO
 
         public CustomerResponseDTO Customer { get; set; } // Navigation to Customer DTO
         public PetResponseDTOs Pet { get; set; } // Navigation to Pet DTO
+        public AppointmentDTO Appointment { get; set; } // Navigation to Appointment DTO
+    }
+
+    public class AppointmentDTO
+    {
+        public int AppointmentId { get; set; }
+        public string AppointmentCode { get; set; }
     }
 }

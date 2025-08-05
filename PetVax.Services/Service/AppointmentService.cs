@@ -3742,7 +3742,7 @@ namespace PetVax.Services.Service
                 HealthCondition healthConditiont = new HealthCondition();
                 if (currentStatus != EnumList.AppointmentStatus.Confirmed && newStatus == EnumList.AppointmentStatus.Confirmed)
                 {
-                    healthConditiont.Price = 1000;
+                    healthConditiont.Price = 10000;
                     healthConditiont.CreatedAt = DateTime.UtcNow;
                     healthConditiont.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
                     var createHealthcondition = await _healthConditionRepository.AddHealthConditionAsync(healthConditiont, cancellationToken);
