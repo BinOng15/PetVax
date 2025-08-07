@@ -835,17 +835,6 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                // Check old password
-                if (!VerifyPassword(resetPasswordAfterForgetDTO.OldPassword, account.PasswordHash, account.PasswordSalt))
-                {
-                    return new BaseResponse<ResetPasswordResponseDTO>
-                    {
-                        Code = 401,
-                        Success = false,
-                        Message = "Mật khẩu cũ không đúng.",
-                        Data = null
-                    };
-                }
                 // Generate new password hash and salt
                 string newPasswordSalt = PasswordHelper.GenerateSalt();
                 string newPasswordHash = PasswordHelper.HashPassword(resetPasswordAfterForgetDTO.NewPassword, newPasswordSalt);

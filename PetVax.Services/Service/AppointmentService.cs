@@ -858,7 +858,19 @@ namespace PetVax.Services.Service
             {
                 createAppointmentVaccinationDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
             }
-            var hour = createAppointmentVaccinationDTO.Appointment.AppointmentDate.Hour;
+            var appointmentDate = createAppointmentVaccinationDTO.Appointment.AppointmentDate;
+            var now = DateTimeHelper.Now();
+            if (appointmentDate.Date == now.Date)
+            {
+                return new BaseResponse<AppointmentWithVaccinationResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Không cho phép đặt lịch trong ngày. Vui lòng chọn ngày khác.",
+                    Data = null
+                };
+            }
+            var hour = appointmentDate.Hour;
             if (!((hour >= 8 && hour <= 11) || (hour >= 13 && hour <= 16)))
             {
                 return new BaseResponse<AppointmentWithVaccinationResponseDTO>
@@ -904,10 +916,10 @@ namespace PetVax.Services.Service
             }
 
             // 1. Kiểm tra lịch tiêm cùng bệnh trong cùng ngày
-            var appointmentDate = createAppointmentVaccinationDTO.Appointment.AppointmentDate.Date;
+            var appointmentDateOnly = appointmentDate.Date;
             var appointmentsForPet = await _appointmentDetailRepository.GetAppointmentVaccinationDetailByPetId(pet.PetId, cancellationToken);
             var sameDaySameDisease = appointmentsForPet
-                .Where(a => a.DiseaseId == diseaseId && a.AppointmentDate.Date == appointmentDate)
+                .Where(a => a.DiseaseId == diseaseId && a.AppointmentDate.Date == appointmentDateOnly)
                 .ToList();
             if (sameDaySameDisease.Any())
             {
@@ -965,34 +977,6 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
-
-            //// Tìm mũi tiêm gần nhất đã hoàn thành cho bệnh này
-            //var lastCompletedProfile = profilesForDisease
-            //    .Where(p => p.IsCompleted == true)
-            //    .OrderByDescending(p => p.VaccinationDate)
-            //    .FirstOrDefault();
-
-            //// Tìm lịch tiêm cho mũi tiếp theo
-            //int nextDoseNumber = completedDoses + 1;
-            //var nextSchedule = schedulesForDisease.FirstOrDefault(s => s.DoseNumber == nextDoseNumber);
-
-            //if (lastCompletedProfile != null && nextSchedule != null)
-            //{
-            //    var minDaysBetween = nextSchedule.MinDaysBetweenDoses;
-            //    var lastVaccinationDate = lastCompletedProfile.VaccinationDate ?? DateTime.MinValue;
-            //    var earliestNextDate = lastVaccinationDate.AddDays(minDaysBetween);
-
-            //    if (appointmentDate < earliestNextDate.Date)
-            //    {
-            //        return new BaseResponse<AppointmentWithVaccinationResponseDTO>
-            //        {
-            //            Code = 400,
-            //            Success = false,
-            //            Message = $"Khoảng cách giữa các mũi chưa đủ ngày. Chỉ được đặt lịch vào ngày {earliestNextDate:dd/MM/yyyy}.",
-            //            Data = null
-            //        };
-            //    }
-            //}
 
             try
             {
@@ -1614,6 +1598,18 @@ namespace PetVax.Services.Service
                     Code = 200,
                     Success = false,
                     Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                    Data = null
+                };
+            }
+            var appointmentDate = createAppointmentMicrochipDTO.Appointment.AppointmentDate;
+            var now = DateTimeHelper.Now();
+            if (appointmentDate.Date == now.Date)
+            {
+                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Không cho phép đặt lịch trong ngày. Vui lòng chọn ngày khác.",
                     Data = null
                 };
             }
@@ -3455,7 +3451,18 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
-
+            var appointmentDate = createAppointmentHealConditionDTO.Appointment.AppointmentDate;
+            var now = DateTimeHelper.Now();
+            if (appointmentDate.Date == now.Date)
+            {
+                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Không cho phép đặt lịch trong ngày. Vui lòng chọn ngày khác.",
+                    Data = null
+                };
+            }
             var hour = createAppointmentHealConditionDTO.Appointment.AppointmentDate.Hour;
             if (!((hour >= 8 && hour <= 11) || (hour >= 13 && hour <= 16)))
             {

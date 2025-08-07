@@ -37,7 +37,17 @@ namespace PediVax.Controllers
             var coords = await _mapBoxService.GetFptHcmCoordinatesAsync();
             if (coords == null)
                 return NotFound("Không tìm thấy tọa độ cho địa chỉ của Vax Pet");
-            return Ok(new { Latitude = coords.Value.lat, Longitude = coords.Value.lng, Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam", ClinicName = "Vax Pet" });
+            return Ok(new
+            {
+                Latitude = coords.Value.lat,
+                Longitude = coords.Value.lng,
+                Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam",
+                ClinicName = "Vax Pet",
+                PhoneNumber = "0976345543",
+                TimeMorning = "8:00 - 12:00",
+                TimeAfternoon = "13:00 - 17:00",
+                DayOfWeek = "Thứ 2 - Thứ 7"
+            });
         }
 
     }

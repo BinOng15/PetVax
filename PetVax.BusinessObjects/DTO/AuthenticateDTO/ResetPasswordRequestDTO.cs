@@ -37,10 +37,6 @@ namespace PetVax.BusinessObjects.DTO.AuthenticateDTO
         [Required]
         [RegularExpression(@"^(?=.*[A-Z])(?=.*\d).{8,16}$",
             ErrorMessage = "Tối thiểu 8 ký tự, ít nhất một chữ cái viết hoa và một chữ số")]
-        public string OldPassword { get; set; }
-        [Required]
-        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d).{8,16}$",
-            ErrorMessage = "Tối thiểu 8 ký tự, ít nhất một chữ cái viết hoa và một chữ số")]
         public string NewPassword { get; set; }
     }
 }
