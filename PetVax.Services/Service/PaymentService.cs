@@ -323,7 +323,7 @@ namespace PetVax.Services.Service
                 if (createPaymentRequest.PaymentMethod == EnumList.PaymentMethod.BankTransfer)
                 {
                     payment.PaymentStatus = EnumList.PaymentStatus.Pending;
-                    var paymentLink = await GeneratePaymentLinkForAppointmentDetailAsync(createPaymentRequest.AppointmentDetailId, cancellationToken);
+                    var paymentLink = await GeneratePaymentLinkForAppointmentDetailAsync(createPaymentRequest.AppointmentDetailId, amount, cancellationToken);
                     payment.CheckoutUrl = paymentLink.paymentLink;
                     payment.QRCode = paymentLink.qrCode;
                 }
@@ -738,7 +738,7 @@ namespace PetVax.Services.Service
                 Data = paymentResponse
             };
         }
-        public async Task<(string paymentLink, string qrCode)> GeneratePaymentLinkForAppointmentDetailAsync(int appointmentDetailId, CancellationToken cancellationToken)
+        public async Task<(string paymentLink, string qrCode)> GeneratePaymentLinkForAppointmentDetailAsync(int appointmentDetailId, decimal amount, CancellationToken cancellationToken)
         {
             var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentDetailId, cancellationToken);
             if (appointmentDetail == null)
@@ -747,29 +747,7 @@ namespace PetVax.Services.Service
                 return (null, null);
             }
 
-            decimal amount = 0;
-
-            if (appointmentDetail.VaccineBatchId.HasValue)
-            {
-                var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(appointmentDetail.VaccineBatchId.Value, cancellationToken);
-                amount = vaccineBatch.Vaccine.Price;
-            }
-            else if (appointmentDetail.MicrochipItemId.HasValue)
-            {
-                var microchipItem = appointmentDetail.MicrochipItem;
-                var microchip = await _microchipRepository.GetMicrochipByIdAsync(microchipItem.MicrochipId, cancellationToken);
-                amount = microchip.Price;
-            }
-            else if (appointmentDetail.VaccinationCertificateId.HasValue)
-            {
-                var certificate = await _vaccinationCertificateRepository.GetVaccinationCertificateByIdAsync(appointmentDetail.VaccinationCertificateId.Value, cancellationToken);
-                amount = certificate.Price;
-            }
-            else if (appointmentDetail.HealthConditionId.HasValue)
-            {
-                var healthCondition = await _healthConditionRepository.GetHealthConditionByIdAsync(appointmentDetail.HealthConditionId.Value, cancellationToken);
-                amount = healthCondition.Price;
-            }
+            var payment = await _paymentRepository.GetPaymentByAppointmentDetailIdAsync(appointmentDetailId, cancellationToken);
 
             var paymentData = new PaymentData(
                 orderCode: (long)appointmentDetail.AppointmentDetailId,
@@ -784,7 +762,6 @@ namespace PetVax.Services.Service
             var paymentLink = await _payOsService.CreatePaymentLink(paymentData);
             _logger.LogInformation("PayOs checkoutUrl: {CheckoutUrl}", paymentLink.checkoutUrl);
             _logger.LogInformation("PayOs QRCode: {QRCode}", paymentLink.qrCode);
-            // Trả ra cả link và QRCode
             return (paymentLink.checkoutUrl, paymentLink.qrCode);
         }
 

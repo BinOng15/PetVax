@@ -235,6 +235,7 @@ namespace PetVax.Services.Configurations.Mapper
 
             //VaccineReceipt
             CreateMap<CreateVaccineReceiptDTO, VaccineReceipt>();
+            CreateMap<CreateFullVaccineReceiptDTO, VaccineReceipt>();
             CreateMap<UpdateVaccineReceiptDTO, VaccineReceipt>();
             CreateMap<VaccineReceipt, VaccineReceiptResponseDTO>();
 
@@ -244,6 +245,8 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<VaccineReceiptDetail, VaccineReceiptDetailResponseDTO>()
                 .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
                 .ForMember(dest => dest.VaccineReceipt, opt => opt.MapFrom(src => src.VaccineReceipt));
+            CreateMap<CreateFullVaccineReceiptDTO, VaccineReceiptDetail>();
+
 
             //ColdChainLog
             CreateMap<CreateColdChainLogDTO, ColdChainLog>();
@@ -253,11 +256,13 @@ namespace PetVax.Services.Configurations.Mapper
 
             //VaccineExport
             CreateMap<CreateVaccineExportDTO, VaccineExport>();
+            CreateMap<CreateFullVaccineExportDTO, VaccineExport>();
             CreateMap<UpdateVaccineExportDTO, VaccineExport>();
             CreateMap<VaccineExport, VaccineExportResponseDTO>();
 
             //VaccineExportDetail
             CreateMap<CreateVaccineExportDetailDTO, VaccineExportDetail>();
+            CreateMap<CreateFullVaccineExportDTO, VaccineExportDetail>();
             CreateMap<UpdateVaccineExportDetailDTO, VaccineExportDetail>();
             CreateMap<UpdateVaccineExportDetailForVaccinationDTO, VaccineExportDetail>();
             CreateMap<VaccineExportDetail, VaccineExportDetailResponseDTO>()
