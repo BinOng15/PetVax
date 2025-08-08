@@ -24,6 +24,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using static PetVax.BusinessObjects.DTO.ResponseModel;
+using Google.Apis.Auth;
 
 namespace PetVax.Services.Service
 {
@@ -865,6 +866,57 @@ namespace PetVax.Services.Service
                     Message = ex.Message,
                     Data = null
                 };
+            }
+        }
+
+        public async Task<(bool Success, string Message, string Token)> LoginWithGoogleAsync(string idToken, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
+                if (payload == null)
+                {
+                    return (false, "Token không hợp lệ.", string.Empty);
+                }
+                var account = await _accountRepository.GetAccountByEmailAsync(payload.Email, cancellationToken);
+                if (account == null)
+                {
+                    // Create new account if it doesn't exist
+                    account = new Account
+                    {
+                        Email = payload.Email,
+                        Role = EnumList.Role.Customer,
+                        CreatedAt = DateTimeHelper.Now(),
+                        isVerify = true // Automatically verify Google accounts
+                    };
+                    await _accountRepository.CreateAccountAsync(account, cancellationToken);
+                }
+                // Generate JWT token
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
+                    new Claim(ClaimTypes.Email, account.Email),
+                    new Claim(ClaimTypes.Role, account.Role.ToString())
+                };
+
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    signingCredentials: credentials
+                );
+
+                var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
+                return (true, "Đăng nhập với Google thành công.", accessToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error logging in with Google.");
+                return (false, "Đăng nhập với Google thất bại.", string.Empty);
             }
         }
     }

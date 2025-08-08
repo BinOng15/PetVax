@@ -326,7 +326,6 @@ namespace PetVax.Services.Service
                 existingBatch.Manufacturer = updateVaccineBatchDTO.Manufacturer ?? existingBatch.Manufacturer;
                 existingBatch.Source = updateVaccineBatchDTO.Source ?? existingBatch.Source;
                 existingBatch.StorageConditions = updateVaccineBatchDTO.StorageCondition ?? existingBatch.StorageConditions;
-                existingBatch.Quantity = updateVaccineBatchDTO.Quantity ?? existingBatch.Quantity;
                 existingBatch.ModifiedAt = DateTimeHelper.Now();
                 existingBatch.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 int batchId = await _vaccineBatchRepository.UpdateVaccineBatchAsync(existingBatch, cancellationToken);

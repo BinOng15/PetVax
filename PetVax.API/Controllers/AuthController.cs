@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.AuthenticateDTO;
@@ -88,75 +89,13 @@ namespace PetVax.Controllers
 
         }
         [HttpPost("google-login")]
-        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDTO request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDTO googleLoginRequest, CancellationToken cancellationToken)
         {
-            var result = await _authService.LoginWithGoogleAsync(request.Email, request.Name, cancellationToken);
-            var authResponse = result.Data;
+            var (success, message, token) = await _authService.LoginWithGoogleAsync(googleLoginRequest.IdToken, cancellationToken);
+            if (!success)
+                return Unauthorized(new { message });
 
-            Response.Cookies.Append("AccessToken", authResponse.AccessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                Expires = authResponse.AccessTokenExpiration,
-                SameSite = SameSiteMode.Strict
-            });
-
-            Response.Cookies.Append("RefreshToken", authResponse.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                Expires = authResponse.RefreshTokenExpiration,
-                SameSite = SameSiteMode.Strict
-            });
-
-            //return StatusCode(StatusCodes.Status200OK, new
-            //{
-            //    authResponse.AccountId,
-            //    authResponse.Email,
-            //    authResponse.Role,
-            //    authResponse.AccessToken,
-            //    authResponse.RefreshToken,
-            //    authResponse.AccessTokenExpiration,
-            //    authResponse.RefreshTokenExpiration,
-            //    Message = "Google login successful."
-            //});
-            return StatusCode(result.Code, result);
-        }
-
-        [HttpPost("google-verify")]
-        public async Task<IActionResult> GoogleVerify([FromBody] GoogleVerifyRequestDTO request, CancellationToken cancellationToken)
-        {
-            var result = await _authService.VerifyGoogleEmailAsync(request.Email, request.Token, request.Name, cancellationToken);
-            var authResponse = result.Data;
-
-            Response.Cookies.Append("AccessToken", authResponse.AccessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                Expires = authResponse.AccessTokenExpiration,
-                SameSite = SameSiteMode.Strict
-            });
-
-            Response.Cookies.Append("RefreshToken", authResponse.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                Expires = authResponse.RefreshTokenExpiration,
-                SameSite = SameSiteMode.Strict
-            });
-
-            //return StatusCode(StatusCodes.Status200OK, new
-            //{
-            //    authResponse.AccountId,
-            //    authResponse.Email,
-            //    authResponse.Role,
-            //    authResponse.AccessToken,
-            //    authResponse.RefreshToken,
-            //    authResponse.AccessTokenExpiration,
-            //    authResponse.RefreshTokenExpiration,
-            //    Message = "Google verification successful."
-            //});
-            return StatusCode(result.Code, result);
+            return Ok(new { token });
         }
 
         [HttpPost("reset-password")]

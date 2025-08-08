@@ -17,11 +17,12 @@ namespace PetVax.Services.IService
         Task<BaseResponse<AuthResponseForMobileDTO>> VerifyOtpAsync(string email, string otp, CancellationToken cancellationToken);
         Task<BaseResponse<AuthResponseDTO>> LoginSimple(LoginRequestDTO loginRequestDTO, CancellationToken cancellationToken);
         Task<BaseResponse> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken);
-        Task<BaseResponse<AuthResponseDTO>> LoginWithGoogleAsync(string email, string name, CancellationToken cancellationToken);
-        Task<BaseResponse<AuthResponseDTO>> VerifyGoogleEmailAsync(string email, string token, string name, CancellationToken cancellationToken);
+        //Task<BaseResponse<AuthResponseDTO>> LoginWithGoogleAsync(string email, string name, CancellationToken cancellationToken);
+        //Task<BaseResponse<AuthResponseDTO>> VerifyGoogleEmailAsync(string email, string token, string name, CancellationToken cancellationToken);
         Task<BaseResponse<ResetPasswordResponseDTO>> ResetPasswordAsync(ResetPasswordRequestDTO resetPasswordRequestDTO, CancellationToken cancellationToken);
         Task<BaseResponse> VerifyEmail(string email, string otp, CancellationToken cancellationToken);
         Task<BaseResponse<ForgetPasswordResponseDTO>> SendResetPasswordEmailAsync(string email, CancellationToken cancellationToken);
         Task<BaseResponse<ResetPasswordResponseDTO>> ResetPasswordAfterForgetAsync(ResetPasswordAfterForgetDTO resetPasswordAfterForgetDTO, CancellationToken cancellationToken);
+        Task<(bool Success, string Message, string Token)> LoginWithGoogleAsync(string idToken, CancellationToken cancellationToken);
     }
 }

@@ -278,20 +278,9 @@ namespace PetVax.Services.Service
                 if (!string.IsNullOrWhiteSpace(updateCustomerDTO.Gender))
                     customer.Gender = updateCustomerDTO.Gender;
 
-                // Validate address is in Ho Chi Minh City
+                // No address validation, just update if provided
                 if (!string.IsNullOrWhiteSpace(updateCustomerDTO.Address))
                 {
-                    bool isValidAddress = await IsAddressInHoChiMinhCity(updateCustomerDTO.Address);
-                    if (!isValidAddress)
-                    {
-                        return new BaseResponse<bool>
-                        {
-                            Code = 400,
-                            Success = false,
-                            Message = "Địa chỉ phải nằm trong khu vực Thành phố Hồ Chí Minh.",
-                            Data = false
-                        };
-                    }
                     customer.Address = updateCustomerDTO.Address;
                 }
 
@@ -328,62 +317,7 @@ namespace PetVax.Services.Service
                 };
             }
         }
-        private async Task<bool> IsAddressInHoChiMinhCity(string address)
-        {
-            try
-            {
-                string mapboxApiKey = _configuration["Mapbox:AccessToken"];
-                string encodedAddress = Uri.EscapeDataString(address);
-                string requestUrl = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{encodedAddress}.json?access_token={mapboxApiKey}&country=vn&limit=1";
-
-                using (HttpClient client = new HttpClient())
-                {
-                    HttpResponseMessage response = await client.GetAsync(requestUrl);
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        _logger.LogWarning("Mapbox API returned non-success status code: {StatusCode}", response.StatusCode);
-                        return false;
-                    }
-
-                    string jsonResponse = await response.Content.ReadAsStringAsync();
-                    using (var document = System.Text.Json.JsonDocument.Parse(jsonResponse))
-                    {
-                        var features = document.RootElement.GetProperty("features");
-                        if (features.GetArrayLength() == 0)
-                        {
-                            _logger.LogWarning("No features found for address: {Address}", address);
-                            return false;
-                        }
-
-                        var feature = features[0];
-                        // Lấy tọa độ (longitude, latitude)
-                        if (!feature.TryGetProperty("center", out var center) || center.GetArrayLength() != 2)
-                        {
-                            _logger.LogWarning("No center coordinates found for address: {Address}", address);
-                            return false;
-                        }
-                        double longitude = center[0].GetDouble();
-                        double latitude = center[1].GetDouble();
-
-                        // Khu vực Thành phố Hồ Chí Minh (theo wikipedia https://vi.wikipedia.org/wiki/Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh#V%E1%BB%8B_tr%C3%AD_%C4%91%E1%BB%8Ba_l%C3%BD)
-                        double minLat = 10.10, maxLat = 10.38;
-                        double minLng = 106.22, maxLng = 106.54;
-
-                        bool isInHCM = latitude >= minLat && latitude <= maxLat && longitude >= minLng && longitude <= maxLng;
-                        if (!isInHCM)
-                        {
-                            _logger.LogInformation("Address coordinates ({Lat}, {Lng}) are not in Ho Chi Minh City area.", latitude, longitude);
-                        }
-                        return isInHCM;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while validating address with Mapbox API.");
-                return false;
-            }
-        }
+        
     }
 }
 

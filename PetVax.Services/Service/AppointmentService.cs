@@ -844,15 +844,30 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
-            if (createAppointmentVaccinationDTO.Appointment.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(createAppointmentVaccinationDTO.Appointment.Address))
+            if (createAppointmentVaccinationDTO.Appointment.Location == EnumList.Location.HomeVisit)
             {
-                return new BaseResponse<AppointmentWithVaccinationResponseDTO>
+                if (string.IsNullOrWhiteSpace(createAppointmentVaccinationDTO.Appointment.Address))
                 {
-                    Code = 400,
-                    Success = false,
-                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
-                    Data = null
-                };
+                    return new BaseResponse<AppointmentWithVaccinationResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                        Data = null
+                    };
+                }
+                // Check if address is in Ho Chi Minh City
+                bool isInHCM = await IsAddressInHoChiMinhCity(createAppointmentVaccinationDTO.Appointment.Address);
+                if (!isInHCM)
+                {
+                    return new BaseResponse<AppointmentWithVaccinationResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Địa chỉ bạn nhập không thuộc khu vực Thành phố Hồ Chí Minh. Vui lòng nhập địa chỉ hợp lệ trong khu vực này.",
+                        Data = null
+                    };
+                }
             }
             if (createAppointmentVaccinationDTO.Appointment.Location == EnumList.Location.Clinic)
             {
@@ -1455,7 +1470,7 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
-            var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(appointmentId, cancellationToken);
+            var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailsByAppointmentIdAsync(appointmentId, cancellationToken);
             if (appointmentDetail == null)
             {
                 return new BaseResponse<AppointmentForVaccinationResponseDTO>
@@ -1470,6 +1485,55 @@ namespace PetVax.Services.Service
             {
                 // Update Appointment fields
                 var updateApp = updateAppointmentForVaccinationDTO.Appointment;
+
+                // Check address like CreateAppointmentVaccinationAsync
+                if (updateApp.Location == EnumList.Location.HomeVisit)
+                {
+                    if (string.IsNullOrWhiteSpace(updateApp.Address))
+                    {
+                        return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                            Data = null
+                        };
+                    }
+                    bool isInHCM = await IsAddressInHoChiMinhCity(updateApp.Address);
+                    if (!isInHCM)
+                    {
+                        return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Địa chỉ bạn nhập không thuộc khu vực Thành phố Hồ Chí Minh. Vui lòng nhập địa chỉ hợp lệ trong khu vực này.",
+                            Data = null
+                        };
+                    }
+                }
+                else
+                {
+                    // Nếu không phải HomeVisit, vẫn kiểm tra nếu có Address truyền vào thì phải thuộc HCM
+                    if (!string.IsNullOrWhiteSpace(updateApp.Address))
+                    {
+                        bool isInHCM = await IsAddressInHoChiMinhCity(updateApp.Address);
+                        if (!isInHCM)
+                        {
+                            return new BaseResponse<AppointmentForVaccinationResponseDTO>
+                            {
+                                Code = 400,
+                                Success = false,
+                                Message = "Địa chỉ bạn nhập không thuộc khu vực Thành phố Hồ Chí Minh. Vui lòng nhập địa chỉ hợp lệ trong khu vực này.",
+                                Data = null
+                            };
+                        }
+                    }
+                }
+                if (updateApp.Location == EnumList.Location.Clinic)
+                {
+                    updateApp.Address = "Đại học FPT TP. Hồ Chí Minh";
+                }
+
                 if (updateApp.AppointmentDate.HasValue)
                     appointment.AppointmentDate = updateApp.AppointmentDate.Value;
                 if (updateApp.Location.HasValue)
@@ -1591,15 +1655,34 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
-            if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(createAppointmentMicrochipDTO.Appointment.Address))
+            if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.HomeVisit)
             {
-                return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                if (string.IsNullOrWhiteSpace(createAppointmentMicrochipDTO.Appointment.Address))
                 {
-                    Code = 200,
-                    Success = false,
-                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
-                    Data = null
-                };
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                        Data = null
+                    };
+                }
+                // Check if address is in Ho Chi Minh City
+                bool isInHCM = await IsAddressInHoChiMinhCity(createAppointmentMicrochipDTO.Appointment.Address);
+                if (!isInHCM)
+                {
+                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Địa chỉ bạn nhập không thuộc khu vực Thành phố Hồ Chí Minh. Vui lòng nhập địa chỉ hợp lệ trong khu vực này.",
+                        Data = null
+                    };
+                }
+            }
+            if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.Clinic)
+            {
+                createAppointmentMicrochipDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
             }
             var appointmentDate = createAppointmentMicrochipDTO.Appointment.AppointmentDate;
             var now = DateTimeHelper.Now();
@@ -1623,10 +1706,6 @@ namespace PetVax.Services.Service
                     Message = "Chỉ cho phép đặt lịch trong khung giờ từ 8h-11h và 13h-16h.",
                     Data = null
                 };
-            }
-            if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.Clinic)
-            {
-                createAppointmentMicrochipDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
             }
             var pet = await _petRepository.GetPetByIdAsync(createAppointmentMicrochipDTO.Appointment.PetId, cancellationToken);
             if (pet == null || pet.CustomerId != createAppointmentMicrochipDTO.Appointment.CustomerId)
@@ -1956,9 +2035,6 @@ namespace PetVax.Services.Service
         }
         public async Task<BaseResponse<AppointmentWithMicorchipResponseDTO>> UpdateAppointmentMicrochipAsync(int appointmentId, UpdateAppointmentDTO updateAppointmentDTO, CancellationToken cancellationToken)
         {
-
-     
-
             try
             {
                 var appointmentExist = await _appointmentRepository.GetAppointmentByIdAsync(appointmentId, cancellationToken);
@@ -1992,29 +2068,58 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                if (updateAppointmentDTO.Location == EnumList.Location.HomeVisit && string.IsNullOrWhiteSpace(updateAppointmentDTO.Address))
+                if (updateAppointmentDTO.Location == EnumList.Location.HomeVisit)
                 {
-                    return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                    if (string.IsNullOrWhiteSpace(updateAppointmentDTO.Address))
                     {
-                        Code = 200,
-                        Success = false,
-                        Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
-                        Data = null
-                    };
+                        return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                        {
+                            Code = 200,
+                            Success = false,
+                            Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                            Data = null
+                        };
+                    }
+                    // Check if address is in Ho Chi Minh City
+                    bool isInHCM = await IsAddressInHoChiMinhCity(updateAppointmentDTO.Address);
+                    if (!isInHCM)
+                    {
+                        return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Địa chỉ bạn nhập không thuộc khu vực Thành phố Hồ Chí Minh. Vui lòng nhập địa chỉ hợp lệ trong khu vực này.",
+                            Data = null
+                        };
+                    }
+                }
+                else
+                {
+                    // Nếu không phải HomeVisit, vẫn kiểm tra nếu có Address truyền vào thì phải thuộc HCM
+                    if (!string.IsNullOrWhiteSpace(updateAppointmentDTO.Address))
+                    {
+                        bool isInHCM = await IsAddressInHoChiMinhCity(updateAppointmentDTO.Address);
+                        if (!isInHCM)
+                        {
+                            return new BaseResponse<AppointmentWithMicorchipResponseDTO>
+                            {
+                                Code = 400,
+                                Success = false,
+                                Message = "Địa chỉ bạn nhập không thuộc khu vực Thành phố Hồ Chí Minh. Vui lòng nhập địa chỉ hợp lệ trong khu vực này.",
+                                Data = null
+                            };
+                        }
+                    }
                 }
                 if (updateAppointmentDTO.Location == EnumList.Location.Clinic)
                 {
                     updateAppointmentDTO.Address = "Đại học FPT TP. Hồ Chí Minh";
                 }
 
-
-
                 appointmentExist.AppointmentDate = updateAppointmentDTO.AppointmentDate ?? appointmentExist.AppointmentDate;
                 appointmentExist.ServiceType = updateAppointmentDTO.ServiceType ?? appointmentExist.ServiceType;
-    
                 appointmentExist.Location = updateAppointmentDTO.Location ?? appointmentExist.Location;
                 appointmentExist.Address = updateAppointmentDTO.Address ?? appointmentExist.Address;
-
                 appointmentExist.ModifiedAt = DateTime.UtcNow;
                 appointmentExist.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
@@ -2032,7 +2137,7 @@ namespace PetVax.Services.Service
 
                 var appoimentCheck = await _appointmentRepository.GetAppointmentByIdAsync(updateAppointment.AppointmentId, cancellationToken);
 
-                if( appoimentCheck == null)
+                if (appoimentCheck == null)
                 {
                     return new BaseResponse<AppointmentWithMicorchipResponseDTO>
                     {
@@ -2061,8 +2166,6 @@ namespace PetVax.Services.Service
                 appointmentDetail.AppointmentStatus = appoimentCheck.AppointmentStatus;
                 appointmentDetail.ModifiedAt = DateTime.UtcNow;
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-
-
 
                 var updatedAppointmentDetail = await _appointmentDetailRepository.UpdateAppointmentDetailAsync(appointmentDetail, cancellationToken);
                 if (updatedAppointmentDetail == null)
@@ -3424,16 +3527,30 @@ namespace PetVax.Services.Service
                 };
             }
 
-            if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.HomeVisit &&
-                string.IsNullOrWhiteSpace(createAppointmentHealConditionDTO.Appointment.Address))
+            if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.HomeVisit)
             {
-                return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                if (string.IsNullOrWhiteSpace(createAppointmentHealConditionDTO.Appointment.Address))
                 {
-                    Code = 200,
-                    Success = false,
-                    Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
-                    Data = null
-                };
+                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                        Data = null
+                    };
+                }
+                // Check if address is in Ho Chi Minh City
+                bool isInHCM = await IsAddressInHoChiMinhCity(createAppointmentHealConditionDTO.Appointment.Address);
+                if (!isInHCM)
+                {
+                    return new BaseResponse<AppointmenWithHealthConditionResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Địa chỉ bạn nhập không thuộc khu vực Thành phố Hồ Chí Minh. Vui lòng nhập địa chỉ hợp lệ trong khu vực này.",
+                        Data = null
+                    };
+                }
             }
 
             if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.Clinic)
@@ -3986,6 +4103,49 @@ namespace PetVax.Services.Service
                     Data = null
                 };
             }
+            if (updateAppointmentHealConditionDTO.Location == EnumList.Location.HomeVisit)
+            {
+                if (string.IsNullOrWhiteSpace(updateAppointmentHealConditionDTO.Address))
+                {
+                    return new BaseResponse<AppointmentResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Vui lòng nhập địa chỉ khi chọn dịch vụ tại nhà.",
+                        Data = null
+                    };
+                }
+                // Check if address is in Ho Chi Minh City
+                bool isInHCM = await IsAddressInHoChiMinhCity(updateAppointmentHealConditionDTO.Address);
+                if (!isInHCM)
+                {
+                    return new BaseResponse<AppointmentResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Địa chỉ bạn nhập không thuộc khu vực Thành phố Hồ Chí Minh. Vui lòng nhập địa chỉ hợp lệ trong khu vực này.",
+                        Data = null
+                    };
+                }
+            }
+            else
+            {
+                // Nếu không phải HomeVisit, vẫn kiểm tra nếu có Address truyền vào thì phải thuộc HCM
+                if (!string.IsNullOrWhiteSpace(updateAppointmentHealConditionDTO.Address))
+                {
+                    bool isInHCM = await IsAddressInHoChiMinhCity(updateAppointmentHealConditionDTO.Address);
+                    if (!isInHCM)
+                    {
+                        return new BaseResponse<AppointmentResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Địa chỉ bạn nhập không thuộc khu vực Thành phố Hồ Chí Minh. Vui lòng nhập địa chỉ hợp lệ trong khu vực này.",
+                            Data = null
+                        };
+                    }
+                }
+            }
             try
             {
                 // Update Appointment fields
@@ -4114,8 +4274,61 @@ namespace PetVax.Services.Service
                 };
             }
         }
+        private async Task<bool> IsAddressInHoChiMinhCity(string address)
+        {
+            try
+            {
+                string mapboxApiKey = _configuration["Mapbox:AccessToken"];
+                string encodedAddress = Uri.EscapeDataString(address);
+                string requestUrl = $"https://api.mapbox.com/geocoding/v5/mapbox.places/{encodedAddress}.json?access_token={mapboxApiKey}&country=vn&limit=1";
 
+                using (HttpClient client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.GetAsync(requestUrl);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogWarning("Mapbox API returned non-success status code: {StatusCode}", response.StatusCode);
+                        return false;
+                    }
 
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    using (var document = System.Text.Json.JsonDocument.Parse(jsonResponse))
+                    {
+                        var features = document.RootElement.GetProperty("features");
+                        if (features.GetArrayLength() == 0)
+                        {
+                            _logger.LogWarning("No features found for address: {Address}", address);
+                            return false;
+                        }
 
+                        var feature = features[0];
+                        // Lấy tọa độ (longitude, latitude)
+                        if (!feature.TryGetProperty("center", out var center) || center.GetArrayLength() != 2)
+                        {
+                            _logger.LogWarning("No center coordinates found for address: {Address}", address);
+                            return false;
+                        }
+                        double longitude = center[0].GetDouble();
+                        double latitude = center[1].GetDouble();
+
+                        // Khu vực Thành phố Hồ Chí Minh (theo wikipedia https://vi.wikipedia.org/wiki/Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh#V%E1%BB%8B_tr%C3%AD_%C4%91%E1%BB%8Ba_l%C3%BD)
+                        double minLat = 10.10, maxLat = 11.160;
+                        double minLng = 106.22, maxLng = 107.010;
+
+                        bool isInHCM = latitude >= minLat && latitude <= maxLat && longitude >= minLng && longitude <= maxLng;
+                        if (!isInHCM)
+                        {
+                            _logger.LogInformation("Address coordinates ({Lat}, {Lng}) are not in Ho Chi Minh City area.", latitude, longitude);
+                        }
+                        return isInHCM;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while validating address with Mapbox API.");
+                return false;
+            }
+        }
     }
 }

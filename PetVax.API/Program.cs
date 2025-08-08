@@ -76,11 +76,11 @@ public class Program
                 };
             })
             .AddGoogle(options =>
-             {
-                 options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-                 options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-                 options.CallbackPath = "/signin-google";
-             });
+            {
+                options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                options.CallbackPath = "/signin-google";
+            });
         builder.Services.AddAuthorization();
 
         // Session Configuration

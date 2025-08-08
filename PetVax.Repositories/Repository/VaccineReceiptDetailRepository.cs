@@ -47,7 +47,7 @@ namespace PetVax.Repositories.Repository
                 .Include(vrd => vrd.VaccineBatch)
                     .ThenInclude(vb => vb.Vaccine)
                 .Include(vrd => vrd.VaccineReceipt)
-                .Where(vrd => vrd.VaccineReceiptId == vaccineReceiptId && !vrd.isDeleted.HasValue || !vrd.isDeleted.Value)
+                .Where(vrd => vrd.VaccineReceiptId == vaccineReceiptId && (!vrd.isDeleted.HasValue || !vrd.isDeleted.Value))
                 .ToListAsync(cancellationToken);
         }
         public async Task<VaccineReceiptDetail> GetVaccineReceiptDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
