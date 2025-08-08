@@ -18,5 +18,7 @@ namespace PetVax.Repositories.IRepository
         Task<MicrochipItem> GetMicrochipItemByMicrochipCodedAsync(string microchipCode, CancellationToken cancellationToken);
         Task<MicrochipItem> GetMicrochipItemByPetIdAsync(int? petId, CancellationToken cancellationToken);
         Task<int> GetTotalMicrochipItemsAsync(CancellationToken cancellationToken);
+        Task<List<MicrochipItem>> GetListMicrochipItemByPetIdAsync(int petId, CancellationToken cancellationToken);
+
     }
 }
