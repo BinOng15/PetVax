@@ -361,18 +361,18 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AuthResponseDTO>> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken)
         {
             try
             {
                 var account = await _accountRepository.GetAccountByEmailAsync(regisRequestDTO.Email, cancellationToken);
                 if (account != null)
                 {
-                    return new BaseResponse
+                    return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 409,
                         Success = false,
-                        Message = "Email dã được sử dụng. Vui lòng sử dụng email khác."
+                        Message = "Email dã được sử dụng. Vui lòng sử dụng email khác.",
                     };
                 }
 
@@ -398,16 +398,17 @@ namespace PetVax.Services.Service
 
                 await _accountRepository.CreateAccountAsync(newAccount, cancellationToken);
 
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Đăng ký thành công. Vui lòng kiểm tra email để nhận mã OTP xác thực.",
+
                 };
             }
             catch (ErrorException ex)
             {
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = ex.ErrorCode,
                     Success = false,
@@ -416,7 +417,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 500,
                     Success = false,
@@ -425,13 +426,13 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse> VerifyEmail(string email, string otp, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AuthResponseDTO>> VerifyEmail(string email, string otp, CancellationToken cancellationToken)
         {
             try
             {
                 if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
                 {
-                    return new BaseResponse
+                    return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 401,
                         Success = false,
@@ -442,7 +443,7 @@ namespace PetVax.Services.Service
                 var account = await _accountRepository.GetAccountByEmailAsync(email, cancellationToken);
                 if (account == null)
                 {
-                    return new BaseResponse
+                    return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 404,
                         Success = false,
@@ -477,7 +478,7 @@ namespace PetVax.Services.Service
 
                 _otpStore.TryRemove(email, out _);
 
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 200,
                     Success = true,
@@ -487,7 +488,7 @@ namespace PetVax.Services.Service
             catch (ErrorException ex)
             {
                 var errorData = new ErrorResponseModel(ex.ErrorCode, ex.Message);
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 500,
                     Success = false,
@@ -748,7 +749,7 @@ namespace PetVax.Services.Service
                 }
                 // Generate OTP and expiration time
                 var otp = GenerateOtp();
-                var expiration = DateTimeHelper.Now().AddMinutes(10);
+                var expiration = DateTimeHelper.Now().AddMinutes(5);
                 _otpStore[email] = (otp, expiration);
                 // Send OTP email
                 await SendOtpEmailAsync(email, otp, cancellationToken);
@@ -776,13 +777,13 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse> VerifyResetPasswordOtpAsync(string email, string otp, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AuthResponseDTO>> VerifyResetPasswordOtpAsync(string email, string otp, CancellationToken cancellationToken)
         {
             try
             {
                 if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
                 {
-                    return new BaseResponse
+                    return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 401,
                         Success = false,
@@ -791,7 +792,7 @@ namespace PetVax.Services.Service
                 }
                 // Remove OTP from store after verification
                 _otpStore.TryRemove(email, out _);
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 200,
                     Success = true,
@@ -800,7 +801,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 500,
                     Success = false,
