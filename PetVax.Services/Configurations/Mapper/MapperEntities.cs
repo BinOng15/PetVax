@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PetVax.BusinessObjects.DTO.AccountDTO;
+using PetVax.BusinessObjects.DTO.AddressDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.ColdChainLogDTO;
@@ -322,6 +323,9 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreateFAQDTO, FAQItem>();
             CreateMap<UpdateFAQDTO, FAQItem>();
             CreateMap<FAQItem, FAQResponseDTO>();
+
+            //Address
+            CreateMap<Address, AddressResponseDTO>();
 
         }
     }   

@@ -101,8 +101,8 @@ namespace PetVax.Services.Service
                 {
                     var keyword = getAllCustomerRequestDTO.KeyWord.Trim().ToLower();
                     customers = customers
-                        .Where(c => c.FullName.ToLower().Contains(keyword))
-                    .ToList();
+                        .Where(c => !string.IsNullOrWhiteSpace(c.FullName) && c.FullName.ToLower().Contains(keyword))
+                        .ToList();
                 }
 
                 int pageNumber = getAllCustomerRequestDTO?.PageNumber > 0 ? getAllCustomerRequestDTO.PageNumber : 1;
@@ -124,8 +124,6 @@ namespace PetVax.Services.Service
                         Size = pageSize,
                         TotalItem = totalItem,
                         TotalPage = totalPage,
-                        Sort = null,
-                        Order = null
                     },
                     SearchInfo = new SearchCondition
                     {

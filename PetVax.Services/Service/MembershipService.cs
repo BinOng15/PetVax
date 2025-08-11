@@ -333,7 +333,7 @@ namespace PetVax.Services.Service
                 int? pointsToNextRank = nextMembership != null ? nextMembership.MinPoints - currentPoints : 0;
 
                 int redeemablePoints = customer.RedeemablePoints ?? 0;
-                decimal totalSpents = customer.TotalSpent ?? 0;
+                decimal totalSpents = customer.TotalSpent ?? 0.0m;
 
                 int minPointsCurrentRank = currentMembership?.MinPoints ?? 0;
                 int maxPointsCurrentRank = nextMembership?.MinPoints ?? int.MaxValue;

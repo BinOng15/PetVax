@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
@@ -113,7 +114,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 200,
                         Success = false,
-                        Message = "No vets found",
+                        Message = "Không tìm thấy thú cưng nào",
                         Data = responseData
                     };
                 }

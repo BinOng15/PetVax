@@ -94,6 +94,7 @@ namespace PediVax.BusinessObjects.DBContext
         public DbSet<Handbook> Handbooks { get; set; }
         public DbSet<SupportCategory> SupportCategories { get; set; }
         public DbSet<FAQItem> FAQItems { get; set; }
+        public DbSet<Address> Addresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -92,5 +92,19 @@ namespace PediVax.Controllers
             var response = await _accountService.DeleteAccountAsync(accountId, cancellationToken);
             return StatusCode(response.Code, new { Message = "Account deleted successfully" });
         }
+        [HttpGet("get-all-staff-accounts")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllStaffAccounts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyWord = null, [FromQuery] bool? status = true, CancellationToken cancellationToken = default)
+        {
+            var request = new GetAllAccountRequestDTO
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                KeyWord = keyWord,
+                Status = status
+            };
+            var response = await _accountService.GetAllStaffAccountsAsync(request, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

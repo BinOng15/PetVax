@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PediVax.BusinessObjects.DBContext;
 
@@ -11,9 +12,11 @@ using PediVax.BusinessObjects.DBContext;
 namespace PetVax.BusinessObjects.Migrations
 {
     [DbContext(typeof(PetVaxContext))]
-    partial class PetVaxContextModelSnapshot : ModelSnapshot
+    [Migration("20250811152804_Address")]
+    partial class Address
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,11 +73,11 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 1,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 8, 11, 15, 52, 52, 914, DateTimeKind.Utc).AddTicks(5957),
+                            CreatedAt = new DateTime(2025, 8, 11, 15, 28, 4, 129, DateTimeKind.Utc).AddTicks(1868),
                             CreatedBy = "system",
                             Email = "admin@petvax.com",
-                            PasswordHash = "Gh8TFQdryMXNQiFypwCNA2tCV6/yf2UbQOM4J5hIre0=",
-                            PasswordSalt = "7P1+/y3U03YWiz7SryUU7g7aA3hZMmPr4+149wY4BzU=",
+                            PasswordHash = "lG8mJYUsQYbkSJlNCb2lW3KUX4kByEq2Atl46+vBf6A=",
+                            PasswordSalt = "SjfvbytGb122RPQBbceUugeIj3wRHbMdx9NcY6DEz6s=",
                             RefereshToken = "",
                             Role = 1,
                             isDeleted = false,
@@ -84,33 +87,16 @@ namespace PetVax.BusinessObjects.Migrations
                         {
                             AccountId = 2,
                             AccessToken = "",
-                            CreatedAt = new DateTime(2025, 8, 11, 15, 52, 52, 914, DateTimeKind.Utc).AddTicks(5962),
+                            CreatedAt = new DateTime(2025, 8, 11, 15, 28, 4, 129, DateTimeKind.Utc).AddTicks(1872),
                             CreatedBy = "system",
                             Email = "staff@petvax.com",
-                            PasswordHash = "cdp8+GOeI9LGxR+mPFd0QpHQGtB+Ez6n8R97drO1mxU=",
-                            PasswordSalt = "tn1Q+5qZrsTFj/BdfxVkbGsJ57zdYgcHhtfZZXyoyUA=",
+                            PasswordHash = "HoPNCduxOV6chlJGtRkd4yudjqdNx5lpz6YEdTx8z8Y=",
+                            PasswordSalt = "SdaMAZwaT/78KO0MDYXBNe11xl0+zAZ0xhEcqOjkANE=",
                             RefereshToken = "",
                             Role = 2,
                             isDeleted = false,
                             isVerify = true
                         });
-                });
-
-            modelBuilder.Entity("PetVax.BusinessObjects.Models.Address", b =>
-                {
-                    b.Property<int>("AddressId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressId"));
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AddressId");
-
-                    b.ToTable("Address");
                 });
 
             modelBuilder.Entity("PetVax.BusinessObjects.Models.Appointment", b =>

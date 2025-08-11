@@ -442,6 +442,88 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<DynamicResponse<AccountResponseDTO>> GetAllStaffAccountsAsync(GetAllAccountRequestDTO getAllAccountRequestDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var accounts = await _accountRepository.GetAllAccountsAsync(cancellationToken);
+                accounts = accounts.Where(a => a.Role == EnumList.Role.Staff).ToList();
+                // Filter by keyword if provided
+                if (!string.IsNullOrWhiteSpace(getAllAccountRequestDTO?.KeyWord))
+                {
+                    var keyword = getAllAccountRequestDTO.KeyWord.Trim().ToLower();
+                    accounts = accounts
+                        .Where(a => a.Email.ToLower().Contains(keyword))
+                        .ToList();
+                }
+                // Filter by status if provided
+                if (getAllAccountRequestDTO?.Status.HasValue == true)
+                {
+                    accounts = accounts
+                        .Where(a => a.isVerify == getAllAccountRequestDTO.Status.Value)
+                        .ToList();
+                }
+                // Pagination
+                int pageNumber = getAllAccountRequestDTO?.PageNumber > 0 ? getAllAccountRequestDTO.PageNumber : 1;
+                int pageSize = getAllAccountRequestDTO?.PageSize > 0 ? getAllAccountRequestDTO.PageSize : 10;
+                int skip = (pageNumber - 1) * pageSize;
+                int totalItem = accounts.Count;
+                int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
+                var pagedAccounts = accounts
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+                var responseData = new MegaData<AccountResponseDTO>
+                {
+                    PageInfo = new PagingMetaData
+                    {
+                        Page = pageNumber,
+                        Size = pageSize,
+                        TotalItem = totalItem,
+                        TotalPage = totalPage,
+                        Sort = null,
+                        Order = null
+                    },
+                    SearchInfo = new SearchCondition
+                    {
+                        keyWord = getAllAccountRequestDTO?.KeyWord,
+                        status = getAllAccountRequestDTO?.Status
+                    },
+                    PageData = _mapper.Map<List<AccountResponseDTO>>(pagedAccounts)
+                };
+                if (!pagedAccounts.Any())
+                {
+                    _logger.LogInformation("No staff accounts found for the given criteria");
+                    return new DynamicResponse<AccountResponseDTO>
+                    {
+                        Code = 200,
+                        Success = true,
+                        Message = "Không tìm thấy tài khoản nhân viên nào phù hợp với tiêu chí tìm kiếm",
+                        Data = null
+                    };
+                }
+                _logger.LogInformation("Retrieved {Count} staff accounts successfully (Page {PageNumber}, PageSize {PageSize})", pagedAccounts.Count, pageNumber, pageSize);
+                return new DynamicResponse<AccountResponseDTO>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Đã lấy danh sách tài khoản nhân viên thành công",
+                    Data = responseData
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving all staff accounts with pagination");
+                return new DynamicResponse<AccountResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Lỗi khi lấy danh sách tài khoản nhân viên: " + (ex.InnerException?.Message ?? ex.Message),
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<AccountResponseDTO>> GetCurrentAccountAsync(CancellationToken cancellationToken)
         {
             try
