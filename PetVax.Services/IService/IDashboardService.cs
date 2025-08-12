@@ -12,5 +12,6 @@ namespace PetVax.Services.IService
     {
         Task<BaseResponse<AdminDashboardResponseDTO>> GetDashboardDataForAdminAsync(CancellationToken cancellationToken);
         Task<BaseResponse<VetDashboardResponseDTO>> GetDashboardDataForVetAsync(CancellationToken cancellationToken);
+        Task<BaseResponse<StaffDashboardResponseDTO>> GetDashboardDataForStaffAsync(CancellationToken cancellationToken);
     }
 }

@@ -28,5 +28,12 @@ namespace PediVax.Controllers
             var response = await _dashboardService.GetDashboardDataForVetAsync(cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpGet("staff-dashboard")]
+        [Authorize(Roles = "Staff")]
+        public async Task<IActionResult> GetStaffDashboardData(CancellationToken cancellationToken)
+        {
+            var response = await _dashboardService.GetDashboardDataForStaffAsync(cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }
