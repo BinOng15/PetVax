@@ -74,5 +74,12 @@ namespace PediVax.Controllers
             var response = await _vaccineReceiptDetailService.DeleteVaccineReceiptDetailAsync(vaccineReceiptDetailId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpPost("create-full-vaccine-receipt")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> CreateFullVaccineReceipt([FromBody] CreateFullVaccineReceiptDTO createFullVaccineReceiptDTO, CancellationToken cancellationToken = default)
+        {
+            var response = await _vaccineReceiptDetailService.CreateFullVaccineReceiptAsync(createFullVaccineReceiptDTO, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

@@ -96,5 +96,12 @@ namespace PediVax.Controllers
             var response = await _vaccineExportDetailService.GetVaccineExportDetailByAppointmentDetailIdAsync(appointmentDetailId, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpPost("create-full-vaccine-export")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> CreateFullVaccineExport([FromBody] CreateFullVaccineExportDTO createFullVaccineExportDTO, CancellationToken cancellationToken = default)
+        {
+            var response = await _vaccineExportDetailService.CreateFullVaccineExportAsync(createFullVaccineExportDTO, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

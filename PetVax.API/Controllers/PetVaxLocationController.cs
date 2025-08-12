@@ -41,7 +41,7 @@ namespace PediVax.Controllers
             {
                 Latitude = coords.Value.lat,
                 Longitude = coords.Value.lng,
-                Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam",
+                Address = coords.Value.address,
                 ClinicName = "Vax Pet",
                 PhoneNumber = "0976345543",
                 TimeMorning = "8:00 - 12:00",

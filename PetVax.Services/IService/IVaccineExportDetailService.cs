@@ -21,5 +21,6 @@ namespace PetVax.Services.IService
         Task<BaseResponse<bool>> DeleteVaccineExportDetailAsync(int vaccineExportDetailId, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineExportDetailResponseForVaccinationDTO>> CreateVaccineExportDetailForVaccinationAsync(CreateVaccineExportDetailForVaccinationDTO createVaccineExportDetailForVaccinationDTO, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineExportDetailResponseForVaccinationDTO>> UpdateVaccineExportDetailForVaccinationAsync(int vaccineExportDetailId, UpdateVaccineExportDetailForVaccinationDTO updateVaccineExportDetailForVaccinationDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<VaccineExportDetailResponseDTO>> CreateFullVaccineExportAsync(CreateFullVaccineExportDTO createFullVaccineExportDTO, CancellationToken cancellationToken);
     }
 }

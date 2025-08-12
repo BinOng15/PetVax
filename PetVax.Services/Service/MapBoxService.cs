@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using PetVax.Repositories.IRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,12 @@ namespace PetVax.Services.Service
     public class MapBoxService
     {
         private readonly string _accessToken;
+        private readonly IAddressRepository _addressRepository;
 
-        public MapBoxService(IConfiguration configuration)
+        public MapBoxService(IConfiguration configuration, IAddressRepository addressRepository)
         {
             _accessToken = configuration["MapBox:AccessToken"];
+            _addressRepository = addressRepository;
         }
 
         public async Task<(double lat, double lng)?> GetCoordinatesAsync(string address)
@@ -54,10 +57,16 @@ namespace PetVax.Services.Service
             return placeName;
         }
 
-        public async Task<(double lat, double lng)?> GetFptHcmCoordinatesAsync()
+        public async Task<(double lat, double lng, string address)?> GetFptHcmCoordinatesAsync()
         {
-            const string defaultAddress = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam"; //FPTU
-            return await GetCoordinatesAsync(defaultAddress);
+            var addresses = await _addressRepository.GetAllAddressesAsync(CancellationToken.None);
+            var defaultAddress = addresses.FirstOrDefault()?.Location;
+            if (string.IsNullOrWhiteSpace(defaultAddress))
+                return null;
+            var coordinates = await GetCoordinatesAsync(defaultAddress);
+            if (coordinates == null)
+                return null;
+            return (coordinates.Value.lat, coordinates.Value.lng, defaultAddress);
         }
     }
 }

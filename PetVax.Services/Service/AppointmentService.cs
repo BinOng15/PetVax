@@ -195,6 +195,13 @@ namespace PetVax.Services.Service
                         )
                         .ToList();
                 }
+                // Filter by status if provided
+                if (getAllItemsDTO?.Status.HasValue == true)
+                {
+                    appointments = appointments
+                        .Where(a => a.isDeleted == getAllItemsDTO.Status.Value)
+                        .ToList();
+                }
 
                 int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
                 int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
@@ -871,7 +878,7 @@ namespace PetVax.Services.Service
             }
             if (createAppointmentVaccinationDTO.Appointment.Location == EnumList.Location.Clinic)
             {
-                createAppointmentVaccinationDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
+                createAppointmentVaccinationDTO.Appointment.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
             }
             var appointmentDate = createAppointmentVaccinationDTO.Appointment.AppointmentDate;
             var now = DateTimeHelper.Now();
@@ -1531,7 +1538,7 @@ namespace PetVax.Services.Service
                 }
                 if (updateApp.Location == EnumList.Location.Clinic)
                 {
-                    updateApp.Address = "Đại học FPT TP. Hồ Chí Minh";
+                    updateApp.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
                 }
 
                 if (updateApp.AppointmentDate.HasValue)
@@ -1682,7 +1689,7 @@ namespace PetVax.Services.Service
             }
             if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.Clinic)
             {
-                createAppointmentMicrochipDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
+                createAppointmentMicrochipDTO.Appointment.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
             }
             var appointmentDate = createAppointmentMicrochipDTO.Appointment.AppointmentDate;
             var now = DateTimeHelper.Now();
@@ -2113,7 +2120,7 @@ namespace PetVax.Services.Service
                 }
                 if (updateAppointmentDTO.Location == EnumList.Location.Clinic)
                 {
-                    updateAppointmentDTO.Address = "Đại học FPT TP. Hồ Chí Minh";
+                    updateAppointmentDTO.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
                 }
 
                 appointmentExist.AppointmentDate = updateAppointmentDTO.AppointmentDate ?? appointmentExist.AppointmentDate;
@@ -2297,7 +2304,7 @@ namespace PetVax.Services.Service
             }
             if (createAppointmentVaccinationCertificateDTO.AppointmentDTO.Location == EnumList.Location.Clinic)
             {
-                createAppointmentVaccinationCertificateDTO.AppointmentDTO.Address = "Đại học FPT TP. Hồ Chí Minh";
+                createAppointmentVaccinationCertificateDTO.AppointmentDTO.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
             }
             var pet = await _petRepository.GetPetByIdAsync(createAppointmentVaccinationCertificateDTO.AppointmentDTO.PetId, cancellationToken);
             if (pet == null || pet.CustomerId != createAppointmentVaccinationCertificateDTO.AppointmentDTO.CustomerId)
@@ -2650,7 +2657,7 @@ namespace PetVax.Services.Service
                                 DoseNumber = maxDose,
                                 VaccinationDate = vaccinationDate ?? DateTime.UtcNow,
                                 ClinicName = "Trung tâm tiêm chủng cho thú cưng PetVax",
-                                ClinicAddress = "Đại học FPT TP. Hồ Chí Minh",
+                                ClinicAddress = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam",
                                 CreatedAt = DateTimeHelper.Now(),
                                 CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System"
                             };
@@ -3555,7 +3562,7 @@ namespace PetVax.Services.Service
 
             if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.Clinic)
             {
-                createAppointmentHealConditionDTO.Appointment.Address = "Đại học FPT TP. Hồ Chí Minh";
+                createAppointmentHealConditionDTO.Appointment.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
             }
 
             if (createAppointmentHealConditionDTO.Appointment.ServiceType != EnumList.ServiceType.HealthCondition)
