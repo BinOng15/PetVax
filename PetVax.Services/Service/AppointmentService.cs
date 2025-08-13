@@ -3979,6 +3979,12 @@ namespace PetVax.Services.Service
                         {
                             healthIssues.Add("Cân nặng không hợp lệ.");
                         }
+                        else
+                        {
+                            var existpet = await _petRepository.GetPetAndAppointmentByIdAsync(appointment.PetId, cancellationToken);
+                            existpet.Weight = updateDTO.Weight;
+                            await _petRepository.UpdatePetAsync(existpet, cancellationToken);
+                        }
 
                         if (healthIssues.Any())
                         {
