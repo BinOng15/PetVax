@@ -14,6 +14,7 @@ using PetVax.Services.ExternalService;
 using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -342,7 +343,36 @@ namespace PetVax.Services.Service
                 pet.DateOfBirth = createPetRequest.DateOfBirth;
                 pet.PlaceToLive = createPetRequest.PlaceToLive;
                 pet.PlaceOfBirth = createPetRequest.PlaceOfBirth;
-                pet.Weight = createPetRequest.Weight;
+                if (!string.IsNullOrWhiteSpace(createPetRequest.Weight))
+                {
+                    var weightInput = createPetRequest.Weight.Trim();
+
+                    if (!decimal.TryParse(weightInput, NumberStyles.Any, CultureInfo.InvariantCulture, out var weightValue))
+                    {
+                        return new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Cân nặng phải là số hợp lệ!",
+                            Data = null
+                        };
+                    }
+
+                    if (weightValue < 0)
+                    {
+                        return new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Cân nặng không được bé hơn 0!",
+                            Data = null
+                        };
+                    }
+
+                    pet.Weight = weightInput; // Lưu string đã trim
+                }
+
+
                 pet.Color = createPetRequest.Color;
                 pet.Nationality = createPetRequest.Nationality;
                 pet.isSterilized = createPetRequest.isSterilized;
