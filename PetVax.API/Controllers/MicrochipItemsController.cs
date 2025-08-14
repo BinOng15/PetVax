@@ -27,13 +27,13 @@ namespace PediVax.Controllers
         }
 
         [HttpGet("get-information-of-pet-by-microchip-code")]
-        public async Task<IActionResult> GetMicrochipItemsByMicrochipCode(string microchipCode, AppointmentStatus status, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetMicrochipItemsByMicrochipCode(string microchipCode,  CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(microchipCode))
             {
                 return BadRequest("Microchip code cannot be null or empty.");
             }
-            var response = await _microchipItemService.GetMicrochipItemByMicrochipCodeAsync(microchipCode, status, cancellationToken);
+            var response = await _microchipItemService.GetMicrochipItemByMicrochipCodeAsync(microchipCode, cancellationToken);
             return StatusCode(response.Code, response);
         }
 
