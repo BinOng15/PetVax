@@ -81,5 +81,12 @@ namespace PediVax.Controllers
             var response = await _vaccineReceiptDetailService.CreateFullVaccineReceiptAsync(createFullVaccineReceiptDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpGet("get-list-receipt-detail-by-vaccine-batch-id/{vaccineBatchId}")]
+        [Authorize(Roles = "Admin, Staff, Vet")]
+        public async Task<IActionResult> GetListReceiptDetailByVaccineBatchId(int vaccineBatchId, CancellationToken cancellationToken = default)
+        {
+            var response = await _vaccineReceiptDetailService.GetListVaccineReceiptDetailByVaccineBatchIdAsync(vaccineBatchId, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

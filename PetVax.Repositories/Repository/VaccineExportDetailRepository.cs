@@ -94,5 +94,18 @@ namespace PetVax.Repositories.Repository
                 .Where(ved => ved.isDeleted == false)
                 .CountAsync(cancellationToken);
         }
+
+        public async Task<List<VaccineExportDetail>> GetListVaccineExportDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
+        {
+            return await _context.VaccineExportDetails
+                .Include(ved => ved.VaccineBatch)
+                    .ThenInclude(vb => vb.Vaccine)
+                .Include(ved => ved.VaccineExport)
+                .Include(ved => ved.AppointmentDetail)
+                    .ThenInclude(ad => ad.Appointment)
+                .Where(ved => ved.VaccineBatchId == vaccineBatchId
+                    && (!ved.isDeleted.HasValue || !ved.isDeleted.Value))
+                .ToListAsync(cancellationToken);
+        }
     }
 }

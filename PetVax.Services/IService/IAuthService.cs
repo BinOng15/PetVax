@@ -24,5 +24,6 @@ namespace PetVax.Services.IService
         Task<BaseResponse<ForgetPasswordResponseDTO>> SendResetPasswordEmailAsync(string email, CancellationToken cancellationToken);
         Task<BaseResponse<ResetPasswordResponseDTO>> ResetPasswordAfterForgetAsync(ResetPasswordAfterForgetDTO resetPasswordAfterForgetDTO, CancellationToken cancellationToken);
         Task<(bool Success, string Message, string Token)> LoginWithGoogleAsync(string idToken, CancellationToken cancellationToken);
+        Task<BaseResponse<bool>> LogoutAsync(string accessToken, string refreshToken, CancellationToken cancellationToken);
     }
 }

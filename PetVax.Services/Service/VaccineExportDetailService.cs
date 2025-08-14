@@ -521,6 +521,53 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse<List<VaccineExportDetailResponseDTO>>> GetListVaccineExportDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
+        {
+            if (vaccineBatchId <= 0)
+            {
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "ID lô vắc xin không hợp lệ.",
+                    Data = null
+                };
+            }
+            try
+            {
+                var vaccineExportDetails = await _vaccineExportDetailRepository.GetListVaccineExportDetailByVaccineBatchIdAsync(vaccineBatchId, cancellationToken);
+                if (vaccineExportDetails == null || !vaccineExportDetails.Any())
+                {
+                    return new BaseResponse<List<VaccineExportDetailResponseDTO>>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết phiếu xuất vắc xin nào cho lô này.",
+                        Data = null
+                    };
+                }
+                var responseDTO = _mapper.Map<List<VaccineExportDetailResponseDTO>>(vaccineExportDetails);
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy danh sách chi tiết phiếu xuất vắc xin theo lô thành công.",
+                    Data = responseDTO
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy danh sách chi tiết phiếu xuất vắc xin theo lô.");
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy danh sách chi tiết phiếu xuất kho cho lô vắc xin, vui lòng thử lại sau!",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<VaccineExportDetailResponseForVaccinationDTO>> GetVaccineExportDetailByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
         {
             if (appointmentDetailId <= 0)
@@ -634,8 +681,8 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Chi tiết phiếu xuất vắc xin không tồn tại hoặc đã bị xóa.",
                         Data = null
                     };

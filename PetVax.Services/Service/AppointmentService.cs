@@ -1396,10 +1396,69 @@ namespace PetVax.Services.Service
                                                     doseProfile.IsCompleted = true;
                                                     doseProfile.ModifiedAt = DateTimeHelper.Now();
                                                     doseProfile.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                                                    // Tránh lỗi tracking disease
+                                                    doseProfile.Disease = null;
+                                                    doseProfile.AppointmentDetail = null;
                                                     await _vaccineProfileRepository.UpdateVaccineProfileAsync(doseProfile, cancellationToken);
+
+                                                    // Cập nhật ngày tiêm dự kiến cho tất cả các mũi tiếp theo cho tới mũi cuối cùng
+                                                    var schedulesForDisease = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(diseaseId, cancellationToken);
+                                                    var lastVaccinationDate = appointmentDetail.AppointmentDate;
+                                                    for (int nextDose = i + 1; nextDose <= diseaseProfiles.Max(p => p.Dose ?? 0) + schedulesForDisease.Count(); nextDose++)
+                                                    {
+                                                        var nextProfile = diseaseProfiles.FirstOrDefault(p => (p.Dose ?? nextDose) == nextDose && p.IsCompleted != true);
+                                                        var nextSchedule = schedulesForDisease.FirstOrDefault(s => s.DoseNumber == nextDose);
+                                                        if (nextProfile != null && nextSchedule != null)
+                                                        {
+                                                            // Nếu mũi hiện tại đã tiêm, dự kiến mũi tiếp theo = ngày tiêm hiện tại + ageInterval (tính theo tuần)
+                                                            lastVaccinationDate = lastVaccinationDate.AddDays(nextSchedule.AgeInterval * 7);
+                                                            nextProfile.PreferedDate = lastVaccinationDate;
+                                                            nextProfile.Disease = null;
+                                                            nextProfile.AppointmentDetail = null;
+                                                            await _vaccineProfileRepository.UpdateVaccineProfileAsync(nextProfile, cancellationToken);
+                                                        }
+                                                    }
                                                     break;
                                                 }
                                             }
+                                            // BẮT ĐẦU: Tạo mũi tiêm nhắc lại sau 1 năm nếu đã tiêm đủ liều
+                                            var vaccinationSchedules = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(diseaseId, cancellationToken);
+                                            int totalDose = vaccinationSchedules?.Sum(s => s.DoseNumber) ?? 0;
+                                            int completedDoses = diseaseProfiles.Count(p => p.IsCompleted == true);
+
+                                            if (totalDose > 0 && completedDoses >= totalDose)
+                                            {
+                                                // Kiểm tra đã có mũi tiêm nhắc lại chưa
+                                                var reminderProfile = diseaseProfiles.FirstOrDefault(p => p.Dose == totalDose + 1);
+                                                if (reminderProfile == null)
+                                                {
+                                                    var lastCompleted = diseaseProfiles.Where(p => p.IsCompleted == true).OrderByDescending(p => p.Dose ?? 0).FirstOrDefault();
+                                                    var preferedDate = lastCompleted?.VaccinationDate?.AddYears(1) ?? DateTimeHelper.Now().AddYears(1);
+
+                                                    var newReminderProfile = new VaccineProfile
+                                                    {
+                                                        PetId = appointment.PetId,
+                                                        DiseaseId = diseaseId,
+                                                        Dose = totalDose + 1,
+                                                        IsActive = true,
+                                                        IsCompleted = false,
+                                                        PreferedDate = preferedDate,
+                                                        CreatedAt = DateTimeHelper.Now(),
+                                                        CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                                                        VaccinationScheduleId = null
+                                                    };
+                                                    _logger.LogInformation("Creating new reminder VaccineProfile for PetId: {PetId}, DiseaseId: {DiseaseId}, Dose: {Dose}, PreferedDate: {PreferedDate}",
+                                                        appointment.PetId, diseaseId, totalDose + 1, preferedDate);
+                                                    await _vaccineProfileRepository.CreateVaccineProfileAsync(newReminderProfile, cancellationToken);
+                                                }
+
+                                                else
+                                                {
+                                                    _logger.LogInformation("Reminder VaccineProfile already exists for PetId: {PetId}, DiseaseId: {DiseaseId}, Dose: {Dose}",
+                                                        appointment.PetId, diseaseId, totalDose + 1);
+                                                }
+                                            }
+                                            // KẾT THÚC: Tạo mũi tiêm nhắc lại sau 1 năm
                                         }
                                     }
                                 }

@@ -369,6 +369,53 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse<List<VaccineReceiptDetailResponseDTO>>> GetListVaccineReceiptDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
+        {
+            if (vaccineBatchId <= 0)
+            {
+                return new BaseResponse<List<VaccineReceiptDetailResponseDTO>>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "ID lô vắc xin không hợp lệ.",
+                    Data = null
+                };
+            }
+            try
+            {
+                var details = await _vaccineReceiptDetailRepository.GetListVaccineReceiptDetailByVaccineBatchIdAsync(vaccineBatchId, cancellationToken);
+                if (details == null || !details.Any())
+                {
+                    return new BaseResponse<List<VaccineReceiptDetailResponseDTO>>
+                    {
+                        Code = 200,
+                        Success = true,
+                        Message = "Không tìm thấy chi tiết phiếu nhập kho nào cho lô vắc xin này.",
+                        Data = null
+                    };
+                }
+                var responseDTOs = _mapper.Map<List<VaccineReceiptDetailResponseDTO>>(details);
+                return new BaseResponse<List<VaccineReceiptDetailResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy danh sách chi tiết phiếu nhập kho theo lô vắc xin thành công.",
+                    Data = responseDTOs
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving Vaccine Receipt Details by Vaccine Batch ID");
+                return new BaseResponse<List<VaccineReceiptDetailResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã có lỗi khi lấy danh sách chi tiết phiếu nhập kho theo lô vắc xin, vui lòng thử lại sau!",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<VaccineReceiptDetailResponseDTO>> GetVaccineReceiptDetailByIdAsync(int vaccineReceiptDetailId, CancellationToken cancellationToken)
         {
             if (vaccineReceiptDetailId <= 0)
@@ -435,8 +482,8 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<VaccineReceiptDetailResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Chi tiết phiếu nhập kho cho lô vắc xin này không tồn tại.",
                         Data = null
                     };

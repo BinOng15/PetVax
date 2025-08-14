@@ -276,8 +276,8 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<MicrochipResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy microchip nào.",
                         Data = responseData
                     };

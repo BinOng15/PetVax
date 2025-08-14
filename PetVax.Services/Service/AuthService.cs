@@ -920,5 +920,35 @@ namespace PetVax.Services.Service
                 return (false, "Đăng nhập với Google thất bại.", string.Empty);
             }
         }
+
+        public async Task<BaseResponse<bool>> LogoutAsync(string accessToken, string refreshToken, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Invalidate the access token and refresh token
+                // For this example, we will just return success as we are not storing tokens in a database
+                // In a real application, you would remove the tokens from your store or mark them as invalid
+                // Log the logout action
+                _logger.LogInformation($"User logged out. AccessToken: {accessToken}, RefreshToken: {refreshToken}");
+                return new BaseResponse<bool>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Đăng xuất thành công.",
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error logging out.");
+                return new BaseResponse<bool>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đăng xuất thất bại.",
+                    Data = false
+                };
+            }
+        }
     }
 }
