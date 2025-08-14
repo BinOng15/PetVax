@@ -134,8 +134,8 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<List<PointTransactionResponseDTO>>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy lịch sử điểm cho khách hàng này",
                         Data = null
                     };

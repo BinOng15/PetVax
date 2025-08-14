@@ -19,5 +19,15 @@ namespace PetVax.BusinessObjects.Helpers
         {
             return TimeZoneInfo.ConvertTimeFromUtc(dateTime, VietNamTimeZone);
         }
+        public static DateTime StartOfWeek(this DateTime date, DayOfWeek startOfWeek)
+        {
+            int diff = (7 + (date.DayOfWeek - startOfWeek)) % 7;
+            return date.AddDays(-1 * diff).Date;
+        }
+
+        public static DateTime EndOfWeek(this DateTime date, DayOfWeek startOfWeek)
+        {
+            return StartOfWeek(date, startOfWeek).AddDays(6);
+        }
     }
 }

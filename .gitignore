@@ -7,7 +7,7 @@
 # .NET Core build folders
 bin/
 obj/
-
+PetVax.API/appsettings*.json
 # Common node modules locations
 /node_modules
 /wwwroot/node_modules

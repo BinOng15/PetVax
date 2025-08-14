@@ -18,5 +18,7 @@ namespace PetVax.Services.IService
         Task<BaseResponse<VaccineReceiptDetailResponseDTO>> CreateVaccineReceiptDetailAsync(CreateVaccineReceiptDetailDTO createVaccineReceiptDetailDTO, CancellationToken cancellationToken);
         Task<BaseResponse<VaccineReceiptDetailResponseDTO>> UpdateVaccineReceiptDetailAsync(int vaccineReceiptDetailId, UpdateVaccineReceiptDetailDTO updateVaccineReceiptDetailDTO, CancellationToken cancellationToken);
         Task<BaseResponse<bool>> DeleteVaccineReceiptDetailAsync(int vaccineReceiptDetailId, CancellationToken cancellationToken);
+        Task<BaseResponse<VaccineReceiptDetailResponseDTO>> CreateFullVaccineReceiptAsync(CreateFullVaccineReceiptDTO createFullVaccineReceiptDTO, CancellationToken cancellationToken);
+        Task<BaseResponse<List<VaccineReceiptDetailResponseDTO>>> GetListVaccineReceiptDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken);
     }
 }

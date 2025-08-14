@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using PetVax.BusinessObjects.DTO;
+using PetVax.BusinessObjects.DTO.AccountDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.Enum;
@@ -278,6 +279,13 @@ namespace PetVax.Services.Service
 
                         // Search by Dose information
                         )
+                        .ToList();
+                }
+                // Filter by status if provided
+                if (getAllItemsDTO?.Status.HasValue == true)
+                {
+                    details = details
+                        .Where(a => a.isDeleted == getAllItemsDTO.Status.Value)
                         .ToList();
                 }
                 int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;

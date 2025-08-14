@@ -198,7 +198,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<DiseaseResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy bệnh nào",
                         Data = responseData
                     };

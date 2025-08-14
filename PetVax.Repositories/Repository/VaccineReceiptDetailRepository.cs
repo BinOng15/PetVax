@@ -47,7 +47,7 @@ namespace PetVax.Repositories.Repository
                 .Include(vrd => vrd.VaccineBatch)
                     .ThenInclude(vb => vb.Vaccine)
                 .Include(vrd => vrd.VaccineReceipt)
-                .Where(vrd => vrd.VaccineReceiptId == vaccineReceiptId && !vrd.isDeleted.HasValue || !vrd.isDeleted.Value)
+                .Where(vrd => vrd.VaccineReceiptId == vaccineReceiptId && (!vrd.isDeleted.HasValue || !vrd.isDeleted.Value))
                 .ToListAsync(cancellationToken);
         }
         public async Task<VaccineReceiptDetail> GetVaccineReceiptDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
@@ -56,7 +56,7 @@ namespace PetVax.Repositories.Repository
                 .Include(vrd => vrd.VaccineBatch)
                     .ThenInclude(vb => vb.Vaccine)
                 .Include(vrd => vrd.VaccineReceipt)
-                .FirstOrDefaultAsync(vrd => vrd.VaccineBatchId == vaccineBatchId && !vrd.isDeleted.HasValue || !vrd.isDeleted.Value, cancellationToken);
+                .FirstOrDefaultAsync(vrd => vrd.VaccineBatchId == vaccineBatchId && (!vrd.isDeleted.HasValue || !vrd.isDeleted.Value), cancellationToken);
         }
         public async Task<int> UpdateVaccineReceiptDetailAsync(VaccineReceiptDetail vaccineReceiptDetail, CancellationToken cancellationToken)
         {
@@ -68,6 +68,16 @@ namespace PetVax.Repositories.Repository
             return await _context.VaccineReceiptDetails
                 .Where(vrd => vrd.isDeleted == false)
                 .CountAsync(cancellationToken);
+        }
+
+        public async Task<List<VaccineReceiptDetail>> GetListVaccineReceiptDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
+        {
+            return await _context.VaccineReceiptDetails
+                .Include(vrd => vrd.VaccineBatch)
+                    .ThenInclude(vb => vb.Vaccine)
+                .Include(vrd => vrd.VaccineReceipt)
+                .Where(vrd => vrd.VaccineBatchId == vaccineBatchId && (!vrd.isDeleted.HasValue || !vrd.isDeleted.Value))
+                .ToListAsync(cancellationToken);
         }
     }
 }

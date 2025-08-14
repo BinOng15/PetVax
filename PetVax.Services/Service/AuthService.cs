@@ -24,6 +24,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using static PetVax.BusinessObjects.DTO.ResponseModel;
+using Google.Apis.Auth;
 
 namespace PetVax.Services.Service
 {
@@ -360,18 +361,18 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AuthResponseDTO>> Register(RegisRequestDTO regisRequestDTO, CancellationToken cancellationToken)
         {
             try
             {
                 var account = await _accountRepository.GetAccountByEmailAsync(regisRequestDTO.Email, cancellationToken);
                 if (account != null)
                 {
-                    return new BaseResponse
+                    return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 409,
                         Success = false,
-                        Message = "Email dã được sử dụng. Vui lòng sử dụng email khác."
+                        Message = "Email dã được sử dụng. Vui lòng sử dụng email khác.",
                     };
                 }
 
@@ -397,16 +398,17 @@ namespace PetVax.Services.Service
 
                 await _accountRepository.CreateAccountAsync(newAccount, cancellationToken);
 
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 200,
                     Success = true,
                     Message = "Đăng ký thành công. Vui lòng kiểm tra email để nhận mã OTP xác thực.",
+
                 };
             }
             catch (ErrorException ex)
             {
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = ex.ErrorCode,
                     Success = false,
@@ -415,7 +417,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 500,
                     Success = false,
@@ -424,13 +426,13 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse> VerifyEmail(string email, string otp, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AuthResponseDTO>> VerifyEmail(string email, string otp, CancellationToken cancellationToken)
         {
             try
             {
                 if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
                 {
-                    return new BaseResponse
+                    return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 401,
                         Success = false,
@@ -441,7 +443,7 @@ namespace PetVax.Services.Service
                 var account = await _accountRepository.GetAccountByEmailAsync(email, cancellationToken);
                 if (account == null)
                 {
-                    return new BaseResponse
+                    return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 404,
                         Success = false,
@@ -476,7 +478,7 @@ namespace PetVax.Services.Service
 
                 _otpStore.TryRemove(email, out _);
 
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 200,
                     Success = true,
@@ -486,7 +488,7 @@ namespace PetVax.Services.Service
             catch (ErrorException ex)
             {
                 var errorData = new ErrorResponseModel(ex.ErrorCode, ex.Message);
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 500,
                     Success = false,
@@ -747,7 +749,7 @@ namespace PetVax.Services.Service
                 }
                 // Generate OTP and expiration time
                 var otp = GenerateOtp();
-                var expiration = DateTimeHelper.Now().AddMinutes(10);
+                var expiration = DateTimeHelper.Now().AddMinutes(5);
                 _otpStore[email] = (otp, expiration);
                 // Send OTP email
                 await SendOtpEmailAsync(email, otp, cancellationToken);
@@ -775,13 +777,13 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse> VerifyResetPasswordOtpAsync(string email, string otp, CancellationToken cancellationToken)
+        public async Task<BaseResponse<AuthResponseDTO>> VerifyResetPasswordOtpAsync(string email, string otp, CancellationToken cancellationToken)
         {
             try
             {
                 if (!_otpStore.TryGetValue(email, out var otpInfo) || otpInfo.Expiration < DateTimeHelper.Now() || otpInfo.Otp != otp)
                 {
-                    return new BaseResponse
+                    return new BaseResponse<AuthResponseDTO>
                     {
                         Code = 401,
                         Success = false,
@@ -790,7 +792,7 @@ namespace PetVax.Services.Service
                 }
                 // Remove OTP from store after verification
                 _otpStore.TryRemove(email, out _);
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 200,
                     Success = true,
@@ -799,7 +801,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                return new BaseResponse
+                return new BaseResponse<AuthResponseDTO>
                 {
                     Code = 500,
                     Success = false,
@@ -835,17 +837,6 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                // Check old password
-                if (!VerifyPassword(resetPasswordAfterForgetDTO.OldPassword, account.PasswordHash, account.PasswordSalt))
-                {
-                    return new BaseResponse<ResetPasswordResponseDTO>
-                    {
-                        Code = 401,
-                        Success = false,
-                        Message = "Mật khẩu cũ không đúng.",
-                        Data = null
-                    };
-                }
                 // Generate new password hash and salt
                 string newPasswordSalt = PasswordHelper.GenerateSalt();
                 string newPasswordHash = PasswordHelper.HashPassword(resetPasswordAfterForgetDTO.NewPassword, newPasswordSalt);
@@ -875,6 +866,87 @@ namespace PetVax.Services.Service
                     Success = false,
                     Message = ex.Message,
                     Data = null
+                };
+            }
+        }
+
+        public async Task<(bool Success, string Message, string Token)> LoginWithGoogleAsync(string idToken, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
+                if (payload == null)
+                {
+                    return (false, "Token không hợp lệ.", string.Empty);
+                }
+                var account = await _accountRepository.GetAccountByEmailAsync(payload.Email, cancellationToken);
+                if (account == null)
+                {
+                    // Create new account if it doesn't exist
+                    account = new Account
+                    {
+                        Email = payload.Email,
+                        Role = EnumList.Role.Customer,
+                        CreatedAt = DateTimeHelper.Now(),
+                        isVerify = true // Automatically verify Google accounts
+                    };
+                    await _accountRepository.CreateAccountAsync(account, cancellationToken);
+                }
+                // Generate JWT token
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
+                    new Claim(ClaimTypes.Email, account.Email),
+                    new Claim(ClaimTypes.Role, account.Role.ToString())
+                };
+
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTimeHelper.Now().AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpiration"])),
+                    signingCredentials: credentials
+                );
+
+                var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
+                return (true, "Đăng nhập với Google thành công.", accessToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error logging in with Google.");
+                return (false, "Đăng nhập với Google thất bại.", string.Empty);
+            }
+        }
+
+        public async Task<BaseResponse<bool>> LogoutAsync(string accessToken, string refreshToken, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Invalidate the access token and refresh token
+                // For this example, we will just return success as we are not storing tokens in a database
+                // In a real application, you would remove the tokens from your store or mark them as invalid
+                // Log the logout action
+                _logger.LogInformation($"User logged out. AccessToken: {accessToken}, RefreshToken: {refreshToken}");
+                return new BaseResponse<bool>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Đăng xuất thành công.",
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error logging out.");
+                return new BaseResponse<bool>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đăng xuất thất bại.",
+                    Data = false
                 };
             }
         }

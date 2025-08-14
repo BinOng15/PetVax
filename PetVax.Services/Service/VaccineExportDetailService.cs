@@ -48,6 +48,113 @@ namespace PetVax.Services.Service
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public async Task<BaseResponse<VaccineExportDetailResponseDTO>> CreateFullVaccineExportAsync(CreateFullVaccineExportDTO createFullVaccineExportDTO, CancellationToken cancellationToken)
+        {
+            if (createFullVaccineExportDTO == null)
+            {
+                return new BaseResponse<VaccineExportDetailResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Dữ liệu không hợp lệ.",
+                    Data = null
+                };
+            }
+            try
+            {
+                // Tạo VaccineExport
+                var vaccineExport = new VaccineExport
+                {
+                    // Gán các thuộc tính cần thiết từ DTO, ví dụ:
+                    ExportCode = "EXPORT" + new Random().Next(100000, 1000000).ToString(),
+                    ExportDate = DateTimeHelper.Now(),
+                    CreatedAt = DateTimeHelper.Now(),
+                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                };
+                var createdVaccineExportId = await _vaccineExportRepository.CreateVaccineExportAsync(vaccineExport, cancellationToken);
+
+                // Tạo VaccineExportDetail
+                var vaccineExportDetail = new VaccineExportDetail
+                {
+                    VaccineExportId = createdVaccineExportId,
+                    VaccineBatchId = createFullVaccineExportDTO.VaccineBatchId,
+                    Quantity = createFullVaccineExportDTO.Quantity,
+                    Purpose = createFullVaccineExportDTO.Purpose,
+                    Notes = createFullVaccineExportDTO.Notes,
+                    CreatedAt = DateTimeHelper.Now(),
+                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                    isDeleted = false
+                };
+                var createdVaccineExportDetailId = await _vaccineExportDetailRepository.CreateVaccineExportDetailAsync(vaccineExportDetail, cancellationToken);
+
+                // Trừ số lượng từ VaccineBatch
+                var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(createFullVaccineExportDTO.VaccineBatchId, cancellationToken);
+                if (vaccineBatch == null || vaccineBatch.isDeleted == true)
+                {
+                    return new BaseResponse<VaccineExportDetailResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Lô vắc xin không tồn tại hoặc đã bị xóa.",
+                        Data = null
+                    };
+                }
+                if (createFullVaccineExportDTO.Quantity > vaccineBatch.Quantity)
+                {
+                    return new BaseResponse<VaccineExportDetailResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Số lượng xuất vượt quá số lượng hiện có của lô vắc xin.",
+                        Data = null
+                    };
+                }
+                vaccineBatch.Quantity -= createFullVaccineExportDTO.Quantity;
+                await _vaccineBatchRepository.UpdateVaccineBatchAsync(vaccineBatch, cancellationToken);
+
+                // Tạo ColdChainLog nếu có
+                if (createFullVaccineExportDTO.ColdChainLog != null)
+                {
+                    var coldChainLogDTO = createFullVaccineExportDTO.ColdChainLog;
+                    var coldChainLog = new ColdChainLog
+                    {
+                        VaccineBatchId = createFullVaccineExportDTO.VaccineBatchId,
+                        LogTime = coldChainLogDTO?.LogTime ?? DateTimeHelper.Now(),
+                        Temperature = coldChainLogDTO?.Temperature ?? 0,
+                        Humidity = coldChainLogDTO?.Humidity ?? 0,
+                        Event = coldChainLogDTO?.Event ?? "Xuất kho",
+                        Notes = coldChainLogDTO?.Notes ?? $"Tạo log cho chi tiết xuất kho có id: {createdVaccineExportDetailId}",
+                        RecordedAt = DateTimeHelper.Now(),
+                        RecordedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                        isDeleted = false
+                    };
+                    await _coldChainLogRepository.CreateColdChainLogAsync(coldChainLog, cancellationToken);
+                }
+
+                var createdDetail = await _vaccineExportDetailRepository.GetVaccineExportDetailByIdAsync(createdVaccineExportDetailId, cancellationToken);
+                var responseDTO = _mapper.Map<VaccineExportDetailResponseDTO>(createdDetail);
+
+                return new BaseResponse<VaccineExportDetailResponseDTO>
+                {
+                    Code = 201,
+                    Success = true,
+                    Message = "Tạo phiếu xuất và chi tiết phiếu xuất vắc xin thành công.",
+                    Data = responseDTO
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi tạo phiếu xuất và chi tiết phiếu xuất vắc xin.");
+                return new BaseResponse<VaccineExportDetailResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi tạo phiếu xuất kho cho lô vắc xin, vui lòng thử lại sau!",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<VaccineExportDetailResponseDTO>> CreateVaccineExportDetailAsync(CreateVaccineExportDetailDTO createVaccineExportDetailDTO, CancellationToken cancellationToken)
         {
             if (createVaccineExportDetailDTO == null)
@@ -414,6 +521,53 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse<List<VaccineExportDetailResponseDTO>>> GetListVaccineExportDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
+        {
+            if (vaccineBatchId <= 0)
+            {
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "ID lô vắc xin không hợp lệ.",
+                    Data = null
+                };
+            }
+            try
+            {
+                var vaccineExportDetails = await _vaccineExportDetailRepository.GetListVaccineExportDetailByVaccineBatchIdAsync(vaccineBatchId, cancellationToken);
+                if (vaccineExportDetails == null || !vaccineExportDetails.Any())
+                {
+                    return new BaseResponse<List<VaccineExportDetailResponseDTO>>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Không tìm thấy chi tiết phiếu xuất vắc xin nào cho lô này.",
+                        Data = null
+                    };
+                }
+                var responseDTO = _mapper.Map<List<VaccineExportDetailResponseDTO>>(vaccineExportDetails);
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy danh sách chi tiết phiếu xuất vắc xin theo lô thành công.",
+                    Data = responseDTO
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy danh sách chi tiết phiếu xuất vắc xin theo lô.");
+                return new BaseResponse<List<VaccineExportDetailResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi lấy danh sách chi tiết phiếu xuất kho cho lô vắc xin, vui lòng thử lại sau!",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<VaccineExportDetailResponseForVaccinationDTO>> GetVaccineExportDetailByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
         {
             if (appointmentDetailId <= 0)
@@ -527,8 +681,8 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<List<VaccineExportDetailResponseDTO>>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Chi tiết phiếu xuất vắc xin không tồn tại hoặc đã bị xóa.",
                         Data = null
                     };

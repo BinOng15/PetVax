@@ -45,6 +45,103 @@ namespace PetVax.Services.Service
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public async Task<BaseResponse<VaccineReceiptDetailResponseDTO>> CreateFullVaccineReceiptAsync(CreateFullVaccineReceiptDTO createFullVaccineReceiptDTO, CancellationToken cancellationToken)
+        {
+            if (createFullVaccineReceiptDTO == null)
+            {
+                return new BaseResponse<VaccineReceiptDetailResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Dữ liệu không hợp lệ",
+                    Data = null
+                };
+            }
+            try
+            {
+                // 1. Tạo VaccineReceipt
+                var vaccineReceipt = new VaccineReceipt
+                {
+                    ReceiptCode = "RECEIPT" + new Random().Next(100000, 1000000).ToString(),
+                    ReceiptDate = createFullVaccineReceiptDTO.ReceiptDate,
+                    CreatedAt = DateTimeHelper.Now(),
+                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                };
+                var vaccineReceiptId = await _vaccineReceiptRepository.CreateVaccineReceiptAsync(vaccineReceipt, cancellationToken);
+
+                // 2. Kiểm tra VaccineBatchId có hợp lệ không
+                var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(createFullVaccineReceiptDTO.VaccineBatchId, cancellationToken);
+                if (vaccineBatch == null)
+                {
+                    return new BaseResponse<VaccineReceiptDetailResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Lô vắc xin không tồn tại.",
+                        Data = null
+                    };
+                }
+
+                // 3. Tạo VaccineReceiptDetail
+                var vaccineReceiptDetail = new VaccineReceiptDetail
+                {
+                    VaccineReceiptId = vaccineReceiptId,
+                    VaccineBatchId = createFullVaccineReceiptDTO.VaccineBatchId,
+                    Suppiler = createFullVaccineReceiptDTO.Suppiler,
+                    Quantity = createFullVaccineReceiptDTO.Quantity,
+                    VaccineStatus = createFullVaccineReceiptDTO.VaccineStatus,
+                    Notes = createFullVaccineReceiptDTO.Notes,
+                    CreatedAt = DateTimeHelper.Now(),
+                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                    isDeleted = false
+                };
+                var vaccineReceiptDetailId = await _vaccineReceiptDetailRepository.CreateVaccineReceiptDetailAsync(vaccineReceiptDetail, cancellationToken);
+
+                // 4. Tăng quantity của VaccineBatch
+                vaccineBatch.Quantity += createFullVaccineReceiptDTO.Quantity;
+                await _vaccineBatchRepository.UpdateVaccineBatchAsync(vaccineBatch, cancellationToken);
+
+                // 5. Tạo ColdChainLog
+                var coldChainLogDTO = createFullVaccineReceiptDTO.ColdChainLog;
+                var coldChainLog = new ColdChainLog
+                {
+                    VaccineBatchId = coldChainLogDTO?.VaccineBatchId ?? createFullVaccineReceiptDTO.VaccineBatchId,
+                    LogTime = coldChainLogDTO?.LogTime ?? DateTimeHelper.Now(),
+                    Temperature = coldChainLogDTO?.Temperature ?? 0,
+                    Humidity = coldChainLogDTO?.Humidity ?? 0,
+                    Event = coldChainLogDTO?.Event ?? "Nhập kho",
+                    Notes = coldChainLogDTO?.Notes ?? $"Tạo log cho chi tiết nhập kho có id: {vaccineReceiptDetailId}",
+                    RecordedAt = DateTimeHelper.Now(),
+                    RecordedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                    isDeleted = false
+                };
+                await _coldChainLogRepository.CreateColdChainLogAsync(coldChainLog, cancellationToken);
+
+                // 6. Lấy lại VaccineReceiptDetail vừa tạo để trả về
+                var createdDetail = await _vaccineReceiptDetailRepository.GetVaccineReceiptDetailByIdAsync(vaccineReceiptDetailId, cancellationToken);
+                var responseDTO = _mapper.Map<VaccineReceiptDetailResponseDTO>(createdDetail);
+
+                return new BaseResponse<VaccineReceiptDetailResponseDTO>
+                {
+                    Code = 201,
+                    Success = true,
+                    Message = "Tạo phiếu nhập kho và chi tiết thành công.",
+                    Data = responseDTO
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating full Vaccine Receipt");
+                return new BaseResponse<VaccineReceiptDetailResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã có lỗi khi tạo phiếu nhập kho và chi tiết, vui lòng thử lại sau!",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<VaccineReceiptDetailResponseDTO>> CreateVaccineReceiptDetailAsync(CreateVaccineReceiptDetailDTO createVaccineReceiptDetailDTO, CancellationToken cancellationToken)
         {
             if (createVaccineReceiptDetailDTO == null)
@@ -272,6 +369,53 @@ namespace PetVax.Services.Service
             }
         }
 
+        public async Task<BaseResponse<List<VaccineReceiptDetailResponseDTO>>> GetListVaccineReceiptDetailByVaccineBatchIdAsync(int vaccineBatchId, CancellationToken cancellationToken)
+        {
+            if (vaccineBatchId <= 0)
+            {
+                return new BaseResponse<List<VaccineReceiptDetailResponseDTO>>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "ID lô vắc xin không hợp lệ.",
+                    Data = null
+                };
+            }
+            try
+            {
+                var details = await _vaccineReceiptDetailRepository.GetListVaccineReceiptDetailByVaccineBatchIdAsync(vaccineBatchId, cancellationToken);
+                if (details == null || !details.Any())
+                {
+                    return new BaseResponse<List<VaccineReceiptDetailResponseDTO>>
+                    {
+                        Code = 200,
+                        Success = true,
+                        Message = "Không tìm thấy chi tiết phiếu nhập kho nào cho lô vắc xin này.",
+                        Data = null
+                    };
+                }
+                var responseDTOs = _mapper.Map<List<VaccineReceiptDetailResponseDTO>>(details);
+                return new BaseResponse<List<VaccineReceiptDetailResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Message = "Lấy danh sách chi tiết phiếu nhập kho theo lô vắc xin thành công.",
+                    Data = responseDTOs
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving Vaccine Receipt Details by Vaccine Batch ID");
+                return new BaseResponse<List<VaccineReceiptDetailResponseDTO>>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã có lỗi khi lấy danh sách chi tiết phiếu nhập kho theo lô vắc xin, vui lòng thử lại sau!",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<VaccineReceiptDetailResponseDTO>> GetVaccineReceiptDetailByIdAsync(int vaccineReceiptDetailId, CancellationToken cancellationToken)
         {
             if (vaccineReceiptDetailId <= 0)
@@ -338,8 +482,8 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<VaccineReceiptDetailResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Chi tiết phiếu nhập kho cho lô vắc xin này không tồn tại.",
                         Data = null
                     };

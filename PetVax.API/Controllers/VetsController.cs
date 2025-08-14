@@ -40,7 +40,7 @@ namespace PediVax.Controllers
 
         [HttpPut("update-vet")]
         [Authorize(Roles = "Admin, Vet, Staff")]
-        public async Task<IActionResult> UpdateVet([FromBody] UpdateVetRequest updateVetRequest, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UpdateVet([FromForm] UpdateVetRequest updateVetRequest, CancellationToken cancellationToken = default)
         {
 
             var response = await _vetService.UpdateVetsAsync(updateVetRequest, cancellationToken);

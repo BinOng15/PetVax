@@ -186,6 +186,9 @@ namespace PetVax.Repositories.Repository
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Pet)
+                    .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Customer)
+                        .ThenInclude(c => c.Membership)
                 .Include(ad => ad.Payment)
                 .FirstOrDefaultAsync(ad => ad.Appointment.AppointmentId == appointmentId, cancellationToken);
         }
@@ -335,6 +338,9 @@ namespace PetVax.Repositories.Repository
                    .ThenInclude(a => a.Pet)
                        .ThenInclude(p => p.Customer)
                             .ThenInclude(a => a.Account)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Customer)
+                        .ThenInclude(c => c.Membership)
                 .Include(ad => ad.Payment)
 
                .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
@@ -460,6 +466,9 @@ namespace PetVax.Repositories.Repository
                     .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Pet)
+                .Include(ad => ad.Appointment)
+                    .ThenInclude(a => a.Customer)
+                        .ThenInclude(c => c.Membership)
                 .Include(ad => ad.Payment)
                 .FirstOrDefaultAsync(ad => ad.AppointmentId == appointmentId, cancellationToken);
         }

@@ -18,5 +18,6 @@ namespace PetVax.Services.IService
         Task<BaseResponse<bool>> UpdateAccountAsync(int accountId, UpdateAccountDTO updateAccountDTO, CancellationToken cancellationToken);
         Task<BaseResponse<bool>> DeleteAccountAsync(int accountId, CancellationToken cancellationToken);
         Task<BaseResponse<AccountResponseDTO>> GetCurrentAccountAsync(CancellationToken cancellationToken);
+        Task<DynamicResponse<AccountResponseDTO>> GetAllStaffAccountsAsync(GetAllAccountRequestDTO getAllAccountRequestDTO, CancellationToken cancellationToken);
     }
 }

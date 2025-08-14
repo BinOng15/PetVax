@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PetVax.BusinessObjects.DTO.AccountDTO;
+using PetVax.BusinessObjects.DTO.AddressDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
 using PetVax.BusinessObjects.DTO.AppointmentDTO;
 using PetVax.BusinessObjects.DTO.ColdChainLogDTO;
@@ -116,6 +117,10 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image))
                 .ForMember(dest => dest.CustomerResponseDTO, opt => opt.MapFrom(src => src.Customer));
             CreateMap<Pet, PetResponseDTOs>();
+            CreateMap<Pet, PetHasMicrochipResponseDTO>()
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : src.Image))
+                .ForMember(dest => dest.CustomerResponseDTO, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.MicrochipItems, otp => otp.MapFrom(src => src.MicrochipItems));
 
             //Appointment
             CreateMap<CreateAppointmentDTO, Appointment>();
@@ -188,11 +193,12 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<MicrochipItem, MicrochipItemResponse>()
                 .ForMember(dest => dest.Pet, opt => opt.Ignore());
             CreateMap<HealthCondition, HealthConditionResponse>();
-       
+
 
             //VaccineProfile
             CreateMap<VaccineProfile, VaccineProfileResponseDTO>()
-                .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.AppointmentDetail));
+                //.ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.AppointmentDetail))
+                .ForMember(dest => dest.AppointmentDetail, opt => opt.Ignore());
 
             //VaccinationCertificate
             CreateMap<CreateVaccinationCertificateDTO, VaccinationCertificate>();
@@ -231,6 +237,7 @@ namespace PetVax.Services.Configurations.Mapper
 
             //VaccineReceipt
             CreateMap<CreateVaccineReceiptDTO, VaccineReceipt>();
+            CreateMap<CreateFullVaccineReceiptDTO, VaccineReceipt>();
             CreateMap<UpdateVaccineReceiptDTO, VaccineReceipt>();
             CreateMap<VaccineReceipt, VaccineReceiptResponseDTO>();
 
@@ -240,6 +247,8 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<VaccineReceiptDetail, VaccineReceiptDetailResponseDTO>()
                 .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
                 .ForMember(dest => dest.VaccineReceipt, opt => opt.MapFrom(src => src.VaccineReceipt));
+            CreateMap<CreateFullVaccineReceiptDTO, VaccineReceiptDetail>();
+
 
             //ColdChainLog
             CreateMap<CreateColdChainLogDTO, ColdChainLog>();
@@ -249,11 +258,13 @@ namespace PetVax.Services.Configurations.Mapper
 
             //VaccineExport
             CreateMap<CreateVaccineExportDTO, VaccineExport>();
+            CreateMap<CreateFullVaccineExportDTO, VaccineExport>();
             CreateMap<UpdateVaccineExportDTO, VaccineExport>();
             CreateMap<VaccineExport, VaccineExportResponseDTO>();
 
             //VaccineExportDetail
             CreateMap<CreateVaccineExportDetailDTO, VaccineExportDetail>();
+            CreateMap<CreateFullVaccineExportDTO, VaccineExportDetail>();
             CreateMap<UpdateVaccineExportDetailDTO, VaccineExportDetail>();
             CreateMap<UpdateVaccineExportDetailForVaccinationDTO, VaccineExportDetail>();
             CreateMap<VaccineExportDetail, VaccineExportDetailResponseDTO>()
@@ -313,6 +324,9 @@ namespace PetVax.Services.Configurations.Mapper
             CreateMap<CreateFAQDTO, FAQItem>();
             CreateMap<UpdateFAQDTO, FAQItem>();
             CreateMap<FAQItem, FAQResponseDTO>();
+
+            //Address
+            CreateMap<Address, AddressResponseDTO>();
 
         }
     }   

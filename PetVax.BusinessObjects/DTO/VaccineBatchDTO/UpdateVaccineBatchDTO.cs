@@ -16,6 +16,5 @@ namespace PetVax.BusinessObjects.DTO.VaccineBatchDTO
         public string? Manufacturer { get; set; }
         public string? Source { get; set; }
         public string? StorageCondition { get; set; }
-        public int? Quantity { get; set; }
     }
 }

@@ -131,6 +131,7 @@ namespace PetVax.Services.Service
                 var totalProcessingAppointmentHealthConditions = await _appointmentRepository.GetTotalProcessingAppointmentHealthConditions(cancellationToken);
                 var totalConfirmedAppointmentHealthConditions = await _appointmentRepository.GetTotalConfirmedAppointmentHealthConditions(cancellationToken);
                 var totalCheckedInAppointmentHealthConditions = await _appointmentRepository.GetTotalCheckedInAppointmentHealthConditions(cancellationToken);
+                var totalProcessedAppointmentHealthConditions = await _appointmentRepository.GetTotalProcessedAppointmentHealthConditions(cancellationToken);
                 var totalPaidAppointmentHealthConditions = await _appointmentRepository.GetTotalPaidAppointmentHealthConditions(cancellationToken);
                 var totalCompletedAppointmentHealthConditions = await _appointmentRepository.GetTotalCompletedAppointmentHealthConditions(cancellationToken);
                 var totalCancelledAppointmentHealthConditions = await _appointmentRepository.GetTotalCancelledAppointmentHealthConditions(cancellationToken);
@@ -179,7 +180,7 @@ namespace PetVax.Services.Service
                     TotalProcessingAppointmentHealthConditions = totalProcessingAppointmentHealthConditions,
                     TotalConfirmedAppointmentHealthConditions = totalConfirmedAppointmentHealthConditions,
                     TotalCheckedInAppointmentHealthConditions = totalCheckedInAppointmentHealthConditions,
-                    TotalProcessedAppointmentHealthConditions = totalPaidAppointmentHealthConditions,
+                    TotalProcessedAppointmentHealthConditions = totalProcessedAppointmentHealthConditions,
                     TotalPaidAppointmentHealthConditions = totalPaidAppointmentHealthConditions,
                     TotalCompletedAppointmentHealthConditions = totalCompletedAppointmentHealthConditions,
                     TotalCancelledAppointmentHealthConditions = totalCancelledAppointmentHealthConditions,
@@ -202,6 +203,108 @@ namespace PetVax.Services.Service
                     Code = 500,
                     Success = false,
                     Message = "Đã có lỗi khi lấy dữ liệu dashboard cho admin.",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<StaffDashboardResponseDTO>> GetDashboardDataForStaffAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var totalCustomers = await _customerRepository.GetTotalCustomersAsync(cancellationToken);
+                var totalDiseases = await _diseaseRepository.GetTotalDiseasesAsync(cancellationToken);
+                var totalPets = await _petRepository.GetTotalPetsAsync(cancellationToken);
+                var totalVaccines = await _vaccineRepository.GetTotalVaccinesAsync(cancellationToken);
+                var totalVaccineBatches = await _vaccineBatchRepository.GetTotalVaccineBatchesAsync(cancellationToken);
+                var totalVets = await _vetRepository.GetTotalVetsAsync(cancellationToken);
+                var totalAppointmentVaccinations = await _appointmentRepository.GetTotalAppointmentVaccinations(cancellationToken);
+                var totalProcessingAppointmentVaccinations = await _appointmentRepository.GetTotalProcessingAppointmentVaccinations(cancellationToken);
+                var totalConfirmedAppointmentVaccinations = await _appointmentRepository.GetTotalConfirmedAppointmentVaccinations(cancellationToken);
+                var totalCheckedInAppointmentVaccinations = await _appointmentRepository.GetTotalCheckedInAppointmentVaccinations(cancellationToken);
+                var totalPaidAppointmentVaccinations = await _appointmentRepository.GetTotalPaidAppointmentVaccinations(cancellationToken);
+                var totalCompletedAppointmentVaccinations = await _appointmentRepository.GetTotalCompletedAppointmentVaccinations(cancellationToken);
+                var totalCancelledAppointmentVaccinations = await _appointmentRepository.GetTotalCancelledAppointmentVaccinations(cancellationToken);
+                var totalRejectedAppointmentVaccinations = await _appointmentRepository.GetTotalRejectedAppointmentVaccinations(cancellationToken);
+                var totalAppointmentMicrochips = await _appointmentRepository.GetTotalAppointmentMicrochips(cancellationToken);
+                var totalProcessingAppointmentMicrochips = await _appointmentRepository.GetTotalProcessingAppointmentMicrochips(cancellationToken);
+                var totalConfirmedAppointmentMicrochips = await _appointmentRepository.GetTotalConfirmedAppointmentMicrochips(cancellationToken);
+                var totalCheckedInAppointmentMicrochips = await _appointmentRepository.GetTotalCheckedInAppointmentMicrochips(cancellationToken);
+                var totalPaidAppointmentMicrochips = await _appointmentRepository.GetTotalPaidAppointmentMicrochips(cancellationToken);
+                var totalCompletedAppointmentMicrochips = await _appointmentRepository.GetTotalCompletedAppointmentMicrochips(cancellationToken);
+                var totalCancelledAppointmentMicrochips = await _appointmentRepository.GetTotalCancelledAppointmentMicrochips(cancellationToken);
+                var totalRejectedAppointmentMicrochips = await _appointmentRepository.GetTotalRejectedAppointmentMicrochips(cancellationToken);
+                var totalAppointmentHealthConditions = await _appointmentRepository.GetTotalAppointmentHealthConditions(cancellationToken);
+                var totalProcessingAppointmentHealthConditions = await _appointmentRepository.GetTotalProcessingAppointmentHealthConditions(cancellationToken);
+                var totalConfirmedAppointmentHealthConditions = await _appointmentRepository.GetTotalConfirmedAppointmentHealthConditions(cancellationToken);
+                var totalCheckedInAppointmentHealthConditions = await _appointmentRepository.GetTotalCheckedInAppointmentHealthConditions(cancellationToken);
+                var totalProcessedAppointmentHealthConditions = await _appointmentRepository.GetTotalProcessedAppointmentHealthConditions(cancellationToken);
+                var totalPaidAppointmentHealthConditions = await _appointmentRepository.GetTotalPaidAppointmentHealthConditions(cancellationToken);
+                var totalCompletedAppointmentHealthConditions = await _appointmentRepository.GetTotalCompletedAppointmentHealthConditions(cancellationToken);
+                var totalCancelledAppointmentHealthConditions = await _appointmentRepository.GetTotalCancelledAppointmentHealthConditions(cancellationToken);
+                var totalRejectedAppointmentHealthConditions = await _appointmentRepository.GetTotalRejectedAppointmentHealthConditions(cancellationToken);
+                var totalAppointmentsToday = await _appointmentRepository.GetTotalAppointmentsToday(cancellationToken);
+                var totalAppointmentsThisWeek = await _appointmentRepository.GetTotalAppointmentsThisWeek(cancellationToken);
+                var totalAppointmentsThisMonth = await _appointmentRepository.GetTotalAppointmentsThisMonth(cancellationToken);
+                var totalAppointmentsThisYear = await _appointmentRepository.GetTotalAppointmentsThisYear(cancellationToken);
+
+                var dashboardData = new StaffDashboardResponseDTO
+                {
+                    TotalCustomers = totalCustomers,
+                    TotalDiseases = totalDiseases,
+                    TotalPets = totalPets,
+                    TotalVaccines = totalVaccines,
+                    TotalVaccineBatches = totalVaccineBatches,
+                    TotalVets = totalVets,
+                    TotalAppointmentVaccinations = totalAppointmentVaccinations,
+                    TotalProcessingAppointmentVaccinations = totalProcessingAppointmentVaccinations,
+                    TotalConfirmedAppointmentVaccinations = totalConfirmedAppointmentVaccinations,
+                    TotalCheckedInAppointmentVaccinations = totalCheckedInAppointmentVaccinations,
+                    TotalProcessedAppointmentVaccinations = totalPaidAppointmentVaccinations,
+                    TotalPaidAppointmentVaccinations = totalPaidAppointmentVaccinations,
+                    TotalCompletedAppointmentVaccinations = totalCompletedAppointmentVaccinations,
+                    TotalCancelledAppointmentVaccinations = totalCancelledAppointmentVaccinations,
+                    TotalRejectedAppointmentVaccinations = totalRejectedAppointmentVaccinations,
+                    TotalAppointmentMicrochips = totalAppointmentMicrochips,
+                    TotalProcessingAppointmentMicrochips = totalProcessingAppointmentMicrochips,
+                    TotalConfirmedAppointmentMicrochips = totalConfirmedAppointmentMicrochips,
+                    TotalCheckedInAppointmentMicrochips = totalCheckedInAppointmentMicrochips,
+                    TotalProcessedAppointmentMicrochips = totalPaidAppointmentMicrochips,
+                    TotalPaidAppointmentMicrochips = totalPaidAppointmentMicrochips,
+                    TotalCompletedAppointmentMicrochips = totalCompletedAppointmentMicrochips,
+                    TotalCancelledAppointmentMicrochips = totalCancelledAppointmentMicrochips,
+                    TotalRejectedAppointmentMicrochips = totalRejectedAppointmentMicrochips,
+                    TotalAppointmentHealthConditions = totalAppointmentHealthConditions,
+                    TotalProcessingAppointmentHealthConditions = totalProcessingAppointmentHealthConditions,
+                    TotalConfirmedAppointmentHealthConditions = totalConfirmedAppointmentHealthConditions,
+                    TotalCheckedInAppointmentHealthConditions = totalCheckedInAppointmentHealthConditions,
+                    TotalProcessedAppointmentHealthConditions = totalProcessedAppointmentHealthConditions,
+                    TotalPaidAppointmentHealthConditions = totalPaidAppointmentHealthConditions,
+                    TotalCompletedAppointmentHealthConditions = totalCompletedAppointmentHealthConditions,
+                    TotalCancelledAppointmentHealthConditions = totalCancelledAppointmentHealthConditions,
+                    TotalRejectedAppointmentHealthConditions = totalRejectedAppointmentHealthConditions,
+                    TotalAppointmentsToday = totalAppointmentsToday,
+                    TotalAppointmentsThisWeek = totalAppointmentsThisWeek,
+                    TotalAppointmentsThisMonth = totalAppointmentsThisMonth,
+                    TotalAppointmentsThisYear = totalAppointmentsThisYear,
+                    LastUpdated = DateTimeHelper.Now()
+                };
+                return new BaseResponse<StaffDashboardResponseDTO>
+                {
+                    Code = 200,
+                    Data = dashboardData,
+                    Success = true,
+                    Message = "Lấy dữ liệu dashboard cho staff thành công."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving dashboard data for staff.");
+                return new BaseResponse<StaffDashboardResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã có lỗi khi lấy dữ liệu dashboard cho staff.",
                     Data = null
                 };
             }

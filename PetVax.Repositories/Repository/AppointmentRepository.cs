@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using PetVax.BusinessObjects.Enum;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
@@ -51,8 +52,10 @@ namespace PetVax.Repositories.Repository
         public async Task<List<Appointment>> GetAllAppointmentsAsync(CancellationToken cancellationToken)
         {
             return await _context.Appointments
-                .Include(a => a.Customer) // Load Customer
-                    .ThenInclude(c => c.Account) // Load Account của Customer
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Account)
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Membership)
                 .Include(a => a.Pet) // Load Pet
                 .ToListAsync(cancellationToken);
         }
@@ -61,6 +64,8 @@ namespace PetVax.Repositories.Repository
             return await _context.Appointments
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Membership)
                 .Include(a => a.Pet)
                 .FirstOrDefaultAsync(a => a.AppointmentId == appointmentId, cancellationToken);
         }
@@ -69,6 +74,8 @@ namespace PetVax.Repositories.Repository
             return await _context.Set<Appointment>()
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Membership)
                 .Include(a => a.Pet)
                 .Where(a => a.PetId == petId && a.AppointmentStatus == status && a.isDeleted == false)
                 .ToListAsync(cancellationToken);
@@ -77,7 +84,9 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.Set<Appointment>()
                 .Include(a => a.Customer)
-                .ThenInclude(c => c.Account)
+                    .ThenInclude(c => c.Account)
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Membership)
                 .Include(a => a.Pet)
                 .Where(a => a.CustomerId == customerId && a.isDeleted == false)
                 .ToListAsync(cancellationToken);
@@ -86,8 +95,10 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.Set<Appointment>()
                 .Include(a => a.Customer)
-                .ThenInclude(c => c.Account)
+                    .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
+                .Include(a => a.Customer)
+                    .ThenInclude(c => c.Membership)
                 .Where(a => a.PetId == petId)
                 .ToListAsync(cancellationToken);
         }
@@ -355,6 +366,46 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.Appointments
                 .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.AppointmentStatus == EnumList.AppointmentStatus.Rejected && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalAppointmentsToday(CancellationToken cancellationToken)
+        {
+            var today = DateTimeHelper.Now().Date;
+            return await _context.Appointments
+                .CountAsync(a => a.AppointmentDate.Date == today && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalAppointmentsThisWeek(CancellationToken cancellationToken)
+        {
+            var today = DateTimeHelper.Now();
+            var startOfWeek = today.StartOfWeek(DayOfWeek.Sunday);
+            var endOfWeek = today.EndOfWeek(DayOfWeek.Sunday);
+            return await _context.Appointments
+                .CountAsync(a => a.AppointmentDate >= startOfWeek && a.AppointmentDate <= endOfWeek && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalAppointmentsThisMonth(CancellationToken cancellationToken)
+        {
+            var today = DateTimeHelper.Now();
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+            return await _context.Appointments
+                .CountAsync(a => a.AppointmentDate >= startOfMonth && a.AppointmentDate <= endOfMonth && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalAppointmentsThisYear(CancellationToken cancellationToken)
+        {
+            var today = DateTimeHelper.Now();
+            var startOfYear = new DateTime(today.Year, 1, 1);
+            var endOfYear = new DateTime(today.Year, 12, 31);
+            return await _context.Appointments
+                .CountAsync(a => a.AppointmentDate >= startOfYear && a.AppointmentDate <= endOfYear && a.isDeleted == false, cancellationToken);
+        }
+
+        public async Task<int> GetTotalProcessedAppointmentHealthConditions(CancellationToken cancellationToken)
+        {
+            return await _context.Appointments
+                .CountAsync(a => a.ServiceType == EnumList.ServiceType.HealthCondition && a.AppointmentStatus == EnumList.AppointmentStatus.Processed && a.isDeleted == false, cancellationToken);
         }
     }
 }

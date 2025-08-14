@@ -59,6 +59,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IHandbookRepository, HandbookRepository>();
             services.AddScoped<ISupportCategoryRepository, SupportCategoryRepository>();
             services.AddScoped<IFAQItemRepository, FAQItemRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
 
             //Register services
             services.AddScoped<IAuthService, AuthService>();
@@ -96,6 +97,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<IHandbookService, HandbookService>();
             services.AddScoped<ISupportCategoryService, SupportCategoryService>();
             services.AddScoped<IFAQItemService, FAQItemService>();
+            services.AddScoped<IAddressService, AddressService>();
 
             //Register external services
             services.AddScoped<PayOsService>();

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using PetVax.BusinessObjects.DTO;
+using PetVax.BusinessObjects.DTO.MicrochipItemDTO;
 using PetVax.BusinessObjects.DTO.PetDTO;
 using PetVax.BusinessObjects.DTO.VetDTO;
 using PetVax.BusinessObjects.DTO.VetScheduleDTO;
@@ -12,6 +14,7 @@ using PetVax.Services.ExternalService;
 using PetVax.Services.IService;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -112,7 +115,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 200,
                         Success = false,
-                        Message = "No vets found",
+                        Message = "Không tìm thấy thú cưng nào",
                         Data = responseData
                     };
                 }
@@ -232,7 +235,7 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<BaseResponse<PetResponseDTO>> GetPetByIdAsync(int petId, CancellationToken cancellationToken)
+        public async Task<BaseResponse<PetHasMicrochipResponseDTO>> GetPetByIdAsync(int petId, CancellationToken cancellationToken)
         {
             try
             {
@@ -240,7 +243,7 @@ namespace PetVax.Services.Service
                 if (pet == null)
                 {
                     _logger.LogWarning("Pet with ID {PetId} not found", petId);
-                    return new BaseResponse<PetResponseDTO>
+                    return new BaseResponse<PetHasMicrochipResponseDTO>
                     {
                         Code = 200,
                         Success = false,
@@ -250,10 +253,33 @@ namespace PetVax.Services.Service
                 }
                 _logger.LogInformation("Retrieved pet with ID {PetId} successfully", petId);
 
-                // Use AutoMapper to map Pet entity to PetResponseDTO
-                var petResponse = _mapper.Map<PetResponseDTO>(pet);
+                // Map Pet entity to PetHasMicrochipResponseDTO
+                var petResponse = _mapper.Map<PetHasMicrochipResponseDTO>(pet);
 
-                return new BaseResponse<PetResponseDTO>
+                // Get microchip info
+                var microchipItems = await _microchipItemRepository.GetListMicrochipItemByPetIdAsync(petId, cancellationToken);
+                petResponse.MicrochipItems = new List<MicrochipItemResponse>();
+
+                if (microchipItems != null && microchipItems.Any())
+                {
+                    foreach (var item in microchipItems)
+                    {
+                        if (item.Microchip != null)
+                        {
+                            petResponse.MicrochipItems.Add(new MicrochipItemResponse
+                            {
+                                MicrochipId = item.MicrochipId,
+                                Name = item.Microchip.Name,
+                                Description = item.Description,
+                                InstallationDate = item.InstallationDate,
+                                Status = item.Status
+                            });
+                        }
+                    }
+                }
+
+
+                return new BaseResponse<PetHasMicrochipResponseDTO>
                 {
                     Code = 200,
                     Success = true,
@@ -264,7 +290,7 @@ namespace PetVax.Services.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving pet with ID {PetId}", petId);
-                return new BaseResponse<PetResponseDTO>
+                return new BaseResponse<PetHasMicrochipResponseDTO>
                 {
                     Code = 500,
                     Success = false,
@@ -317,7 +343,36 @@ namespace PetVax.Services.Service
                 pet.DateOfBirth = createPetRequest.DateOfBirth;
                 pet.PlaceToLive = createPetRequest.PlaceToLive;
                 pet.PlaceOfBirth = createPetRequest.PlaceOfBirth;
-                pet.Weight = createPetRequest.Weight;
+                if (!string.IsNullOrWhiteSpace(createPetRequest.Weight))
+                {
+                    var weightInput = createPetRequest.Weight.Trim();
+
+                    if (!decimal.TryParse(weightInput, NumberStyles.Any, CultureInfo.InvariantCulture, out var weightValue))
+                    {
+                        return new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Cân nặng phải là số hợp lệ!",
+                            Data = null
+                        };
+                    }
+
+                    if (weightValue < 0)
+                    {
+                        return new BaseResponse<PetResponseDTO>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Cân nặng không được bé hơn 0!",
+                            Data = null
+                        };
+                    }
+
+                    pet.Weight = weightInput; // Lưu string đã trim
+                }
+
+
                 pet.Color = createPetRequest.Color;
                 pet.Nationality = createPetRequest.Nationality;
                 pet.isSterilized = createPetRequest.isSterilized;

@@ -8,8 +8,7 @@ namespace PetVax.BusinessObjects.DTO.AuthenticateDTO
 {
     public class GoogleLoginRequestDTO
     {
-        public string Email { get; set; }
-        public string Name { get; set; }
+        public string IdToken { get; set; }
     }
 
 }

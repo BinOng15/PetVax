@@ -123,24 +123,24 @@ namespace PetVax.Services.Service
             {
                 if (updateVetRequest == null || updateVetRequest.VetId <= 0)
                 {
-                    _logger.LogWarning("Invalid update request for Vet with ID {VetId}", updateVetRequest?.VetId);
+
                     return new BaseResponse<VetResponseDTO>
                     {
                         Code = 200,
                         Success = false,
-                        Message = "Invalid request data",
+                        Message = "Nhập Id vet cần cập nhật.",
                         Data = null
                     };
                 }
                 var existingVet = await _vetRepository.GetVetByIdAsync(updateVetRequest.VetId, cancellationToken);
                 if (existingVet == null)
                 {
-                    _logger.LogWarning("Vet with ID {VetId} not found", updateVetRequest.VetId);
+         
                     return new BaseResponse<VetResponseDTO>
                     {
                         Code = 200,
                         Success = false,
-                        Message = "Vet not found",
+                        Message = "Không tìm thấy vet",
                         Data = null
                     };
                 }
@@ -148,10 +148,6 @@ namespace PetVax.Services.Service
                 if (updateVetRequest.Image != null)
                 {
                     existingVet.image = await _cloudinariService.UploadImage(updateVetRequest.Image);
-                }
-                else
-                {
-                    existingVet.image = null;
                 }
                 // Map updated properties
                 existingVet.Name = updateVetRequest.Name ?? existingVet.Name;
@@ -169,7 +165,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 200,
                         Success = true,
-                        Message = "Veterinarian updated successfully",
+                        Message = "Cập nhật Vet thành công",
                         Data = responseData
                     };
                 }
@@ -179,18 +175,18 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Failed to update veterinarian",
+                    Message = "Lỗi cập nhật vet",
                     Data = null
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating Vet with ID {VetId}", updateVetRequest?.VetId);
+
                 return new BaseResponse<VetResponseDTO>
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Error while updating veterinarian: " + (ex.InnerException?.Message ?? ex.Message),
+                    Message = "Lỗi cập nhật vet" + (ex.InnerException?.Message ?? ex.Message),
                     Data = null
                 };
             }
