@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PetVax.Repositories.IRepository
 {
@@ -16,5 +17,6 @@ namespace PetVax.Repositories.IRepository
         Task<List<ServiceHistory>> GetServiceHistoriesByCustomerIdAsync(int customerId, CancellationToken cancellationToken);
         Task<ServiceHistory> UpdateServiceHistoryAsync(ServiceHistory serviceHistory, CancellationToken cancellationToken);
         Task UpdateExpiredServiceHistoriesAsync(CancellationToken cancellationToken);
+        Task<List<ServiceHistory>> GetServiceHistoriesByServiceTypeAsync(ServiceType serviceType, CancellationToken cancellationToken);
     }
 }

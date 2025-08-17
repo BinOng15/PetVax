@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PediVax.Controllers
 {
@@ -24,7 +25,7 @@ namespace PediVax.Controllers
             _serviceHistoryService = serviceHistoryService;
         }
         // GET: api/ServiceHistories/Customer/{customerId}
-        [HttpGet("Get-service-history-by/{customerId}")]
+        [HttpGet("Get-service-history-by-customer/{customerId}")]
         public async Task<IActionResult> GetServiceHistoriesByCustomerId(int customerId, CancellationToken cancellationToken)
         {
             var response = await _serviceHistoryService.GetServiceHistoryByCustomerIdAsync(customerId, cancellationToken);
@@ -43,6 +44,13 @@ namespace PediVax.Controllers
             };
             var response = await _serviceHistoryService.GetAllServiceHistoryAsync(request, cancellationToken);
             return StatusCode(response.Code, response);
+        }
+
+        [HttpGet("Get-service-history-by-type/{serviceType}")]
+        public async Task<IActionResult> GetServiceHistoriesByServiceType(ServiceType serviceType, CancellationToken cancellationToken)
+        {
+            var response = await _serviceHistoryService.GetServiceHistoryByServiceTypedAsync(serviceType, cancellationToken);
+            return Ok(response);
         }
 
     }
