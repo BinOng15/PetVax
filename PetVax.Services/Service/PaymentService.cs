@@ -754,8 +754,8 @@ namespace PetVax.Services.Service
                 amount: (int)amount,
                 description: $"VaxPet #{appointmentDetail.AppointmentDetailCode}",
                 items: new List<ItemData>(),
-                cancelUrl: "http://localhost:5173/staff/vaccination-appointments/cancel",
-                returnUrl: "http://localhost:5173/staff/vaccination-appointments/success"
+                cancelUrl: "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/cancel",
+                returnUrl: "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/success"
             );
 
             _logger.LogInformation("Amount: {amount}", amount);
