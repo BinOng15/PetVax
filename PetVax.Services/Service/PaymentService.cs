@@ -866,6 +866,7 @@ namespace PetVax.Services.Service
                         int earnedPoints = (int)(originalAmount / 10000m);
                         if (customer.CurrentPoints == null) customer.CurrentPoints = 0;
                         customer.CurrentPoints += earnedPoints;
+                        if (customer.RedeemablePoints == null) customer.RedeemablePoints = 0;
                         customer.RedeemablePoints += earnedPoints;
 
                         // Create point transaction
