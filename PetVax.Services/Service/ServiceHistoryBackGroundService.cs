@@ -15,7 +15,7 @@ namespace PetVax.Services.Service
     {
         private readonly IServiceProvider _serviceProvider;
 
-        private readonly TimeSpan _period = TimeSpan.FromSeconds(30);
+        private readonly TimeSpan _period = TimeSpan.FromSeconds(3);
         private readonly ILogger<ServiceHistoryBackGroundService> _logger;
 
         public ServiceHistoryBackGroundService(
