@@ -328,6 +328,12 @@ namespace PetVax.Services.Configurations.Mapper
             //Address
             CreateMap<Address, AddressResponseDTO>();
 
+            //ColdChainLog
+            CreateMap<CreateColdChainLogDTO, ColdChainLog>();
+            CreateMap<UpdateColdChainLogDTO, ColdChainLog>();
+            CreateMap<ColdChainLog, ColdChainLogResponseDTO>()
+                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch));
+
         }
     }   
 }

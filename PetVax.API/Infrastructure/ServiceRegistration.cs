@@ -98,6 +98,7 @@ namespace PetVax.Infrastructure
             services.AddScoped<ISupportCategoryService, SupportCategoryService>();
             services.AddScoped<IFAQItemService, FAQItemService>();
             services.AddScoped<IAddressService, AddressService>();
+            services.AddScoped<IColdChainLogService, ColdChainLogService>();
 
             //Register external services
             services.AddScoped<PayOsService>();

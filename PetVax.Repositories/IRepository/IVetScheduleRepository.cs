@@ -9,7 +9,7 @@ namespace PetVax.Repositories.IRepository
 {
     public interface IVetScheduleRepository
     {
-        Task<List<VetSchedule>> GetAllVetSchedulesAsync(CancellationToken cancellationToken);
+        Task<List<VetSchedule>> GetAllVetSchedulesAsync(int pageNumber, int pageSize, string keyword,CancellationToken cancellationToken);
         Task<VetSchedule> GetVetScheduleByIdAsync(int vetScheduleId, CancellationToken cancellationToken);
         Task<int> CreateVetScheduleAsync(VetSchedule vetSchedule, CancellationToken cancellationToken);
         Task<int> UpdateVetScheduleAsync(VetSchedule vetSchedule, CancellationToken cancellationToken);
