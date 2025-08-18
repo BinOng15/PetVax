@@ -18,50 +18,45 @@ namespace PetVax.Repositories.Repository
         }
         public async Task CreateServiceHistoryAsync(CancellationToken cancellationToken)
         {
-
-            // Lấy các lịch hẹn đã hoàn tất, bao gồm cả thông tin Appointment và Payment
+            // Lấy tất cả lịch hẹn đã hoàn tất, bao gồm thông tin Appointment và Payment
             var appointments = await _context.AppointmentDetails
                 .Include(a => a.Appointment)
                 .Include(a => a.Payment)
-                .Where(a =>
-                    a.AppointmentStatus == AppointmentStatus.Completed)
+                .Where(a => a.AppointmentStatus == AppointmentStatus.Completed)
                 .ToListAsync(cancellationToken);
 
-            foreach (var appointment in appointments)
-            {
+            // Lấy danh sách AppointmentId đã tồn tại trong ServiceHistories (chưa bị xóa)
+            var existingIds = await _context.ServiceHistories
+                .Select(sh => sh.AppointmentId)
+                .ToListAsync(cancellationToken);
 
-                // Kiểm tra xem ServiceHistory đã tồn tại hay chưa
-                bool isExist = await _context.ServiceHistories.AnyAsync(sh =>
-                    sh.AppointmentId == appointment.AppointmentId,
-                    cancellationToken);
-
-                if (!isExist)
-
+            // Tạo danh sách ServiceHistory mới
+            var newServiceHistories = appointments
+                .Where(a => a.Appointment != null && a.Payment != null)
+                .Where(a => !existingIds.Contains(a.AppointmentId)) // tránh trùng
+                .Select(a => new ServiceHistory
                 {
-                    if (appointment.Appointment == null || appointment.Payment == null)
-                    {
-                        continue;
-                    }
-                    var serviceHistory = new ServiceHistory
-                    {
-                        CustomerId = appointment.Appointment.CustomerId,
-                        AppointmentId = appointment.AppointmentId,
-                        PetId = appointment.Appointment.PetId,
-                        ServiceDate = appointment.AppointmentDate,
-                        ServiceType = appointment.ServiceType,
-                        PaymentMethod = appointment.Payment.PaymentMethod,
-                        Amount = appointment.Payment.Amount,
-                        Status = appointment.AppointmentStatus.ToString(),
-                        CreatedAt = DateTime.UtcNow,
-                        CreatedBy = "System-Auto",
-                        isDeleted = false
-                    };
+                    CustomerId = a.Appointment.CustomerId,
+                    AppointmentId = a.AppointmentId,
+                    PetId = a.Appointment.PetId,
+                    ServiceDate = a.AppointmentDate,
+                    ServiceType = a.ServiceType,
+                    PaymentMethod = a.Payment.PaymentMethod,
+                    Amount = a.Payment.Amount,
+                    Status = a.AppointmentStatus.ToString(),
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = "System-Auto",
+                    isDeleted = false
+                })
+                .ToList();
 
-                    await _context.ServiceHistories.AddAsync(serviceHistory, cancellationToken);
-                    await _context.SaveChangesAsync(cancellationToken);
-                }
+            if (newServiceHistories.Any())
+            {
+                await _context.ServiceHistories.AddRangeAsync(newServiceHistories, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
             }
         }
+
 
 
 
