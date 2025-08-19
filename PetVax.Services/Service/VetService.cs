@@ -89,8 +89,8 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<VetResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
-                        Message = "No vets found",
+                        Success = true,
+                        Message = "Không tìm thấy vet nào",
                         Data = responseData
                     };
                 }
@@ -100,7 +100,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Vets retrieved successfully",
+                    Message = "Lấy danh sách vet thành công",
                     Data = responseData
                 };
             }

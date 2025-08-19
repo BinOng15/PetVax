@@ -78,7 +78,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<VetScheduleDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy lịch làm việc của vet.",
                         Data = responseData
                     };

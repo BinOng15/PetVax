@@ -349,8 +349,8 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<VaccineReceiptDetailResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy chi tiết phiếu nhập kho nào.",
                         Data = response
                     };

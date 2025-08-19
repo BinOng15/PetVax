@@ -210,7 +210,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<VaccineExportResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy phiếu xuất kho nào",
                         Data = null
                     };

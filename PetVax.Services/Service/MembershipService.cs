@@ -259,8 +259,8 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("GetAllMembershipAsync: No memberships found");
                     return new DynamicResponse<MembershipResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy membership nào!",
                         Data = response
                     };

@@ -459,7 +459,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<PaymentResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy thanh toán nào!",
                         Data = null
                     };

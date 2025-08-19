@@ -814,7 +814,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<AppointmentForVaccinationResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy cuộc hẹn tiêm phòng nào.",
                         Data = null
                     };

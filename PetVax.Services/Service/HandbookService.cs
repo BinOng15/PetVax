@@ -202,7 +202,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<HandbookResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy cẩm nang nào.",
                         Data = responseData
                     };
