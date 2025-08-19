@@ -25,7 +25,7 @@ namespace PetVax.Repositories.Repository
                 .Where(a => a.AppointmentStatus == AppointmentStatus.Completed)
                 .ToListAsync(cancellationToken);
 
-            // Lấy danh sách AppointmentId đã tồn tại trong ServiceHistories (chưa bị xóa)
+            // Lấy danh sách AppointmentId đã tồn tại trong ServiceHistories
             var existingIds = await _context.ServiceHistories
                 .Select(sh => sh.AppointmentId)
                 .ToListAsync(cancellationToken);
