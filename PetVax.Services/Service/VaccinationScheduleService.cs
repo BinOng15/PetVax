@@ -203,8 +203,8 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<VaccinationScheduleResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy lịch tiêm nào.",
                         Data = respnse
                     };
@@ -236,8 +236,8 @@ namespace PetVax.Services.Service
             {
                 return new BaseResponse<VaccinationScheduleByDiseaseResponseDTO>
                 {
-                    Code = 400,
-                    Success = false,
+                    Code = 200,
+                    Success = true,
                     Message = "ID bệnh không hợp lệ.",
                     Data = null
                 };
@@ -249,8 +249,8 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<VaccinationScheduleByDiseaseResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy lịch tiêm cho bệnh này.",
                         Data = null
                     };
