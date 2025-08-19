@@ -747,23 +747,70 @@ namespace PetVax.Services.Service
                 return (null, null);
             }
 
-            var payment = await _paymentRepository.GetPaymentByAppointmentDetailIdAsync(appointmentDetailId, cancellationToken);
+            // Xác định loại dịch vụ và URL tương ứng
+            string cancelUrl, returnUrl;
+
+            if (appointmentDetail.VaccineBatchId.HasValue)
+            {
+                // Dịch vụ tiêm chủng
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/success";
+            }
+            else if (appointmentDetail.MicrochipItemId.HasValue)
+            {
+                // Dịch vụ cấy microchip
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/success";
+            }
+            else if (appointmentDetail.VaccinationCertificateId.HasValue)
+            {
+                // Dịch vụ cấp chứng nhận tiêm chủng
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/certificate-appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/certificate-appointments/success";
+            }
+            else if (appointmentDetail.HealthConditionId.HasValue)
+            {
+                // Dịch vụ khám sức khỏe
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/success";
+            }
+            else
+            {
+                // Mặc định
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/appointments/success";
+            }
 
             var paymentData = new PaymentData(
                 orderCode: (long)appointmentDetail.AppointmentDetailId,
                 amount: (int)amount,
                 description: $"VaxPet #{appointmentDetail.AppointmentDetailCode}",
                 items: new List<ItemData>(),
-                cancelUrl: "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/cancel",
-                returnUrl: "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/success"
+                cancelUrl: cancelUrl,
+                returnUrl: returnUrl
             );
 
+            _logger.LogInformation("Service Type: {ServiceType}", GetServiceTypeName(appointmentDetail));
             _logger.LogInformation("Amount: {amount}", amount);
+            _logger.LogInformation("CancelUrl: {CancelUrl}", cancelUrl);
+            _logger.LogInformation("ReturnUrl: {ReturnUrl}", returnUrl);
+
             var paymentLink = await _payOsService.CreatePaymentLink(paymentData);
             _logger.LogInformation("PayOs checkoutUrl: {CheckoutUrl}", paymentLink.checkoutUrl);
             _logger.LogInformation("PayOs QRCode: {QRCode}", paymentLink.qrCode);
             return (paymentLink.checkoutUrl, paymentLink.qrCode);
         }
+
+        // Phương thức helper để xác định tên loại dịch vụ
+        private string GetServiceTypeName(AppointmentDetail appointmentDetail)
+        {
+            if (appointmentDetail.VaccineBatchId.HasValue) return "Vaccination";
+            if (appointmentDetail.MicrochipItemId.HasValue) return "Microchip";
+            if (appointmentDetail.VaccinationCertificateId.HasValue) return "Certificate";
+            if (appointmentDetail.HealthConditionId.HasValue) return "HealthCheck";
+            return "Unknown";
+        }
+
 
         public async Task<BaseResponse<PaymentResponseDTO>> HandlePayOsCallBackAsync(PaymentCallBackDTO paymentCallBackDTO, CancellationToken cancellationToken)
         {
