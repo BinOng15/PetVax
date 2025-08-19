@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.DTO.CustomerDTO;
+﻿using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
+using PetVax.BusinessObjects.DTO.CustomerDTO;
 using PetVax.BusinessObjects.DTO.VoucherDTO;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace PetVax.BusinessObjects.DTO.PointTransactionDTO
     {
         public int AppointmentDetailId { get; set; }
         public string ServiceName { get; set; }
+        public AppointmentDetailResponseDTO AppointmentDetail { get; set; }
     }
     public class VoucherForTransactionResponseDTO
     {

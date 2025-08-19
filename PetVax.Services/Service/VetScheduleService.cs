@@ -36,7 +36,7 @@ namespace PetVax.Services.Service
         {
             try
             {
-                var vetSchedules = await _vetScheduleRepository.GetAllVetSchedulesAsync(cancellationToken);
+                var vetSchedules = await _vetScheduleRepository.GetAllVetSchedulesAsync(getAllItemsDTO.PageNumber, getAllItemsDTO.PageSize, getAllItemsDTO.KeyWord, cancellationToken);
 
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
@@ -157,6 +157,7 @@ namespace PetVax.Services.Service
                 }
 
                 var createdSchedules = new List<VetScheduleDTO>();
+                var duplicateSlots = new List<int>();
 
                 foreach (var schedule in request.Schedules)
                 {
@@ -172,8 +173,22 @@ namespace PetVax.Services.Service
                             Data = null
                         };
                     }
+
+                    // Get all existing schedules for this vet and date
+                    var existingSchedules = await _vetScheduleRepository.GetVetSchedulesByVetIdAsync(request.VetId, cancellationToken);
+                    var existingSlotsToday = existingSchedules
+                        .Where(x => x.ScheduleDate.Date == date)
+                        .Select(x => x.SlotNumber)
+                        .ToHashSet();
+
                     foreach (var slot in schedule.SlotNumbers)
                     {
+                        if (existingSlotsToday.Contains(slot))
+                        {
+                            duplicateSlots.Add(slot);
+                            continue;
+                        }
+
                         var vetSchedule = new VetSchedule
                         {
                             VetId = request.VetId,
@@ -203,19 +218,30 @@ namespace PetVax.Services.Service
 
                 if (!createdSchedules.Any())
                 {
+                    string message = "Không tạo được lịch hẹn nào.";
+                    if (duplicateSlots.Any())
+                    {
+                        message += $" Các slot đã tồn tại trong ngày: {string.Join(", ", duplicateSlots.Distinct())}.";
+                    }
                     return new BaseResponse<List<VetScheduleDTO>>
                     {
                         Success = false,
-                        Message = "Không tạo được lịch hẹn nào.",
+                        Message = message,
                         Code = 200,
                         Data = null
                     };
                 }
 
+                string successMessage = "Tạo lịch hẹn thành công.";
+                if (duplicateSlots.Any())
+                {
+                    successMessage += $" Các slot đã tồn tại trong ngày và không được tạo: {string.Join(", ", duplicateSlots.Distinct())}.";
+                }
+
                 return new BaseResponse<List<VetScheduleDTO>>
                 {
                     Success = true,
-                    Message = "Tạo lịch hẹn thành công.",
+                    Message = successMessage,
                     Code = 201,
                     Data = createdSchedules
                 };
@@ -243,7 +269,25 @@ namespace PetVax.Services.Service
                     return new BaseResponse<VetScheduleDTO>
                     {
                         Success = false,
-                        Message = "Vet schedule not found",
+                        Message = "Không tìm thấy lịch làm việc của vet",
+                        Code = 200,
+                        Data = null
+                    };
+                }
+
+                // Check for duplicate slot in the same day for the same vet, excluding the current schedule
+                var existingSchedules = await _vetScheduleRepository.GetVetSchedulesByVetIdAsync(request.VetId, cancellationToken);
+                bool isDuplicate = existingSchedules.Any(x =>
+                    x.ScheduleDate.Date == request.ScheduleDate.Date &&
+                    x.SlotNumber == request.SlotNumber &&
+                    x.VetScheduleId != request.vetScheduleId);
+
+                if (isDuplicate)
+                {
+                    return new BaseResponse<VetScheduleDTO>
+                    {
+                        Success = false,
+                        Message = $"Slot {request.SlotNumber} vày ngày {request.ScheduleDate:dd-MM-yyyy} đã được lên lịch cho vet.",
                         Code = 200,
                         Data = null
                     };

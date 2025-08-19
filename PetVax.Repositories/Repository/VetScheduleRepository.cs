@@ -28,11 +28,17 @@ namespace PetVax.Repositories.Repository
             return await DeleteAsync(vetScheduleId, cancellationToken);
         }
 
-        public async Task<List<VetSchedule>> GetAllVetSchedulesAsync(CancellationToken cancellationToken)
+        public async Task<List<VetSchedule>> GetAllVetSchedulesAsync(int pageNumber, int pageSize, string keyword, CancellationToken cancellationToken)
         {
-            return await _context.VetSchedules
-                .Include(vs => vs.Vet)
-                .Where(vs => vs.isDeleted != true)
+            var query = _context.VetSchedules.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(vs => vs.VetId.ToString().Contains(keyword));
+            }
+            return await query
+                .OrderBy(vs => vs.ScheduleDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync(cancellationToken);
         }
 

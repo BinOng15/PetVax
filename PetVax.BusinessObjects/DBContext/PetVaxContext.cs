@@ -246,11 +246,11 @@ namespace PediVax.BusinessObjects.DBContext
                 .HasForeignKey("ServiceHistoryId")
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Payment - AppointmentDetail (1-1)
+            // Payment - AppointmentDetail (N-1)
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.AppointmentDetail)
-                .WithOne(ad => ad.Payment)
-                .HasForeignKey<Payment>(p => p.AppointmentDetailId)
+                .WithMany(ad => ad.Payment)
+                .HasForeignKey(p => p.AppointmentDetailId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Payment - Customer (N-1)

@@ -16,7 +16,8 @@ namespace PetVax.Repositories.IRepository
         Task<bool> DeletePaymentAsync(int id, CancellationToken cancellationToken);
         Task<List<Payment>> GetPaymentsByAccountIdAsync(int customerId, CancellationToken cancellationToken);
         Task<List<Payment>> GetPaymentsByAppointmentIdAsync(int appointmenDetailtId, CancellationToken cancellationToken);
-        Task<Payment> GetPaymentByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken);
+        Task<List<Payment>> GetPaymentByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken);
         Task<int> GetTotalPaymentsAsync(CancellationToken cancellationToken);
+        Task<Payment?> GetLastestFailedPaymentByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken);
     }
 }

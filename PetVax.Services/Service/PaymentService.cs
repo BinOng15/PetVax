@@ -513,8 +513,8 @@ namespace PetVax.Services.Service
 
         public async Task<BaseResponse<List<PaymentResponseDTO>>> GetPaymentsByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
         {
-            var payments = await _paymentRepository.GetPaymentsByAppointmentIdAsync(appointmentDetailId, cancellationToken);
-            if (payments == null || !payments.Any())
+            var payments = await _paymentRepository.GetPaymentByAppointmentDetailIdAsync(appointmentDetailId, cancellationToken);
+            if (payments == null)
             {
                 _logger.LogError("GetPaymentsByAppointmentDetailIdAsync: No payments found for AppointmentDetailId {AppointmentDetailId}", appointmentDetailId);
                 return new BaseResponse<List<PaymentResponseDTO>>
@@ -981,6 +981,176 @@ namespace PetVax.Services.Service
             dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
             var distanceMeters = result.routes[0].distance;
             return (double)distanceMeters / 1000.0;
+        }
+
+        public async Task<BaseResponse<PaymentResponseDTO>> RetryPaymentAsync(RetryPaymentRequestDTO retryPaymentRequest, CancellationToken cancellationToken)
+        {
+            if (retryPaymentRequest == null)
+            {
+                _logger.LogError("RetryPaymentAsync: retryPaymentRequest is null");
+                return new BaseResponse<PaymentResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Dữ liệu yêu cầu thanh toán lại không hợp lệ, vui lòng thử lại!",
+                    Data = null
+                };
+            }
+
+            try
+            {
+                var appointmentDetail = await _appointmentDetailRepository.GetAppointmentDetailByIdAsync(retryPaymentRequest.AppointmentDetailId, cancellationToken);
+                if (appointmentDetail == null)
+                {
+                    _logger.LogError("RetryPaymentAsync: Appointment detail not found for ID {AppointmentDetailId}", retryPaymentRequest.AppointmentDetailId);
+                    return new BaseResponse<PaymentResponseDTO>
+                    {
+                        Code = 404,
+                        Success = false,
+                        Message = "Chi tiết cuộc hẹn không tồn tại, vui lòng kiểm tra lại!",
+                        Data = null
+                    };
+                }
+
+                // Lấy payment gần nhất cho appointmentDetail
+                var payments = await _paymentRepository.GetPaymentByAppointmentDetailIdAsync(retryPaymentRequest.AppointmentDetailId, cancellationToken);
+                var latestPayment = payments?
+                    .OrderByDescending(p => p.CreatedAt)
+                    .FirstOrDefault();
+
+                if (latestPayment == null || latestPayment.PaymentStatus != EnumList.PaymentStatus.Failed)
+                {
+                    _logger.LogError("RetryPaymentAsync: Latest payment for AppointmentDetailId {AppointmentDetailId} is not failed", retryPaymentRequest.AppointmentDetailId);
+                    return new BaseResponse<PaymentResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Chỉ cho phép tạo lại thanh toán nếu thanh toán gần nhất bị thất bại!",
+                        Data = null
+                    };
+                }
+
+                var newPayment = new Payment
+                {
+                    AppointmentDetailId = retryPaymentRequest.AppointmentDetailId,
+                    CustomerId = appointmentDetail.Appointment.CustomerId,
+                    VaccineBatchId = appointmentDetail.VaccineBatchId,
+                    MicrochipId = appointmentDetail.MicrochipItem?.MicrochipId,
+                    VaccinationCertificateId = appointmentDetail.VaccinationCertificateId,
+                    HealthConditionId = appointmentDetail.HealthConditionId,
+                    PaymentMethod = retryPaymentRequest.PaymentMethod.ToString(),
+                    VoucherCode = retryPaymentRequest.VoucherCode,
+                    PaymentStatus = EnumList.PaymentStatus.Pending,
+                    isDeleted = false
+                };
+
+                newPayment.AppointmentDetail = null;
+                newPayment.Customer = null;
+                newPayment.VaccineBatch = null;
+                newPayment.Microchip = null;
+                newPayment.HealthCondition = null;
+                newPayment.VaccinationCertificate = null;
+
+                decimal amount = 0;
+                if (appointmentDetail.VaccineBatchId.HasValue)
+                {
+                    var vaccineBatch = await _vaccineBatchRepository.GetVaccineBatchByIdAsync(appointmentDetail.VaccineBatchId.Value, cancellationToken);
+                    if (vaccineBatch?.Vaccine != null)
+                    {
+                        amount = vaccineBatch.Vaccine.Price;
+                    }
+                }
+                else if (appointmentDetail.MicrochipItemId.HasValue && appointmentDetail.MicrochipItem != null)
+                {
+                    var microchip = await _microchipRepository.GetMicrochipByIdAsync(appointmentDetail.MicrochipItem.MicrochipId, cancellationToken);
+                    if (microchip != null)
+                    {
+                        amount = microchip.Price;
+                    }
+                }
+                else if (appointmentDetail.VaccinationCertificateId.HasValue)
+                {
+                    var certificate = await _vaccinationCertificateRepository.GetVaccinationCertificateByIdAsync(appointmentDetail.VaccinationCertificateId.Value, cancellationToken);
+                    if (certificate != null)
+                    {
+                        amount = certificate.Price;
+                    }
+                }
+                else if (appointmentDetail.HealthConditionId.HasValue)
+                {
+                    var healthCondition = await _healthConditionRepository.GetHealthConditionByIdAsync(appointmentDetail.HealthConditionId.Value, cancellationToken);
+                    if (healthCondition != null)
+                    {
+                        amount = healthCondition.Price;
+                    }
+                }
+
+                if (amount <= 0)
+                {
+                    return new BaseResponse<PaymentResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Không thể xác định số tiền thanh toán!",
+                        Data = null
+                    };
+                }
+
+                newPayment.Amount = amount;
+                newPayment.PaymentCode = $"PAY{DateTime.UtcNow:yyyyMMddHHmmssfff}{Guid.NewGuid().ToString("N")[..6]}";
+                newPayment.PaymentDate = DateTimeHelper.Now();
+                newPayment.CreatedAt = DateTimeHelper.Now();
+                newPayment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+
+                if (retryPaymentRequest.PaymentMethod == EnumList.PaymentMethod.BankTransfer)
+                {
+                    var paymentLink = await GeneratePaymentLinkForAppointmentDetailAsync(retryPaymentRequest.AppointmentDetailId, amount, cancellationToken);
+                    newPayment.CheckoutUrl = paymentLink.paymentLink;
+                    newPayment.QRCode = paymentLink.qrCode;
+                }
+                else
+                {
+                    newPayment.CheckoutUrl = string.Empty;
+                    newPayment.QRCode = string.Empty;
+                }
+
+                var newPaymentId = await _paymentRepository.AddPaymentAsync(newPayment, cancellationToken);
+
+                if (newPaymentId <= 0)
+                {
+                    _logger.LogError("RetryPaymentAsync: Failed to create new payment for AppointmentDetailId {AppointmentDetailId}", retryPaymentRequest.AppointmentDetailId);
+                    return new BaseResponse<PaymentResponseDTO>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Không thể thử lại thanh toán, vui lòng kiểm tra lại thông tin và thử lại sau!",
+                        Data = null
+                    };
+                }
+
+                var createdPayment = await _paymentRepository.GetPaymentByIdAsync(newPaymentId, cancellationToken);
+                var paymentResponse = _mapper.Map<PaymentResponseDTO>(createdPayment);
+
+                _logger.LogInformation("RetryPaymentAsync: Successfully created new payment for AppointmentDetailId {AppointmentDetailId}", retryPaymentRequest.AppointmentDetailId);
+                return new BaseResponse<PaymentResponseDTO>
+                {
+                    Code = 201,
+                    Success = true,
+                    Message = "Thử lại thanh toán thành công!",
+                    Data = paymentResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "RetryPaymentAsync: An error occurred while retrying payment");
+                return new BaseResponse<PaymentResponseDTO>
+                {
+                    Code = 500,
+                    Success = false,
+                    Message = "Đã xảy ra lỗi khi thử lại thanh toán, vui lòng thử lại sau!",
+                    Data = null
+                };
+            }
         }
 
     }

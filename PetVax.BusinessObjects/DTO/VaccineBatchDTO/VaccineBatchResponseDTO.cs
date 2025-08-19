@@ -19,7 +19,7 @@ namespace PetVax.BusinessObjects.DTO.VaccineBatchDTO
         public string Source { get; set; }
         public string StorageCondition { get; set; }
         public int Quantity { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreateAt { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedBy { get; set; }
