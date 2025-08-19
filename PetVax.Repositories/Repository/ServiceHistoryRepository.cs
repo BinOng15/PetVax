@@ -32,7 +32,7 @@ namespace PetVax.Repositories.Repository
 
             // Tạo danh sách ServiceHistory mới
             var newServiceHistories = appointments
-                .Where(a => a.Appointment != null && a.Payment != null)
+                .Where(a => a.Appointment != null && a.Payment != null && a.Payment.Any()) // Ensure Payment collection is not empty
                 .Where(a => !existingIds.Contains(a.AppointmentId)) // tránh trùng
                 .Select(a => new ServiceHistory
                 {
@@ -41,8 +41,8 @@ namespace PetVax.Repositories.Repository
                     PetId = a.Appointment.PetId,
                     ServiceDate = a.AppointmentDate,
                     ServiceType = a.ServiceType,
-                    PaymentMethod = a.Payment.PaymentMethod,
-                    Amount = a.Payment.Amount,
+                    PaymentMethod = a.Payment.FirstOrDefault()?.PaymentMethod, // Access the first Payment's PaymentMethod
+                    Amount = a.Payment.FirstOrDefault()?.Amount ?? 0, // Access the first Payment's Amount
                     Status = a.AppointmentStatus.ToString(),
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = "System-Auto",

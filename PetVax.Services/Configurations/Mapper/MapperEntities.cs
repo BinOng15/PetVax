@@ -159,13 +159,19 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
                 .ForMember(dest => dest.Disease, opt => opt.MapFrom(src => src.Disease))
                 .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
-                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment));
+                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => 
+                    src.Payment != null && src.Payment.Any() ? 
+                    src.Payment.OrderByDescending(p => p.CreatedAt).FirstOrDefault() : 
+                    null));
 
             CreateMap<AppointmentDetail, AppointmentMicrochipResponseDTO>()
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
                 .ForMember(dest => dest.MicrochipItem, opt => opt.MapFrom(src => src.MicrochipItem))
                 .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
-                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment));
+                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => 
+                    src.Payment != null && src.Payment.Any() ? 
+                    src.Payment.OrderByDescending(p => p.CreatedAt).FirstOrDefault() : 
+                    null));
             CreateMap<AppointmentDetail, AppointmenDetialMicorchipResponseDTO>()
                 .ForMember(dest => dest.Microchip, opt => opt.MapFrom(src => src));
 
@@ -212,8 +218,16 @@ namespace PetVax.Services.Configurations.Mapper
             //Payment
             CreateMap<CreatePaymentRequestDTO, Payment>();
             CreateMap<UpdatePaymentRequestDTO, Payment>();
-            CreateMap<Payment, PaymentResponseDTO>();
-            CreateMap<Payment, PaymentForTransactionResponseDTO>();
+            CreateMap<Payment, PaymentResponseDTO>()
+                .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.AppointmentDetail))
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.VaccineBatch, opt => opt.MapFrom(src => src.VaccineBatch))
+                .ForMember(dest => dest.Microchip, opt => opt.MapFrom(src => src.Microchip))
+                .ForMember(dest => dest.HealthCondition, opt => opt.MapFrom(src => src.HealthCondition))
+                .ForMember(dest => dest.IsRetrieved, opt => opt.MapFrom(src => src.ModifiedAt.HasValue));
+            CreateMap<Payment, PaymentForTransactionResponseDTO>()
+                .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.AppointmentDetail));
+            CreateMap<RetryPaymentRequestDTO, Payment>();
 
             //HealthCondition
             CreateMap<CreateHealthConditionDTO, HealthCondition>();
@@ -226,7 +240,10 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.HealthCondition, opt => opt.MapFrom(src => src.HealthCondition))
                 .ForMember(dest => dest.Vet, opt => opt.MapFrom(src => src.Vet))
                 .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
-                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment));
+                .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => 
+                    src.Payment != null && src.Payment.Any() ? 
+                    src.Payment.OrderByDescending(p => p.CreatedAt).FirstOrDefault() : 
+                    null));
             CreateMap<AppointmentDetail, AppointmentDetailHealthConditionResponseDTO>();
             CreateMap<UpdateAppointmentHealthConditionDTO, HealthCondition>();
             //VaccinationSchedule

@@ -66,5 +66,11 @@ namespace PediVax.Controllers
             var response = await _paymentService.HandlePayOsCallBackAsync(paymentCallBackDTO, cancellationToken);
             return StatusCode(response.Code, response);
         }
+        [HttpPost("retry-payment")]
+        public async Task<IActionResult> RetryPaymentAsync([FromBody] RetryPaymentRequestDTO retryPaymentRequest, CancellationToken cancellationToken)
+        {
+            var response = await _paymentService.RetryPaymentAsync(retryPaymentRequest, cancellationToken);
+            return StatusCode(response.Code, response);
+        }
     }
 }

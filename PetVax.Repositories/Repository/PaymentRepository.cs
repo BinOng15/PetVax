@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetVax.BusinessObjects.Enum;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
@@ -17,7 +18,9 @@ namespace PetVax.Repositories.Repository
         }
         public async Task<int> AddPaymentAsync(Payment payment, CancellationToken cancellationToken)
         {
-            return await CreateAsync(payment, cancellationToken);
+            await _context.Payments.AddAsync(payment, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return payment.PaymentId;
         }
 
         public async Task<bool> DeletePaymentAsync(int id, CancellationToken cancellationToken)
@@ -38,7 +41,7 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Payment> GetPaymentByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
+        public async Task<Payment?> GetLastestFailedPaymentByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
         {
             return await _context.Payments
                 .Include(p => p.AppointmentDetail)
@@ -47,7 +50,23 @@ namespace PetVax.Repositories.Repository
                 .Include(p => p.Microchip)
                 .Include(p => p.VaccinationCertificate)
                 .Include(p => p.HealthCondition)
-                .FirstOrDefaultAsync(p => p.AppointmentDetailId == appointmentDetailId && p.isDeleted == false, cancellationToken);
+                .Where(p => p.AppointmentDetailId == appointmentDetailId &&
+                           p.PaymentStatus == EnumList.PaymentStatus.Failed)
+                .OrderByDescending(p => p.CreatedAt)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<List<Payment>> GetPaymentByAppointmentDetailIdAsync(int appointmentDetailId, CancellationToken cancellationToken)
+        {
+            return await _context.Payments
+                .Include(p => p.AppointmentDetail)
+                .Include(p => p.Customer)
+                .Include(p => p.VaccineBatch)
+                .Include(p => p.Microchip)
+                .Include(p => p.VaccinationCertificate)
+                .Include(p => p.HealthCondition)
+                .Where(p => p.AppointmentDetailId == appointmentDetailId)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Payment?> GetPaymentByIdAsync(int id, CancellationToken cancellationToken)
