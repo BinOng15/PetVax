@@ -193,12 +193,16 @@ namespace PetVax.Repositories.Repository
             foreach (var appointment in expiredAppointments)
             {
                 appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                appointment.ModifiedAt = DateTimeHelper.Now();
+                appointment.ModifiedBy = "System-Auto";
                 _context.Update(appointment);
             }
 
             foreach (var detail in expiredDetails)
             {
                 detail.AppointmentStatus = AppointmentStatus.Cancelled;
+                detail.ModifiedAt = DateTimeHelper.Now();
+                detail.ModifiedBy = "System-Auto";
                 _context.Update(detail);
             }
 
