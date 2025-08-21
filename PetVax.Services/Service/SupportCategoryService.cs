@@ -193,7 +193,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<SupportCategoryResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy danh mục hỗ trợ nào.",
                         Data = responseData
                     };

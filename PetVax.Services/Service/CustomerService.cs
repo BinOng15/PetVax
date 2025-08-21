@@ -137,7 +137,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<CustomerResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy khách hàng nào phù hợp với tiêu chí tìm kiếm.",
                         Data = null
                     };

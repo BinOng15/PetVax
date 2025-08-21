@@ -174,7 +174,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<VaccineBatchResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy lô vaccine nào",
                         Data = null
                     };

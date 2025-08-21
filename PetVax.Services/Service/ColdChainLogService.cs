@@ -171,8 +171,8 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<ColdChainLogResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy nhật ký lạnh nào.",
                         Data = responseData
                     };

@@ -34,6 +34,7 @@ namespace PetVax.Services.Service
         private readonly IMembershipRepository _membershipRepository;
         private readonly IVoucherRepository _voucherRepository;
         private readonly ICustomerVoucherRepository _customerVoucherRepository;
+        private readonly IAddressRepository _addressRepository;
         private readonly PayOsService _payOsService;
         private readonly ILogger<PaymentService> _logger;
         private readonly IMapper _mapper;
@@ -53,6 +54,7 @@ namespace PetVax.Services.Service
             IMembershipRepository membershipRepository,
             IVoucherRepository voucherRepository,
             ICustomerVoucherRepository customerVoucherRepository,
+            IAddressRepository addressRepository,
             PayOsService payOsService,
             ILogger<PaymentService> logger,
             IMapper mapper,
@@ -71,6 +73,7 @@ namespace PetVax.Services.Service
             _customerRepository = customerRepository;
             _membershipRepository = membershipRepository;
             _customerVoucherRepository = customerVoucherRepository;
+            _addressRepository = addressRepository;
             _voucherRepository = voucherRepository;
             _payOsService = payOsService;
             _logger = logger;
@@ -219,7 +222,9 @@ namespace PetVax.Services.Service
                 var appointment = appointmentDetail.Appointment;
                 if (appointment != null && appointment.Location == EnumList.Location.HomeVisit)
                 {
-                    var clinicAddress = "Trường Đại Học FPT Thành Phố Hồ Chí Minh";
+                    var addresses = await _addressRepository.GetAllAddressesAsync(CancellationToken.None);
+                    var defaultAddress = addresses.FirstOrDefault()?.Location;
+                    var clinicAddress = defaultAddress;
                     var customerAddress = appointment.Address;
                     var clinicCoords = await GetLatLngFromAddressAsync(clinicAddress);
                     var customerCoords = await GetLatLngFromAddressAsync(customerAddress);
@@ -459,7 +464,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<PaymentResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy thanh toán nào!",
                         Data = null
                     };
@@ -747,23 +752,76 @@ namespace PetVax.Services.Service
                 return (null, null);
             }
 
-            var payment = await _paymentRepository.GetPaymentByAppointmentDetailIdAsync(appointmentDetailId, cancellationToken);
+            // Xác định loại dịch vụ và URL tương ứng
+            string cancelUrl, returnUrl;
+
+            if (appointmentDetail.VaccineBatchId.HasValue)
+            {
+                // Dịch vụ tiêm chủng
+                //cancelUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/cancel";
+                //returnUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/success";
+                cancelUrl = "http://localhost:5173/staff/vaccination-appointments/cancel";
+                returnUrl = "http://localhost:5173/staff/vaccination-appointments/success";
+            }
+            else if (appointmentDetail.MicrochipItemId.HasValue)
+            {
+                // Dịch vụ cấy microchip
+                //cancelUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/cancel";
+                //returnUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/success";
+                cancelUrl = "http://localhost:5173/staff/microchip-appointments/cancel";
+                returnUrl = "http://localhost:5173/staff/microchip-appointments/success";
+            }
+            else if (appointmentDetail.VaccinationCertificateId.HasValue)
+            {
+                // Dịch vụ cấp chứng nhận tiêm chủng
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/certificate-appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/certificate-appointments/success";
+            }
+            else if (appointmentDetail.HealthConditionId.HasValue)
+            {
+                // Dịch vụ khám sức khỏe
+                //cancelUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/cancel";
+                //returnUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/success";
+                cancelUrl = "http://localhost:5173/staff/condition-appointments/cancel";
+                returnUrl = "http://localhost:5173/staff/condition-appointments/success";
+            }
+            else
+            {
+                // Mặc định
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/appointments/success";
+            }
 
             var paymentData = new PaymentData(
                 orderCode: (long)appointmentDetail.AppointmentDetailId,
                 amount: (int)amount,
                 description: $"VaxPet #{appointmentDetail.AppointmentDetailCode}",
                 items: new List<ItemData>(),
-                cancelUrl: "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/cancel",
-                returnUrl: "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/success"
+                cancelUrl: cancelUrl,
+                returnUrl: returnUrl
             );
 
+            _logger.LogInformation("Service Type: {ServiceType}", GetServiceTypeName(appointmentDetail));
             _logger.LogInformation("Amount: {amount}", amount);
+            _logger.LogInformation("CancelUrl: {CancelUrl}", cancelUrl);
+            _logger.LogInformation("ReturnUrl: {ReturnUrl}", returnUrl);
+
             var paymentLink = await _payOsService.CreatePaymentLink(paymentData);
             _logger.LogInformation("PayOs checkoutUrl: {CheckoutUrl}", paymentLink.checkoutUrl);
             _logger.LogInformation("PayOs QRCode: {QRCode}", paymentLink.qrCode);
             return (paymentLink.checkoutUrl, paymentLink.qrCode);
         }
+
+        // Phương thức helper để xác định tên loại dịch vụ
+        private string GetServiceTypeName(AppointmentDetail appointmentDetail)
+        {
+            if (appointmentDetail.VaccineBatchId.HasValue) return "Vaccination";
+            if (appointmentDetail.MicrochipItemId.HasValue) return "Microchip";
+            if (appointmentDetail.VaccinationCertificateId.HasValue) return "Certificate";
+            if (appointmentDetail.HealthConditionId.HasValue) return "HealthCheck";
+            return "Unknown";
+        }
+
 
         public async Task<BaseResponse<PaymentResponseDTO>> HandlePayOsCallBackAsync(PaymentCallBackDTO paymentCallBackDTO, CancellationToken cancellationToken)
         {

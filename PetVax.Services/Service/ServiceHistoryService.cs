@@ -123,7 +123,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<ServiceHistoryResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy lịch sử dịch vụ nào.",
                         Data = null
                     };

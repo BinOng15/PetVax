@@ -42,6 +42,7 @@ namespace PetVax.Services.Service
         private readonly IVaccineExportRepository _vaccineExportRepository;
         private readonly IVaccineExportDetailRepository _vaccineExportDetailRepository;
         private readonly IColdChainLogRepository _coldChainLogRepository;
+        private readonly IAddressRepository _addressRepository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AppointmentService> _logger;
         private readonly IMapper _mapper;
@@ -63,6 +64,7 @@ namespace PetVax.Services.Service
             IVaccineExportRepository vaccineExportRepository,
             IVaccineExportDetailRepository vaccineExportDetailRepository,
             IColdChainLogRepository coldChainLogRepository,
+            IAddressRepository addressRepository,
             IConfiguration configuration,
             ILogger<AppointmentService> logger,
             IMapper mapper,
@@ -83,6 +85,7 @@ namespace PetVax.Services.Service
             _vaccineExportRepository = vaccineExportRepository;
             _vaccineExportDetailRepository = vaccineExportDetailRepository;
             _coldChainLogRepository = coldChainLogRepository;
+            _addressRepository = addressRepository;
             _configuration = configuration;
             _logger = logger;
             _mapper = mapper;
@@ -814,7 +817,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<AppointmentForVaccinationResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy cuộc hẹn tiêm phòng nào.",
                         Data = null
                     };
@@ -878,7 +881,9 @@ namespace PetVax.Services.Service
             }
             if (createAppointmentVaccinationDTO.Appointment.Location == EnumList.Location.Clinic)
             {
-                createAppointmentVaccinationDTO.Appointment.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
+                var addresses = await _addressRepository.GetAllAddressesAsync(CancellationToken.None);
+                var defaultAddress = addresses.FirstOrDefault()?.Location;
+                createAppointmentVaccinationDTO.Appointment.Address = defaultAddress;
             }
             var appointmentDate = createAppointmentVaccinationDTO.Appointment.AppointmentDate;
             var now = DateTimeHelper.Now();
@@ -1597,7 +1602,9 @@ namespace PetVax.Services.Service
                 }
                 if (updateApp.Location == EnumList.Location.Clinic)
                 {
-                    updateApp.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
+                    var addresses = await _addressRepository.GetAllAddressesAsync(CancellationToken.None);
+                    var defaultAddress = addresses.FirstOrDefault()?.Location;
+                    updateApp.Address = defaultAddress;
                 }
 
                 if (updateApp.AppointmentDate.HasValue)
@@ -1748,7 +1755,9 @@ namespace PetVax.Services.Service
             }
             if (createAppointmentMicrochipDTO.Appointment.Location == EnumList.Location.Clinic)
             {
-                createAppointmentMicrochipDTO.Appointment.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
+                var addresses = await _addressRepository.GetAllAddressesAsync(CancellationToken.None);
+                var defaultAddress = addresses.FirstOrDefault()?.Location;
+                createAppointmentMicrochipDTO.Appointment.Address = defaultAddress;
             }
             var appointmentDate = createAppointmentMicrochipDTO.Appointment.AppointmentDate;
             var now = DateTimeHelper.Now();
@@ -2179,7 +2188,9 @@ namespace PetVax.Services.Service
                 }
                 if (updateAppointmentDTO.Location == EnumList.Location.Clinic)
                 {
-                    updateAppointmentDTO.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
+                    var addresses = await _addressRepository.GetAllAddressesAsync(CancellationToken.None);
+                    var defaultAddress = addresses.FirstOrDefault()?.Location;
+                    updateAppointmentDTO.Address = defaultAddress;
                 }
 
                 appointmentExist.AppointmentDate = updateAppointmentDTO.AppointmentDate ?? appointmentExist.AppointmentDate;
@@ -3621,7 +3632,9 @@ namespace PetVax.Services.Service
 
             if (createAppointmentHealConditionDTO.Appointment.Location == EnumList.Location.Clinic)
             {
-                createAppointmentHealConditionDTO.Appointment.Address = "Đường D1, Long Bình, 71200, Quận 9, Ho Chi Minh City, Vietnam";
+                var addresses = await _addressRepository.GetAllAddressesAsync(CancellationToken.None);
+                var defaultAddress = addresses.FirstOrDefault()?.Location;
+                createAppointmentHealConditionDTO.Appointment.Address = defaultAddress;
             }
 
             if (createAppointmentHealConditionDTO.Appointment.ServiceType != EnumList.ServiceType.HealthCondition)
@@ -4217,6 +4230,12 @@ namespace PetVax.Services.Service
                         };
                     }
                 }
+            }
+            if (updateAppointmentHealConditionDTO.Location == EnumList.Location.Clinic)
+            {
+                var addresses = await _addressRepository.GetAllAddressesAsync(CancellationToken.None);
+                var defaultAddress = addresses.FirstOrDefault()?.Location;
+                updateAppointmentHealConditionDTO.Address = defaultAddress;
             }
             try
             {

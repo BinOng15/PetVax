@@ -96,7 +96,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<CustomerVoucherResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy CustomerVoucher nào",
                         Data = null
                     };

@@ -114,7 +114,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<PetResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy thú cưng nào",
                         Data = responseData
                     };

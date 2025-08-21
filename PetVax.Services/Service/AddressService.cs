@@ -212,8 +212,8 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<AddressResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy địa chỉ nào",
                         Data = resposneData
                     };
