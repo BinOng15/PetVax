@@ -515,7 +515,8 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<BaseMicrochipItemResponse>
                         {
-                            Code = 200,
+                            Code = 400,
+                            Success = false,
                             Message = "Microchip đã được cấy vào cho thú cưng khác",
                             Data = null
                         };
