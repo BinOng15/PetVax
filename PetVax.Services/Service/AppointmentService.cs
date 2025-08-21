@@ -3945,7 +3945,9 @@ namespace PetVax.Services.Service
                 HealthCondition healthConditiont = new HealthCondition();
                 if (currentStatus != EnumList.AppointmentStatus.Confirmed && newStatus == EnumList.AppointmentStatus.Confirmed)
                 {
+                    var random = new Random();
                     healthConditiont.Price = 10000;
+                    healthConditiont.ConditionCode = "HE" + random.Next(0, 1000000).ToString("D6");
                     healthConditiont.CreatedAt = DateTime.UtcNow;
                     healthConditiont.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
                     var createHealthcondition = await _healthConditionRepository.AddHealthConditionAsync(healthConditiont, cancellationToken);
@@ -4083,7 +4085,7 @@ namespace PetVax.Services.Service
                         getHealthCondition.Behavior = updateDTO.Behavior ?? getHealthCondition.Behavior;
                         getHealthCondition.Psycho = updateDTO.Psycho ?? getHealthCondition.Psycho;
                         getHealthCondition.Different = updateDTO.Different ?? getHealthCondition.Different;
-                        getHealthCondition.Conclusion = Conclusion ?? getHealthCondition.Conclusion;
+                        getHealthCondition.Conclusion = Conclusion;
                         getHealthCondition.Status = Status ?? getHealthCondition.Status;
                         getHealthCondition.CheckDate = DateTime.UtcNow;
                         getHealthCondition.ModifiedAt = DateTime.UtcNow;
