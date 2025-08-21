@@ -173,8 +173,10 @@ namespace PetVax.Repositories.Repository
         public async Task UpdateExpiredAppointmentsAsync(CancellationToken cancellationToken)
         {
             var currentDateTime = DateTime.UtcNow;
+            // Get appointments that are expired and have status Processing or Confirmed
             var expiredAppointments = await _context.Appointments
-                .Where(a => a.AppointmentDate < currentDateTime && a.AppointmentStatus == AppointmentStatus.Processing && a.AppointmentStatus == AppointmentStatus.Confirmed)
+                .Where(a => a.AppointmentDate < currentDateTime &&
+                    (a.AppointmentStatus == AppointmentStatus.Processing || a.AppointmentStatus == AppointmentStatus.Confirmed))
                 .ToListAsync(cancellationToken);
 
             if (expiredAppointments.Count == 0)
@@ -182,8 +184,10 @@ namespace PetVax.Repositories.Repository
 
             var expiredAppointmentIds = expiredAppointments.Select(a => a.AppointmentId).ToList();
 
+            // Get appointment details for those appointments with status Processing or Confirmed
             var expiredDetails = await _context.AppointmentDetails
-                .Where(d => expiredAppointmentIds.Contains(d.AppointmentId) && d.AppointmentStatus == AppointmentStatus.Processing)
+                .Where(d => expiredAppointmentIds.Contains(d.AppointmentId) &&
+                    (d.AppointmentStatus == AppointmentStatus.Processing || d.AppointmentStatus == AppointmentStatus.Confirmed))
                 .ToListAsync(cancellationToken);
 
             foreach (var appointment in expiredAppointments)
