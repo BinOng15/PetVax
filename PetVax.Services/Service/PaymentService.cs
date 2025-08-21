@@ -34,6 +34,7 @@ namespace PetVax.Services.Service
         private readonly IMembershipRepository _membershipRepository;
         private readonly IVoucherRepository _voucherRepository;
         private readonly ICustomerVoucherRepository _customerVoucherRepository;
+        private readonly IAddressRepository _addressRepository;
         private readonly PayOsService _payOsService;
         private readonly ILogger<PaymentService> _logger;
         private readonly IMapper _mapper;
@@ -53,6 +54,7 @@ namespace PetVax.Services.Service
             IMembershipRepository membershipRepository,
             IVoucherRepository voucherRepository,
             ICustomerVoucherRepository customerVoucherRepository,
+            IAddressRepository addressRepository,
             PayOsService payOsService,
             ILogger<PaymentService> logger,
             IMapper mapper,
@@ -71,6 +73,7 @@ namespace PetVax.Services.Service
             _customerRepository = customerRepository;
             _membershipRepository = membershipRepository;
             _customerVoucherRepository = customerVoucherRepository;
+            _addressRepository = addressRepository;
             _voucherRepository = voucherRepository;
             _payOsService = payOsService;
             _logger = logger;
@@ -219,7 +222,9 @@ namespace PetVax.Services.Service
                 var appointment = appointmentDetail.Appointment;
                 if (appointment != null && appointment.Location == EnumList.Location.HomeVisit)
                 {
-                    var clinicAddress = "Trường Đại Học FPT Thành Phố Hồ Chí Minh";
+                    var addresses = await _addressRepository.GetAllAddressesAsync(CancellationToken.None);
+                    var defaultAddress = addresses.FirstOrDefault()?.Location;
+                    var clinicAddress = defaultAddress;
                     var customerAddress = appointment.Address;
                     var clinicCoords = await GetLatLngFromAddressAsync(clinicAddress);
                     var customerCoords = await GetLatLngFromAddressAsync(customerAddress);
@@ -753,14 +758,18 @@ namespace PetVax.Services.Service
             if (appointmentDetail.VaccineBatchId.HasValue)
             {
                 // Dịch vụ tiêm chủng
-                cancelUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/cancel";
-                returnUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/success";
+                //cancelUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/cancel";
+                //returnUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/success";
+                cancelUrl = "http://localhost:5173/staff/vaccination-appointments/cancel";
+                returnUrl = "http://localhost:5173/staff/vaccination-appointments/success";
             }
             else if (appointmentDetail.MicrochipItemId.HasValue)
             {
                 // Dịch vụ cấy microchip
-                cancelUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/cancel";
-                returnUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/success";
+                //cancelUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/cancel";
+                //returnUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/success";
+                cancelUrl = "http://localhost:5173/staff/microchip-appointments/cancel";
+                returnUrl = "http://localhost:5173/staff/microchip-appointments/success";
             }
             else if (appointmentDetail.VaccinationCertificateId.HasValue)
             {
@@ -771,8 +780,10 @@ namespace PetVax.Services.Service
             else if (appointmentDetail.HealthConditionId.HasValue)
             {
                 // Dịch vụ khám sức khỏe
-                cancelUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/cancel";
-                returnUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/success";
+                //cancelUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/cancel";
+                //returnUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/success";
+                cancelUrl = "http://localhost:5173/staff/condition-appointments/cancel";
+                returnUrl = "http://localhost:5173/staff/condition-appointments/success";
             }
             else
             {
