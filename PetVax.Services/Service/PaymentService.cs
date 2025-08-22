@@ -425,11 +425,12 @@ namespace PetVax.Services.Service
                     var keyword = getAllItemsRequest.KeyWord.ToLower();
                     payments = payments
                         .Where(p =>
-                        (p.PaymentCode != null && p.PaymentCode.ToLower().Contains(keyword)) ||
-                        (p.Customer != null && p.Customer.FullName != null && p.Customer.FullName.ToLower().Contains(keyword)) ||
-                        (p.AppointmentDetail != null && p.AppointmentDetail.AppointmentDetailCode != null && p.AppointmentDetail.AppointmentDetailCode.ToLower().Contains(keyword)) ||
-                        (p.VaccineBatch != null && p.VaccineBatch.Vaccine.Name != null && p.VaccineBatch.Vaccine.Name.ToLower().Contains(keyword)) ||
-                        (p.VaccineBatch != null && p.VaccineBatch.Vaccine.VaccineCode != null && p.VaccineBatch.Vaccine.VaccineCode.ToLower().Contains(keyword)))
+                            (p.PaymentCode != null && p.PaymentCode.ToLower().Contains(keyword)) ||
+                            (p.Customer != null && p.Customer.FullName != null && p.Customer.FullName.ToLower().Contains(keyword)) ||
+                            (p.AppointmentDetail != null && p.AppointmentDetail.AppointmentDetailCode != null && p.AppointmentDetail.AppointmentDetailCode.ToLower().Contains(keyword)) ||
+                            (p.VaccineBatch != null && p.VaccineBatch.Vaccine != null && p.VaccineBatch.Vaccine.Name != null && p.VaccineBatch.Vaccine.Name.ToLower().Contains(keyword)) ||
+                            (p.VaccineBatch != null && p.VaccineBatch.Vaccine != null && p.VaccineBatch.Vaccine.VaccineCode != null && p.VaccineBatch.Vaccine.VaccineCode.ToLower().Contains(keyword))
+                        )
                         .ToList();
                 }
                 int pageNumber = getAllItemsRequest?.PageNumber > 0 ? getAllItemsRequest.PageNumber : 1;
@@ -466,7 +467,7 @@ namespace PetVax.Services.Service
                         Code = 200,
                         Success = true,
                         Message = "Không tìm thấy thanh toán nào!",
-                        Data = null
+                        Data = response // Return empty response instead of null to avoid CS8625
                     };
                 }
                 _logger.LogInformation("GetAllPaymentsAsync: Successfully retrieved {Count} payments", pagedPayments.Count);
