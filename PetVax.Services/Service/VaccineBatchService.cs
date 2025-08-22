@@ -57,7 +57,7 @@ namespace PetVax.Services.Service
                 vaccineBatch.ManufactureDate = createVaccineBatchDTO.ManufactureDate;
                 vaccineBatch.ExpiryDate = createVaccineBatchDTO.ExpiryDate;
                 vaccineBatch.Source = createVaccineBatchDTO.Source;
-                vaccineBatch.StorageConditions = createVaccineBatchDTO.StorageCondition;
+                vaccineBatch.StorageCondition = createVaccineBatchDTO.StorageCondition;
                 vaccineBatch.Quantity = 0;
                 vaccineBatch.CreateAt = DateTimeHelper.Now();
                 vaccineBatch.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
@@ -340,7 +340,7 @@ namespace PetVax.Services.Service
                 existingBatch.ExpiryDate = updateVaccineBatchDTO.ExpiryDate ?? existingBatch.ExpiryDate;
                 existingBatch.Manufacturer = updateVaccineBatchDTO.Manufacturer ?? existingBatch.Manufacturer;
                 existingBatch.Source = updateVaccineBatchDTO.Source ?? existingBatch.Source;
-                existingBatch.StorageConditions = updateVaccineBatchDTO.StorageCondition ?? existingBatch.StorageConditions;
+                existingBatch.StorageCondition = updateVaccineBatchDTO.StorageCondition ?? existingBatch.StorageCondition;
                 existingBatch.ModifiedAt = DateTimeHelper.Now();
                 existingBatch.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 int batchId = await _vaccineBatchRepository.UpdateVaccineBatchAsync(existingBatch, cancellationToken);

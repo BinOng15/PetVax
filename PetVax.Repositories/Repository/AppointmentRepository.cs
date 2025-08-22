@@ -140,33 +140,36 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Appointment>> GetPastAppointmentsByCustomerIdAsync(DateTime now, int customerId, CancellationToken cancellationToken)
+        public async Task<List<Appointment>> GetPastAppointmentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
+            var now = DateTimeHelper.Now();
             return await _context.Set<Appointment>()
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentDate < now && a.CustomerId == customerId && a.isDeleted == false)
+                .Where(a => a.AppointmentDate.Date < now.Date && (a.CustomerId == customerId && a.isDeleted == false))
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Appointment>> GetTodayAppointmentsByCustomerIdAsync(DateTime today, int customerId, CancellationToken cancellationToken)
+        public async Task<List<Appointment>> GetTodayAppointmentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
+            var now = DateTimeHelper.Now();
             return await _context.Set<Appointment>()
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentDate.Date == today.Date && a.CustomerId == customerId && a.isDeleted == false)
+                .Where(a => a.AppointmentDate.Date == now.Date && (a.CustomerId == customerId && a.isDeleted == false))
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Appointment>> GetFutureAppointmentsByCustomerIdAsync(DateTime now, int customerId, CancellationToken cancellationToken)
+        public async Task<List<Appointment>> GetFutureAppointmentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
+            var now = DateTimeHelper.Now();
             return await _context.Set<Appointment>()
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentDate > now && a.CustomerId == customerId && a.isDeleted == false)
+                .Where(a => a.AppointmentDate > now && (a.CustomerId == customerId && a.isDeleted == false))
                 .ToListAsync(cancellationToken);
         }
 
