@@ -19,13 +19,15 @@ namespace PetVax.Services.Service
     public class VaccineBatchService : IVaccineBatchService
     {
         private readonly IVaccineBatchRepository _vaccineBatchRepository;
+        private readonly IVaccineRepository _vaccineRepository;
         private readonly ILogger<VaccineBatchService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public VaccineBatchService(IVaccineBatchRepository vaccineBatchRepository, ILogger<VaccineBatchService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public VaccineBatchService(IVaccineBatchRepository vaccineBatchRepository, IVaccineRepository vaccineRepository, ILogger<VaccineBatchService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _vaccineBatchRepository = vaccineBatchRepository;
+            _vaccineRepository = vaccineRepository;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -35,6 +37,19 @@ namespace PetVax.Services.Service
         {
             try
             {
+                // Check if the vaccine exists and is not deleted
+                var vaccine = await _vaccineRepository.GetVaccineByIdAsync(createVaccineBatchDTO.VaccineId, cancellationToken);
+                if (vaccine == null || vaccine.isDeleted == true)
+                {
+                    return new BaseResponse<VaccineBatchResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Vắc xin không tồn tại hoặc đã bị xóa.",
+                        Data = null
+                    };
+                }
+
                 var vaccineBatch = _mapper.Map<VaccineBatch>(createVaccineBatchDTO);
                 vaccineBatch.VaccineId = createVaccineBatchDTO.VaccineId;
                 vaccineBatch.BatchNumber = "BATCH" + new Random().Next(100000, 1000000).ToString();
