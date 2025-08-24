@@ -126,7 +126,7 @@ namespace PetVax.Services.Service
 
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 200,
+                        Code = 400,
                         Success = false,
                         Message = "Nhập Id vet cần cập nhật.",
                         Data = null
@@ -138,7 +138,7 @@ namespace PetVax.Services.Service
          
                     return new BaseResponse<VetResponseDTO>
                     {
-                        Code = 200,
+                        Code = 404,
                         Success = false,
                         Message = "Không tìm thấy vet",
                         Data = null
