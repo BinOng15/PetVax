@@ -159,6 +159,9 @@ namespace PetVax.Services.Service
                     };
                 }
 
+                // Track if DateOfBirth is updated
+                bool isDateOfBirthUpdated = updatePetRequest?.DateOfBirth != null && updatePetRequest.DateOfBirth != pet.DateOfBirth;
+
                 // Update pet properties
                 pet.Name = updatePetRequest.Name ?? pet.Name;
                 pet.Species = updatePetRequest.Species ?? pet.Species;
@@ -173,7 +176,6 @@ namespace PetVax.Services.Service
                 {
                     pet.Image = await _cloudinariService.UploadImage(updatePetRequest.Image);
                 }
-
 
                 pet.Weight = updatePetRequest?.Weight ?? pet.Weight;
                 pet.Color = updatePetRequest?.Color ?? pet.Color;
@@ -195,7 +197,49 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                _logger.LogInformation("Pet with ID {PetId} updated successfully", petId);
+                if (isDateOfBirthUpdated)
+                {
+                    var vaccineProfiles = await _vaccineProfileRepository.GetListVaccineProfileByPetIdAsync(petId, cancellationToken);
+                    var vaccinationSchedules = await _vaccinationScheduleRepository.GetAllVaccinationSchedulesAsync(cancellationToken);
+
+                    foreach (var profile in vaccineProfiles)
+                    {
+                        var schedule = vaccinationSchedules.FirstOrDefault(s => s.VaccinationScheduleId == profile.VaccinationScheduleId);
+                        if (schedule != null && schedule is VaccinationSchedule vaccinationSchedule)
+                        {
+                            // AgeInterval is in weeks, so multiply by 7 for days
+                            if (DateTime.TryParse(pet.DateOfBirth, out var dob))
+                            {
+                                // ✅ FIX: Detach navigation properties để tránh tracking conflict
+                                var updateProfile = new VaccineProfile
+                                {
+                                    VaccineProfileId = profile.VaccineProfileId,
+                                    PetId = profile.PetId,
+                                    VaccinationScheduleId = profile.VaccinationScheduleId,
+                                    DiseaseId = profile.DiseaseId,
+                                    AppointmentDetailId = profile.AppointmentDetailId,
+                                    PreferedDate = dob.AddDays(vaccinationSchedule.AgeInterval * 7),
+                                    VaccinationDate = profile.VaccinationDate,
+                                    Dose = profile.Dose,
+                                    Reaction = profile.Reaction,
+                                    NextVaccinationInfo = profile.NextVaccinationInfo,
+                                    IsActive = profile.IsActive,
+                                    IsCompleted = profile.IsCompleted,
+                                    CreatedAt = profile.CreatedAt,
+                                    CreatedBy = profile.CreatedBy,
+                                    ModifiedAt = DateTimeHelper.Now(),
+                                    ModifiedBy = GetCurrentUserName(),
+                                    isDeleted = profile.isDeleted
+                                    // ✅ KHÔNG set navigation properties để tránh tracking conflict
+                                };
+
+                                await _vaccineProfileRepository.UpdateVaccineProfileAsync(updateProfile, cancellationToken);
+                            }
+                        }
+                    }
+
+                    _logger.LogInformation("Pet with ID {PetId} updated successfully", petId);
+                }
                 return new BaseResponse<PetResponseDTO>
                 {
                     Code = 200,
