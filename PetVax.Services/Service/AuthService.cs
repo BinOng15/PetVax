@@ -66,6 +66,16 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
+                if (account.isVerify != true)
+                {
+                    return new BaseResponse<AuthResponseDTO>
+                    {
+                        Code = 403,
+                        Success = false,
+                        Message = "Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực.",
+                        Data = null
+                    };
+                }
 
                 // Generate OTP and send email
                 var otp = GenerateOtp();

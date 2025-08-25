@@ -30,6 +30,7 @@ namespace PetVax.Repositories.Repository
             return await _context.VaccineDiseases
                 .Include(vd => vd.Disease)
                 .Include(vd => vd.Vaccine)
+                .Where(vd => vd.Vaccine.isDeleted == false && vd.Disease.isDeleted == false && vd.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
@@ -39,6 +40,7 @@ namespace PetVax.Repositories.Repository
                 .Include(vd => vd.Disease)
                 .Include(vd => vd.Vaccine)
                 .Where(vd => vd.DiseaseId == diseaseId)
+                .Where(vd => vd.Vaccine.isDeleted == false && vd.Disease.isDeleted == false && vd.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
@@ -48,6 +50,7 @@ namespace PetVax.Repositories.Repository
             return await _context.VaccineDiseases
                 .Include(vd => vd.Disease)
                 .Include(vd => vd.Vaccine)
+                .Where(vd => vd.Vaccine.isDeleted == false && vd.Disease.isDeleted == false && vd.isDeleted == false)
                 .FirstOrDefaultAsync(vd => vd.VaccineDiseaseId == diseaseId, cancellationToken);
         }
 
@@ -57,6 +60,7 @@ namespace PetVax.Repositories.Repository
                 .Include(vd => vd.Disease)
                 .Include(vd => vd.Vaccine)
                 .Where(vd => vd.VaccineId == vaccineId)
+                .Where(vd => vd.Vaccine.isDeleted == false && vd.Disease.isDeleted == false && vd.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 

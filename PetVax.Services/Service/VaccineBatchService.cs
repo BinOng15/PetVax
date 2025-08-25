@@ -19,13 +19,15 @@ namespace PetVax.Services.Service
     public class VaccineBatchService : IVaccineBatchService
     {
         private readonly IVaccineBatchRepository _vaccineBatchRepository;
+        private readonly IVaccineRepository _vaccineRepository;
         private readonly ILogger<VaccineBatchService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public VaccineBatchService(IVaccineBatchRepository vaccineBatchRepository, ILogger<VaccineBatchService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public VaccineBatchService(IVaccineBatchRepository vaccineBatchRepository, IVaccineRepository vaccineRepository, ILogger<VaccineBatchService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _vaccineBatchRepository = vaccineBatchRepository;
+            _vaccineRepository = vaccineRepository;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -35,6 +37,19 @@ namespace PetVax.Services.Service
         {
             try
             {
+                // Check if the vaccine exists and is not deleted
+                var vaccine = await _vaccineRepository.GetVaccineByIdAsync(createVaccineBatchDTO.VaccineId, cancellationToken);
+                if (vaccine == null || vaccine.isDeleted == true)
+                {
+                    return new BaseResponse<VaccineBatchResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Vắc xin không tồn tại hoặc đã bị xóa.",
+                        Data = null
+                    };
+                }
+
                 var vaccineBatch = _mapper.Map<VaccineBatch>(createVaccineBatchDTO);
                 vaccineBatch.VaccineId = createVaccineBatchDTO.VaccineId;
                 vaccineBatch.BatchNumber = "BATCH" + new Random().Next(100000, 1000000).ToString();
@@ -42,7 +57,7 @@ namespace PetVax.Services.Service
                 vaccineBatch.ManufactureDate = createVaccineBatchDTO.ManufactureDate;
                 vaccineBatch.ExpiryDate = createVaccineBatchDTO.ExpiryDate;
                 vaccineBatch.Source = createVaccineBatchDTO.Source;
-                vaccineBatch.StorageConditions = createVaccineBatchDTO.StorageCondition;
+                vaccineBatch.StorageCondition = createVaccineBatchDTO.StorageCondition;
                 vaccineBatch.Quantity = 0;
                 vaccineBatch.CreateAt = DateTimeHelper.Now();
                 vaccineBatch.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
@@ -174,7 +189,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<VaccineBatchResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy lô vaccine nào",
                         Data = null
                     };
@@ -325,7 +340,7 @@ namespace PetVax.Services.Service
                 existingBatch.ExpiryDate = updateVaccineBatchDTO.ExpiryDate ?? existingBatch.ExpiryDate;
                 existingBatch.Manufacturer = updateVaccineBatchDTO.Manufacturer ?? existingBatch.Manufacturer;
                 existingBatch.Source = updateVaccineBatchDTO.Source ?? existingBatch.Source;
-                existingBatch.StorageConditions = updateVaccineBatchDTO.StorageCondition ?? existingBatch.StorageConditions;
+                existingBatch.StorageCondition = updateVaccineBatchDTO.StorageCondition ?? existingBatch.StorageCondition;
                 existingBatch.ModifiedAt = DateTimeHelper.Now();
                 existingBatch.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 int batchId = await _vaccineBatchRepository.UpdateVaccineBatchAsync(existingBatch, cancellationToken);

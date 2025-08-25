@@ -826,7 +826,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<AppointmenDetialMicorchipResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy chi tiết cuộc hẹn microchip nào.",
                         Data = null
                     };
@@ -988,7 +988,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<AppointmentHealthConditionResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy chi tiết cuộc hẹn sức khỏe nào.",
                         Data = null
                     };

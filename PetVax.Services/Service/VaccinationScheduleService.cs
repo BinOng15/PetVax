@@ -49,6 +49,65 @@ namespace PetVax.Services.Service
             }
             try
             {
+                // Check for existing schedules for the same disease and species
+                var existingSchedules = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(createVaccinationScheduleDTO.DiseaseId, cancellationToken);
+                var sameSpeciesSchedules = existingSchedules?.Where(s => s.Species == createVaccinationScheduleDTO.Species).ToList() ?? new List<VaccinationSchedule>();
+
+                if (sameSpeciesSchedules.Any())
+                {
+                    var maxDose = sameSpeciesSchedules.Max(s => s.DoseNumber);
+                    if (createVaccinationScheduleDTO.DoseNumber <= maxDose)
+                    {
+                        return new BaseResponse<VaccinationScheduleResponseDTO>
+                        {
+                            Code = 409,
+                            Success = false,
+                            Message = $"Đã tồn tại mũi {createVaccinationScheduleDTO.DoseNumber} cho bệnh này. Vui lòng tạo mũi tiếp theo (mũi {maxDose + 1}).",
+                            Data = null
+                        };
+                    }
+                    if (createVaccinationScheduleDTO.DoseNumber > maxDose + 1)
+                    {
+                        return new BaseResponse<VaccinationScheduleResponseDTO>
+                        {
+                            Code = 409,
+                            Success = false,
+                            Message = $"Bạn chỉ có thể tạo mũi tiếp theo là mũi {maxDose + 1} cho bệnh này.",
+                            Data = null
+                        };
+                    }
+
+                    // Validate age interval: new dose must have ageInterval > previous dose
+                    var previousDose = sameSpeciesSchedules
+                        .Where(s => s.DoseNumber == createVaccinationScheduleDTO.DoseNumber - 1)
+                        .OrderByDescending(s => s.DoseNumber)
+                        .FirstOrDefault();
+
+                    if (previousDose != null && createVaccinationScheduleDTO.AgeInterval <= previousDose.AgeInterval)
+                    {
+                        return new BaseResponse<VaccinationScheduleResponseDTO>
+                        {
+                            Code = 409,
+                            Success = false,
+                            Message = $"Độ tuổi tiêm của mũi này phải lớn hơn mũi trước đó (mũi {previousDose.DoseNumber}, tuổi {previousDose.AgeInterval}).",
+                            Data = null
+                        };
+                    }
+                }
+                else
+                {
+                    if (createVaccinationScheduleDTO.DoseNumber != 1)
+                    {
+                        return new BaseResponse<VaccinationScheduleResponseDTO>
+                        {
+                            Code = 409,
+                            Success = false,
+                            Message = "Mũi đầu tiên cho bệnh này phải là mũi 1.",
+                            Data = null
+                        };
+                    }
+                }
+
                 var newVaccinationSchedule = _mapper.Map<VaccinationSchedule>(createVaccinationScheduleDTO);
                 newVaccinationSchedule.DiseaseId = createVaccinationScheduleDTO.DiseaseId;
                 newVaccinationSchedule.Species = createVaccinationScheduleDTO.Species;
@@ -78,7 +137,6 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-
             }
             catch (Exception ex)
             {
@@ -108,7 +166,7 @@ namespace PetVax.Services.Service
             try
             {
                 var vaccinationSchedule = await _vaccinationScheduleRepository.GetVaccinationScheduleByIdAsync(vaccinationScheduleId, cancellationToken);
-                if (vaccinationSchedule == null || (vaccinationSchedule.isDeleted.HasValue && vaccinationSchedule.isDeleted.Value))
+                if (vaccinationSchedule == null)
                 {
                     return new BaseResponse<bool>
                     {
@@ -119,12 +177,8 @@ namespace PetVax.Services.Service
                     };
                 }
 
-                vaccinationSchedule.isDeleted = true;
-                vaccinationSchedule.ModifiedAt = DateTimeHelper.Now();
-                vaccinationSchedule.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Unknown";
-
-                var result = await _vaccinationScheduleRepository.UpdateVaccinationScheduleAsync(vaccinationSchedule, cancellationToken);
-                if (result > 0)
+                var result = await _vaccinationScheduleRepository.DeleteVaccinationScheduleAsync(vaccinationScheduleId, cancellationToken);
+                if (result)
                 {
                     return new BaseResponse<bool>
                     {
@@ -152,7 +206,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Lỗi khi xóa mềm lịch tiêm",
+                    Message = "Lỗi khi xóa lịch tiêm",
                     Data = false
                 };
             }
@@ -203,8 +257,8 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<VaccinationScheduleResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy lịch tiêm nào.",
                         Data = respnse
                     };
@@ -236,8 +290,8 @@ namespace PetVax.Services.Service
             {
                 return new BaseResponse<VaccinationScheduleByDiseaseResponseDTO>
                 {
-                    Code = 400,
-                    Success = false,
+                    Code = 200,
+                    Success = true,
                     Message = "ID bệnh không hợp lệ.",
                     Data = null
                 };
@@ -249,8 +303,8 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<VaccinationScheduleByDiseaseResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy lịch tiêm cho bệnh này.",
                         Data = null
                     };
@@ -423,11 +477,55 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-                // Update properties
-                vaccinationSchedule.DiseaseId = updateVaccinationScheduleDTO.DiseaseId ?? vaccinationSchedule.DiseaseId;
-                vaccinationSchedule.Species = updateVaccinationScheduleDTO.Species ?? vaccinationSchedule.Species;
-                vaccinationSchedule.DoseNumber = updateVaccinationScheduleDTO.DoseNumber ?? vaccinationSchedule.DoseNumber;
-                vaccinationSchedule.AgeInterval = updateVaccinationScheduleDTO.AgeInterval ?? vaccinationSchedule.AgeInterval;
+
+                // Không cho cập nhật DoseNumber
+                int currentDoseNumber = vaccinationSchedule.DoseNumber;
+                int newDiseaseId = updateVaccinationScheduleDTO.DiseaseId ?? vaccinationSchedule.DiseaseId;
+                string newSpecies = updateVaccinationScheduleDTO.Species ?? vaccinationSchedule.Species;
+                int newAgeInterval = updateVaccinationScheduleDTO.AgeInterval ?? vaccinationSchedule.AgeInterval;
+
+                // Kiểm tra ageInterval của mũi sau phải lớn hơn mũi trước
+                var schedules = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(newDiseaseId, cancellationToken);
+                var sameSpeciesSchedules = schedules.Where(s => s.Species == newSpecies).ToList();
+
+                // Nếu có mũi trước đó (doseNumber < currentDoseNumber), kiểm tra ageInterval
+                var previousDose = sameSpeciesSchedules
+                    .Where(s => s.DoseNumber == currentDoseNumber - 1)
+                    .OrderByDescending(s => s.DoseNumber)
+                    .FirstOrDefault();
+
+                if (previousDose != null && newAgeInterval <= previousDose.AgeInterval)
+                {
+                    return new BaseResponse<VaccinationScheduleResponseDTO>
+                    {
+                        Code = 409,
+                        Success = false,
+                        Message = $"Độ tuổi tiêm của mũi này phải lớn hơn mũi trước đó (mũi {previousDose.DoseNumber}, tuổi {previousDose.AgeInterval}).",
+                        Data = null
+                    };
+                }
+
+                // Nếu có mũi sau đó (doseNumber > currentDoseNumber), kiểm tra ageInterval
+                var nextDose = sameSpeciesSchedules
+                    .Where(s => s.DoseNumber == currentDoseNumber + 1)
+                    .OrderBy(s => s.DoseNumber)
+                    .FirstOrDefault();
+
+                if (nextDose != null && nextDose.AgeInterval <= newAgeInterval)
+                {
+                    return new BaseResponse<VaccinationScheduleResponseDTO>
+                    {
+                        Code = 409,
+                        Success = false,
+                        Message = $"Độ tuổi tiêm của mũi sau (mũi {nextDose.DoseNumber}, {nextDose.AgeInterval} tuần tuổi) phải lớn hơn mũi hiện tại.",
+                        Data = null
+                    };
+                }
+
+                // Update properties except DoseNumber
+                vaccinationSchedule.DiseaseId = newDiseaseId;
+                vaccinationSchedule.Species = newSpecies;
+                vaccinationSchedule.AgeInterval = newAgeInterval;
                 vaccinationSchedule.ModifiedAt = DateTimeHelper.Now();
                 vaccinationSchedule.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
                 var result = await _vaccinationScheduleRepository.UpdateVaccinationScheduleAsync(vaccinationSchedule, cancellationToken);
@@ -465,5 +563,6 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
     }
 }

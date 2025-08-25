@@ -501,8 +501,8 @@ namespace PetVax.Services.Service
                 {
                     return new DynamicResponse<VaccineExportDetailResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy chi tiết phiếu xuất vắc xin nào.",
                         Data = response
                     };

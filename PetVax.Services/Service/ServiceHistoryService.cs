@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static PetVax.BusinessObjects.DTO.ResponseModel;
+using static PetVax.BusinessObjects.Enum.EnumList;
 
 namespace PetVax.Services.Service
 {
@@ -122,7 +123,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<ServiceHistoryResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy lịch sử dịch vụ nào.",
                         Data = null
                     };
@@ -144,6 +145,42 @@ namespace PetVax.Services.Service
                     Success = false,
                     Message = "Đã xảy ra lỗi khi lấy tất cả lịch sử dịch vụ.",
                     Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<ServiceHistoryResponseDTO>>> GetServiceHistoryByServiceTypedAsync(ServiceType serviceType, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var serviceHistories = await _serviceHistoryRepository.GetServiceHistoriesByServiceTypeAsync(serviceType, cancellationToken);
+                if (serviceHistories == null || !serviceHistories.Any())
+                {
+                    return new BaseResponse<List<ServiceHistoryResponseDTO>>
+                    {
+                        Code = 200,
+                        Success = true,
+                        Data = new List<ServiceHistoryResponseDTO>(),
+                        Message = "Không tìm thấy lịch sử dịch vụ"
+                    };
+
+                }
+                var response = _mapper.Map<List<ServiceHistoryResponseDTO>>(serviceHistories);
+                return new BaseResponse<List<ServiceHistoryResponseDTO>>
+                {
+                    Code = 200,
+                    Success = true,
+                    Data = response
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<ServiceHistoryResponseDTO>>
+                {
+                    Code = 200,
+                    Success = false,
+                    Data = new List<ServiceHistoryResponseDTO>(),
+                    Message = $"Lỗi khi lấy lịch sử dịch vụ: {ex.Message} {ex.InnerException}"
                 };
             }
         }

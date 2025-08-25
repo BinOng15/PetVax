@@ -95,7 +95,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<PointTransactionResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy lịch sử điểm nào",
                         Data = null
                     };

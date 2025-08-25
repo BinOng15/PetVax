@@ -18,58 +18,45 @@ namespace PetVax.Repositories.Repository
         }
         public async Task CreateServiceHistoryAsync(CancellationToken cancellationToken)
         {
-            var currentDateTime = DateTime.UtcNow;
-            var currrentDate = currentDateTime.Date;
-
-            // Lấy các lịch hẹn đã hoàn tất, bao gồm cả thông tin Appointment và Payment
+            // Lấy tất cả lịch hẹn đã hoàn tất, bao gồm thông tin Appointment và Payment
             var appointments = await _context.AppointmentDetails
                 .Include(a => a.Appointment)
                 .Include(a => a.Payment)
-                .Where(a =>
-                    a.AppointmentDate.Date <= currrentDate &&
-                    a.AppointmentStatus == AppointmentStatus.Completed &&
-                    a.Payment != null &&
-                    a.Payment.PaymentStatus == PaymentStatus.Completed)
+                .Where(a => a.AppointmentStatus == AppointmentStatus.Completed)
                 .ToListAsync(cancellationToken);
 
-            foreach (var appointment in appointments)
+            // Lấy danh sách AppointmentId đã tồn tại trong ServiceHistories
+            var existingIds = await _context.ServiceHistories
+                .Select(sh => sh.AppointmentId)
+                .ToListAsync(cancellationToken);
+
+            // Tạo danh sách ServiceHistory mới
+            var newServiceHistories = appointments
+                .Where(a => a.Appointment != null && a.Payment != null && a.Payment.Any()) // Ensure Payment collection is not empty
+                .Where(a => !existingIds.Contains(a.AppointmentId)) // tránh trùng
+                .Select(a => new ServiceHistory
+                {
+                    CustomerId = a.Appointment.CustomerId,
+                    AppointmentId = a.AppointmentId,
+                    PetId = a.Appointment.PetId,
+                    ServiceDate = a.AppointmentDate,
+                    ServiceType = a.ServiceType,
+                    PaymentMethod = a.Payment.FirstOrDefault()?.PaymentMethod, // Access the first Payment's PaymentMethod
+                    Amount = a.Payment.FirstOrDefault()?.Amount ?? 0, // Access the first Payment's Amount
+                    Status = a.AppointmentStatus.ToString(),
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = "System-Auto",
+                    isDeleted = false
+                })
+                .ToList();
+
+            if (newServiceHistories.Any())
             {
-                // Bỏ qua nếu Appointment hoặc Payment bị null (an toàn)
-                if (appointment.Appointment == null || appointment.Payment == null)
-                {
-                    continue;
-                }
-
-                // Kiểm tra xem ServiceHistory đã tồn tại hay chưa
-                bool isExist = await _context.ServiceHistories.AnyAsync(sh =>
-                    sh.CustomerId == appointment.Appointment.CustomerId &&
-                    sh.ServiceDate == appointment.AppointmentDate &&
-                    sh.ServiceType == appointment.ServiceType &&
-                    sh.isDeleted == false,
-                    cancellationToken);
-
-                if (!isExist)
-                {
-                    var serviceHistory = new ServiceHistory
-                    {
-                        CustomerId = appointment.Appointment.CustomerId,
-                        AppointmentId = appointment.AppointmentId,
-                        PetId = appointment.Appointment.PetId,
-                        ServiceDate = appointment.AppointmentDate,
-                        ServiceType = appointment.ServiceType,
-                        PaymentMethod = appointment.Payment.PaymentMethod,
-                        Amount = appointment.Payment.Amount,
-                        Status = appointment.AppointmentStatus.ToString(),
-                        CreatedAt = currentDateTime,
-                        CreatedBy = "System-Auto",
-                        isDeleted = false
-                    };
-
-                    await _context.ServiceHistories.AddAsync(serviceHistory, cancellationToken);
-                    await _context.SaveChangesAsync(cancellationToken);
-                }
+                await _context.ServiceHistories.AddRangeAsync(newServiceHistories, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
             }
         }
+
 
 
 
@@ -126,6 +113,19 @@ namespace PetVax.Repositories.Repository
             _context.ServiceHistories.Update(serviceHistory);
             await _context.SaveChangesAsync(cancellationToken);
             return serviceHistory;
+        }
+
+        public async Task<List<ServiceHistory>> GetServiceHistoriesByServiceTypeAsync(ServiceType serviceType, CancellationToken cancellationToken)
+        {
+            return await _context.ServiceHistories
+                .Include(sh => sh.Customer)
+                .ThenInclude(sh => sh.Account)
+                .Include(sh => sh.Pet)
+                .Include(sh => sh.Customer)
+                .ThenInclude(sh => sh.Pets)
+                .Include(sh => sh.Appointment)
+                .Where(sh => sh.ServiceType == serviceType && sh.isDeleted != true)
+                .ToListAsync(cancellationToken);
         }
     }
 }

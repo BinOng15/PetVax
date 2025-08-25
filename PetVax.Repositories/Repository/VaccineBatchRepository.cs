@@ -31,13 +31,14 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VaccineBatches
                 .Include(vb => vb.Vaccine)
+                .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
         public async Task<int> GetTotalVaccineBatchesAsync(CancellationToken cancellationToken)
         {
             return await _context.VaccineBatches
-                .Where(vb => vb.isDeleted == false)
+                .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false)
                 .CountAsync(cancellationToken);
         }
 
@@ -45,6 +46,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VaccineBatches
                 .Include(vb => vb.Vaccine)
+                .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false)
                 .FirstOrDefaultAsync(vb => vb.VaccineBatchId == vaccineBatchId, cancellationToken);
         }
 
@@ -52,6 +54,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VaccineBatches
                 .Include(vb => vb.Vaccine)
+                .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false)
                 .FirstOrDefaultAsync(vb => vb.Vaccine.VaccineCode == vaccineCode, cancellationToken);
         }
 
@@ -59,6 +62,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VaccineBatches
                 .Include(vb => vb.Vaccine)
+                .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false)
                 .FirstOrDefaultAsync(vb => vb.Vaccine.VaccineId == vaccineId, cancellationToken);
         }
 

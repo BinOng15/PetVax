@@ -54,7 +54,7 @@ namespace PetVax.Services.Service
             }
 
             // Validate Rank
-            var allowedRanks = new[] { "silver", "gold", "bronze" };
+            var allowedRanks = new[] { "silver", "gold", "bronze", "platinum", "diamond" };
             if (string.IsNullOrWhiteSpace(createMembershipDTO.Rank) ||
                 !allowedRanks.Contains(createMembershipDTO.Rank.Trim().ToLower()))
             {
@@ -63,7 +63,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Rank phải là 'bronze', 'silver' hoặc 'gold'!",
+                    Message = "Rank phải là 'bronze', 'silver','gold', 'platinum' hoặc 'diamond'!",
                     Data = null
                 };
             }
@@ -259,8 +259,8 @@ namespace PetVax.Services.Service
                     _logger.LogWarning("GetAllMembershipAsync: No memberships found");
                     return new DynamicResponse<MembershipResponseDTO>
                     {
-                        Code = 404,
-                        Success = false,
+                        Code = 200,
+                        Success = true,
                         Message = "Không tìm thấy membership nào!",
                         Data = response
                     };

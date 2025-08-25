@@ -140,41 +140,46 @@ namespace PetVax.Repositories.Repository
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Appointment>> GetPastAppointmentsByCustomerIdAsync(DateTime now, int customerId, CancellationToken cancellationToken)
+        public async Task<List<Appointment>> GetPastAppointmentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
+            var now = DateTimeHelper.Now();
             return await _context.Set<Appointment>()
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentDate < now && a.CustomerId == customerId && a.isDeleted == false)
+                .Where(a => a.AppointmentDate.Date < now.Date && (a.CustomerId == customerId && a.isDeleted == false))
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Appointment>> GetTodayAppointmentsByCustomerIdAsync(DateTime today, int customerId, CancellationToken cancellationToken)
+        public async Task<List<Appointment>> GetTodayAppointmentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
+            var now = DateTimeHelper.Now();
             return await _context.Set<Appointment>()
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentDate.Date == today.Date && a.CustomerId == customerId && a.isDeleted == false)
+                .Where(a => a.AppointmentDate.Date == now.Date && (a.CustomerId == customerId && a.isDeleted == false))
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Appointment>> GetFutureAppointmentsByCustomerIdAsync(DateTime now, int customerId, CancellationToken cancellationToken)
+        public async Task<List<Appointment>> GetFutureAppointmentsByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
+            var now = DateTimeHelper.Now();
             return await _context.Set<Appointment>()
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Account)
                 .Include(a => a.Pet)
-                .Where(a => a.AppointmentDate > now && a.CustomerId == customerId && a.isDeleted == false)
+                .Where(a => a.AppointmentDate > now && (a.CustomerId == customerId && a.isDeleted == false))
                 .ToListAsync(cancellationToken);
         }
 
         public async Task UpdateExpiredAppointmentsAsync(CancellationToken cancellationToken)
         {
             var currentDateTime = DateTime.UtcNow;
+            // Get appointments that are expired and have status Processing or Confirmed
             var expiredAppointments = await _context.Appointments
-                .Where(a => a.AppointmentDate < currentDateTime && a.AppointmentStatus == AppointmentStatus.Processing && a.AppointmentStatus == AppointmentStatus.Confirmed)
+                .Where(a => a.AppointmentDate < currentDateTime &&
+                    (a.AppointmentStatus == AppointmentStatus.Processing || a.AppointmentStatus == AppointmentStatus.Confirmed))
                 .ToListAsync(cancellationToken);
 
             if (expiredAppointments.Count == 0)
@@ -182,19 +187,25 @@ namespace PetVax.Repositories.Repository
 
             var expiredAppointmentIds = expiredAppointments.Select(a => a.AppointmentId).ToList();
 
+            // Get appointment details for those appointments with status Processing or Confirmed
             var expiredDetails = await _context.AppointmentDetails
-                .Where(d => expiredAppointmentIds.Contains(d.AppointmentId) && d.AppointmentStatus == AppointmentStatus.Processing)
+                .Where(d => expiredAppointmentIds.Contains(d.AppointmentId) &&
+                    (d.AppointmentStatus == AppointmentStatus.Processing || d.AppointmentStatus == AppointmentStatus.Confirmed))
                 .ToListAsync(cancellationToken);
 
             foreach (var appointment in expiredAppointments)
             {
                 appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                appointment.ModifiedAt = DateTimeHelper.Now();
+                appointment.ModifiedBy = "System-Auto";
                 _context.Update(appointment);
             }
 
             foreach (var detail in expiredDetails)
             {
                 detail.AppointmentStatus = AppointmentStatus.Cancelled;
+                detail.ModifiedAt = DateTimeHelper.Now();
+                detail.ModifiedBy = "System-Auto";
                 _context.Update(detail);
             }
 

@@ -1,4 +1,9 @@
-﻿using PetVax.BusinessObjects.Enum;
+﻿using PetVax.BusinessObjects.DTO.AppointmentDetailDTO;
+using PetVax.BusinessObjects.DTO.CustomerDTO;
+using PetVax.BusinessObjects.DTO.HealthConditionDTO;
+using PetVax.BusinessObjects.DTO.MicrochipDTO;
+using PetVax.BusinessObjects.DTO.VaccineBatchDTO;
+using PetVax.BusinessObjects.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +35,12 @@ namespace PetVax.BusinessObjects.DTO.PaymentDTO
         public string? ModifiedBy { get; set; }
         public bool? isDeleted { get; set; }
         public string Url { get; set; }
+        public bool IsRetrieved { get; set; } = false;
 
+        public AppointmentDetailResponseDTO AppointmentDetail { get; set; }
+        public CustomerResponseDTO Customer { get; set; }
+        public VaccineBatchResponseDTO VaccineBatch { get; set; }
+        public MicrochipResponseDTO Microchip { get; set; }
+        public HealthConditionResponse HealthCondition { get; set; }
     }
 }

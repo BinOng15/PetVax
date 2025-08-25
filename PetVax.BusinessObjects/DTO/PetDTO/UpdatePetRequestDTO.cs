@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace PetVax.BusinessObjects.DTO.PetDTO
         public string? Species { get; set; } // e.g., Dog, Cat
         public string? Breed { get; set; }
         public string? Gender { get; set; }
+        [RegularExpression(@"^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/\d{4}$", ErrorMessage = "Date of Birth must be in mm/dd/yyyy format.")]
         public string? DateOfBirth { get; set; }
         public string? PlaceToLive { get; set; }
         public string? PlaceOfBirth { get; set; }

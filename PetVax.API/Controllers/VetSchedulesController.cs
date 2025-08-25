@@ -51,7 +51,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPost("Create-schedule")]
-        [Authorize(Roles = "Admin, Vet")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<ActionResult> CreateVetSchedule([FromBody] CreateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.CreateVetScheduleAsync(request, cancellationToken);
@@ -60,7 +60,7 @@ namespace PediVax.Controllers
         }
 
         [HttpPut("Update-schedule")]
-        [Authorize(Roles = "Admin, Vet")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<ActionResult> UpdateVetSchedule([FromBody] UpdateVetScheduleRequestDTO request, CancellationToken cancellationToken)
         {
 
@@ -79,7 +79,7 @@ namespace PediVax.Controllers
         }
 
         [HttpDelete("Delete-schedule/{vetScheduleId}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<ActionResult> DeleteVetSchedule(int vetScheduleId, CancellationToken cancellationToken)
         {
             var response = await _vetScheduleService.DeleteVetScheduleAsync(vetScheduleId, cancellationToken);

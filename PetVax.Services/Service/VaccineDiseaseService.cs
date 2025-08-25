@@ -21,13 +21,17 @@ namespace PetVax.Services.Service
     public class VaccineDiseaseService : IVaccineDiseaseService
     {
         private readonly IVaccineDiseaseRepository _vaccineDiseaseRepository;
+        private readonly IVaccineRepository _vaccineRepository;
+        private readonly IDiseaseRepository _diseaseRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<VaccineDiseaseService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public VaccineDiseaseService(IVaccineDiseaseRepository vaccineDiseaseRepository, IMapper mapper, ILogger<VaccineDiseaseService> logger, IHttpContextAccessor httpContextAccessor)
+        public VaccineDiseaseService(IVaccineDiseaseRepository vaccineDiseaseRepository, IVaccineRepository vaccineRepository, IDiseaseRepository diseaseRepository, IMapper mapper, ILogger<VaccineDiseaseService> logger, IHttpContextAccessor httpContextAccessor)
         {
             _vaccineDiseaseRepository = vaccineDiseaseRepository;
+            _vaccineRepository = vaccineRepository;
+            _diseaseRepository = diseaseRepository;
             _mapper = mapper;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
@@ -46,6 +50,29 @@ namespace PetVax.Services.Service
             }
             try
             {
+                // Lấy vaccine từ repository (giả sử có phương thức GetVaccineByIdAsync)
+                var vaccine = await _vaccineRepository.GetVaccineByIdAsync(createVaccineDiseaseDTO.VaccineId, cancellationToken);
+                if (vaccine == null || vaccine.isDeleted == true)
+                {
+                    return new BaseResponse<VaccineDiseaseResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Vaccine không tồn tại hoặc đã bị xóa"
+                    };
+                }
+
+                var disease = await _diseaseRepository.GetDiseaseByIdAsync(createVaccineDiseaseDTO.DiseaseId, cancellationToken);
+                if (disease == null || disease.isDeleted == true)
+                {
+                    return new BaseResponse<VaccineDiseaseResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "Bệnh không tồn tại hoặc đã bị xóa"
+                    };
+                }
+
                 var vaccineDisease = _mapper.Map<VaccineDisease>(createVaccineDiseaseDTO);
 
                 vaccineDisease.VaccineId = createVaccineDiseaseDTO.VaccineId;
@@ -163,7 +190,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<VaccineDiseaseResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không có vaccine diseases nào được tìm thấy",
                         Data = responseData
                     };

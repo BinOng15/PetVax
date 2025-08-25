@@ -134,10 +134,12 @@ namespace PetVax.Services.Service
                         Data = false
                     };
                 }
-                var isDeleted = await _voucherRepository.DeleteVoucherAsync(voucherId, cancellationToken);
-                if (!isDeleted)
+                // Soft delete: set isDeleted = true
+                voucher.isDeleted = true;
+                var updatedRows = await _voucherRepository.UpdateVoucherAsync(voucher, cancellationToken);
+                if (updatedRows <= 0)
                 {
-                    _logger.LogError($"DeleteVoucherAsync: Failed to delete voucher with ID {voucherId}");
+                    _logger.LogError($"DeleteVoucherAsync: Failed to soft delete voucher with ID {voucherId}");
                     return new BaseResponse<bool>
                     {
                         Code = 500,
@@ -156,7 +158,7 @@ namespace PetVax.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"DeleteVoucherAsync: An error occurred while deleting voucher with ID {voucherId}");
+                _logger.LogError(ex, $"DeleteVoucherAsync: An error occurred while soft deleting voucher with ID {voucherId}");
                 return new BaseResponse<bool>
                 {
                     Code = 500,
@@ -220,7 +222,7 @@ namespace PetVax.Services.Service
                     return new DynamicResponse<VoucherResponseDTO>
                     {
                         Code = 200,
-                        Success = false,
+                        Success = true,
                         Message = "Không tìm thấy voucher nào!",
                         Data = null
                     };
@@ -426,6 +428,21 @@ namespace PetVax.Services.Service
                 };
             }
 
+            // Check if voucher is expired (status == 3)
+            var customerVoucherList = await _customerVoucherRepository.GetCustomerVoucherByVoucherIdAsync(voucherId, cancellationToken);
+            var expiredVoucher = customerVoucherList.FirstOrDefault(cv => cv.Status == EnumList.VoucherStatus.Expired);
+            if (expiredVoucher != null)
+            {
+                _logger.LogError($"RedeemPointsForVoucherAsync: Voucher with ID {voucherId} is expired (status = 3)");
+                return new BaseResponse<CustomerVoucherResponseDTO>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Voucher đã hết hạn, không thể đổi điểm!",
+                    Data = null
+                };
+            }
+
             int pointsRequired = voucher.PointsRequired;
             int redeemablePoints = customer.RedeemablePoints ?? 0;
 
@@ -474,7 +491,6 @@ namespace PetVax.Services.Service
                     CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
                 };
                 var customerVoucherId = await _customerVoucherRepository.CreateCustomerVoucherAsync(customerVoucher, cancellationToken);
-
 
                 var createdCustomerVoucher = await _customerVoucherRepository.GetCustomerVoucherByIdAsync(customerVoucherId, cancellationToken);
                 // Return the voucher details
