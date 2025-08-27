@@ -50,6 +50,8 @@ namespace PetVax.Services.Service
         private readonly IMicrochipItemRepository _microchipItemRepository;
         private readonly IHealthConditionRepository _healthConditionRepository;
 
+        public object DateTimeHe { get; private set; }
+
         public AppointmentService(
             IAppointmentRepository appointmentRepository,
             IPetRepository petRepository,
@@ -484,8 +486,7 @@ namespace PetVax.Services.Service
         {
             try
             {
-                var now = DateTime.UtcNow;
-                var appointments = await _appointmentRepository.GetPastAppointmentsByCustomerIdAsync(now, customerId, cancellationToken);
+                var appointments = await _appointmentRepository.GetPastAppointmentsByCustomerIdAsync(customerId, cancellationToken);
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
                     var keyword = getAllItemsDTO.KeyWord.ToLower();
@@ -577,8 +578,7 @@ namespace PetVax.Services.Service
         {
             try
             {
-                var today = DateTime.UtcNow.Date;
-                var appointments = await _appointmentRepository.GetTodayAppointmentsByCustomerIdAsync(today, customerId, cancellationToken);
+                var appointments = await _appointmentRepository.GetTodayAppointmentsByCustomerIdAsync(customerId, cancellationToken);
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
                     var keyword = getAllItemsDTO.KeyWord.ToLower();
@@ -661,8 +661,7 @@ namespace PetVax.Services.Service
         {
             try
             {
-                var now = DateTime.UtcNow;
-                var appointments = await _appointmentRepository.GetFutureAppointmentsByCustomerIdAsync(now, customerId, cancellationToken);
+                var appointments = await _appointmentRepository.GetFutureAppointmentsByCustomerIdAsync(customerId, cancellationToken);
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
                     var keyword = getAllItemsDTO.KeyWord.ToLower();

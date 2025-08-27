@@ -125,32 +125,47 @@ namespace PetVax.Services.Service
             }
             try
             {
-                var isDeleted = await _vaccineRepository.DeleteVaccineAsync(vaccineId, cancellationToken);
-                if (!isDeleted)
+                var vaccine = await _vaccineRepository.GetVaccineByIdAsync(vaccineId, cancellationToken);
+                if (vaccine == null)
                 {
                     return new BaseResponse<bool>
                     {
                         Code = 404,
                         Success = false,
-                        Message = "Không tìm thấy vắc xin với ID đã cung cấp hoặc vắc xin không thể bị xóa.",
+                        Message = "Không tìm thấy vắc xin với ID đã cung cấp.",
+                    };
+                }
+
+                vaccine.isDeleted = true;
+                vaccine.ModifiedAt = DateTimeHelper.Now();
+                vaccine.ModifiedBy = GetCurrentUserName();
+
+                var updated = await _vaccineRepository.UpdateVaccineAsync(vaccine, cancellationToken);
+                if (updated <= 0)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Lỗi khi xóa mềm vắc xin. Vui lòng thử lại sau."
                     };
                 }
                 return new BaseResponse<bool>
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Xóa vắc xin thành công.",
+                    Message = "Xóa mềm vắc xin thành công.",
                     Data = true
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting vaccine");
+                _logger.LogError(ex, "Error soft deleting vaccine");
                 return new BaseResponse<bool>
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Đã xảy ra lỗi khi xóa vắc xin. Vui lòng thử lại sau."
+                    Message = "Đã xảy ra lỗi khi xóa mềm vắc xin. Vui lòng thử lại sau."
                 };
             }
         }

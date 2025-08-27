@@ -14,7 +14,7 @@ namespace PetVax.Services.Service
     public class AppointmentBackgroundService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly TimeSpan _period = TimeSpan.FromMinutes(30);
+        private readonly TimeSpan _period = TimeSpan.FromMinutes(5);
         private readonly ILogger<AppointmentBackgroundService> _logger;
 
         public AppointmentBackgroundService(IServiceProvider serviceProvider, ILogger<AppointmentBackgroundService> logger)

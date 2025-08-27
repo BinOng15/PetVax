@@ -28,7 +28,9 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<Vaccine>> GetAllVaccineAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.Vaccines
+                .Where(v => v.isDeleted == false)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<int> GetTotalVaccinesAsync(CancellationToken cancellationToken)
@@ -43,23 +45,24 @@ namespace PetVax.Repositories.Repository
                 .Where(vd => vd.DiseaseId == diseaseId)
                 .Include(vd => vd.Vaccine)
                 .Select(vd => vd.Vaccine)
+                .Where(v => v.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 
         public async Task<Vaccine> GetVaccineByIdAsync(int vaccineId, CancellationToken cancellationToken)
         {
-            return await _context.Vaccines.FirstOrDefaultAsync(v => v.VaccineId == vaccineId, cancellationToken);
+            return await _context.Vaccines.Where(v => v.isDeleted == false).FirstOrDefaultAsync(v => v.VaccineId == vaccineId, cancellationToken);
         }
 
         public async Task<Vaccine> GetVaccineByName(string Name, CancellationToken cancellationToken)
         {
-            return await _context.Vaccines.FirstOrDefaultAsync(v => v.Name == Name, cancellationToken);
+            return await _context.Vaccines.Where(v => v.isDeleted == false).FirstOrDefaultAsync(v => v.Name == Name, cancellationToken);
         }
 
 
         public async Task<Vaccine> GetVaccineByVaccineCodeAsync(string vaccineCode, CancellationToken cancellationToken)
         {
-            return await _context.Vaccines.FirstOrDefaultAsync(v => v.VaccineCode == vaccineCode, cancellationToken);
+            return await _context.Vaccines.Where(v => v.isDeleted == false).FirstOrDefaultAsync(v => v.VaccineCode == vaccineCode, cancellationToken);
         }
 
         public async Task<int> UpdateVaccineAsync(Vaccine vaccine, CancellationToken cancellationToken)

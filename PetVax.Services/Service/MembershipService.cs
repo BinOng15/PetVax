@@ -54,7 +54,7 @@ namespace PetVax.Services.Service
             }
 
             // Validate Rank
-            var allowedRanks = new[] { "silver", "gold", "bronze" };
+            var allowedRanks = new[] { "silver", "gold", "bronze", "platinum", "diamond" };
             if (string.IsNullOrWhiteSpace(createMembershipDTO.Rank) ||
                 !allowedRanks.Contains(createMembershipDTO.Rank.Trim().ToLower()))
             {
@@ -63,7 +63,7 @@ namespace PetVax.Services.Service
                 {
                     Code = 400,
                     Success = false,
-                    Message = "Rank phải là 'bronze', 'silver' hoặc 'gold'!",
+                    Message = "Rank phải là 'bronze', 'silver','gold', 'platinum' hoặc 'diamond'!",
                     Data = null
                 };
             }
