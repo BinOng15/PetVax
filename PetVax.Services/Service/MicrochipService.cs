@@ -100,8 +100,19 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<BaseMicrochipItemResponse>
                     {
-                        Code = 200,
+                        Code = 400,
                         Message = "Giá microchip phải lớn hơn 0",
+                        Data = null
+                    };
+                }
+
+                var existingMicrochip = await _microchipRepository.GetMicrochipByCodeAsync(request.MicrochipCode, cancellationToken);
+                if (existingMicrochip != null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 400,
+                        Message = "Mã microchip đã tồn tại, vui lòng nhập mã khác!",
                         Data = null
                     };
                 }
@@ -123,7 +134,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<BaseMicrochipItemResponse>
                     {
-                        Code = 200,
+                        Code = 400,
                         Message = "Không thể tạo microchip",
                         Data = null
                     };
@@ -135,7 +146,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<BaseMicrochipItemResponse>
                     {
-                        Code = 200,
+                        Code = 400,
                         Message = "Thú cưng này đã được cấy microchip",
                         Data = null
                     };
@@ -158,7 +169,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<BaseMicrochipItemResponse>
                         {
-                            Code = 200,
+                            Code = 400,
                             Message = "Thú cưng không tồn tại!",
                             Data = null
                         };

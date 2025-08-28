@@ -32,6 +32,12 @@ namespace PetVax.Repositories.Repository
             return await GetAllAsync(cancellationToken);
         }
 
+        public Task<Microchip> GetMicrochipByCodeAsync(string microchipCode, CancellationToken cancellationToken)
+        {
+            return _context.Microchips
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.MicrochipCode == microchipCode, cancellationToken);
+        }
 
         public async Task<Microchip> GetMicrochipByIdAsync(int microchipId, CancellationToken cancellationToken)
         {
