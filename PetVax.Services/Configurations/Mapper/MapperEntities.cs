@@ -53,6 +53,7 @@ namespace PetVax.Services.Configurations.Mapper
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore());
             CreateMap<Account, AccountResponseDTO>();
+            CreateMap<Account, AccountResponseDTOs>();
 
             //Customer
             CreateMap<CreateCustomerDTO, Customer>();

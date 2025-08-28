@@ -30,28 +30,23 @@ namespace PetVax.Controllers
         public async Task<IActionResult> VerifyOtp([FromBody] OtpVerificationRequestDTO otpRequest, CancellationToken cancellationToken)
         {
             var result = await _authService.VerifyOtpAsync(otpRequest.Email, otpRequest.Otp, cancellationToken);
-            if (!result.Success)
-            {
-                return Unauthorized(result.Message);
-            }
+            //var authResponse = result.Data;
 
-            var authResponse = result.Data;
+            //Response.Cookies.Append("AccessToken", authResponse.AccessToken, new CookieOptions
+            //{
+            //    HttpOnly = true,
+            //    Secure = true,
+            //    Expires = authResponse.AccessTokenExpiration,
+            //    SameSite = SameSiteMode.Strict
+            //});
 
-            Response.Cookies.Append("AccessToken", authResponse.AccessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                Expires = authResponse.AccessTokenExpiration,
-                SameSite = SameSiteMode.Strict
-            });
-
-            Response.Cookies.Append("RefreshToken", authResponse.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                Expires = authResponse.RefreshTokenExpiration,
-                SameSite = SameSiteMode.Strict
-            });
+            //Response.Cookies.Append("RefreshToken", authResponse.RefreshToken, new CookieOptions
+            //{
+            //    HttpOnly = true,
+            //    Secure = true,
+            //    Expires = authResponse.RefreshTokenExpiration,
+            //    SameSite = SameSiteMode.Strict
+            //});
 
             //return StatusCode(StatusCodes.Status200OK, new
             //{
