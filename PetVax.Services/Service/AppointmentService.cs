@@ -1204,6 +1204,29 @@ namespace PetVax.Services.Service
                 }
                 // --- END CHECK VACCINEBATCH VÀ DISEASEID ---
 
+                // --- CHECK DISEASE FOR PET SPECIES ---
+                if (updateAppointmentVaccinationDTO.DiseaseId.HasValue)
+                {
+                    var pet = await _petRepository.GetPetAndAppointmentByIdAsync(appointment.PetId, cancellationToken);
+                    var disease = await _diseaseRepository.GetDiseaseByIdAsync(updateAppointmentVaccinationDTO.DiseaseId.Value, cancellationToken);
+                    if (pet != null && disease != null)
+                    {
+                        var petSpecies = pet.Species?.Trim().ToLower();
+                        var diseaseSpecies = disease.Species?.Trim().ToLower();
+                        if (!string.IsNullOrEmpty(petSpecies) && !string.IsNullOrEmpty(diseaseSpecies) && petSpecies != diseaseSpecies)
+                        {
+                            return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                            {
+                                Code = 400,
+                                Success = false,
+                                Message = $"Không thể cập nhật bệnh dành cho loài khác. Loài thú cưng: '{petSpecies}', bệnh dành cho: '{diseaseSpecies}'.",
+                                Data = null
+                            };
+                        }
+                    }
+                }
+                // --- END CHECK DISEASE FOR PET SPECIES ---
+
                 if (updateAppointmentVaccinationDTO.VetId.HasValue)
                 {
                     var appointmentDate = appointmentDetail.AppointmentDate;
