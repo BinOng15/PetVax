@@ -354,14 +354,21 @@ namespace PetVax.Services.Service
             {
                 var microchipItems = await _microchipItemRepository.GetAllMicrochipItemsAsync(cancellationToken);
 
-                // Lọc theo trạng thái isUsed trước
-                microchipItems = microchipItems
-                    .Where(m => m.IsUsed == isUsed)
+                // Truy vấn tất cả AppointmentDetail có MicrochipItemId khác null
+                var appointmentDetails = await _appointmentDetailRepository.GetAllAppointmentDetailsAsync(cancellationToken);
+                var usedMicrochipItemIds = new HashSet<int>(
+                    appointmentDetails
+                        .Where(ad => ad.MicrochipItemId.HasValue)
+                        .Select(ad => ad.MicrochipItemId.Value)
+                );
+
+                // Lọc các MicrochipItem chưa được gán vào AppointmentDetail
+                var filteredMicrochipItems = microchipItems
+                    .Where(item => !usedMicrochipItemIds.Contains(item.MicrochipItemId))
                     .ToList();
 
-                // Lọc theo từ khóa nếu có
-                // Lọc theo trạng thái isUsed trước
-                microchipItems = microchipItems
+                // Lọc theo trạng thái isUsed
+                var resultItems = filteredMicrochipItems
                     .Where(m => m.IsUsed == isUsed)
                     .ToList();
 
@@ -369,7 +376,7 @@ namespace PetVax.Services.Service
                 if (!string.IsNullOrWhiteSpace(getAllItemsDTO.KeyWord))
                 {
                     var lowerKeyword = getAllItemsDTO.KeyWord.Trim().ToLower();
-                    microchipItems = microchipItems
+                    resultItems = resultItems
                         .Where(m => (m.Name != null && m.Name.ToLower().Contains(lowerKeyword)) ||
                                     (m.Description != null && m.Description.ToLower().Contains(lowerKeyword)))
                         .ToList();
@@ -379,10 +386,10 @@ namespace PetVax.Services.Service
                 int pageNumber = getAllItemsDTO?.PageNumber > 0 ? getAllItemsDTO.PageNumber : 1;
                 int pageSize = getAllItemsDTO?.PageSize > 0 ? getAllItemsDTO.PageSize : 10;
                 int skip = (pageNumber - 1) * pageSize;
-                int totalItem = microchipItems.Count;
+                int totalItem = resultItems.Count;
                 int totalPage = (int)Math.Ceiling((double)totalItem / pageSize);
 
-                var pagedItems = microchipItems
+                var pagedItems = resultItems
                     .Skip(skip)
                     .Take(pageSize)
                     .ToList();

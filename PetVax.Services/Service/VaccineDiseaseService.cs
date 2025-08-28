@@ -405,7 +405,7 @@ namespace PetVax.Services.Service
         }
         private string GetCurrentUserName()
         {
-            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value ?? "System";
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value ?? "Admin";
         }
     }
 }
