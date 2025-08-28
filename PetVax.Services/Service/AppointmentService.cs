@@ -1281,6 +1281,7 @@ namespace PetVax.Services.Service
                 appointmentDetail.Others = updateAppointmentVaccinationDTO.Others ?? appointmentDetail.Others;
                 appointmentDetail.GeneralCondition = updateAppointmentVaccinationDTO.GeneralCondition ?? appointmentDetail.GeneralCondition;
                 appointmentDetail.Notes = updateAppointmentVaccinationDTO.Notes ?? appointmentDetail.Notes;
+                appointmentDetail.AppointmentDate = updateAppointmentVaccinationDTO.AppointmentDate ?? DateTimeHelper.Now();
                 appointmentDetail.AppointmentStatus = newStatus;
                 appointmentDetail.ModifiedAt = DateTimeHelper.Now();
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
@@ -1898,7 +1899,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentMicrochipResponseDTO>
                     {
-                        Code = 200,
+                        Code = 404,
                         Success = false,
                         Message = "Cuộc hẹn không tồn tại.",
                         Data = null
@@ -1934,7 +1935,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentMicrochipResponseDTO>
                     {
-                        Code = 200,
+                        Code = 400,
                         Success = false,
                         Message = $"Không thể chuyển trạng thái từ {currentStatus} sang {newStatus}.",
                         Data = null
@@ -1957,7 +1958,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentMicrochipResponseDTO>
                     {
-                        Code = 200,
+                        Code = 404,
                         Success = false,
                         Message = "Chi tiết cuộc hẹn không tồn tại.",
                         Data = null
@@ -1982,7 +1983,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
                         {
-                            Code = 200,
+                            Code = 400,
                             Success = false,
                             Message = "Bác sĩ không có lịch làm việc vào thời gian này.",
                             Data = null
@@ -1998,7 +1999,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
                         {
-                            Code = 200,
+                            Code = 400,
                             Success = false,
                             Message = "Bác sĩ đã có lịch hẹn khác vào khung giờ này.",
                             Data = null
@@ -2027,7 +2028,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
                         {
-                            Code = 200,
+                            Code = 400,
                             Success = false,
                             Message = "Microchip đã được sử dụng trong cuộc hẹn khác.",
                             Data = null
@@ -2037,7 +2038,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
                         {
-                            Code = 200,
+                            Code = 404,
                             Success = false,
                             Message = "Microchip không tồn tại.",
                             Data = null

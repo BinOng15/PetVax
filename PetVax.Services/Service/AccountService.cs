@@ -228,10 +228,10 @@ namespace PetVax.Services.Service
             }
             try
             {
-                var result = await _accountRepository.DeleteAccountAsync(accountId, cancellationToken);
-                if (!result)
+                var account = await _accountRepository.GetAccountByIdAsync(accountId, cancellationToken);
+                if (account == null)
                 {
-                    _logger.LogError("Failed to delete account with ID {AccountId}", accountId);
+                    _logger.LogError("Failed to find account with ID {AccountId} for soft delete", accountId);
                     return new BaseResponse<bool>
                     {
                         Code = 404,
@@ -240,23 +240,37 @@ namespace PetVax.Services.Service
                         Data = false
                     };
                 }
-                _logger.LogInformation("Account with ID {AccountId} deleted successfully", accountId);
+
+                account.isDeleted = true;
+                var result = await _accountRepository.UpdateAccountAsync(account, cancellationToken);
+                if (result <= 0)
+                {
+                    _logger.LogError("Failed to soft delete account with ID {AccountId}", accountId);
+                    return new BaseResponse<bool>
+                    {
+                        Code = 500,
+                        Success = false,
+                        Message = "Lỗi khi xóa mềm tài khoản",
+                        Data = false
+                    };
+                }
+                _logger.LogInformation("Account with ID {AccountId} soft deleted successfully", accountId);
                 return new BaseResponse<bool>
                 {
                     Code = 200,
                     Success = true,
-                    Message = "Tài khoản đã được xóa thành công",
+                    Message = "Tài khoản đã được xóa mềm thành công",
                     Data = true
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting account with ID {AccountId}", accountId);
+                _logger.LogError(ex, "Error soft deleting account with ID {AccountId}", accountId);
                 return new BaseResponse<bool>
                 {
                     Code = 500,
                     Success = false,
-                    Message = "Lỗi khi xóa tài khoản: " + ex.InnerException?.Message ?? ex.Message,
+                    Message = "Lỗi khi xóa mềm tài khoản: " + (ex.InnerException?.Message ?? ex.Message),
                     Data = false
                 };
             }
@@ -354,7 +368,7 @@ namespace PetVax.Services.Service
             }
         }
 
-        public async Task<DynamicResponse<AccountResponseDTO>> GetAllAccountsAsync(GetAllAccountRequestDTO getAllAccountRequestDTO, CancellationToken cancellationToken)
+        public async Task<DynamicResponse<AccountResponseDTOs>> GetAllAccountsAsync(GetAllAccountRequestDTO getAllAccountRequestDTO, CancellationToken cancellationToken)
         {
             try
             {
@@ -389,7 +403,7 @@ namespace PetVax.Services.Service
                     .Take(pageSize)
                     .ToList();
 
-                var responseData = new MegaData<AccountResponseDTO>
+                var responseData = new MegaData<AccountResponseDTOs>
                 {
                     PageInfo = new PagingMetaData
                     {
@@ -405,13 +419,13 @@ namespace PetVax.Services.Service
                         keyWord = getAllAccountRequestDTO?.KeyWord,
                         status = getAllAccountRequestDTO?.Status
                     },
-                    PageData = _mapper.Map<List<AccountResponseDTO>>(pagedAccounts)
+                    PageData = _mapper.Map<List<AccountResponseDTOs>>(pagedAccounts)
                 };
 
                 if (!pagedAccounts.Any())
                 {
                     _logger.LogInformation("No accounts found for the given criteria");
-                    return new DynamicResponse<AccountResponseDTO>
+                    return new DynamicResponse<AccountResponseDTOs>
                     {
                         Code = 200,
                         Success = true,
@@ -421,7 +435,7 @@ namespace PetVax.Services.Service
                 }
 
                 _logger.LogInformation("Retrieved {Count} accounts successfully (Page {PageNumber}, PageSize {PageSize})", pagedAccounts.Count, pageNumber, pageSize);
-                return new DynamicResponse<AccountResponseDTO>
+                return new DynamicResponse<AccountResponseDTOs>
                 {
                     Code = 200,
                     Success = true,
@@ -432,7 +446,7 @@ namespace PetVax.Services.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all accounts with pagination");
-                return new DynamicResponse<AccountResponseDTO>
+                return new DynamicResponse<AccountResponseDTOs>
                 {
                     Code = 500,
                     Success = false,

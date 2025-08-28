@@ -32,6 +32,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.MicrochipItems
                 .Include(mc => mc.Microchip)
+                .Where(mc => mc.isDeleted == false)
                 .ToListAsync(cancellationToken);
         }
 

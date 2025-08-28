@@ -14,4 +14,12 @@ namespace PetVax.BusinessObjects.DTO.AccountDTO
         public EnumList.Role Role { get; set; }
         public int VetId { get; set; }
     }
+    public class AccountResponseDTOs
+    {
+        public int AccountId { get; set; }
+        public string Email { get; set; }
+        public Enum.EnumList.Role Role { get; set; }
+        public bool isVerify { get; set; }
+        public bool? isDeleted { get; set; }
+    }
 }
