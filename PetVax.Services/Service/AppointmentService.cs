@@ -1304,7 +1304,6 @@ namespace PetVax.Services.Service
                 appointmentDetail.Others = updateAppointmentVaccinationDTO.Others ?? appointmentDetail.Others;
                 appointmentDetail.GeneralCondition = updateAppointmentVaccinationDTO.GeneralCondition ?? appointmentDetail.GeneralCondition;
                 appointmentDetail.Notes = updateAppointmentVaccinationDTO.Notes ?? appointmentDetail.Notes;
-                appointmentDetail.AppointmentDate = updateAppointmentVaccinationDTO.AppointmentDate ?? DateTimeHelper.Now();
                 appointmentDetail.AppointmentStatus = newStatus;
                 appointmentDetail.ModifiedAt = DateTimeHelper.Now();
                 appointmentDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
@@ -1418,7 +1417,7 @@ namespace PetVax.Services.Service
                                                     (i == 1 || (diseaseProfiles.FirstOrDefault(p2 => (p2.Dose ?? (i - 1)) == (i - 1))?.IsCompleted == true)))
                                                 {
                                                     doseProfile.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
-                                                    doseProfile.VaccinationDate = appointmentDetail.AppointmentDate;
+                                                    doseProfile.VaccinationDate = DateTimeHelper.Now();
                                                     doseProfile.Reaction = appointmentDetail.Reaction;
                                                     doseProfile.IsActive = true;
                                                     doseProfile.IsCompleted = true;
@@ -1431,7 +1430,7 @@ namespace PetVax.Services.Service
 
                                                     // Cập nhật ngày tiêm dự kiến cho tất cả các mũi tiếp theo cho tới mũi cuối cùng
                                                     var schedulesForDisease = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(diseaseId, cancellationToken);
-                                                    var lastVaccinationDate = appointmentDetail.AppointmentDate;
+                                                    var lastVaccinationDate = DateTimeHelper.Now();
                                                     for (int nextDose = i + 1; nextDose <= diseaseProfiles.Max(p => p.Dose ?? 0) + schedulesForDisease.Count(); nextDose++)
                                                     {
                                                         var nextProfile = diseaseProfiles.FirstOrDefault(p => (p.Dose ?? nextDose) == nextDose && p.IsCompleted != true);
