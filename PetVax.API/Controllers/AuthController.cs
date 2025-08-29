@@ -48,17 +48,6 @@ namespace PetVax.Controllers
             //    SameSite = SameSiteMode.Strict
             //});
 
-            //return StatusCode(StatusCodes.Status200OK, new
-            //{
-            //    authResponse.AccountId,
-            //    authResponse.Email,
-            //    authResponse.Role,
-            //    authResponse.AccessToken,
-            //    authResponse.RefreshToken,
-            //    authResponse.AccessTokenExpiration,
-            //    authResponse.RefreshTokenExpiration,
-            //    Message = "OTP verification successful."
-            //});
             return StatusCode(result.Code, result);
         }
 

@@ -505,6 +505,17 @@ namespace PetVax.Services.Service
                     };
                 }
 
+                var appointment = pet.Appointments.FirstOrDefault(a => a.ServiceType == ServiceType.Microchip && a.AppointmentStatus == AppointmentStatus.Completed);
+                if (appointment != null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Success = false,
+                        Message = "Thú cưng này đã gắn microchip",
+                        Data = null
+                    };
+                }
                 var microchipItem = await _microchipItemRepository.GetMicrochipItemByIdAsync(id, cancellationToken);
                 if (microchipItem == null)
                 {
