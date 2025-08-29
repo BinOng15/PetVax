@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
@@ -325,6 +326,27 @@ namespace PetVax.Services.Service
                     {
                         Code = 200,
                         Message = "Microchip không tồn tại",
+                        Data = null
+                    };
+                }
+
+                var existingMicrochips = await _microchipRepository.GetMicrochipByCodeAsync(microchipRequestDTO.MicrochipCode, cancellationToken);
+                if (existingMicrochips != null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 400,
+                        Message = "Mã microchip đã tồn tại, vui lòng nhập mã khác!",
+                        Data = null
+                    };
+                }
+
+                if(microchipRequestDTO.Price <= 0)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "Giá microchip phải lớn hơn 0",
                         Data = null
                     };
                 }
