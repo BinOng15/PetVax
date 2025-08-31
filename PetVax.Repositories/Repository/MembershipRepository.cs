@@ -31,6 +31,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.Memberships
                 .Include(m => m.Customers)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

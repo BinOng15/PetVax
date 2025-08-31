@@ -61,6 +61,18 @@ namespace PetVax.Services.Service
             }
             try
             {
+                if (createVoucherDTO.DiscountAmount < 1 || createVoucherDTO.DiscountAmount > 100)
+                {
+                    _logger.LogError("CreateVoucherAsync: DiscountAmount must be between 1 and 100");
+                    return new BaseResponse<CreateUpdateVoucherResponseDTO>
+                    {
+                        Code = 400,
+                        Success = false,
+                        Message = "% giảm giá phải từ 1 đến 100!",
+                        Data = null
+                    };
+                }
+
                 var voucher = _mapper.Map<Voucher>(createVoucherDTO);
                 voucher.VoucherCode = "VCH" + new Random().Next(100000, 1000000).ToString();
                 voucher.VoucherName = createVoucherDTO.VoucherName;

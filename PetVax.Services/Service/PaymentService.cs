@@ -229,7 +229,17 @@ namespace PetVax.Services.Service
                     var clinicCoords = await GetLatLngFromAddressAsync(clinicAddress);
                     var customerCoords = await GetLatLngFromAddressAsync(customerAddress);
                     var distanceKm = await GetDistanceKmAsync(clinicCoords, customerCoords);
-                    decimal extraFee = (decimal)distanceKm * 1000;
+
+                    decimal extraFee;
+                    if (distanceKm < 5)
+                        extraFee = 50000m;
+                    else if (distanceKm < 10)
+                        extraFee = 80000m;
+                    else if (distanceKm < 20)
+                        extraFee = 120000m;
+                    else
+                        extraFee = 200000m;
+
                     amount += extraFee;
                 }
 

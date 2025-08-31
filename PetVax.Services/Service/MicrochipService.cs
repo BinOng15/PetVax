@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using PetVax.BusinessObjects.DTO;
 using PetVax.BusinessObjects.DTO.MicrochipDTO;
@@ -100,8 +101,19 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<BaseMicrochipItemResponse>
                     {
-                        Code = 200,
+                        Code = 400,
                         Message = "Giá microchip phải lớn hơn 0",
+                        Data = null
+                    };
+                }
+
+                var existingMicrochip = await _microchipRepository.GetMicrochipByCodeAsync(request.MicrochipCode, cancellationToken);
+                if (existingMicrochip != null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 400,
+                        Message = "Mã microchip đã tồn tại, vui lòng nhập mã khác!",
                         Data = null
                     };
                 }
@@ -123,24 +135,26 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<BaseMicrochipItemResponse>
                     {
-                        Code = 200,
+                        Code = 400,
                         Message = "Không thể tạo microchip",
                         Data = null
                     };
                 }           
               
-                // Kiểm tra Pet đã gắn Microchip chưa
+                // Remove the restriction - Allow pets to have multiple microchips
+                // Comment out the check that prevents multiple microchips per pet
+                /*
                 var existingChip = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(request.createMicrochipItemRequest.PetId, cancellationToken);
                 if (existingChip != null)
                 {
                     return new BaseResponse<BaseMicrochipItemResponse>
                     {
-                        Code = 200,
+                        Code = 400,
                         Message = "Thú cưng này đã được cấy microchip",
                         Data = null
                     };
                 }
-
+                */
 
                 // Tạo MicrochipItem
                 var microchipItem = new MicrochipItem();
@@ -158,7 +172,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<BaseMicrochipItemResponse>
                         {
-                            Code = 200,
+                            Code = 400,
                             Message = "Thú cưng không tồn tại!",
                             Data = null
                         };
@@ -166,7 +180,7 @@ namespace PetVax.Services.Service
 
                     microchipItem.PetId = pet.PetId;
                     microchipItem.IsUsed = true;
-                    microchipItem.Location = request.createMicrochipItemRequest.Location; // Giả sử Pet có thuộc tính Location
+                    microchipItem.Location = request.createMicrochipItemRequest.Location;
                 }    
                 microchipItem.Name = request.createMicrochipItemRequest.Name;
                 microchipItem.Description = request.createMicrochipItemRequest.Description;
@@ -318,6 +332,27 @@ namespace PetVax.Services.Service
                     };
                 }
 
+                var existingMicrochips = await _microchipRepository.GetMicrochipByCodeAsync(microchipRequestDTO.MicrochipCode, cancellationToken);
+                if (existingMicrochips != null)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 400,
+                        Message = "Mã microchip đã tồn tại, vui lòng nhập mã khác!",
+                        Data = null
+                    };
+                }
+
+                if(microchipRequestDTO.Price <= 0)
+                {
+                    return new BaseResponse<BaseMicrochipItemResponse>
+                    {
+                        Code = 200,
+                        Message = "Giá microchip phải lớn hơn 0",
+                        Data = null
+                    };
+                }
+
                 existingMicrochip.MicrochipCode = microchipRequestDTO.MicrochipCode;
                 existingMicrochip.Name = microchipRequestDTO.Name;
                 existingMicrochip.Description = microchipRequestDTO.Description;
@@ -346,16 +381,21 @@ namespace PetVax.Services.Service
                             Data = null
                         };                   
                 }
-                //check microchipItem.PetId
+                
+                //check microchipItem.PetId - Remove restriction for multiple microchips per pet
                 if (microchipRequestDTO.createMicrochipItemRequest.PetId != null && microchipRequestDTO.createMicrochipItemRequest.PetId > 0)
                 {
-                    var microchipItemByPet = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(microchipRequestDTO.createMicrochipItemRequest.PetId, cancellationToken);
-                    if (microchipItemByPet != null)
+                    // Only check if this specific microchip item is being assigned to a pet that already has THIS microchip
+                    // Allow pets to have multiple different microchips
+                    var existingMicrochipForThisPet = await _microchipItemRepository.GetListMicrochipItemByPetIdAsync(microchipRequestDTO.createMicrochipItemRequest.PetId.Value, cancellationToken);
+                    var duplicateMicrochip = existingMicrochipForThisPet.FirstOrDefault(m => m.MicrochipId == microchipId);
+                    
+                    if (duplicateMicrochip != null && duplicateMicrochip.MicrochipItemId != microchipItem.MicrochipItemId)
                     {
                         return new BaseResponse<BaseMicrochipItemResponse>
                         {
                             Code = 200,
-                            Message = "Thú cưng này đã được cấy microchip!",
+                            Message = "Thú cưng này đã có microchip này rồi!",
                             Data = null
                         };
                     }

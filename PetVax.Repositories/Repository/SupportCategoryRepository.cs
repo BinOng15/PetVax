@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
 using System;
@@ -29,7 +30,9 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<SupportCategory>> GetAllSupportCategoriesAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.SupportCategories
+                .OrderByDescending(s => s.CreatedAt)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<SupportCategory> GetSupportCategoryByIdAsync(int supportCategoryId, CancellationToken cancellationToken)

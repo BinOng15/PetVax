@@ -1204,6 +1204,29 @@ namespace PetVax.Services.Service
                 }
                 // --- END CHECK VACCINEBATCH VÀ DISEASEID ---
 
+                // --- CHECK DISEASE FOR PET SPECIES ---
+                if (updateAppointmentVaccinationDTO.DiseaseId.HasValue)
+                {
+                    var pet = await _petRepository.GetPetAndAppointmentByIdAsync(appointment.PetId, cancellationToken);
+                    var disease = await _diseaseRepository.GetDiseaseByIdAsync(updateAppointmentVaccinationDTO.DiseaseId.Value, cancellationToken);
+                    if (pet != null && disease != null)
+                    {
+                        var petSpecies = pet.Species?.Trim().ToLower();
+                        var diseaseSpecies = disease.Species?.Trim().ToLower();
+                        if (!string.IsNullOrEmpty(petSpecies) && !string.IsNullOrEmpty(diseaseSpecies) && petSpecies != diseaseSpecies)
+                        {
+                            return new BaseResponse<AppointmentVaccinationDetailResponseDTO>
+                            {
+                                Code = 400,
+                                Success = false,
+                                Message = $"Không thể cập nhật bệnh dành cho loài khác. Loài thú cưng: '{petSpecies}', bệnh dành cho: '{diseaseSpecies}'.",
+                                Data = null
+                            };
+                        }
+                    }
+                }
+                // --- END CHECK DISEASE FOR PET SPECIES ---
+
                 if (updateAppointmentVaccinationDTO.VetId.HasValue)
                 {
                     var appointmentDate = appointmentDetail.AppointmentDate;
@@ -1394,7 +1417,7 @@ namespace PetVax.Services.Service
                                                     (i == 1 || (diseaseProfiles.FirstOrDefault(p2 => (p2.Dose ?? (i - 1)) == (i - 1))?.IsCompleted == true)))
                                                 {
                                                     doseProfile.AppointmentDetailId = appointmentDetail.AppointmentDetailId;
-                                                    doseProfile.VaccinationDate = appointmentDetail.AppointmentDate;
+                                                    doseProfile.VaccinationDate = DateTimeHelper.Now();
                                                     doseProfile.Reaction = appointmentDetail.Reaction;
                                                     doseProfile.IsActive = true;
                                                     doseProfile.IsCompleted = true;
@@ -1407,7 +1430,7 @@ namespace PetVax.Services.Service
 
                                                     // Cập nhật ngày tiêm dự kiến cho tất cả các mũi tiếp theo cho tới mũi cuối cùng
                                                     var schedulesForDisease = await _vaccinationScheduleRepository.GetVaccinationScheduleByDiseaseIdAsync(diseaseId, cancellationToken);
-                                                    var lastVaccinationDate = appointmentDetail.AppointmentDate;
+                                                    var lastVaccinationDate = DateTimeHelper.Now();
                                                     for (int nextDose = i + 1; nextDose <= diseaseProfiles.Max(p => p.Dose ?? 0) + schedulesForDisease.Count(); nextDose++)
                                                     {
                                                         var nextProfile = diseaseProfiles.FirstOrDefault(p => (p.Dose ?? nextDose) == nextDose && p.IsCompleted != true);
@@ -1898,7 +1921,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentMicrochipResponseDTO>
                     {
-                        Code = 200,
+                        Code = 404,
                         Success = false,
                         Message = "Cuộc hẹn không tồn tại.",
                         Data = null
@@ -1934,7 +1957,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentMicrochipResponseDTO>
                     {
-                        Code = 200,
+                        Code = 400,
                         Success = false,
                         Message = $"Không thể chuyển trạng thái từ {currentStatus} sang {newStatus}.",
                         Data = null
@@ -1957,7 +1980,7 @@ namespace PetVax.Services.Service
                 {
                     return new BaseResponse<AppointmentMicrochipResponseDTO>
                     {
-                        Code = 200,
+                        Code = 404,
                         Success = false,
                         Message = "Chi tiết cuộc hẹn không tồn tại.",
                         Data = null
@@ -1982,7 +2005,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
                         {
-                            Code = 200,
+                            Code = 400,
                             Success = false,
                             Message = "Bác sĩ không có lịch làm việc vào thời gian này.",
                             Data = null
@@ -1998,7 +2021,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
                         {
-                            Code = 200,
+                            Code = 400,
                             Success = false,
                             Message = "Bác sĩ đã có lịch hẹn khác vào khung giờ này.",
                             Data = null
@@ -2027,7 +2050,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
                         {
-                            Code = 200,
+                            Code = 400,
                             Success = false,
                             Message = "Microchip đã được sử dụng trong cuộc hẹn khác.",
                             Data = null
@@ -2037,7 +2060,7 @@ namespace PetVax.Services.Service
                     {
                         return new BaseResponse<AppointmentMicrochipResponseDTO>
                         {
-                            Code = 200,
+                            Code = 404,
                             Success = false,
                             Message = "Microchip không tồn tại.",
                             Data = null
@@ -3995,80 +4018,80 @@ namespace PetVax.Services.Service
 
                         var getHealthCondition = await _healthConditionRepository.GetHealthConditionByIdAsync(updateDTO.HealthConditionId, cancellationToken);
 
-                        var healthIssues = new List<string>();
+                        //var healthIssues = new List<string>();
 
-                        // Validate dog
-                        if (species == "dog")
-                        {
-                            if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
-                                decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
-                            {
-                                if (tempC < 37.5m || tempC > 39.2m)
-                                    healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
-                            }
+                        //// Validate dog
+                        //if (species == "dog")
+                        //{
+                        //    if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
+                        //        decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                        //    {
+                        //        if (tempC < 37.5m || tempC > 39.2m)
+                        //            healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                        //    }
 
-                            if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
-                                int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
-                            {
-                                if (heartRate < 60 || heartRate > 140)
-                                    healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
-                            }
+                        //    if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
+                        //        int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
+                        //    {
+                        //        if (heartRate < 60 || heartRate > 140)
+                        //            healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                        //    }
 
-                            if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
-                                int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
-                            {
-                                if (breathingRate < 10 || breathingRate > 30)
-                                    healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
-                            }
-                        }
-                        // Validate cat
-                        else if (species == "cat")
-                        {
-                            if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
-                                decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
-                            {
-                                if (tempC < 38.0m || tempC > 39.5m)
-                                    healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
-                            }
+                        //    if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
+                        //        int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
+                        //    {
+                        //        if (breathingRate < 10 || breathingRate > 30)
+                        //            healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                        //    }
+                        //}
+                        //// Validate cat
+                        //else if (species == "cat")
+                        //{
+                        //    if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
+                        //        decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                        //    {
+                        //        if (tempC < 38.0m || tempC > 39.5m)
+                        //            healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                        //    }
 
-                            if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
-                                int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
-                            {
-                                if (heartRate < 140 || heartRate > 220)
-                                    healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
-                            }
+                        //    if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
+                        //        int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
+                        //    {
+                        //        if (heartRate < 140 || heartRate > 220)
+                        //            healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                        //    }
 
-                            if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
-                                int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
-                            {
-                                if (breathingRate < 20 || breathingRate > 30)
-                                    healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
-                            }
-                        }
+                        //    if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
+                        //        int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
+                        //    {
+                        //        if (breathingRate < 20 || breathingRate > 30)
+                        //            healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                        //    }
+                        //}
 
-                        // check weight
-                        if (!string.IsNullOrEmpty(updateDTO.Weight) &&
-                            !decimal.TryParse(updateDTO.Weight.Trim(), out _))
-                        {
-                            healthIssues.Add("Cân nặng không hợp lệ.");
-                        }
-                        else
-                        {
-                            var existpet = await _petRepository.GetPetAndAppointmentByIdAsync(appointment.PetId, cancellationToken);
-                            existpet.Weight = updateDTO.Weight;
-                            await _petRepository.UpdatePetAsync(existpet, cancellationToken);
-                        }
+                        //// check weight
+                        //if (!string.IsNullOrEmpty(updateDTO.Weight) &&
+                        //    !decimal.TryParse(updateDTO.Weight.Trim(), out _))
+                        //{
+                        //    healthIssues.Add("Cân nặng không hợp lệ.");
+                        //}
+                        //else
+                        //{
+                        //    var existpet = await _petRepository.GetPetAndAppointmentByIdAsync(appointment.PetId, cancellationToken);
+                        //    existpet.Weight = updateDTO.Weight;
+                        //    await _petRepository.UpdatePetAsync(existpet, cancellationToken);
+                        //}
 
-                        if (healthIssues.Any())
-                        {
-                            Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}, {updateDTO.Conclusion}";
-                            Status = "FAIL";
-                        }
-                        else
-                        {
-                            Conclusion = $"Đạt: Tình trạng sức khỏe trong ngưỡng bình thường. {updateDTO.Conclusion}";
-                            Status = "PASS";
-                        }
+                        //if (healthIssues.Any())
+                        //{
+                        //    Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}, {updateDTO.Conclusion}";
+                        //    Status = "FAIL";
+                        //}
+                        //else
+                        //{
+                        //    Conclusion = $"Đạt: Tình trạng sức khỏe trong ngưỡng bình thường. {updateDTO.Conclusion}";
+                        //    Status = "PASS";
+                        //}
 
                         getHealthCondition.PetId = updateDTO.PetId ?? getHealthCondition.PetId;
                         getHealthCondition.VetId = updateDTO.VetId ?? getHealthCondition.VetId;
@@ -4084,7 +4107,7 @@ namespace PetVax.Services.Service
                         getHealthCondition.Behavior = updateDTO.Behavior ?? getHealthCondition.Behavior;
                         getHealthCondition.Psycho = updateDTO.Psycho ?? getHealthCondition.Psycho;
                         getHealthCondition.Different = updateDTO.Different ?? getHealthCondition.Different;
-                        getHealthCondition.Conclusion = Conclusion;
+                        getHealthCondition.Conclusion = updateDTO.Conclusion ?? getHealthCondition.Conclusion;
                         getHealthCondition.Status = Status ?? getHealthCondition.Status;
                         getHealthCondition.CheckDate = DateTime.UtcNow;
                         getHealthCondition.ModifiedAt = DateTime.UtcNow;

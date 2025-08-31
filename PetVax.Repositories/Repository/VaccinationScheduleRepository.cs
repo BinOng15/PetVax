@@ -30,6 +30,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VaccinationSchedules
                 .Include(vs => vs.Disease)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

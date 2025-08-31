@@ -29,9 +29,18 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<Microchip>> GetAllMicrochipsAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.Microchips
+                .Where(m => m.isDeleted == false)
+                .OrderByDescending(m => m.CreatedAt)
+                .ToListAsync(cancellationToken);
         }
 
+        public Task<Microchip> GetMicrochipByCodeAsync(string microchipCode, CancellationToken cancellationToken)
+        {
+            return _context.Microchips
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.MicrochipCode == microchipCode, cancellationToken);
+        }
 
         public async Task<Microchip> GetMicrochipByIdAsync(int microchipId, CancellationToken cancellationToken)
         {

@@ -28,6 +28,7 @@ namespace PetVax.Repositories.Repository
         public async Task<List<VaccineExport>> GetAllVaccineExportsAsync(CancellationToken cancellationToken)
         {
             return await _context.VaccineExports
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

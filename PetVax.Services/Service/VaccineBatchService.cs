@@ -60,7 +60,7 @@ namespace PetVax.Services.Service
                 vaccineBatch.StorageCondition = createVaccineBatchDTO.StorageCondition;
                 vaccineBatch.Quantity = 0;
                 vaccineBatch.CreateAt = DateTimeHelper.Now();
-                vaccineBatch.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+                vaccineBatch.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin";
                 int batchId = await _vaccineBatchRepository.CreateVaccineBatchAsync(vaccineBatch, cancellationToken);
 
                 // Get the batch again to ensure navigation properties are loaded

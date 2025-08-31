@@ -31,6 +31,7 @@ namespace PetVax.Repositories.Repository
                 .Include(vrd => vrd.VaccineBatch)
                     .ThenInclude(vb => vb.Vaccine)
                 .Include(vrd => vrd.VaccineReceipt)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
         public async Task<VaccineReceiptDetail> GetVaccineReceiptDetailByIdAsync(int vaccineReceiptDetailId, CancellationToken cancellationToken)

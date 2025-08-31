@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
@@ -32,7 +33,8 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.Vouchers
                 .Include(v => v.PointTransaction)
-                .Where(v => v.isDeleted == false)
+                .Where(v => v.isDeleted == false && v.ExpirationDate > DateTimeHelper.Now())
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

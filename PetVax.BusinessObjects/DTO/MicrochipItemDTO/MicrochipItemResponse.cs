@@ -11,8 +11,8 @@ namespace PetVax.BusinessObjects.DTO.MicrochipItemDTO
 {
     public class MicrochipItemResponse
     {
-        public int MicrochipId { get; set; } 
-        public string Name { get; set; } 
+        public int MicrochipId { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; } 
         public DateTime? InstallationDate { get; set; } 
         public string Status { get; set; }

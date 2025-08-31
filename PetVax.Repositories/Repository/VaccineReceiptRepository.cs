@@ -31,6 +31,7 @@ namespace PetVax.Repositories.Repository
         public async Task<List<VaccineReceipt>> GetAllVaccineReceiptsAsync(CancellationToken cancellationToken)
         {
             return await _context.VaccineReceipts
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 
