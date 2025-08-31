@@ -38,7 +38,9 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<Account>> GetAllAccountsAsync(CancellationToken cancellationToken)
         {
-            return await _context.Accounts.Where(a => a.isDeleted == false).ToListAsync(cancellationToken);
+            return await _context.Accounts.Where(a => a.isDeleted == false)
+                .OrderByDescending(v => v.CreatedAt)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<int> GetTotalAccounts(CancellationToken cancellationToken)

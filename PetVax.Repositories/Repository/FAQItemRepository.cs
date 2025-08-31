@@ -1,4 +1,5 @@
-﻿using PetVax.BusinessObjects.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
 using System;
@@ -27,7 +28,9 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<FAQItem>> GetAllFAQItemsAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.FAQItems
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<FAQItem> GetFAQItemByIdAsync(int faqItemId, CancellationToken cancellationToken)

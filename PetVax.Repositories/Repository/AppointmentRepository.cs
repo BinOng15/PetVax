@@ -57,6 +57,7 @@ namespace PetVax.Repositories.Repository
                 .Include(a => a.Customer)
                     .ThenInclude(c => c.Membership)
                 .Include(a => a.Pet) // Load Pet
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
         public async Task<Appointment> GetAppointmentByIdAsync(int appointmentId, CancellationToken cancellationToken)

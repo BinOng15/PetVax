@@ -33,6 +33,7 @@ namespace PetVax.Repositories.Repository
                 .Include(ved => ved.VaccineExport)
                 .Include(ved => ved.AppointmentDetail)
                     .ThenInclude(ad => ad.Appointment)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
         public async Task<VaccineExportDetail> GetVaccineExportDetailByIdAsync(int vaccineExportDetailId, CancellationToken cancellationToken)

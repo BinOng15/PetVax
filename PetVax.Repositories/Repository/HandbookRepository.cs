@@ -30,7 +30,9 @@ namespace PetVax.Repositories.Repository
 
         public async Task<List<Handbook>> GetAllHandbookAsync(CancellationToken cancellationToken)
         {
-            return await GetAllAsync(cancellationToken);
+            return await _context.Handbooks
+                .OrderByDescending(h => h.CreatedAt)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Handbook> GetHandbookByIdAsync(int handbookId, CancellationToken cancellationToken)

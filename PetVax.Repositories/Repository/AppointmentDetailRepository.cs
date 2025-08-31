@@ -43,6 +43,7 @@ namespace PetVax.Repositories.Repository
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Pet)
                 .Include(ad => ad.Payment)
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 
@@ -173,6 +174,7 @@ namespace PetVax.Repositories.Repository
            .Include(ad => ad.Payment)
 
            .Where(ad => ad.Appointment.ServiceType == ServiceType.Microchip && ad.isDeleted == false)
+           .OrderByDescending(m => m.CreatedAt)
            .ToListAsync(cancellationToken);
         }
 
@@ -359,6 +361,7 @@ namespace PetVax.Repositories.Repository
                     .ThenInclude(a => a.Pet)
                 .Include(ad => ad.Payment)
                 .Where(ad => ad.ServiceType == ServiceType.Vaccination)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 
@@ -499,6 +502,7 @@ namespace PetVax.Repositories.Repository
                        .ThenInclude(a => a.Pet)
                     .Include(ad => ad.Payment)
                    .Where(a => a.isDeleted == false && a.Appointment.ServiceType == ServiceType.HealthCondition)
+                   .OrderByDescending(m => m.CreatedAt)
                    .ToListAsync(cancellationToken);
         }
 

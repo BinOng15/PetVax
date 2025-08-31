@@ -28,6 +28,7 @@ namespace PetVax.Repositories.Repository
         public async Task<List<Disease>> GetAllDiseaseAsync(CancellationToken cancellationToken)
         {
             return await _context.Diseases
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
         public async Task<Disease> GetDiseaseByIdAsync(int diseaseId, CancellationToken cancellationToken)

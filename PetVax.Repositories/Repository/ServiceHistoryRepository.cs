@@ -75,6 +75,7 @@ namespace PetVax.Repositories.Repository
                 .ThenInclude(sh => sh.Pets)
                 .Include(sh => sh.Appointment)
                 .Where(sh => sh.isDeleted != true)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

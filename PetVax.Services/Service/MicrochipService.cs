@@ -141,7 +141,9 @@ namespace PetVax.Services.Service
                     };
                 }           
               
-                // Kiểm tra Pet đã gắn Microchip chưa
+                // Remove the restriction - Allow pets to have multiple microchips
+                // Comment out the check that prevents multiple microchips per pet
+                /*
                 var existingChip = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(request.createMicrochipItemRequest.PetId, cancellationToken);
                 if (existingChip != null)
                 {
@@ -152,7 +154,7 @@ namespace PetVax.Services.Service
                         Data = null
                     };
                 }
-
+                */
 
                 // Tạo MicrochipItem
                 var microchipItem = new MicrochipItem();
@@ -178,7 +180,7 @@ namespace PetVax.Services.Service
 
                     microchipItem.PetId = pet.PetId;
                     microchipItem.IsUsed = true;
-                    microchipItem.Location = request.createMicrochipItemRequest.Location; // Giả sử Pet có thuộc tính Location
+                    microchipItem.Location = request.createMicrochipItemRequest.Location;
                 }    
                 microchipItem.Name = request.createMicrochipItemRequest.Name;
                 microchipItem.Description = request.createMicrochipItemRequest.Description;
@@ -379,16 +381,21 @@ namespace PetVax.Services.Service
                             Data = null
                         };                   
                 }
-                //check microchipItem.PetId
+                
+                //check microchipItem.PetId - Remove restriction for multiple microchips per pet
                 if (microchipRequestDTO.createMicrochipItemRequest.PetId != null && microchipRequestDTO.createMicrochipItemRequest.PetId > 0)
                 {
-                    var microchipItemByPet = await _microchipItemRepository.GetMicrochipItemByPetIdAsync(microchipRequestDTO.createMicrochipItemRequest.PetId, cancellationToken);
-                    if (microchipItemByPet != null)
+                    // Only check if this specific microchip item is being assigned to a pet that already has THIS microchip
+                    // Allow pets to have multiple different microchips
+                    var existingMicrochipForThisPet = await _microchipItemRepository.GetListMicrochipItemByPetIdAsync(microchipRequestDTO.createMicrochipItemRequest.PetId.Value, cancellationToken);
+                    var duplicateMicrochip = existingMicrochipForThisPet.FirstOrDefault(m => m.MicrochipId == microchipId);
+                    
+                    if (duplicateMicrochip != null && duplicateMicrochip.MicrochipItemId != microchipItem.MicrochipItemId)
                     {
                         return new BaseResponse<BaseMicrochipItemResponse>
                         {
                             Code = 200,
-                            Message = "Thú cưng này đã được cấy microchip!",
+                            Message = "Thú cưng này đã có microchip này rồi!",
                             Data = null
                         };
                     }

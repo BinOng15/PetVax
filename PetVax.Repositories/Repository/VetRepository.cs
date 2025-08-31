@@ -34,6 +34,7 @@ namespace PetVax.Repositories.Repository
                 .Include(v => v.Account)
                 .Include(v => v.VetSchedules)
                 .Where(v => v.isDeleted != true)
+                .OrderByDescending(m => m.CreateAt)
                 .ToListAsync(cancellationToken);
         }
 

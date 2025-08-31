@@ -39,6 +39,7 @@ namespace PetVax.Repositories.Repository
                 .OrderBy(vs => vs.ScheduleDate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

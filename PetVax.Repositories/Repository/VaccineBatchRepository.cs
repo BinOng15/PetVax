@@ -32,6 +32,7 @@ namespace PetVax.Repositories.Repository
             return await _context.VaccineBatches
                 .Include(vb => vb.Vaccine)
                 .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false)
+                .OrderByDescending(v => v.CreateAt)
                 .ToListAsync(cancellationToken);
         }
 

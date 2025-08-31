@@ -31,6 +31,7 @@ namespace PetVax.Repositories.Repository
                 .Include(vd => vd.Disease)
                 .Include(vd => vd.Vaccine)
                 .Where(vd => vd.Vaccine.isDeleted == false && vd.Disease.isDeleted == false && vd.isDeleted == false)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 
