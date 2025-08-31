@@ -34,6 +34,7 @@ namespace PetVax.Repositories.Repository
                 .Include(pt => pt.Voucher)
                 .Include(pt => pt.Payment)
                 .Where(pt => pt.isDeleted == false)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

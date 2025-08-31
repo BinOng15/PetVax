@@ -120,10 +120,16 @@ namespace PetVax.Services.Service
                         Data = false
                     };
                 }
-                var result = await _diseaseRepository.DeleteDiseaseAsync(diseaseId, cancellationToken);
-                if (!result)
+
+                // Soft delete: mark as deleted instead of physical deletion
+                existingDisease.isDeleted = true;
+                existingDisease.ModifiedAt = DateTimeHelper.Now();
+                existingDisease.ModifiedBy = GetCurrentUserName();
+
+                var result = await _diseaseRepository.UpdateDiseaseAsync(existingDisease, cancellationToken);
+                if (result <= 0)
                 {
-                    _logger.LogError($"DeleteDiseaseAsync: Failed to delete disease with ID {diseaseId}");
+                    _logger.LogError($"DeleteDiseaseAsync: Failed to soft delete disease with ID {diseaseId}");
                     return new BaseResponse<bool>
                     {
                         Code = 500,
@@ -132,7 +138,8 @@ namespace PetVax.Services.Service
                         Data = false
                     };
                 }
-                _logger.LogInformation($"DeleteDiseaseAsync: Disease with ID {diseaseId} deleted successfully by {GetCurrentUserName()}");
+
+                _logger.LogInformation($"DeleteDiseaseAsync: Disease with ID {diseaseId} soft deleted successfully by {GetCurrentUserName()}");
                 return new BaseResponse<bool>
                 {
                     Code = 200,
@@ -153,6 +160,7 @@ namespace PetVax.Services.Service
                 };
             }
         }
+
 
         public async Task<DynamicResponse<DiseaseResponseDTO>> GetAllDiseaseAsync(GetAllItemsDTO getAllItemsDTO, CancellationToken cancellationToken)
         {

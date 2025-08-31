@@ -38,6 +38,7 @@ namespace PetVax.Repositories.Repository
                 .Include(p => p.VaccinationCertificate)
                 .Include(p => p.HealthCondition)
                 .Where(p => p.isDeleted == false)
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

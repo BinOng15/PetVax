@@ -38,6 +38,7 @@ namespace PetVax.Repositories.Repository
                     .ThenInclude(c => c.Membership)
                 .Include(cv => cv.Customer)
                     .ThenInclude(c => c.Account)
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

@@ -36,6 +36,7 @@ namespace PetVax.Repositories.Repository
                 .Include(vp => vp.AppointmentDetail)
                     .ThenInclude(ad => ad.VaccineBatch)
                         .ThenInclude(vb => vb.Vaccine)
+                .OrderByDescending(m => m.CreatedAt)
                 .AsNoTracking()
     .           ToListAsync(cancellationToken);
         }

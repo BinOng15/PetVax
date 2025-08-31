@@ -36,6 +36,7 @@ namespace PetVax.Repositories.Repository
                 .Include(hc => hc.Vet)
                     .ThenInclude(hc => hc.Account)
                 .Include(hc => hc.MicrochipItem)
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

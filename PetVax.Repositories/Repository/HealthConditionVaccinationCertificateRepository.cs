@@ -33,6 +33,7 @@ namespace PetVax.Repositories.Repository
             return await _context.HealthConditionVaccinationCertificates
                 .Include(hcvc => hcvc.HealthCondition)
                 .Include(hcvc => hcvc.VaccinationCertificate)
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

@@ -33,6 +33,7 @@ namespace PetVax.Repositories.Repository
             return await _context.MicrochipItems
                 .Include(mc => mc.Microchip)
                 .Where(mc => mc.isDeleted == false)
+                .OrderByDescending(mc => mc.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 
@@ -56,7 +57,8 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.MicrochipItems
                 .Include(mc => mc.Microchip)
-                .FirstOrDefaultAsync(mc => mc.Microchip.MicrochipCode == microchipCode, cancellationToken);
+                .Where(mc => mc.Status != "Inactive" && mc.Microchip.MicrochipCode == microchipCode)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<MicrochipItem> GetMicrochipItemByMicrochipIdAsync(int microchipId, CancellationToken cancellationToken)

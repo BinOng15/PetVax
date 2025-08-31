@@ -30,6 +30,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.Vaccines
                 .Where(v => v.isDeleted == false)
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

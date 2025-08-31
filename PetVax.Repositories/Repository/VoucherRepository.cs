@@ -34,6 +34,7 @@ namespace PetVax.Repositories.Repository
             return await _context.Vouchers
                 .Include(v => v.PointTransaction)
                 .Where(v => v.isDeleted == false && v.ExpirationDate > DateTimeHelper.Now())
+                .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 

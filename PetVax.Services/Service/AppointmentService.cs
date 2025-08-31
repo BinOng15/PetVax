@@ -4018,80 +4018,80 @@ namespace PetVax.Services.Service
 
                         var getHealthCondition = await _healthConditionRepository.GetHealthConditionByIdAsync(updateDTO.HealthConditionId, cancellationToken);
 
-                        var healthIssues = new List<string>();
+                        //var healthIssues = new List<string>();
 
-                        // Validate dog
-                        if (species == "dog")
-                        {
-                            if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
-                                decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
-                            {
-                                if (tempC < 37.5m || tempC > 39.2m)
-                                    healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
-                            }
+                        //// Validate dog
+                        //if (species == "dog")
+                        //{
+                        //    if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
+                        //        decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                        //    {
+                        //        if (tempC < 37.5m || tempC > 39.2m)
+                        //            healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                        //    }
 
-                            if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
-                                int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
-                            {
-                                if (heartRate < 60 || heartRate > 140)
-                                    healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
-                            }
+                        //    if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
+                        //        int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
+                        //    {
+                        //        if (heartRate < 60 || heartRate > 140)
+                        //            healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                        //    }
 
-                            if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
-                                int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
-                            {
-                                if (breathingRate < 10 || breathingRate > 30)
-                                    healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
-                            }
-                        }
-                        // Validate cat
-                        else if (species == "cat")
-                        {
-                            if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
-                                decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
-                            {
-                                if (tempC < 38.0m || tempC > 39.5m)
-                                    healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
-                            }
+                        //    if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
+                        //        int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
+                        //    {
+                        //        if (breathingRate < 10 || breathingRate > 30)
+                        //            healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                        //    }
+                        //}
+                        //// Validate cat
+                        //else if (species == "cat")
+                        //{
+                        //    if (!string.IsNullOrEmpty(updateDTO.Temperature) &&
+                        //        decimal.TryParse(updateDTO.Temperature.Replace("°C", "").Trim(), out decimal tempC))
+                        //    {
+                        //        if (tempC < 38.0m || tempC > 39.5m)
+                        //            healthIssues.Add($"Nhiệt độ bất thường: {tempC} °C");
+                        //    }
 
-                            if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
-                                int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
-                            {
-                                if (heartRate < 140 || heartRate > 220)
-                                    healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
-                            }
+                        //    if (!string.IsNullOrEmpty(updateDTO.HeartRate) &&
+                        //        int.TryParse(updateDTO.HeartRate.Trim(), out int heartRate))
+                        //    {
+                        //        if (heartRate < 140 || heartRate > 220)
+                        //            healthIssues.Add($"Nhịp tim bất thường: {heartRate} bpm");
+                        //    }
 
-                            if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
-                                int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
-                            {
-                                if (breathingRate < 20 || breathingRate > 30)
-                                    healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
-                            }
-                        }
+                        //    if (!string.IsNullOrEmpty(updateDTO.BreathingRate) &&
+                        //        int.TryParse(updateDTO.BreathingRate.Trim(), out int breathingRate))
+                        //    {
+                        //        if (breathingRate < 20 || breathingRate > 30)
+                        //            healthIssues.Add($"Nhịp thở bất thường: {breathingRate} lần/phút");
+                        //    }
+                        //}
 
-                        // check weight
-                        if (!string.IsNullOrEmpty(updateDTO.Weight) &&
-                            !decimal.TryParse(updateDTO.Weight.Trim(), out _))
-                        {
-                            healthIssues.Add("Cân nặng không hợp lệ.");
-                        }
-                        else
-                        {
-                            var existpet = await _petRepository.GetPetAndAppointmentByIdAsync(appointment.PetId, cancellationToken);
-                            existpet.Weight = updateDTO.Weight;
-                            await _petRepository.UpdatePetAsync(existpet, cancellationToken);
-                        }
+                        //// check weight
+                        //if (!string.IsNullOrEmpty(updateDTO.Weight) &&
+                        //    !decimal.TryParse(updateDTO.Weight.Trim(), out _))
+                        //{
+                        //    healthIssues.Add("Cân nặng không hợp lệ.");
+                        //}
+                        //else
+                        //{
+                        //    var existpet = await _petRepository.GetPetAndAppointmentByIdAsync(appointment.PetId, cancellationToken);
+                        //    existpet.Weight = updateDTO.Weight;
+                        //    await _petRepository.UpdatePetAsync(existpet, cancellationToken);
+                        //}
 
-                        if (healthIssues.Any())
-                        {
-                            Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}, {updateDTO.Conclusion}";
-                            Status = "FAIL";
-                        }
-                        else
-                        {
-                            Conclusion = $"Đạt: Tình trạng sức khỏe trong ngưỡng bình thường. {updateDTO.Conclusion}";
-                            Status = "PASS";
-                        }
+                        //if (healthIssues.Any())
+                        //{
+                        //    Conclusion = $"❌ Không đạt: {string.Join("; ", healthIssues)}, {updateDTO.Conclusion}";
+                        //    Status = "FAIL";
+                        //}
+                        //else
+                        //{
+                        //    Conclusion = $"Đạt: Tình trạng sức khỏe trong ngưỡng bình thường. {updateDTO.Conclusion}";
+                        //    Status = "PASS";
+                        //}
 
                         getHealthCondition.PetId = updateDTO.PetId ?? getHealthCondition.PetId;
                         getHealthCondition.VetId = updateDTO.VetId ?? getHealthCondition.VetId;
@@ -4107,7 +4107,7 @@ namespace PetVax.Services.Service
                         getHealthCondition.Behavior = updateDTO.Behavior ?? getHealthCondition.Behavior;
                         getHealthCondition.Psycho = updateDTO.Psycho ?? getHealthCondition.Psycho;
                         getHealthCondition.Different = updateDTO.Different ?? getHealthCondition.Different;
-                        getHealthCondition.Conclusion = Conclusion;
+                        getHealthCondition.Conclusion = updateDTO.Conclusion ?? getHealthCondition.Conclusion;
                         getHealthCondition.Status = Status ?? getHealthCondition.Status;
                         getHealthCondition.CheckDate = DateTime.UtcNow;
                         getHealthCondition.ModifiedAt = DateTime.UtcNow;
