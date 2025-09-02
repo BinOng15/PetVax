@@ -164,18 +164,20 @@ namespace PetVax.Repositories.Repository
         public async Task<List<AppointmentDetail>> GetAllAppointmentDetailsMicrochipAsync(CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
-           .Include(ad => ad.MicrochipItem).ThenInclude(mi => mi.Microchip)
-           .Include(ad => ad.Vet).ThenInclude(v => v.Account)
-           .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
-           .Include(ad => ad.Appointment)
-               .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
-           .Include(ad => ad.Appointment)
-               .ThenInclude(a => a.Pet)
-           .Include(ad => ad.Payment)
-
-           .Where(ad => ad.Appointment.ServiceType == ServiceType.Microchip && ad.isDeleted == false)
-           .OrderByDescending(m => m.CreatedAt)
-           .ToListAsync(cancellationToken);
+               .AsNoTracking()
+               .Where(ad => ad.Appointment.ServiceType == ServiceType.Microchip && ad.isDeleted == false)
+               .Include(ad => ad.MicrochipItem)
+                   .ThenInclude(mi => mi.Microchip)
+               .Include(ad => ad.Vet)
+                   .ThenInclude(v => v.Account)
+               .Include(ad => ad.Appointment)
+                   .ThenInclude(a => a.Customer)
+                   .ThenInclude(c => c.Account)
+               .Include(ad => ad.Appointment)
+                   .ThenInclude(a => a.Pet)
+               .Include(ad => ad.Payment)
+               .OrderByDescending(m => m.CreatedAt)
+               .ToListAsync(cancellationToken);
         }
 
         public async Task<AppointmentDetail> GetAppointmentDetailMicrochipByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken)
@@ -360,7 +362,7 @@ namespace PetVax.Repositories.Repository
                 .Include(ad => ad.Appointment)
                     .ThenInclude(a => a.Pet)
                 .Include(ad => ad.Payment)
-                .Where(ad => ad.ServiceType == ServiceType.Vaccination)
+                .Where(ad => ad.ServiceType == ServiceType.Vaccination && ad.isDeleted == false)
                 .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
@@ -493,15 +495,17 @@ namespace PetVax.Repositories.Repository
         public async Task<List<AppointmentDetail>> GetAllAppointmentDetailHealthConditionAsync(CancellationToken cancellationToken)
         {
             return await _context.AppointmentDetails
+                   .AsNoTracking()
+                   .Where(a => a.isDeleted == false && a.Appointment.ServiceType == ServiceType.HealthCondition)
                    .Include(ad => ad.HealthCondition)
-                   .Include(ad => ad.Vet).ThenInclude(v => v.Account)
-                     .Include(ad => ad.Vet).ThenInclude(v => v.VetSchedules)
+                   .Include(ad => ad.Vet)
+                       .ThenInclude(v => v.Account)
                    .Include(ad => ad.Appointment)
-                       .ThenInclude(a => a.Customer).ThenInclude(c => c.Account)
+                       .ThenInclude(a => a.Customer)
+                       .ThenInclude(c => c.Account)
                    .Include(ad => ad.Appointment)
                        .ThenInclude(a => a.Pet)
-                    .Include(ad => ad.Payment)
-                   .Where(a => a.isDeleted == false && a.Appointment.ServiceType == ServiceType.HealthCondition)
+                   .Include(ad => ad.Payment)
                    .OrderByDescending(m => m.CreatedAt)
                    .ToListAsync(cancellationToken);
         }

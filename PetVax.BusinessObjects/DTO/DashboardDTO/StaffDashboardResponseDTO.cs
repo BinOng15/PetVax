@@ -14,6 +14,8 @@ namespace PetVax.BusinessObjects.DTO.DashboardDTO
         public int TotalVaccines { get; set; }
         public int TotalVaccineBatches { get; set; }
         public int TotalVets { get; set; }
+        public int TotalVouchers { get; set; }
+        public int TotalPayments { get; set; }
         public int TotalAppointmentVaccinations { get; set; }
         public int TotalProcessingAppointmentVaccinations { get; set; }
         public int TotalConfirmedAppointmentVaccinations { get; set; }
@@ -45,6 +47,18 @@ namespace PetVax.BusinessObjects.DTO.DashboardDTO
         public int TotalAppointmentsThisWeek { get; set; }
         public int TotalAppointmentsThisMonth { get; set; }
         public int TotalAppointmentsThisYear { get; set; }
+        public int TotalVetSchedules { get; set; }
+        public int TotalAvailableVetSchedules { get; set; }
+        public int TotalUnavailableVetSchedules { get; set; }
+        public int TotalScheduledVetSchedules { get; set; }
+        public int TotalProcessingAppointments { get; set; }
+        public int TotalConfirmedAppointments { get; set; }
+        public int TotalCheckedInAppointments { get; set; }
+        public int TotalProcessedAppointments { get; set; }
+        public int TotalPaidAppointments { get; set; }
+        public int TotalCompletedAppointments { get; set; }
+        public int TotalCancelledAppointments { get; set; }
+        public int TotalRejectedAppointments { get; set; }
         public DateTime LastUpdated { get; set; }
     }
 }

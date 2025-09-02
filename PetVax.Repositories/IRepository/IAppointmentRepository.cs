@@ -60,5 +60,14 @@ namespace PetVax.Repositories.IRepository
         Task<int> GetTotalAppointmentsThisWeek(CancellationToken cancellationToken);
         Task<int> GetTotalAppointmentsThisMonth(CancellationToken cancellationToken);
         Task<int> GetTotalAppointmentsThisYear(CancellationToken cancellationToken);
+        Task<int> GetTotalAppointmentsAsync(CancellationToken cancellationToken);
+        Task<int> GetTotalProcessingAppointments(CancellationToken cancellationToken);
+        Task<int> GetTotalConfirmedAppointments(CancellationToken cancellationToken);
+        Task<int> GetTotalCheckedInAppointments(CancellationToken cancellationToken);
+        Task<int> GetTotalProcessedAppointments(CancellationToken cancellationToken);
+        Task<int> GetTotalPaidAppointments(CancellationToken cancellationToken);
+        Task<int> GetTotalCompletedAppointments(CancellationToken cancellationToken);
+        Task<int> GetTotalCancelledAppointments(CancellationToken cancellationToken);
+        Task<int> GetTotalRejectedAppointments(CancellationToken cancellationToken);
     }
 }

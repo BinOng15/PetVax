@@ -21,5 +21,8 @@ namespace PetVax.Repositories.IRepository
         Task<List<VetSchedule>> GetVetSchedulesBySlotAsync(int? slot, CancellationToken cancellationToken);
         Task<List<VetSchedule>> GetVetSchedulesFromDateToDateAsync(DateTime? fromDate, DateTime? toDate, CancellationToken cancellationToken);
         Task<int> GetTotalVetSchedulesAsync(CancellationToken cancellationToken);
+        Task<int> GetTotalAvailableVetSchedulesAsync(CancellationToken cancellationToken);
+        Task<int> GetTotalUnavailableVetSchedulesAsync(CancellationToken cancellationToken);
+        Task<int> GetTotalScheduledVetSchedulesAsync(CancellationToken cancellationToken);
     }
 }
