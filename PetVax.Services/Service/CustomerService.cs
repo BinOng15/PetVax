@@ -270,8 +270,21 @@ namespace PetVax.Services.Service
                 if (!string.IsNullOrWhiteSpace(updateCustomerDTO.PhoneNumber))
                     customer.PhoneNumber = updateCustomerDTO.PhoneNumber;
 
+                // Validate DateOfBirth format to dd/MM/yyyy
                 if (!string.IsNullOrWhiteSpace(updateCustomerDTO.DateOfBirth))
-                    customer.DateOfBirth = updateCustomerDTO.DateOfBirth;
+                {
+                    if (!DateTime.TryParseExact(updateCustomerDTO.DateOfBirth, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out var dob))
+                    {
+                        return new BaseResponse<bool>
+                        {
+                            Code = 400,
+                            Success = false,
+                            Message = "Ngày sinh phải theo định dạng dd/MM/yyyy.",
+                            Data = false
+                        };
+                    }
+                    customer.DateOfBirth = dob.ToString("dd/MM/yyyy");
+                }
 
                 if (!string.IsNullOrWhiteSpace(updateCustomerDTO.Gender))
                     customer.Gender = updateCustomerDTO.Gender;

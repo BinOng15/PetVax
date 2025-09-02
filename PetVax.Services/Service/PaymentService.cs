@@ -769,18 +769,18 @@ namespace PetVax.Services.Service
             if (appointmentDetail.VaccineBatchId.HasValue)
             {
                 // Dịch vụ tiêm chủng
-                //cancelUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/cancel";
-                //returnUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/success";
-                cancelUrl = "http://localhost:5173/staff/vaccination-appointments/cancel";
-                returnUrl = "http://localhost:5173/staff/vaccination-appointments/success";
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/vaccination-appointments/success";
+                //cancelUrl = "http://localhost:5173/staff/vaccination-appointments/cancel";
+                //returnUrl = "http://localhost:5173/staff/vaccination-appointments/success";
             }
             else if (appointmentDetail.MicrochipItemId.HasValue)
             {
                 // Dịch vụ cấy microchip
-                //cancelUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/cancel";
-                //returnUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/success";
-                cancelUrl = "http://localhost:5173/staff/microchip-appointments/cancel";
-                returnUrl = "http://localhost:5173/staff/microchip-appointments/success";
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/microchip-appointments/success";
+                //cancelUrl = "http://localhost:5173/staff/microchip-appointments/cancel";
+                //returnUrl = "http://localhost:5173/staff/microchip-appointments/success";
             }
             else if (appointmentDetail.VaccinationCertificateId.HasValue)
             {
@@ -791,10 +791,10 @@ namespace PetVax.Services.Service
             else if (appointmentDetail.HealthConditionId.HasValue)
             {
                 // Dịch vụ khám sức khỏe
-                //cancelUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/cancel";
-                //returnUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/success";
-                cancelUrl = "http://localhost:5173/staff/condition-appointments/cancel";
-                returnUrl = "http://localhost:5173/staff/condition-appointments/success";
+                cancelUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/cancel";
+                returnUrl = "https://sep490-pvsm.vercel.app/staff/condition-appointments/success";
+                //cancelUrl = "http://localhost:5173/staff/condition-appointments/cancel";
+                //returnUrl = "http://localhost:5173/staff/condition-appointments/success";
             }
             else
             {
