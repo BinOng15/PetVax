@@ -141,5 +141,26 @@ namespace PetVax.Repositories.Repository
                 .Where(vs => vs.isDeleted == false)
                 .CountAsync(cancellationToken);
         }
+
+        public async Task<int> GetTotalAvailableVetSchedulesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.VetSchedules
+                .Where(vs => vs.Status == EnumList.VetScheduleStatus.Available && vs.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
+
+        public async Task<int> GetTotalUnavailableVetSchedulesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.VetSchedules
+                .Where(vs => vs.Status == EnumList.VetScheduleStatus.Unavailable && vs.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
+
+        public async Task<int> GetTotalScheduledVetSchedulesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.VetSchedules
+                .Where(vs => vs.Status == EnumList.VetScheduleStatus.Scheduled && vs.isDeleted == false)
+                .CountAsync(cancellationToken);
+        }
     }
 }

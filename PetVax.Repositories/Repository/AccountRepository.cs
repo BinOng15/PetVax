@@ -45,12 +45,12 @@ namespace PetVax.Repositories.Repository
 
         public async Task<int> GetTotalAccounts(CancellationToken cancellationToken)
         {
-            return await _context.Accounts.CountAsync(cancellationToken);
+            return await _context.Accounts.Where(a => a.isDeleted == false).CountAsync(cancellationToken);
         }
 
         public async Task<int> GetTotalActiveAccounts(CancellationToken cancellationToken)
         {
-            return await _context.Accounts.CountAsync(a => a.isVerify == true, cancellationToken);
+            return await _context.Accounts.CountAsync(a => a.isVerify == true && a.isDeleted == false, cancellationToken);
         }
 
         public async Task<int> UpdateAccountAsync(Account account, CancellationToken cancellationToken)

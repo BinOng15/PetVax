@@ -136,6 +136,14 @@ namespace PetVax.Services.Service
                 var totalCompletedAppointmentHealthConditions = await _appointmentRepository.GetTotalCompletedAppointmentHealthConditions(cancellationToken);
                 var totalCancelledAppointmentHealthConditions = await _appointmentRepository.GetTotalCancelledAppointmentHealthConditions(cancellationToken);
                 var totalRejectedAppointmentHealthConditions = await _appointmentRepository.GetTotalRejectedAppointmentHealthConditions(cancellationToken);
+                var totalProcessingAppointments = await _appointmentRepository.GetTotalProcessingAppointments(cancellationToken);
+                var totalConfirmedAppointments = await _appointmentRepository.GetTotalConfirmedAppointments(cancellationToken);
+                var totalCheckedInAppointments = await _appointmentRepository.GetTotalCheckedInAppointments(cancellationToken);
+                var totalProcessedAppointments = await _appointmentRepository.GetTotalProcessedAppointments(cancellationToken);
+                var totalPaidAppointments = await _appointmentRepository.GetTotalPaidAppointments(cancellationToken);
+                var totalCompletedAppointments = await _appointmentRepository.GetTotalCompletedAppointments(cancellationToken);
+                var totalCancelledAppointments = await _appointmentRepository.GetTotalCancelledAppointments(cancellationToken);
+                var totalRejectedAppointments = await _appointmentRepository.GetTotalRejectedAppointments(cancellationToken);
 
                 var dashboardData = new AdminDashboardResponseDTO
                 {
@@ -162,7 +170,7 @@ namespace PetVax.Services.Service
                     TotalProcessingAppointmentVaccinations = totalProcessingAppointmentVaccinations,
                     TotalConfirmedAppointmentVaccinations = totalConfirmedAppointmentVaccinations,
                     TotalCheckedInAppointmentVaccinations = totalCheckedInAppointmentVaccinations,
-                    TotalProcessedAppointmentVaccinations = totalPaidAppointmentVaccinations,
+                    TotalProcessedAppointmentVaccinations = totalProcessedAppointments,
                     TotalPaidAppointmentVaccinations = totalPaidAppointmentVaccinations,
                     TotalCompletedAppointmentVaccinations = totalCompletedAppointmentVaccinations,
                     TotalCancelledAppointmentVaccinations = totalCancelledAppointmentVaccinations,
@@ -185,6 +193,14 @@ namespace PetVax.Services.Service
                     TotalCompletedAppointmentHealthConditions = totalCompletedAppointmentHealthConditions,
                     TotalCancelledAppointmentHealthConditions = totalCancelledAppointmentHealthConditions,
                     TotalRejectedAppointmentHealthConditions = totalRejectedAppointmentHealthConditions,
+                    TotalProcessingAppointments = totalProcessingAppointments,
+                    TotalConfirmedAppointments = totalConfirmedAppointments,
+                    TotalCheckedInAppointments = totalCheckedInAppointments,
+                    TotalProcessedAppointments = totalProcessedAppointments,
+                    TotalPaidAppointments = totalPaidAppointments,
+                    TotalCompletedAppointments = totalCompletedAppointments,
+                    TotalCancelledAppointments = totalCancelledAppointments,
+                    TotalRejectedAppointments = totalRejectedAppointments,
                     LastUpdated = DateTimeHelper.Now() 
                 };
                 return new BaseResponse<AdminDashboardResponseDTO>
@@ -218,6 +234,8 @@ namespace PetVax.Services.Service
                 var totalVaccines = await _vaccineRepository.GetTotalVaccinesAsync(cancellationToken);
                 var totalVaccineBatches = await _vaccineBatchRepository.GetTotalVaccineBatchesAsync(cancellationToken);
                 var totalVets = await _vetRepository.GetTotalVetsAsync(cancellationToken);
+                var totalVouchers = await _voucherRepository.GetTotalVouchersAsync(cancellationToken);
+                var totalPayments = await _paymentRepository.GetTotalPaymentsAsync(cancellationToken);
                 var totalAppointmentVaccinations = await _appointmentRepository.GetTotalAppointmentVaccinations(cancellationToken);
                 var totalProcessingAppointmentVaccinations = await _appointmentRepository.GetTotalProcessingAppointmentVaccinations(cancellationToken);
                 var totalConfirmedAppointmentVaccinations = await _appointmentRepository.GetTotalConfirmedAppointmentVaccinations(cancellationToken);
@@ -247,6 +265,18 @@ namespace PetVax.Services.Service
                 var totalAppointmentsThisWeek = await _appointmentRepository.GetTotalAppointmentsThisWeek(cancellationToken);
                 var totalAppointmentsThisMonth = await _appointmentRepository.GetTotalAppointmentsThisMonth(cancellationToken);
                 var totalAppointmentsThisYear = await _appointmentRepository.GetTotalAppointmentsThisYear(cancellationToken);
+                var totalVetSchedules = await _vetScheduleRepository.GetTotalVetSchedulesAsync(cancellationToken);
+                var totalAvailableVetSchedules = await _vetScheduleRepository.GetTotalAvailableVetSchedulesAsync(cancellationToken);
+                var totalUnavailableVetSchedules = await _vetScheduleRepository.GetTotalUnavailableVetSchedulesAsync(cancellationToken);
+                var totalScheduledVetSchedules = await _vetScheduleRepository.GetTotalScheduledVetSchedulesAsync(cancellationToken);
+                var totalProcessingAppointments = await _appointmentRepository.GetTotalProcessingAppointments(cancellationToken);
+                var totalConfirmedAppointments = await _appointmentRepository.GetTotalConfirmedAppointments(cancellationToken);
+                var totalCheckedInAppointments = await _appointmentRepository.GetTotalCheckedInAppointments(cancellationToken);
+                var totalProcessedAppointments = await _appointmentRepository.GetTotalProcessedAppointments(cancellationToken);
+                var totalPaidAppointments = await _appointmentRepository.GetTotalPaidAppointments(cancellationToken);
+                var totalCompletedAppointments = await _appointmentRepository.GetTotalCompletedAppointments(cancellationToken);
+                var totalCancelledAppointments = await _appointmentRepository.GetTotalCancelledAppointments(cancellationToken);
+                var totalRejectedAppointments = await _appointmentRepository.GetTotalRejectedAppointments(cancellationToken);
 
                 var dashboardData = new StaffDashboardResponseDTO
                 {
@@ -256,6 +286,8 @@ namespace PetVax.Services.Service
                     TotalVaccines = totalVaccines,
                     TotalVaccineBatches = totalVaccineBatches,
                     TotalVets = totalVets,
+                    TotalVouchers = totalVouchers,
+                    TotalPayments = totalPayments,
                     TotalAppointmentVaccinations = totalAppointmentVaccinations,
                     TotalProcessingAppointmentVaccinations = totalProcessingAppointmentVaccinations,
                     TotalConfirmedAppointmentVaccinations = totalConfirmedAppointmentVaccinations,
@@ -287,6 +319,18 @@ namespace PetVax.Services.Service
                     TotalAppointmentsThisWeek = totalAppointmentsThisWeek,
                     TotalAppointmentsThisMonth = totalAppointmentsThisMonth,
                     TotalAppointmentsThisYear = totalAppointmentsThisYear,
+                    TotalVetSchedules = totalVetSchedules,
+                    TotalAvailableVetSchedules = totalAvailableVetSchedules,
+                    TotalUnavailableVetSchedules = totalUnavailableVetSchedules,
+                    TotalScheduledVetSchedules = totalScheduledVetSchedules,
+                    TotalProcessingAppointments = totalProcessingAppointments,
+                    TotalConfirmedAppointments = totalConfirmedAppointments,
+                    TotalCheckedInAppointments = totalCheckedInAppointments,
+                    TotalProcessedAppointments = totalProcessedAppointments,
+                    TotalPaidAppointments = totalPaidAppointments,
+                    TotalCompletedAppointments = totalCompletedAppointments,
+                    TotalCancelledAppointments = totalCancelledAppointments,
+                    TotalRejectedAppointments = totalRejectedAppointments,
                     LastUpdated = DateTimeHelper.Now()
                 };
                 return new BaseResponse<StaffDashboardResponseDTO>
@@ -322,6 +366,14 @@ namespace PetVax.Services.Service
                 var totalProcessingAppointmentVaccinations = await _appointmentRepository.GetTotalProcessingAppointmentVaccinations(cancellationToken);
                 var totalProcessingAppointmentMicrochips = await _appointmentRepository.GetTotalProcessingAppointmentMicrochips(cancellationToken);
                 var totalProcessingAppointmentHealthConditions = await _appointmentRepository.GetTotalProcessingAppointmentHealthConditions(cancellationToken);
+                var totalProcessingAppointments = await _appointmentRepository.GetTotalProcessingAppointments(cancellationToken);
+                var totalConfirmedAppointments = await _appointmentRepository.GetTotalConfirmedAppointments(cancellationToken);
+                var totalCheckedInAppointments = await _appointmentRepository.GetTotalCheckedInAppointments(cancellationToken);
+                var totalProcessedAppointments = await _appointmentRepository.GetTotalProcessedAppointments(cancellationToken);
+                var totalPaidAppointments = await _appointmentRepository.GetTotalPaidAppointments(cancellationToken);
+                var totalCompletedAppointments = await _appointmentRepository.GetTotalCompletedAppointments(cancellationToken);
+                var totalCancelledAppointments = await _appointmentRepository.GetTotalCancelledAppointments(cancellationToken);
+                var totalRejectedAppointments = await _appointmentRepository.GetTotalRejectedAppointments(cancellationToken);
                 var dashboardData = new VetDashboardResponseDTO
                 {
                     TotalVaccines = totalVaccines,
@@ -332,6 +384,14 @@ namespace PetVax.Services.Service
                     TotalProcessedAppointmentVaccinations = totalProcessingAppointmentVaccinations,
                     TotalProcessedAppointmentMicrochips = totalProcessingAppointmentMicrochips,
                     TotalProcessedAppointmentHealthConditions = totalProcessingAppointmentHealthConditions,
+                    TotalProcessingAppointments = totalProcessingAppointments,
+                    TotalConfirmedAppointments = totalConfirmedAppointments,
+                    TotalCheckedInAppointments = totalCheckedInAppointments,
+                    TotalProcessedAppointments = totalProcessedAppointments,
+                    TotalPaidAppointments = totalPaidAppointments,
+                    TotalCompletedAppointments = totalCompletedAppointments,
+                    TotalCancelledAppointments = totalCancelledAppointments,
+                    TotalRejectedAppointments = totalRejectedAppointments,
                     LastUpdated = DateTimeHelper.Now()
                 };
                 return new BaseResponse<VetDashboardResponseDTO>

@@ -16,6 +16,14 @@ namespace PetVax.BusinessObjects.DTO.DashboardDTO
         public int TotalProcessedAppointmentVaccinations { get; set; }
         public int TotalProcessedAppointmentMicrochips { get; set; }
         public int TotalProcessedAppointmentHealthConditions { get; set; }
+        public int TotalProcessingAppointments { get; set; }
+        public int TotalConfirmedAppointments { get; set; }
+        public int TotalCheckedInAppointments { get; set; }
+        public int TotalProcessedAppointments { get; set; }
+        public int TotalPaidAppointments { get; set; }
+        public int TotalCompletedAppointments { get; set; }
+        public int TotalCancelledAppointments { get; set; }
+        public int TotalRejectedAppointments { get; set; }
         public DateTime LastUpdated { get; set; }
     }
 }
