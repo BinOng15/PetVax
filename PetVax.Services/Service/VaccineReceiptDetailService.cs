@@ -65,7 +65,7 @@ namespace PetVax.Services.Service
                     ReceiptCode = "RECEIPT" + new Random().Next(100000, 1000000).ToString(),
                     ReceiptDate = createFullVaccineReceiptDTO.ReceiptDate,
                     CreatedAt = DateTimeHelper.Now(),
-                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin",
                 };
                 var vaccineReceiptId = await _vaccineReceiptRepository.CreateVaccineReceiptAsync(vaccineReceipt, cancellationToken);
 
@@ -92,7 +92,7 @@ namespace PetVax.Services.Service
                     VaccineStatus = createFullVaccineReceiptDTO.VaccineStatus,
                     Notes = createFullVaccineReceiptDTO.Notes,
                     CreatedAt = DateTimeHelper.Now(),
-                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin",
                     isDeleted = false
                 };
                 var vaccineReceiptDetailId = await _vaccineReceiptDetailRepository.CreateVaccineReceiptDetailAsync(vaccineReceiptDetail, cancellationToken);
@@ -112,7 +112,7 @@ namespace PetVax.Services.Service
                     Event = coldChainLogDTO?.Event ?? "Nhập kho",
                     Notes = coldChainLogDTO?.Notes ?? $"Tạo log cho chi tiết nhập kho có id: {vaccineReceiptDetailId}",
                     RecordedAt = DateTimeHelper.Now(),
-                    RecordedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                    RecordedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin",
                     isDeleted = false
                 };
                 await _coldChainLogRepository.CreateColdChainLogAsync(coldChainLog, cancellationToken);
@@ -190,7 +190,7 @@ namespace PetVax.Services.Service
                     VaccineStatus = createVaccineReceiptDetailDTO.VaccineStatus,
                     Notes = createVaccineReceiptDetailDTO.Notes,
                     CreatedAt = DateTimeHelper.Now(),
-                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                    CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin",
                     isDeleted = false
                 };
                 var vaccineReceiptDetailId = await _vaccineReceiptDetailRepository.CreateVaccineReceiptDetailAsync(vaccineReceiptDetail, cancellationToken);
@@ -213,7 +213,7 @@ namespace PetVax.Services.Service
                     Event = coldChainLogDTO?.Event ?? "Nhập kho",
                     Notes = coldChainLogDTO?.Notes ?? $"Tạo log cho chi tiết nhập kho có id: {vaccineReceiptDetailId}",
                     RecordedAt = DateTimeHelper.Now(),
-                    RecordedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System",
+                    RecordedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin",
                     isDeleted = false
                 };
                 await _coldChainLogRepository.CreateColdChainLogAsync(coldChainLog, cancellationToken);
@@ -603,7 +603,7 @@ namespace PetVax.Services.Service
                 existingDetail.VaccineStatus = updateVaccineReceiptDetailDTO.VaccineStatus ?? existingDetail.VaccineStatus;
                 existingDetail.Notes = updateVaccineReceiptDetailDTO.Notes ?? existingDetail.Notes;
                 existingDetail.ModifiedAt = DateTimeHelper.Now();
-                existingDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                existingDetail.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin";
                 var updatedId = await _vaccineReceiptDetailRepository.UpdateVaccineReceiptDetailAsync(existingDetail, cancellationToken);
 
                 // Cập nhật ColdChainLog nếu có
@@ -620,7 +620,7 @@ namespace PetVax.Services.Service
                         coldChainLog.Event = updateVaccineReceiptDetailDTO.ColdChainLog.Event ?? coldChainLog.Event;
                         coldChainLog.Notes = updateVaccineReceiptDetailDTO.ColdChainLog.Notes ?? coldChainLog.Notes;
                         coldChainLog.ModifiedAt = DateTimeHelper.Now();
-                        coldChainLog.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                        coldChainLog.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin";
                         await _coldChainLogRepository.UpdateColdChainLogAsync(coldChainLog, cancellationToken);
                     }
                 }

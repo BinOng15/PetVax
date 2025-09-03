@@ -54,7 +54,7 @@ namespace PetVax.Services.Service
                 vaccineReceipt.ReceiptDate = DateTimeHelper.Now();
                 vaccineReceipt.ReceiptCode = "RECEIPT" + new Random().Next(100000, 1000000).ToString();
                 vaccineReceipt.CreatedAt = DateTimeHelper.Now();
-                vaccineReceipt.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                vaccineReceipt.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin";
                 // Call repository to create the vaccine receipt
                 int createdId = await _vaccineReceiptRepository.CreateVaccineReceiptAsync(vaccineReceipt, cancellationToken);
                 if (createdId <= 0)
@@ -397,7 +397,7 @@ namespace PetVax.Services.Service
                 // Map the updated fields
                 existingReceipt.ReceiptDate = updateVaccineReceiptDTO.ReceiptDate ?? existingReceipt.ReceiptDate;
                 existingReceipt.ModifiedAt = DateTimeHelper.Now();
-                existingReceipt.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                existingReceipt.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin";
                 int updatedId = await _vaccineReceiptRepository.UpdateVaccineReceiptAsync(existingReceipt, cancellationToken);
                 if (updatedId <= 0)
                 {

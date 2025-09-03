@@ -529,7 +529,7 @@ namespace PetVax.Services.Service
                             // Update microchip item status
                             existingItem.Status = "Inactive";
                             existingItem.ModifiedAt = DateTimeHelper.Now();
-                            existingItem.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+                            existingItem.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Vet";
                             await _microchipItemRepository.UpdateMicrochipItemAsync(existingItem, cancellationToken);
 
                             // Update corresponding microchip status
@@ -546,8 +546,9 @@ namespace PetVax.Services.Service
                     microchipItem.PetId = petId;
                     microchipItem.IsUsed = true;
                     microchipItem.Status = "Active";
+                    microchipItem.InstallationDate = DateTimeHelper.Now();
                     microchipItem.ModifiedAt = DateTimeHelper.Now();
-                    microchipItem.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+                    microchipItem.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Vet";
 
                     // Update the new microchip status to Active
                     var newMicrochip = await _microchipRepository.GetMicrochipByIdAsync(microchipItem.MicrochipId, cancellationToken);

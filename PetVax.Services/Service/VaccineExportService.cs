@@ -54,7 +54,7 @@ namespace PetVax.Services.Service
                 vaccineExport.ExportDate = DateTimeHelper.Now();
                 vaccineExport.ExportCode = "EXPORT" + new Random().Next(100000, 1000000).ToString();
                 vaccineExport.CreatedAt = DateTimeHelper.Now();
-                vaccineExport.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+                vaccineExport.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Admin";
 
                 int createdId = await _vaccineExportRepository.CreateVaccineExportAsync(vaccineExport, cancellationToken);
                 if (createdId <= 0)

@@ -218,7 +218,7 @@ namespace PetVax.Services.Service
                     {
                         Code = 200,
                         Success = false,
-                        Message = "Lô vaccine không tồn tại",
+                        Message = "Lô vaccine không tồn tại hoặc đã hết hạn",
                         Data = null
                     };
                 }

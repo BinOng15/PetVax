@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetVax.BusinessObjects.Helpers;
 using PetVax.BusinessObjects.Models;
 using PetVax.Repositories.IRepository;
 using PetVax.Repositories.Repository.BaseResponse;
@@ -47,7 +48,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VaccineBatches
                 .Include(vb => vb.Vaccine)
-                .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false)
+                .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false && vb.ExpiryDate > DateTimeHelper.Now())
                 .FirstOrDefaultAsync(vb => vb.VaccineBatchId == vaccineBatchId, cancellationToken);
         }
 
@@ -63,7 +64,7 @@ namespace PetVax.Repositories.Repository
         {
             return await _context.VaccineBatches
                 .Include(vb => vb.Vaccine)
-                .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false)
+                .Where(vb => vb.isDeleted == false && vb.Vaccine.isDeleted == false && vb.ExpiryDate > DateTimeHelper.Now())
                 .FirstOrDefaultAsync(vb => vb.Vaccine.VaccineId == vaccineId, cancellationToken);
         }
 

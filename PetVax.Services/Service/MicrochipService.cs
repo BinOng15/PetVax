@@ -183,7 +183,7 @@ namespace PetVax.Services.Service
                 }    
                 microchipItem.Name = request.createMicrochipItemRequest.Name;
                 microchipItem.Description = request.createMicrochipItemRequest.Description;
-                microchipItem.InstallationDate = request.createMicrochipItemRequest.InstallationDate;
+                microchipItem.InstallationDate = DateTimeHelper.Now();
                 microchipItem.CreatedAt = DateTimeHelper.Now();
                 microchipItem.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
                 microchipItem.Status = "Active";

@@ -41,7 +41,7 @@ namespace PetVax.Repositories.Repository
         public async Task<int> GetTotalVouchersAsync(CancellationToken cancellationToken)
         {
             return await _context.Vouchers
-                .Where(v => v.isDeleted == false)
+                .Where(v => v.isDeleted == false && v.ExpirationDate > DateTimeHelper.Now())
                 .CountAsync(cancellationToken);
         }
 

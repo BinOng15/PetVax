@@ -297,9 +297,11 @@ namespace PetVax.Services.Service
                             Data = null
                         };
                     }
-                    // Check if voucher belongs to customer and status == 1 (Available)
-                    var customerVoucher = await _customerVoucherRepository.GetCustomerVoucherByCustomerIdAndVoucherIdAsync(createPaymentRequest.CustomerId, voucher.VoucherId, cancellationToken);
-                    if (customerVoucher == null || customerVoucher.Status != EnumList.VoucherStatus.Available)
+                    // Check if voucher belongs to customer and has any available status
+                    var customerVouchers = await _customerVoucherRepository.GetCustomerVouchersByCustomerIdAsync(createPaymentRequest.CustomerId, cancellationToken);
+                    var availableCustomerVoucher = customerVouchers?.FirstOrDefault(cv => cv.Status == EnumList.VoucherStatus.Available && cv.VoucherId == voucher.VoucherId);
+
+                    if (availableCustomerVoucher == null)
                     {
                         _logger.LogError("CreatePaymentAsync: Voucher {VoucherCode} does not belong to customer {CustomerId} or is not available", createPaymentRequest.VoucherCode, createPaymentRequest.CustomerId);
                         return new BaseResponse<PaymentResponseDTO>
@@ -310,6 +312,7 @@ namespace PetVax.Services.Service
                             Data = null
                         };
                     }
+
                     var discountPercent = voucher.DiscountAmount;
                     var discountAmount = amount * (discountPercent / 100m);
                     amount -= discountAmount;
@@ -332,7 +335,7 @@ namespace PetVax.Services.Service
                 payment.PaymentCode = $"PAY{DateTime.UtcNow:yyyyMMddHHmmssfff}{Guid.NewGuid().ToString("N")[..6]}";
                 payment.PaymentDate = DateTimeHelper.Now();
                 payment.CreatedAt = DateTimeHelper.Now();
-                payment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+                payment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Staff";
 
                 string? paymentUrl = null;
                 if (createPaymentRequest.PaymentMethod == EnumList.PaymentMethod.BankTransfer)
@@ -682,7 +685,7 @@ namespace PetVax.Services.Service
                             TransactionDate = DateTimeHelper.Now(),
                             Description = $"Tích điểm từ thanh toán {payment.PaymentCode}",
                             CreatedAt = DateTimeHelper.Now(),
-                            CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system",
+                            CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Staff",
                         };
                         await _pointTransactionRepository.CreatePointTransactionAsync(pointTransaction, cancellationToken);
 
@@ -948,7 +951,7 @@ namespace PetVax.Services.Service
                             TransactionDate = DateTimeHelper.Now(),
                             Description = $"Tích điểm từ thanh toán {payment.PaymentCode}",
                             CreatedAt = DateTimeHelper.Now(),
-                            CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system",
+                            CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Staff",
                         };
                         // Save point transaction
                         await _pointTransactionRepository.CreatePointTransactionAsync(pointTransaction, cancellationToken);
@@ -1169,7 +1172,7 @@ namespace PetVax.Services.Service
                 newPayment.PaymentCode = $"PAY{DateTime.UtcNow:yyyyMMddHHmmssfff}{Guid.NewGuid().ToString("N")[..6]}";
                 newPayment.PaymentDate = DateTimeHelper.Now();
                 newPayment.CreatedAt = DateTimeHelper.Now();
-                newPayment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+                newPayment.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Staff";
 
                 if (retryPaymentRequest.PaymentMethod == EnumList.PaymentMethod.BankTransfer)
                 {

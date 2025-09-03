@@ -314,7 +314,7 @@ namespace PetVax.Services.Service
                             {
                                 MicrochipId = item.MicrochipId,
                                 Name = item.Microchip.Name,
-                                Description = item.Description,
+                                Description = item.Microchip.Description,
                                 InstallationDate = item.InstallationDate,
                                 Status = item.Status
                             });
